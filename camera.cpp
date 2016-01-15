@@ -19,7 +19,7 @@ mat4 rotX(float theta)
 	return newM;
 }
 
-//Rotates around the y axis
+//Rotates around the y axis 
 mat4 rotY(float theta)
 {
 	/*mat4 newM;
