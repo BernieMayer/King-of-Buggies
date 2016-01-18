@@ -10,6 +10,11 @@ InputManager::InputManager()
 InputManager::~InputManager()
 {
 }
+// Updates and returns input for all players
+Input* InputManager::getInput()
+{
+	return 0;
+}
 // Used to notify game manager of the amount of forward/backward acceleration 
 // the player is requesting
 void InputManager::notifyForward(float accel)

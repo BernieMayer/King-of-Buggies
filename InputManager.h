@@ -1,9 +1,25 @@
 #pragma once
+
+struct Input
+{
+	float forward;
+	float turn;
+	float camV;
+	float camH;
+
+	bool drift;
+	bool powerup;
+	bool menu;
+
+	int playerNum;
+};
+
 class InputManager
 {
 public:
 	InputManager();
 	~InputManager();
+	Input* getInput();
 private:
 	// Used to notify game manager of the amount of forward/backward acceleration 
 	// the player is requesting
