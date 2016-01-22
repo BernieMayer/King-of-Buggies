@@ -1,16 +1,8 @@
-#include "camera.h"
+#include "Camera.h"
 
 //Rotates around the x axis
 mat4 rotX(float theta)
 {
-	/*mat4 newM;
-	newM.identity();
-
-	newM.m[1][1] = cos(theta);
-	newM.m[1][2] = -sin(theta);
-	newM.m[2][1] = sin(theta);
-	newM.m[2][2] = cos(theta);*/
-
 	mat4 newM (	1, 0, 0, 0,
 				0, cos(theta), sin(theta), 0,
 				0, -sin(theta), cos(theta), 0,
@@ -22,14 +14,6 @@ mat4 rotX(float theta)
 //Rotates around the y axis 
 mat4 rotY(float theta)
 {
-	/*mat4 newM;
-	newM.identity();
-
-	newM.m[0][0] = cos(theta);
-	newM.m[0][2] = sin(theta);
-	newM.m[2][0] = -sin(theta);
-	newM.m[2][2] = cos(theta);
-	*/
 	mat4 newM (	cos(theta), 0, -sin(theta), 0,
 				0, 1, 0, 0,
 				sin(theta), 0, cos(theta), 0,
@@ -41,14 +25,6 @@ mat4 rotY(float theta)
 //Rotates around the z axis
 mat4 rotZ(float theta)
 {
-	/*mat4 newM;
-	newM.identity();
-	
-	newM.m[0][0] = cos(theta);
-	newM.m[0][1] = -sin(theta);
-	newM.m[1][0] = sin(theta);
-	newM.m[1][1] = cos(theta);*/
-
 	mat4 newM (	cos(theta), sin(theta), 0, 0,
 				-sin(theta), cos(theta), 0, 0,
 				0, 0, 1, 0,
@@ -95,24 +71,6 @@ void Camera::changeDir(vec3 _dir)
 
 mat4 Camera::getMatrix()
 {
-	/*mat4 lookat;
-
-	lookat.m[0][0] = right.x;
-	lookat.m[0][1] = right.y;
-	lookat.m[0][2] = right.z;
- 
-	lookat.m[1][0] = up.x;
-	lookat.m[1][1] = up.y;
-	lookat.m[1][2] = up.z;
-
-	lookat.m[2][0] = -dir.x;
-	lookat.m[2][1] = -dir.y;
-	lookat.m[2][2] = -dir.z;
-
-	mat4 translation;
-	translation.m[0][3] = -pos.x;
-	translation.m[1][3] = -pos.y;
-	translation.m[2][3] = -pos.z;*/
 
 	mat4 lookat (	right.x, up.x, -dir.x, -pos.x,
 					right.y, up.y, -dir.y, -pos.y,
@@ -120,7 +78,7 @@ mat4 Camera::getMatrix()
 					0, 0, 0, 1);
 	
 
-	return lookat*translation;
+	return lookat;	// *translation;
 }
 
 void Camera::rotateView(float x, float y)
@@ -131,12 +89,12 @@ void Camera::rotateView(float x, float y)
 
 	if(cameraMode == FREEROAM_CAMERA)
 	{
-		vec3 newDir = MxV(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY), dir);
+		vec3 newDir = vec3(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY) * vec4(dir, 1));
 		changeDir(newDir);
 	}
 	else if(cameraMode == MODELVIEWER_CAMERA)
 	{
-		pos =  MxV(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY), pos - viewCenter) + viewCenter;	//Rotate position around center
+		pos =  vec3(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY) * vec4(pos - viewCenter, 1)) + viewCenter;	//Rotate position around center
 
 		changeDir(viewCenter-pos);
 	}
@@ -149,7 +107,7 @@ void Camera::rotateViewAround(float x, float y)
 	float thetaY = -y*right.y + x*up.y;
 	float thetaZ = -y*right.z + x*up.z;
 
-	pos =  rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY)* pos - viewCenter + viewCenter;	//Rotate position around center
+	pos =  vec3(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY)* vec4(pos - viewCenter, 1) )+ viewCenter;	//Rotate position around center
 
 	changeDir(viewCenter-pos);
 }
