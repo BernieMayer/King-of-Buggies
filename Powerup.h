@@ -3,8 +3,8 @@
 
 #include "Entity.h"
 
-class Powerup: public Entity {
+class Powerup : public Entity {
 	int type;
 };
 
-#endif
+#endif //ENTITY_H
