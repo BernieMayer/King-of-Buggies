@@ -84,7 +84,9 @@
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Coin.h" />
     <ClInclude Include="DrivingController.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
@@ -99,6 +101,8 @@
     <ClInclude Include="MeshObject.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PlayerInfo.h" />
+    <ClInclude Include="Powerup.h" />
+    <ClInclude Include="PowerupBox.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Timer.h" />
@@ -106,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
