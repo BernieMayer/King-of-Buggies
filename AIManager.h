@@ -6,7 +6,7 @@
 
 class AIManager {
 public:
-	void updateAI(GameState state); // what type should this return?
+	Input* updateAI(GameState state);
 };
 
 #endif // AIMANAGER_H
