@@ -1,10 +1,19 @@
+#ifndef CAMERA_H
+#define CAMERA_H
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-#define minZoom 0.05
-#define maxZoom 5.0
+#include <cstdio>
+
+const float minZoom = 0.05;
+const float maxZoom = 5.0;
 
 const int FREEROAM_CAMERA = 0;
 const int MODELVIEWER_CAMERA = 1;
+
+using namespace glm;
 
 class Camera
 {
@@ -52,3 +61,6 @@ public:
 	void zoom(float scale);
 
 };
+
+
+#endif //CAMERA_H

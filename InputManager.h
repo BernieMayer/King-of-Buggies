@@ -1,4 +1,5 @@
-#pragma once
+#ifndef INPUTMANAGER_H
+#define INPUTMANAGER_H
 
 struct Input
 {
@@ -42,3 +43,4 @@ private:
 	void menuButtonPressed();
 };
 
+#endif //INPUTMANAGER_H
