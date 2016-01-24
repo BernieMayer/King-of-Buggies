@@ -1,5 +1,5 @@
-#ifndef MESHINFO_H
-#define MESHINFO_H
+#ifndef MATERIAL_H
+#define MATERIAL_H
 
 class Material
 {
@@ -9,4 +9,4 @@ class Material
 
 
 
-#endif	//MESHINFO_H
+#endif	//MATERIAL_H

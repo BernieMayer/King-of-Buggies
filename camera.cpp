@@ -1,3 +1,6 @@
+#ifndef CAMERA_CPP
+#define CAMERA_CPP
+
 #include "Camera.h"
 
 //Rotates around the x axis
@@ -166,3 +169,6 @@ void Camera::changeViewCenter(vec3 _viewCenter)
 	printf("viewCenter - (%f, %f, %f)\n", viewCenter.x, viewCenter.y, viewCenter.z);
 	changeDir(viewCenter - pos);
 }
+
+
+#endif //CAMERA_CPP

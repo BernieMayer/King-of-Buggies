@@ -1,3 +1,6 @@
+#ifndef GAMEPAD_CPP
+#define GAMEPAD_CPP
+
 #include "Windows.h"
 #include "Gamepad.h"
 
@@ -267,3 +270,5 @@ bool Gamepad::GetButtonDown(int a_iButton)
 {
 	return bGamepad_ButtonsDown[a_iButton];
 }
+
+#endif

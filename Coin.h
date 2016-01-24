@@ -2,4 +2,4 @@
 
 class Coin: public Entity {
 
-}
+};
