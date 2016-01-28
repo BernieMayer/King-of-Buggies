@@ -5,6 +5,8 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="material.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
