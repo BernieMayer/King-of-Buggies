@@ -5,8 +5,10 @@
 #include <iostream>
 #include <GL/glew.h>  
 #include <GLFW/glfw3.h>  
+#include <glm/glm.hpp>
 #include <stdio.h>  
 #include <stdlib.h>  
+#include <vector>
 
 
 
@@ -103,22 +105,41 @@ void inputTest(GLFWwindow* window) {
 	}
 }
 
+
+void renderTest(GLFWwindow* window)
+{
+	printf("Begin rendering test\n");
+
+	Renderer render = Renderer(window);
+
+	vector<vec3> mesh;
+	vector<vec3> normals;
+	vector<unsigned int> indices;
+
+	unsigned int square = render.generateObjectID();
+	render.assignCube(square, 1.f, &mesh, &normals, &indices);
+	Material mat = Material ();
+	render.assignMaterial(square, &mat);
+
+
+	unsigned int light = render.generateLightObject();
+	render.setLightPosition(light, vec3(10.0, 1.0, 10.0));
+
+
+	render.renderLoop();
+
+	printf("End rendering test\n");
+}
+
 // A quick example of how to use this
 int main() {
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
 		return -1;
 
-	inputTest(window);
+	//inputTest(window);
+	renderTest(window);
 
-	//Set a background color  
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
-	printf("Debugging\n");
-
-	Renderer render = Renderer(window);
-	render.renderLoop();
-	printf("Done\n");
 
 	return 0;
 }

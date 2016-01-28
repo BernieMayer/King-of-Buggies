@@ -20,7 +20,7 @@ struct VAO{
 };
 
 struct VBO{
-	enum { VERT = 0, NORMALS, UVS, COUNT };
+	enum { VERT = 0, NORMALS, UVS, INDICES, COUNT };
 };
 
 const unsigned int DEFAULT_WIDTH = 800;
@@ -38,33 +38,55 @@ private:
 		vector<vec2>* uvs;
 		vector<unsigned int>* indices;
 		Material* mat;
-		vec4 color;
+		vec3 color;
 		int shadowBehaviour;
 		bool deleted;
 
 		//Information about object orientation
-		vec3 position;
-		vec3 forward;
-		vec3 up;
+		mat4 transform;
+	};
+
+	class LightInfo
+	{
+	public:
+		vec3 pos;
+		bool deleted;
+
+		LightInfo();
+
 	};
 
 	GLFWwindow * window;
 	vector<ObjectInfo> objects;		//Objects to be drawn
+	vector<LightInfo> lights;
 
-	mat4 transform;		//Transformation matrix
+	//Transform matrices
+	mat4 projection;
+	mat4 modelView;
+
 
 	GLuint vao[VAO::COUNT];
 	GLuint vbo[VBO::COUNT];
+
+	bool debugging = false;
 
 	/**
 	* Functions
 	**/
 
-	void initializeVAOs();
-	void loadBuffers(Material* mat);
+	void initializeVAOs();		
+	bool loadBuffers(const ObjectInfo& object);		
+	bool loadVertBuffer(const ObjectInfo& object);	
+	bool loadVertNormalBuffer(const ObjectInfo& object);
+	bool loadVertUVBuffer(const ObjectInfo& object);	
+	bool loadVertNormalUVBuffer(const ObjectInfo& object);
+
+	//Debugging
+	void debug_message(string message);		
 
 public:
 	Renderer(GLFWwindow* _window);
+	~Renderer();
 	void renderLoop();
 
 	//Transformations
@@ -79,12 +101,18 @@ public:
 	void assignNormals(unsigned int object, vector<vec3>* normals);
 	void assignUVs(unsigned int object, vector<vec2>* uvs);
 	void assignIndices(unsigned int object, vector<unsigned int>* indices);		//If no indices are assigned, will traverse mesh in order
-	void assignColor(unsigned int object, const vec4& color);
+	void assignColor(unsigned int object, vec3 color);
 	void setShadowBehaviour(int object, int behaviour);
-	void assignMaterial(unsigned int object, Material* mat);		
+	void assignMaterial(unsigned int object, Material* mat);
+	
+	void assignCube(unsigned int object, float width, 
+					vector<vec3>* mesh,
+					vector<vec3>* normals,
+					vector<unsigned int>* indices);
 
 	//Lights
 	unsigned int generateLightObject();
+	void setLightPosition(unsigned int object, vec3 lightPos);
 	void assignLightMesh(unsigned int object, vector<vec3>* mesh);
 	void assignLightColor(unsigned int object, const vec4& color);
 	void assignLightIntensity(unsigned int object, float intensity);
@@ -92,14 +120,15 @@ public:
 	void disableShadowCasting(unsigned int object);
 
 	//Drawing calls
-	void clearBuffers();
+	void clearDrawBuffers();
 	void draw(unsigned int object);
-	void draw(vector<unsigned int> objects);	//Preferred over individual calls, easier to optimize
+	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
 
 	//Delete objects
 	void deleteDrawableObject(int object);
 	void deleteLightObject(int object);
+	void deleteIDs();
 
 };
 

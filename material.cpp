@@ -3,7 +3,7 @@
 
 #include "material.h"
 
-Material::Material(string shader_name)
+Material::Material()
 {
 	//Load shaders
 	string vertShaderSource = loadShaderStringFromFile(shaderDir + shader_name +".vert");
@@ -16,7 +16,20 @@ bool Material::usingVertices(){ return verticesUsed; }
 bool Material::usingNormals(){ return normalsUsed; }
 bool Material::usingUvs(){ return uvsUsed; }
 
+void Material::useShader(){ glUseProgram(programID); }
 
+void Material::loadUniforms(const mat4& transform, vec3 light, vec3 color)
+{
+	GLuint uniformLocation = glGetUniformLocation(programID, "transform");
+	glUniformMatrix4fv(uniformLocation, 1, false, &transform[0][0]);
+
+	uniformLocation = glGetUniformLocation(programID, "light");
+	glUniform3f(uniformLocation, light.x, light.y, light.z);
+
+	uniformLocation = glGetUniformLocation(programID, "color");
+	glUniform3f(uniformLocation, color.x, color.y, color.z);
+	
+}
 
 
 
@@ -150,6 +163,7 @@ string loadShaderStringFromFile(const string & filePath)
 	}
 	return shaderCode;
 }
+
 
 
 #endif	//MATERIAL_CPP

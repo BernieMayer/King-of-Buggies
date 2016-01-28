@@ -20,17 +20,19 @@ protected:
 	const string shader_name = "diffuse";
 	const bool verticesUsed = true;
 	const bool normalsUsed = true;
-	const bool uvsUsed = true;
+	const bool uvsUsed = false;
 public:
-	Material(string shader_name);
+	Material();
 
-	void loadUniforms(mat4 transform, vec3 light);
+	void loadUniforms(const mat4& transform, vec3 light, vec3 color);
 	void useShader();
 
 	bool usingVertices();
 	bool usingNormals();
 	bool usingUvs();
 };
+
+
 
 
 /**
