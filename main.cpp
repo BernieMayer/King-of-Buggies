@@ -66,6 +66,7 @@ void inputTest(GLFWwindow* window) {
 	float turn = 0;
 
 	while (true) {
+		glfwPollEvents();
 		Input input = manager.getInput(1);
 
 		if (input.drift) {

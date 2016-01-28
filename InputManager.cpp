@@ -4,8 +4,41 @@
 #include "InputManager.h"
 #include "Gamepad.h"
 
+float kForward;
+float kTurn;
+float lastMouseX;
+float kCamH;
+float lastMouseY;
+float kCamV;
+bool kPowerup;
+bool kDrift;
+bool kMenu;
+
 void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
-		
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+		kForward += 1;
+	}
+	else if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
+		kForward -= 1;
+	}
+	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+		kForward -= 1;
+	}
+	else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
+		kForward += 1;
+	}
+	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+		kTurn -= 1;
+	}
+	else if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
+		kTurn += 1;
+	}
+	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+		kTurn += 1;
+	}
+	else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
+		kTurn -= 1;
+	}
 }
 
 InputManager::InputManager(GLFWwindow* w)
@@ -13,6 +46,13 @@ InputManager::InputManager(GLFWwindow* w)
 	window = w;
 
 	glfwSetKeyCallback(window, keyboard);
+	kForward = 0;
+	kTurn = 0;
+	kCamH = 0;
+	kCamV = 0;
+	kDrift = false;
+	kPowerup = false;
+	kMenu = false;
 
 	numPlayers = 1;
 
@@ -70,6 +110,12 @@ Input InputManager::getInput(int playerNum)
 		gamepads[playerNum].RefreshState();
 	} else if (playerNum == 1) {
 		// use Keyboard
+		input.forward = kForward;
+		input.turn = kTurn;
+		input.camH = kCamH;
+		input.camV = kCamV;
+		input.drift = kDrift;
+		input.menu = kMenu;
 	} else {
 		input.forward = 0;
 		input.turn = 0;
