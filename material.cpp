@@ -70,11 +70,16 @@ GLuint CreateShaderProgram(const string & vsSource,
 		NULL);
 
 	// Compile the Shader Sources, check for errors
+	cout << "Compiling vertex shader" << endl;
 	glCompileShader(vsID);
-	glCompileShader(fsID);
+	bool vertSuccess = checkCompileStatus(vsID);
 
-	if (!checkCompileStatus(vsID) ||
-		!checkCompileStatus(fsID))
+	cout << "Compiling fragment shader" << endl;
+	glCompileShader(fsID);
+	bool fragSuccess = checkCompileStatus(fsID);
+
+	if (!vertSuccess ||
+		!fragSuccess)
 	{
 		// Clean up others that were created
 		glDeleteProgram(programID);

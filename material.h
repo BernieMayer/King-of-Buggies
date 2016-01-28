@@ -11,7 +11,7 @@
 using namespace std;
 using namespace glm;
 
-const string shaderDir = "./shaders";
+const string shaderDir = "./shaders/";
 
 class Material
 {

@@ -147,7 +147,7 @@ void Renderer::clearDrawBuffers()
 
 void Renderer::draw(unsigned int id)
 {
-	ObjectInfo object = objects[id];
+	ObjectInfo& object = objects[id];
 	if (object.deleted)
 		return;
 
@@ -178,6 +178,7 @@ void Renderer::draw(vector<unsigned int> list)
 
 void Renderer::drawAll()
 {
+
 	for (unsigned int i = 0; i < objects.size(); i++)
 	{
 		draw(i);
@@ -202,7 +203,7 @@ bool Renderer::loadBuffers(const ObjectInfo& object)
 		debug_message("loadBuffers: Invalid material file\n");
 	}
 
-	if (object.indices == NULL)
+	if (object.indices != NULL)
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[VBO::INDICES]);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
