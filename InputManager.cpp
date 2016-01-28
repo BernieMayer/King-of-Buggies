@@ -7,8 +7,10 @@
 float kForward;
 float kTurn;
 float lastMouseX;
+float currentMouseX;
 float kCamH;
 float lastMouseY;
+float currentMouseY;
 float kCamV;
 bool kPowerup;
 bool kDrift;
@@ -30,7 +32,7 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 		deltaX = minDeltaX;
 	}
 	kCamH = map(deltaX, minDeltaX, maxDeltaX, -1.0, 1.0);
-	lastMouseX = x;
+	currentMouseX = x;
 
 	float deltaY = y - lastMouseY;
 	float maxDeltaY = 500;
@@ -42,7 +44,7 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 		deltaY = minDeltaY;
 	}
 	kCamV = map(deltaY, minDeltaY, maxDeltaY, -1.0, 1.0);
-	lastMouseY = y;
+	currentMouseY = y;
 }
 
 // Handles mouse button input
@@ -173,6 +175,8 @@ Input InputManager::getInput(int playerNum)
 		input.drift = kDrift;
 		input.powerup = kPowerup;
 		input.menu = kMenu;
+		lastMouseX = currentMouseX;
+		lastMouseY = currentMouseY;
 	} else {
 		input.forward = 0;
 		input.turn = 0;
