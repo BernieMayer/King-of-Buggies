@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 
+
 Renderer::ObjectInfo::ObjectInfo()
 { 
 	mesh = NULL;
@@ -23,6 +24,10 @@ Renderer::Renderer(GLFWwindow* _window) :window(_window)
 {
 	printf("Renderer constructor\n");
 	window = _window;
+
+	glGenVertexArrays(VAO::COUNT, vao);
+	glGenBuffers(VBO::COUNT, vbo);
+
 }
 
 void Renderer::renderLoop()
@@ -97,7 +102,37 @@ void Renderer::assignIndices(unsigned int id, vector<unsigned int>* indices)
 * Rendering functionality
 **/
 
+void Renderer::initializeVAOs()
+{
+	//Vertex only VAO
+	glBindVertexArray(vao[VAO::VERT]);
+	
+	//Vertex vbo
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VERT]);
+	glVertexAttribPointer(
+		0,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
 
+	//Vertex and Normal VAO
+	glBindVertexArray(vao[VAO::VERT_NORMALS]);
+
+	//Vertex vbo
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VERT]);
+	glVertexAttribPointer(
+		0,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+}
 
 
 #endif // RENDERER_CPP

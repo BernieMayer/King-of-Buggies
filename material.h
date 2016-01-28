@@ -9,6 +9,7 @@
 #include <glm/glm.hpp>
 
 using namespace std;
+using namespace glm;
 
 const string shaderDir = "./shaders";
 
@@ -17,11 +18,18 @@ class Material
 protected:
 	GLuint programID;
 	const string shader_name = "diffuse";
+	const bool verticesUsed = true;
+	const bool normalsUsed = true;
+	const bool uvsUsed = true;
 public:
 	Material(string shader_name);
 
 	void loadUniforms(mat4 transform, vec3 light);
-	void useMaterial();
+	void useShader();
+
+	bool usingVertices();
+	bool usingNormals();
+	bool usingUvs();
 };
 
 

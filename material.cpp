@@ -12,7 +12,9 @@ Material::Material(string shader_name)
 	programID = CreateShaderProgram(vertShaderSource, fragShaderSource);
 }
 
-
+bool Material::usingVertices(){ return verticesUsed; }
+bool Material::usingNormals(){ return normalsUsed; }
+bool Material::usingUvs(){ return uvsUsed; }
 
 
 

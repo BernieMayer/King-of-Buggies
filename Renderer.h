@@ -12,7 +12,16 @@
 using namespace std;
 using namespace glm;
 
-enum SHADOW_BEHAVIOUR {CAST=0, RECEIVE, CAST_AND_RECEIVE, NONE};
+struct SHADOW_BEHAVIOUR{
+	enum { CAST = 0, RECEIVE, CAST_AND_RECEIVE, NONE };
+};
+struct VAO{
+	enum { VERT = 0, VERT_NORMALS, VERT_UVS, VERT_NORMALS_UVS, COUNT };
+};
+
+struct VBO{
+	enum { VERT = 0, NORMALS, UVS, COUNT };
+};
 
 const unsigned int DEFAULT_WIDTH = 800;
 const unsigned int DEFAULT_HEIGHT = 800;
@@ -44,10 +53,14 @@ private:
 
 	mat4 transform;		//Transformation matrix
 
+	GLuint vao[VAO::COUNT];
+	GLuint vbo[VBO::COUNT];
+
 	/**
 	* Functions
 	**/
 
+	void initializeVAOs();
 	void loadBuffers(Material* mat);
 
 public:
