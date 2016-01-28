@@ -1,22 +1,30 @@
+#include <GL/glew.h>  
+#include <GLFW/glfw3.h>
+
 #include "InputManager.h"
 #include "Gamepad.h"
 
-InputManager::InputManager()
+void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
+		
+}
+
+InputManager::InputManager(GLFWwindow* w)
 {
+	window = w;
+
+	glfwSetKeyCallback(window, keyboard);
+
 	numPlayers = 1;
 
 	for (int i = 1; i < 5; i++) {
 		Gamepad *temp = new Gamepad(i);
 
+		gamepads[i] = *temp;
 		if (temp->Connected()) {
-			gamepads[i] = *temp;
 			// Allows for a player when no controllers connected
 			if (numPlayers != 1) {
 				numPlayers += 1;
 			}
-		}
-		else {
-			gamepads[i] = NULL;
 		}
 	}
 }
@@ -51,10 +59,13 @@ Input InputManager::getInput(int playerNum)
 			input->camV = gamepads[playerNum].RightStick_Y();
 		}
 
-		input->drift = gamepads[playerNum].GetButtonDown(XINPUT_GAMEPAD_RIGHT_SHOULDER);
-		input->powerup = gamepads[playerNum].GetButtonPressed(XINPUT_GAMEPAD_B);
+		// Using XINPUT_GAMEPAD_RIGHT_SHOULDER activates when start is pressed for some reason...
+		input->drift = gamepads[playerNum].GetButtonPressed(9);
+		// Using XINPUT_GAMEPAD_B never activates for some reason...
+		input->powerup = gamepads[playerNum].GetButtonPressed(1);
 		
-		input->menu = gamepads[playerNum].GetButtonDown(XINPUT_GAMEPAD_START);
+		// Same problem as with B button...
+		input->menu = gamepads[playerNum].GetButtonPressed(12);
 
 		gamepads[playerNum].RefreshState();
 	} else if (playerNum == 1) {

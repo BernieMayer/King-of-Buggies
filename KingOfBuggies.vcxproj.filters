@@ -5,7 +5,12 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="Main.cpp" />
+<<<<<<< HEAD
     <ClCompile Include="InputManager.cpp" />
+=======
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="material.cpp" />
+>>>>>>> origin/master
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

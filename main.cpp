@@ -1,5 +1,7 @@
 #include "Gamepad.h"
 #include "Renderer.h"
+#include "InputManager.h"
+#include "Input.h"
 #include <iostream>
 #include <GL/glew.h>  
 #include <GLFW/glfw3.h>  
@@ -54,42 +56,59 @@ GLFWwindow* initializeWindow()
 
 }
 
-
-// A quick example of how to use this
-int main() {
-
-	/*Gamepad* controller;
-	controller = new Gamepad(1);
+void inputTest(GLFWwindow* window) {
+	InputManager* manager = new InputManager(window);
 
 	float LX = 0;
 	float LY = 0;
 
-	while (true) {
-		controller->Update();
+	float forward = 0;
+	float turn = 0;
 
-		if (controller->GetButtonPressed(XButtons.A)) {
-			std::cout << "A\n";
+	while (true) {
+		Input input = manager->getInput(1);
+
+		if (input.drift) {
+			std::cout << "Drift\n";
 		}
 
-		if (!(controller->LStick_InDeadzone()) &&
-			(controller->LeftStick_X() != LX ||
-				controller->LeftStick_Y() != LY))
+		if (input.powerup) {
+			std::cout << "Powerup\n";
+		}
+
+		if (input.menu) {
+			std::cout << "Menu\n";
+		}
+
+		if (input.camH != LX ||
+			input.camV != LY)
 		{
-			LX = controller->LeftStick_X();
-			LY = controller->LeftStick_Y();
+			LX = input.camH;
+			LY = input.camV;
 			std::cout << "X: " << LX << '\n';
 			std::cout << "Y: " << LY << '\n';
 			std::cout << '\n';
 		}
 
-		controller->RefreshState();
+		if (input.forward != forward) {
+			forward = input.forward;
+			std::cout << "Forward: " << forward << "\n";
+		}
+
+		if (input.turn != turn) {
+			turn = input.turn;
+			std::cout << "Turn: " << turn << "\n";
+		}
 	}
+}
 
-	return 0;*/
-
+// A quick example of how to use this
+int main() {
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
 		return -1;
+
+	inputTest(window);
 
 	//Set a background color  
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
