@@ -11,6 +11,7 @@ uniform vec3 color;
 
 void main(){
     
+    vec3 red = vec3(1.0, 0.0, 0.0);
     vec3 lightDir = normalize(light-worldPosition);
 
     fragColor = (0.2 + 0.8*clamp(dot(lightDir, fragNormal), 0, 1))*color;

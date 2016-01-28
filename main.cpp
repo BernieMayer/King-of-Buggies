@@ -123,7 +123,7 @@ void renderTest(GLFWwindow* window)
 
 
 	unsigned int light = render.generateLightObject();
-	render.setLightPosition(light, vec3(10.0, 1.0, 10.0));
+	render.setLightPosition(light, vec3(0.0, 10.0, 10.0));
 
 
 	render.renderLoop();
