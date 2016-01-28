@@ -5,6 +5,7 @@
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="InputManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -32,5 +33,6 @@
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="VehicleTraits.h" />
+    <ClInclude Include="Input.h" />
   </ItemGroup>
 </Project>

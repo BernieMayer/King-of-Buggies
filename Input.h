@@ -11,8 +11,6 @@ struct Input
 	bool drift;
 	bool powerup;
 	bool menu;
-
-	int playerNum;
 };
 
 #endif //INPUT_H
