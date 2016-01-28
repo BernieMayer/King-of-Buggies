@@ -85,7 +85,6 @@ bool Gamepad::Connected()
 	ZeroMemory(&m_State, sizeof(XINPUT_STATE));
 
 	// Get the state of the gamepad
-	// Unknown exception on this line happens sometimes
 	DWORD Result = XInputGetState(m_iGamepadIndex, &m_State);
 
 	if (Result == ERROR_SUCCESS)

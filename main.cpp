@@ -57,7 +57,7 @@ GLFWwindow* initializeWindow()
 }
 
 void inputTest(GLFWwindow* window) {
-	InputManager* manager = new InputManager(window);
+	InputManager manager = InputManager(window);
 
 	float LX = 0;
 	float LY = 0;
@@ -66,7 +66,7 @@ void inputTest(GLFWwindow* window) {
 	float turn = 0;
 
 	while (true) {
-		Input input = manager->getInput(1);
+		Input input = manager.getInput(1);
 
 		if (input.drift) {
 			std::cout << "Drift\n";
