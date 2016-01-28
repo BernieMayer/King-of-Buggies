@@ -14,6 +14,54 @@ bool kPowerup;
 bool kDrift;
 bool kMenu;
 
+float map(float value, float min, float max, float newMin, float newMax) {
+	return (value - min) * ((newMax - newMin) / (max - min)) + newMin;
+}
+
+// Handles mouse movement
+void mousePosition(GLFWwindow *sender, double x, double y) {
+	float deltaX = x - lastMouseX;
+	float maxDeltaX = 500;
+	float minDeltaX = -500;
+	if (deltaX > maxDeltaX) {
+		deltaX = maxDeltaX;
+	}
+	else if (deltaX < minDeltaX) {
+		deltaX = minDeltaX;
+	}
+	kCamH = map(deltaX, minDeltaX, maxDeltaX, -1.0, 1.0);
+	lastMouseX = x;
+
+	float deltaY = y - lastMouseY;
+	float maxDeltaY = 500;
+	float minDeltaY = -500;
+	if (deltaY > maxDeltaY) {
+		deltaY = maxDeltaY;
+	}
+	else if (deltaY < minDeltaY) {
+		deltaY = minDeltaY;
+	}
+	kCamV = map(deltaY, minDeltaY, maxDeltaY, -1.0, 1.0);
+	lastMouseY = y;
+}
+
+// Handles mouse button input
+void mouseClick(GLFWwindow *sender, int button, int action, int mods) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+		kPowerup = true;
+	}
+	else if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		kPowerup = false;
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+		kDrift = true;
+	}
+	else if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+		kDrift = false;
+	}
+}
+
+// Handles keyboard input
 void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		kForward += 1;
@@ -39,6 +87,12 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
 		kTurn -= 1;
 	}
+	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		kMenu = true;
+	}
+	else if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
+		kMenu = false;
+	}
 }
 
 InputManager::InputManager(GLFWwindow* w)
@@ -46,6 +100,8 @@ InputManager::InputManager(GLFWwindow* w)
 	window = w;
 
 	glfwSetKeyCallback(window, keyboard);
+	glfwSetMouseButtonCallback(window, mouseClick);
+	glfwSetCursorPosCallback(window, mousePosition);
 	kForward = 0;
 	kTurn = 0;
 	kCamH = 0;
@@ -115,6 +171,7 @@ Input InputManager::getInput(int playerNum)
 		input.camH = kCamH;
 		input.camV = kCamV;
 		input.drift = kDrift;
+		input.powerup = kPowerup;
 		input.menu = kMenu;
 	} else {
 		input.forward = 0;
