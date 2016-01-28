@@ -1,46 +1,21 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
-struct Input
-{
-	float forward;
-	float turn;
-	float camV;
-	float camH;
-
-	bool drift;
-	bool powerup;
-	bool menu;
-
-	int playerNum;
-};
+#include "Input.h"
+#include "Gamepad.h"
 
 class InputManager
 {
 public:
 	InputManager();
 	~InputManager();
-	Input* getInput();
+	// Get input for the given player
+	Input getInput(int playerNum);
+	// Returns the number of players
+	int getNumPlayers();
 private:
-	// Used to notify game manager of the amount of forward/backward acceleration 
-	// the player is requesting
-	void notifyForward(float accel);
-	// Used to notify game manager of the amount of turning the player has requested
-	void notifyTurn(float accel);
-	// Used to notify game manager that the player has requested to start a drift
-	void notifyDriftStart();
-	// Used to notify game manager that the player has requested to end a drift
-	void notifyDriftEnd();
-	// Used to notify game manger that the player has requested to use a power-up
-	void notifyPowerup();
-
-	// Used to notify game manager that the player has requested to tilt camera up/down
-	void notifyTiltCameraV(float accel);
-	// Used to notify game manager that the player has requested to tilt camera left/right
-	void notifyTiltCameraH(float accel);
-
-	// Used to notify game manager that the plaayer has pressed the menu button
-	void menuButtonPressed();
+	Gamepad gamepads[4];
+	int numPlayers;
 };
 
 #endif //INPUTMANAGER_H

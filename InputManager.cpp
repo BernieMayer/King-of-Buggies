@@ -1,53 +1,43 @@
 #include "InputManager.h"
 #include "Gamepad.h"
 
-
 InputManager::InputManager()
 {
+	numPlayers = 1;
+
+	for (int i = 1; i < 5; i++) {
+		Gamepad *temp = new Gamepad(i);
+
+		if (temp->Connected()) {
+			gamepads[i] = *temp;
+			// Allows for a player when no controllers connected
+			if (numPlayers != 1) {
+				numPlayers += 1;
+			}
+		}
+		else {
+			gamepads[i] = NULL;
+		}
+	}
 }
 
 
 InputManager::~InputManager()
 {
 }
+
 // Updates and returns input for all players
-Input* InputManager::getInput()
+Input InputManager::getInput(int playerNum)
 {
-	return 0;
-}
-// Used to notify game manager of the amount of forward/backward acceleration 
-// the player is requesting
-void InputManager::notifyForward(float accel)
-{
-}
-// Used to notify game manager of the amount of turning the player has requested
-void InputManager::notifyTurn(float accel)
-{
-}
-// Used to notify game manager that the player has requested to start a drift
-void InputManager::notifyDriftStart()
-{
-}
-// Used to notify game manager that the player has requested to end a drift
-void InputManager::notifyDriftEnd()
-{
-}
-// Used to notify game manger that the player has requested to use a power-up
-void InputManager::notifyPowerup()
-{
+	Input *input = new Input();
+
+	input->forward = gamepads[playerNum].RightTrigger();
+
+	return *input;
 }
 
-// Used to notify game manager that the player has requested to tilt camera up/down
-void InputManager::notifyTiltCameraV(float accel)
-{
+// Returns the number of players
+int InputManager::getNumPlayers() {
+	return numPlayers;
 }
-// Used to notify game manager that the player has requested to tilt camera left/right
-void InputManager::notifyTiltCameraH(float accel)
-{
-}
-// Used to notify game manager that the plaayer has pressed the menu button
-void InputManager::menuButtonPressed()
-{
-}
-
 
