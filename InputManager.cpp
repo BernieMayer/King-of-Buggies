@@ -168,7 +168,7 @@ Input InputManager::getInput(int playerNum)
 		input.menu = gamepads[playerNum].GetButtonPressed(12);
 
 		gamepads[playerNum].RefreshState();
-	} else if (playerNum == 1) {
+	} else if (playerNum == 0) {
 		// use Keyboard
 		input.forward = kForward;
 		input.turn = kTurn;
