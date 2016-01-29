@@ -117,7 +117,7 @@ InputManager::InputManager(GLFWwindow* w)
 	for (int i = 1; i < 5; i++) {
 		Gamepad temp = Gamepad(i);
 
-		gamepads[i] = temp;
+		gamepads[i - 1] = temp;
 		if (temp.Connected()) {
 			// Allows for a player when no controllers connected
 			if (numPlayers != 1) {
@@ -135,6 +135,8 @@ InputManager::~InputManager()
 // Updates and returns input for all players
 Input InputManager::getInput(int playerNum)
 {
+	playerNum -= 1;
+
 	Input input = Input();
 
 	gamepads[playerNum].Update();
