@@ -24,7 +24,7 @@ protected:
 public:
 	Material();
 
-	void loadUniforms(const mat4& transform, vec3 light, vec3 color);
+	void loadUniforms(const mat4& transform, const mat4& objectTransform, vec3 light, vec3 color);
 	void useShader();
 
 	bool usingVertices();

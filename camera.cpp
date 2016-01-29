@@ -75,13 +75,24 @@ void Camera::changeDir(vec3 _dir)
 mat4 Camera::getMatrix()
 {
 
-	mat4 lookat (	right.x, up.x, -dir.x, -pos.x,
-					right.y, up.y, -dir.y, -pos.y,
-					right.z, up.z, -dir.z, -pos.z,
+	mat4 lookat (	right.x, up.x, dir.x, 0,
+					right.y, up.y, dir.y, 0,
+					right.z, up.z, dir.z, 0,
 					0, 0, 0, 1);
+	/*mat4 lookat(right.x, right.y, right.z, 0,
+				up.x, up.y, up.z, 0,
+				dir.x, dir.y, dir.z, 0,
+				0, 0, 0, 1);*/
+
+	mat4 translation(	1, 0, 0, 0,
+						0, 1, 0, 0,
+						0, 0, 1, 0,
+						pos.x, pos.y, pos.z, 1);
+
+	//mat4 lookat{right.x, }
 	
 
-	return lookat;	// *translation;
+	return lookat*translation;
 }
 
 void Camera::rotateView(float x, float y)

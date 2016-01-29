@@ -2,6 +2,8 @@
 #include "Renderer.h"
 #include "InputManager.h"
 #include "Input.h"
+#include "camera.h"
+
 #include <iostream>
 #include <GL/glew.h>  
 #include <GLFW/glfw3.h>  
@@ -123,10 +125,44 @@ void renderTest(GLFWwindow* window)
 
 
 	unsigned int light = render.generateLightObject();
-	render.setLightPosition(light, vec3(0.0, 10.0, 10.0));
+	render.setLightPosition(light, vec3(0.0, 0.0, -10.0));
 
+	InputManager im(window);
 
-	render.renderLoop();
+	Camera cam (vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0),
+							MODELVIEWER_CAMERA);
+
+	render.loadPerspectiveTransform(0.1f, 20.f, 90.f);
+
+	
+
+	while (!glfwWindowShouldClose(window))
+	{
+		//Clear color buffer  
+		Input in = im.getInput(1);
+		//printf("(%f, %f)\n", in.camH, in.camV);
+
+		if (true)
+		{
+			float scale = 0.001;
+			cam.rotateView(in.turn*scale, in.forward*scale);
+			//cam.rotateView(0.001, 0.0);
+			//render.loadModelviewTransform(cam.getMatrix());
+			render.assignTransform(square, cam.getMatrix());
+		}
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		render.drawAll();
+
+		//Swap buffers  
+		glfwSwapBuffers(window);
+		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
 
 	printf("End rendering test\n");
 }

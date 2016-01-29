@@ -116,6 +116,13 @@ void Renderer::assignMaterial(unsigned int id, Material* mat)
 	objects[id].mat = mat;
 }
 
+void Renderer::assignTransform(unsigned int id, const mat4& transform)
+{
+	if ((id >= objects.size()) || (objects[id].deleted))
+		return;
+	objects[id].transform = transform;
+}
+
 /**
 * Lights
 **/
@@ -134,6 +141,41 @@ void Renderer::setLightPosition(unsigned int id, vec3 lightPos)
 	lights[id].pos = lightPos;
 }
 
+
+/**
+* Transformations
+**/
+
+void Renderer::loadModelviewTransform(const mat4& _modelview)
+{
+	modelview = _modelview;
+}
+
+void Renderer::loadProjectionTransform(const mat4& _projection)
+{
+	projection = _projection;
+}
+
+void Renderer::loadPerspectiveTransform(float n, float f, float fov)
+{
+	float angle = fov*M_PI / 180.f;
+
+	float width = tan(angle*0.5f)*n;
+	float height = tan(angle*0.5f)*n;
+
+	printf("Width %f\nHeight %f\n", width, height);
+
+	mat4 perspective = mat4(1.0);
+
+	perspective[0][0] = n / width;
+	perspective[1][1] = n/ height;
+	perspective[2][2] = -(f + n) / (f - n);
+	perspective[3][2] = -2*f*n / (f - n);
+	perspective[2][3] = -1.f;
+	perspective[3][3] = 0.f;
+
+	projection = perspective;
+}
 
 
 
@@ -158,7 +200,7 @@ void Renderer::draw(unsigned int id)
 		light = lights[0];		//Else, use first light in array
 
 	object.mat->useShader();
-	object.mat->loadUniforms(projection*modelView*object.transform, light.pos, object.color);
+	object.mat->loadUniforms(projection*modelview*object.transform, object.transform, light.pos, object.color);
 	loadBuffers(object);
 
 	if (object.indices != NULL)
@@ -449,10 +491,10 @@ void Renderer::assignCube(	unsigned int id, float width,
 
 	float halfWidth = 0.5*width;
 	//Front face
-	mesh->push_back(vec3(-halfWidth, halfWidth, halfWidth));
-	mesh->push_back(vec3(-halfWidth, -halfWidth, halfWidth));
-	mesh->push_back(vec3(halfWidth, -halfWidth, halfWidth));
-	mesh->push_back(vec3(halfWidth, halfWidth, halfWidth));
+	mesh->push_back(vec3(-halfWidth, halfWidth, 0.f));
+	mesh->push_back(vec3(-halfWidth, -halfWidth, 0.f));
+	mesh->push_back(vec3(halfWidth, -halfWidth, 0.f));
+	mesh->push_back(vec3(halfWidth, halfWidth, 0.f));
 	/*//Back face
 	mesh.push_back(vec3(-halfWidth, halfWidth, -halfWidth));
 	mesh.push_back(vec3(halfWidth, halfWidth, -halfWidth));

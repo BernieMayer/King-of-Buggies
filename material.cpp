@@ -18,10 +18,14 @@ bool Material::usingUvs(){ return uvsUsed; }
 
 void Material::useShader(){ glUseProgram(programID); }
 
-void Material::loadUniforms(const mat4& transform, vec3 light, vec3 color)
+void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
+							vec3 light, vec3 color)
 {
 	GLuint uniformLocation = glGetUniformLocation(programID, "transform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &transform[0][0]);
+
+	uniformLocation = glGetUniformLocation(programID, "objectTransform");
+	glUniformMatrix4fv(uniformLocation, 1, false, &objectTransform[0][0]);
 
 	uniformLocation = glGetUniformLocation(programID, "light");
 	glUniform3f(uniformLocation, light.x, light.y, light.z);

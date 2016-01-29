@@ -6,11 +6,15 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include <cmath>
+
 #include "MeshObject.h"
 #include "Material.h"
 
 using namespace std;
 using namespace glm;
+
+#define M_PI  3.14159265358979323846
 
 struct SHADOW_BEHAVIOUR{
 	enum { CAST = 0, RECEIVE, CAST_AND_RECEIVE, NONE };
@@ -62,7 +66,7 @@ private:
 
 	//Transform matrices
 	mat4 projection;
-	mat4 modelView;
+	mat4 modelview;
 
 
 	GLuint vao[VAO::COUNT];
@@ -104,6 +108,7 @@ public:
 	void assignColor(unsigned int object, vec3 color);
 	void setShadowBehaviour(int object, int behaviour);
 	void assignMaterial(unsigned int object, Material* mat);
+	void assignTransform(unsigned int object, const mat4& transform);
 	
 	void assignCube(unsigned int object, float width, 
 					vector<vec3>* mesh,
