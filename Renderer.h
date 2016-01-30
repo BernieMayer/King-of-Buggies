@@ -72,7 +72,7 @@ private:
 	GLuint vao[VAO::COUNT];
 	GLuint vbo[VBO::COUNT];
 
-	bool debugging = false;
+	bool debugging;
 
 	/**
 	* Functions

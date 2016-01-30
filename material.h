@@ -17,10 +17,10 @@ class Material
 {
 protected:
 	GLuint programID;
-	const string shader_name = "diffuse";
-	const bool verticesUsed = true;
-	const bool normalsUsed = true;
-	const bool uvsUsed = false;
+	string shader_name;
+	bool verticesUsed;
+	bool normalsUsed;
+	bool uvsUsed;
 public:
 	Material();
 

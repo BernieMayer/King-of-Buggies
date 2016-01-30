@@ -23,7 +23,7 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.0, 0.0, 0.0)), deleted(false)
 
 }
 
-Renderer::Renderer(GLFWwindow* _window) :window(_window)
+Renderer::Renderer(GLFWwindow* _window) :window(_window), debugging(false)
 {
 	printf("Renderer constructor\n");
 	window = _window;
@@ -506,7 +506,12 @@ void Renderer::assignCube(	unsigned int id, float width,
 	normals->push_back(vec3(0.0, 0.0, 1.0));
 	normals->push_back(vec3(0.0, 0.0, 1.0));
 
-	*indices = { 0, 1, 2, 2, 3, 0 };
+	indices->push_back(0);
+	indices->push_back(1);
+	indices->push_back(2);
+	indices->push_back(2);
+	indices->push_back(3);
+	indices->push_back(0);
 
 	assignMesh(id, mesh);
 	assignNormals(id, normals);

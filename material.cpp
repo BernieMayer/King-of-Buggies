@@ -5,6 +5,12 @@
 
 Material::Material()
 {
+	verticesUsed = true;
+	normalsUsed = true;
+	uvsUsed = false;
+
+	shader_name = "diffuse";
+
 	//Load shaders
 	string vertShaderSource = loadShaderStringFromFile(shaderDir + shader_name +".vert");
 	string fragShaderSource = loadShaderStringFromFile(shaderDir + shader_name + ".frag");
