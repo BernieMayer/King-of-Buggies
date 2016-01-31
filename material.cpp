@@ -3,19 +3,19 @@
 
 #include "material.h"
 
+ShaderList shaderList;
+
+void ShaderList::initShaders()
+{
+	shaderIDs[ShaderList::DIFFUSE] = GetShader("diffuse");
+	shaderIDs[ShaderList::SPECULAR] = GetShader("specular");
+	shaderIDs[ShaderList::TORRANCE_SPARROW] = GetShader("torranceSparrow");
+}
+
+
 Material::Material()
 {
-	verticesUsed = true;
-	normalsUsed = true;
-	uvsUsed = false;
-
-	shader_name = "diffuse";
-
-	//Load shaders
-	string vertShaderSource = loadShaderStringFromFile(shaderDir + shader_name +".vert");
-	string fragShaderSource = loadShaderStringFromFile(shaderDir + shader_name + ".frag");
-
-	programID = CreateShaderProgram(vertShaderSource, fragShaderSource);
+	
 }
 
 bool Material::usingVertices(){ return verticesUsed; }
@@ -25,13 +25,16 @@ bool Material::usingUvs(){ return uvsUsed; }
 void Material::useShader(){ glUseProgram(programID); }
 
 void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
-							vec3 light, vec3 color)
+							vec3 viewer, vec3 light, vec3 color)
 {
 	GLuint uniformLocation = glGetUniformLocation(programID, "transform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &transform[0][0]);
 
 	uniformLocation = glGetUniformLocation(programID, "objectTransform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &objectTransform[0][0]);
+
+	uniformLocation = glGetUniformLocation(programID, "viewPos");
+	glUniform3f(uniformLocation, viewer.x, viewer.y, viewer.z);
 
 	uniformLocation = glGetUniformLocation(programID, "light");
 	glUniform3f(uniformLocation, light.x, light.y, light.z);
@@ -46,6 +49,17 @@ void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 /**
 * Shader compilation and initialization
 **/
+GLuint GetShader(const string& name)
+{
+	const string shaderDir = "./shaders/";
+
+	//Load shaders
+	string vertShaderSource = loadShaderStringFromFile(shaderDir + name + ".vert");
+	string fragShaderSource = loadShaderStringFromFile(shaderDir + name + ".frag");
+
+	return CreateShaderProgram(vertShaderSource, fragShaderSource);
+}
+
 GLuint CreateShaderProgram(const string & vsSource,
 	const string & fsSource)
 {
@@ -160,6 +174,8 @@ bool checkCompileStatus(GLint shaderID)
 // Returns Empty String if can't load from file
 string loadShaderStringFromFile(const string & filePath)
 {
+	printf("Loading source: %s\n", filePath.c_str());
+
 	string shaderCode;
 	ifstream fileStream(filePath.c_str(), ios::in);
 	if (fileStream.is_open())

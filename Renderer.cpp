@@ -3,6 +3,30 @@
 
 #include "Renderer.h"
 
+void glErrorCheck(const char* location)
+{
+	GLenum code = glGetError();
+
+	switch (code)
+	{
+	case GL_INVALID_ENUM:
+		cout << "GL_INVALID_ENUM - " << location << endl;
+		break;
+	case GL_INVALID_VALUE:
+		cout << "GL_INVALID_VALUE - " << location << endl;
+		break;
+	case GL_INVALID_OPERATION:
+		cout << "GL_INVALID_OPERATION - " << location << endl;
+		break;
+	case GL_INVALID_FRAMEBUFFER_OPERATION:
+		cout << "GL_INVALID_FRAMEBUFFER_OPERATION - " << location << endl;
+		break;
+	case GL_OUT_OF_MEMORY:
+		cout << "GL_OUT_OF_MEMORY - " << location << endl;
+		break;
+	}
+}
+
 
 Renderer::ObjectInfo::ObjectInfo()
 { 
@@ -25,11 +49,15 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.0, 0.0, 0.0)), deleted(false)
 
 Renderer::Renderer(GLFWwindow* _window) :window(_window), debugging(false)
 {
-	printf("Renderer constructor\n");
+	shaderList.initShaders();
+
 	window = _window;
 
 	glGenVertexArrays(VAO::COUNT, vao);
 	glGenBuffers(VBO::COUNT, vbo);
+
+	glEnable(GL_DEPTH_TEST);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	glClearColor(1.0, 1.0, 1.0, 1.0);
 
@@ -45,7 +73,6 @@ Renderer::~Renderer()
 
 void Renderer::renderLoop()
 {
-	printf("Enter function\n");
 	while (!glfwWindowShouldClose(window))
 	{
 		//Clear color buffer  
@@ -177,6 +204,11 @@ void Renderer::loadPerspectiveTransform(float n, float f, float fov)
 	projection = perspective;
 }
 
+void Renderer::loadCamera(Camera* _camera)
+{
+	camera = _camera;
+}
+
 
 
 /**
@@ -189,6 +221,7 @@ void Renderer::clearDrawBuffers()
 
 void Renderer::draw(unsigned int id)
 {
+
 	ObjectInfo& object = objects[id];
 	if (object.deleted)
 		return;
@@ -200,7 +233,15 @@ void Renderer::draw(unsigned int id)
 		light = lights[0];		//Else, use first light in array
 
 	object.mat->useShader();
-	object.mat->loadUniforms(projection*modelview*object.transform, object.transform, light.pos, object.color);
+
+	if (camera != NULL)
+		object.mat->loadUniforms(projection*modelview*camera->getMatrix()*object.transform, object.transform, 
+						camera->getPos(), light.pos, object.color);	
+	else
+		object.mat->loadUniforms(projection*modelview*object.transform, object.transform,
+						vec3(0.0, 0.0, 0.0), light.pos, object.color);
+
+
 	loadBuffers(object);
 
 	if (object.indices != NULL)
@@ -220,7 +261,6 @@ void Renderer::draw(vector<unsigned int> list)
 
 void Renderer::drawAll()
 {
-
 	for (unsigned int i = 0; i < objects.size(); i++)
 	{
 		draw(i);
@@ -411,7 +451,7 @@ void Renderer::initializeVAOs()
 		sizeof(vec3),	//Stride
 		(void*)0			//Offset
 		);
-
+	
 	//Vertex and UV VAO
 	glBindVertexArray(vao[VAO::VERT_UVS]);		//Bind vertex array
 	//Vertex vbo
@@ -476,6 +516,7 @@ void Renderer::initializeVAOs()
 		sizeof(vec2),	//Stride
 		(void*)0			//Offset
 		);
+	
 }
 
 
@@ -501,10 +542,10 @@ void Renderer::assignCube(	unsigned int id, float width,
 	mesh.push_back(vec3(halfWidth, -halfWidth, -halfWidth));
 	mesh.push_back(vec3(-halfWidth, -halfWidth, -halfWidth));*/
 
-	normals->push_back(vec3(0.0, 0.0, 1.0));
-	normals->push_back(vec3(0.0, 0.0, 1.0));
-	normals->push_back(vec3(0.0, 0.0, 1.0));
-	normals->push_back(vec3(0.0, 0.0, 1.0));
+	normals->push_back(vec3(0.0, 0.0, -1.0));
+	normals->push_back(vec3(0.0, 0.0, -1.0));
+	normals->push_back(vec3(0.0, 0.0, -1.0));
+	normals->push_back(vec3(0.0, 0.0, -1.0));
 
 	indices->push_back(0);
 	indices->push_back(1);
@@ -512,6 +553,64 @@ void Renderer::assignCube(	unsigned int id, float width,
 	indices->push_back(2);
 	indices->push_back(3);
 	indices->push_back(0);
+
+	assignMesh(id, mesh);
+	assignNormals(id, normals);
+	assignIndices(id, indices);
+	assignColor(id, vec3(1.0, 0.0, 0.0));
+
+}
+
+void Renderer::assignSphere(unsigned int id, float radius, int divisions,
+	vector<vec3>* mesh,
+	vector<vec3>* normals,
+	vector<unsigned int>* indices)
+{
+
+	mesh->clear();
+	normals->clear();
+	indices->clear();
+
+	int yDivisions = divisions;
+	int xDivisions = 2*divisions;
+
+	float uInc = 2.f*M_PI/(float)xDivisions;
+	float vInc = M_PI / (float)yDivisions;
+
+	//Front face
+	float u = 0.f;
+	for (int i = 0; i <= xDivisions; i++)
+	{
+		float x_base = cos(u);
+		float z_base = sin(u);
+
+		float v = -M_PI*0.5;
+		for (int j = 0; j <= yDivisions; j++)
+		{
+
+			float x = x_base*cos(v);
+			float z = z_base*cos(v);
+			float y = sin(v);
+			mesh->push_back(vec3(x, y, z)*radius);
+			normals->push_back(normalize(vec3(x, y, z)));
+
+			v += vInc;
+		}
+		u += uInc;
+	}
+
+	for (unsigned int i = 0; i < xDivisions; i++)
+	{
+		for (unsigned int j = 0; j < yDivisions; j++)
+		{
+			indices->push_back(i*(yDivisions + 1) + j);
+			indices->push_back(i*(yDivisions + 1) + j+1);
+			indices->push_back((i+1)*(yDivisions + 1) + j+1);
+			indices->push_back(i*(yDivisions + 1) + j);
+			indices->push_back((i+1)*(yDivisions + 1) + j+1);
+			indices->push_back((i+1)*(yDivisions + 1) + j);
+		}
+	}
 
 	assignMesh(id, mesh);
 	assignNormals(id, normals);

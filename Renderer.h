@@ -9,7 +9,11 @@
 #include <cmath>
 
 #include "MeshObject.h"
+#include "camera.h"
 #include "Material.h"
+#include "Specular.h"
+#include "diffuse.h"
+#include "torranceSparrow.h"
 
 using namespace std;
 using namespace glm;
@@ -68,6 +72,8 @@ private:
 	mat4 projection;
 	mat4 modelview;
 
+	Camera* camera;
+
 
 	GLuint vao[VAO::COUNT];
 	GLuint vbo[VBO::COUNT];
@@ -98,6 +104,7 @@ public:
 	void loadProjectionTransform(const mat4& _projection);
 	void loadPerspectiveTransform(float near, float far, float fov);
 	void loadOrthographicTransform(float near, float far, float width, float height);
+	void loadCamera(Camera* _camera);
 
 	//Drawable objects
 	unsigned int generateObjectID();
@@ -111,6 +118,10 @@ public:
 	void assignTransform(unsigned int object, const mat4& transform);
 	
 	void assignCube(unsigned int object, float width, 
+					vector<vec3>* mesh,
+					vector<vec3>* normals,
+					vector<unsigned int>* indices);
+	void assignSphere(unsigned int object, float radius, int divisions,
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
 					vector<unsigned int>* indices);

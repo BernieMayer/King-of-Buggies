@@ -7,7 +7,18 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="material.cpp" />
+    <ClCompile Include="material.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="specular.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="diffuse.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="torranceSparrow.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -24,7 +35,6 @@
     <ClInclude Include="InterfaceManager.h" />
     <ClInclude Include="LevelInfo.h" />
     <ClInclude Include="LevelInfoLoader.h" />
-    <ClInclude Include="material.h" />
     <ClInclude Include="MeshInfo.h" />
     <ClInclude Include="MeshInfoLoader.h" />
     <ClInclude Include="MeshObject.h" />
@@ -36,5 +46,22 @@
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="VehicleTraits.h" />
+    <ClInclude Include="material.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="specular.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="diffuse.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="torranceSparrow.h">
+      <Filter>Materials</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Materials">
+      <UniqueIdentifier>{e519f910-bb3c-4be1-a2cc-e0c9f105d2dc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

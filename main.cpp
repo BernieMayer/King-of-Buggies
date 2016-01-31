@@ -118,14 +118,32 @@ void renderTest(GLFWwindow* window)
 	vector<vec3> normals;
 	vector<unsigned int> indices;
 
+	vector<vec3> mesh2;
+	vector<vec3> normals2;
+	vector<unsigned int> indices2;
+
+	//Object creation
+	Diffuse mat = Diffuse();
+
+	Specular shinyMat = Specular(20.f);
+
+	TorranceSparrow tsMat = TorranceSparrow(5.f);
+
+	//Create square
 	unsigned int square = render.generateObjectID();
 	render.assignCube(square, 1.f, &mesh, &normals, &indices);
-	Material mat = Material ();
 	render.assignMaterial(square, &mat);
 
+	//Create sphere
+	unsigned int sphere = render.generateObjectID();
+	render.assignSphere(sphere, 0.5f, 20, &mesh2, &normals2, &indices2);
+	render.assignMaterial(sphere, &tsMat);
 
+	printf("Mesh = %d\nNormals = %d\nIndices = %d\n\n", mesh2.size(), normals2.size(), indices2.size());
+
+	//Light creation
 	unsigned int light = render.generateLightObject();
-	render.setLightPosition(light, vec3(0.0, 0.0, -2.0));
+	render.setLightPosition(light, vec3(0.0, 0.0, -5.0));
 
 	InputManager im(window);
 
@@ -138,22 +156,16 @@ void renderTest(GLFWwindow* window)
 
 	while (!glfwWindowShouldClose(window))
 	{
-		//Clear color buffer  
-		Input in = im.getInput(1);
-		//printf("(%f, %f)\n", in.camH, in.camV);
+		Input in = im.getInput(1);		//Get input
 
-		if (true)
-		{
-			float scale = 0.001;
-			cam.rotateView(in.turn*scale, in.forward*scale);
-			//cam.rotateView(0.001, 0.0);
-			//render.loadModelviewTransform(cam.getMatrix());
-			render.assignTransform(square, cam.getMatrix());
-		}
+		float scale = 0.001;
+		cam.rotateView(in.turn*scale, in.forward*scale);
+		render.loadCamera(&cam);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		render.drawAll();
+		//render.draw(square);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
