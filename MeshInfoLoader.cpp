@@ -7,23 +7,6 @@
 using namespace std;
 using namespace glm;
 
-MeshInfoLoader::MeshInfoLoader() {
-	//printf("Opening file\n");
-
-	//loadModel("C:\\Users\\Mia\\GitHub\\King_of_Buggies\\models\\brick.obj");
-
-	//printf("Closing file\n");
-}
-
-MeshInfoLoader::MeshInfoLoader(char *filename) {
-	//printf("Opening file\n");
-
-	loadModel(filename);
-
-	//printf("Closing file\n");
-}
-
-
 void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, vector<vec3> &_normals,
 	vector<vec3> &vertices, vector<vec3> &normals, vector<unsigned int> &faces)
 {
@@ -123,18 +106,6 @@ void MeshInfoLoader::clearData() {
 	normals.clear();
 	indices.clear();
 }
-
-/*void ObjFile::draw (GLuint vertexLocation, GLuint normalLocation) {
-glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-glEnableVertexAttribArray (vertexLocation);
-glVertexAttribPointer (vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-glEnableVertexAttribArray (normalLocation);
-glVertexAttribPointer (normalLocation, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(GLfloat) * vertices.size()));
-
-glDrawElements (GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-}*/
 
 /*int ObjFile::numVertices () {
 return vertices.size() / 4;

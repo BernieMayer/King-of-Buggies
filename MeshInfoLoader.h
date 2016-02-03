@@ -12,14 +12,12 @@ using namespace glm;
 
 class MeshInfoLoader {
 public:
-	MeshInfoLoader();
-	MeshInfoLoader(char *filename);
+	MeshInfoLoader() {};
 
 	bool loadModel(char* filename);
 	void clearData();
 
 	//void calculateNormals ();
-	//void draw (GLuint vertexLocation, GLuint normalLocation);
 	//void flipFaces();
 
 	/*int numVertices ();
@@ -31,9 +29,7 @@ public:
 	float getBoundingRadius();
 	float getBottom();
 
-	/*GLuint vertexBuffer, indexBuffer;
-	vector<GLfloat> vertices, normals;
-	vector<GLuint> indices;*/
+	//GLuint vertexBuffer, indexBuffer;
 
 	vector<vec3> vertices, normals;
 	vector<unsigned int> indices;
