@@ -64,7 +64,21 @@ Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos, int _cameraMode):
 
 void Camera::changeDir(vec3 _dir)
 {
+
 	dir = normalize(_dir);
+
+	if (abs(_dir.y) > maxY)
+	{
+		if (dir.y < 0)
+			dir.y = -maxY;
+		else
+			dir.y = maxY;
+		
+		float s = sqrt((1 - maxY*maxY) / (dir.x*dir.x + dir.z*dir.z));
+		dir.x *= s;
+		dir.z *= s;
+		dir = normalize(dir);
+	}
 
 	up = vec3(0.0, 1.0, 0.0);
 
@@ -109,6 +123,24 @@ void Camera::rotateView(float x, float y)
 	else if(cameraMode == MODELVIEWER_CAMERA)
 	{
 		pos =  vec3(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY) * vec4(pos - viewCenter, 1)) + viewCenter;	//Rotate position around center
+
+		float pos_length = length(pos);
+		vec3 _dir = normalize(pos);
+
+		if (abs(_dir.y) > maxY)
+		{
+			if (_dir.y < 0)
+				_dir.y = -maxY;
+			else
+				_dir.y = maxY;
+
+			float s = sqrt((1 - maxY*maxY) / (_dir.x*_dir.x + _dir.z*_dir.z));
+			_dir.x *= s;
+			_dir.z *= s;
+			_dir = normalize(_dir);
+
+			pos = _dir*pos_length;
+		}
 
 		changeDir(viewCenter-pos);
 	}
