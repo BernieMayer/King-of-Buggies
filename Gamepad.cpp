@@ -2,7 +2,7 @@
 #define GAMEPAD_CPP
 
 #include "Windows.h"
-#include "Gamepad.h"
+#include "Gamepad.h" 
 
 // Link the 'Xinput' library - Important!
 #pragma comment(lib, "Xinput.lib")
@@ -112,22 +112,25 @@ void Gamepad::Update()
 	}
 }
 
+float xDeadZone = 0.15f;
+float yDeadZone = 0.15f;
+
 // Deadzone check for Left Thumbstick
 bool Gamepad::LStick_InDeadzone()
 {
 	// Obtain the X & Y axes of the stick
-	short sX = m_State.Gamepad.sThumbLX;
-	short sY = m_State.Gamepad.sThumbLY;
+	float sX = LeftStick_X();
+	short sY = LeftStick_Y();
 
 	// X axis is outside of deadzone
-	if (sX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
-		sX < -XINPUT_GAMEPAD_LEFT_THUMB) {
+	if (sX > xDeadZone ||
+		sX < -xDeadZone) {
 		return false;
 	}
 
 	// Y axis is outside of deadzone
-	if (sY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE ||
-		sY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) {
+	if (sY > yDeadZone ||
+		sY < -yDeadZone) {
 		return false;
 	}
 
@@ -139,18 +142,18 @@ bool Gamepad::LStick_InDeadzone()
 bool Gamepad::RStick_InDeadzone()
 {
 	// Obtain the X & Y axes of the stick
-	short sX = m_State.Gamepad.sThumbRX;
-	short sY = m_State.Gamepad.sThumbRY;
+	short sX = RightStick_X();
+	short sY = RightStick_Y();
 
 	// X axis is outside of deadzone
-	if (sX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-		sX < -XINPUT_GAMEPAD_RIGHT_THUMB) {
+	if (sX > xDeadZone ||
+		sX < -xDeadZone) {
 		return false;
 	}
 
 	// Y axis is outside of deadzone
-	if (sY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ||
-		sY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) {
+	if (sY > yDeadZone ||
+		sY < -yDeadZone) {
 		return false;
 	}
 
