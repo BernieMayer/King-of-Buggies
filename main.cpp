@@ -4,6 +4,8 @@
 #include "Input.h"
 #include "camera.h"
 
+#include "MeshInfo.h"
+
 #include <iostream>
 #include <GL/glew.h>  
 #include <GLFW/glfw3.h>  
@@ -113,21 +115,63 @@ void renderTest(GLFWwindow* window)
 	printf("Begin rendering test\n");
 
 	Renderer render = Renderer(window);
+	MeshInfo meshLoader = MeshInfo();
 
 	vector<vec3> mesh;
 	vector<vec3> normals;
 	vector<unsigned int> indices;
 
+	// Object creation
+	Diffuse mat = Diffuse();
+	Specular shinyMat = Specular(20.f);
+	TorranceSparrow tsMat = TorranceSparrow(5.f);
+	
+	unsigned int model = render.generateObjectID();
+	
+	mesh = meshLoader.getMeshVertices(model);
+	normals = meshLoader.getMeshNormals(model);
+	indices = meshLoader.getMeshIndices(model);
+
+	render.assignMesh(model, &mesh);
+	render.assignNormals(model, &normals);
+	render.assignIndices(model, &indices);
+	render.assignMaterial(model, &tsMat);
+	render.assignColor(model, vec3(1.0, 0.0, 0.0));
+	
 	vector<vec3> mesh2;
 	vector<vec3> normals2;
 	vector<unsigned int> indices2;
 
-	//Object creation
-	Diffuse mat = Diffuse();
+	unsigned int disco = render.generateObjectID();
+	mesh2 = meshLoader.getMeshVertices(disco);
+	normals2 = meshLoader.getMeshNormals(disco);
+	indices2 = meshLoader.getMeshIndices(disco);
 
-	Specular shinyMat = Specular(20.f);
+	render.assignMesh(disco, &mesh2);
+	render.assignNormals(disco, &normals2);
+	render.assignIndices(disco, &indices2);
+	render.assignMaterial(disco, &shinyMat);
+	render.assignColor(disco, vec3(1.0, 0.0, 1.0));
 
-	TorranceSparrow tsMat = TorranceSparrow(5.f);
+	vector<vec3> mesh3;
+	vector<vec3> normals3;
+	vector<unsigned int> indices3;
+
+	unsigned int plane = render.generateObjectID();
+	mesh3 = meshLoader.getMeshVertices(plane);
+	normals3 = meshLoader.getMeshNormals(plane);
+	indices3 = meshLoader.getMeshIndices(plane);
+
+	render.assignMesh(plane, &mesh3);
+	render.assignNormals(plane, &normals3);
+	render.assignIndices(plane, &indices3);
+	render.assignMaterial(plane, &mat);
+	render.assignColor(plane, vec3(0.65, 0.65, 0.65));
+
+	/*
+	vector<vec3> mesh2;
+	vector<vec3> normals2;
+	vector<unsigned int> indices2;
 
 	//Create square
 	unsigned int square = render.generateObjectID();
@@ -140,10 +184,13 @@ void renderTest(GLFWwindow* window)
 	render.assignMaterial(sphere, &tsMat);
 
 	printf("Mesh = %d\nNormals = %d\nIndices = %d\n\n", mesh2.size(), normals2.size(), indices2.size());
-
+	*/
 	//Light creation
+	//unsigned int light = render.generateLightObject();
+	//render.setLightPosition(light, vec3(0.0, 0.0, -5.0));
 	unsigned int light = render.generateLightObject();
-	render.setLightPosition(light, vec3(0.0, 0.0, -5.0));
+	render.setLightPosition(light, vec3(5.0, 5.0, -2.5));
+
 
 	InputManager im(window);
 
