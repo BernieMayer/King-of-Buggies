@@ -123,6 +123,9 @@
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MeshInfo.cpp" />
+    <ClCompile Include="MeshInfoLoader.cpp" />
+    <ClCompile Include="MeshObject.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="specular.cpp" />
