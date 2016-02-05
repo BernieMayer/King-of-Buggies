@@ -8,9 +8,12 @@
 class Physics {
 public:
 	Physics();
+	void shutdown();
 	void startSim(GameState);
 	GameState getSim();
 	Entity* getCollisions();
+private:
+	void initDefaultScene();
 };
 
 #endif // PHYSICS_H

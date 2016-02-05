@@ -3,6 +3,7 @@
 #include "InputManager.h"
 #include "Input.h"
 #include "camera.h"
+#include "Physics.h"
 
 #include <iostream>
 #include <GL/glew.h>  
@@ -108,6 +109,12 @@ void inputTest(GLFWwindow* window) {
 }
 
 
+void physicsTest() {
+	Physics physics = Physics();
+
+	physics.shutdown();
+}
+
 void renderTest(GLFWwindow* window)
 {
 	printf("Begin rendering test\n");
@@ -186,6 +193,7 @@ int main() {
 		return -1;
 
 	//inputTest(window);
+	physicsTest();
 	renderTest(window);
 
 
