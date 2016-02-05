@@ -42,12 +42,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(PhysXDir)\PhysXSDK\Include;$(ProjectDir)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(PhysXDir)\PhysXSDK\Lib\vc11win32;$(PhysXDir)\PhysXSDK\Lib\vc12win32;$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)\lib;$(PhysXDir)\PhysXSDK\Lib\vc12win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(PhysXDir)\PhysXSDK\Include;$(ProjectDir)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(PhysXDir)\PhysXSDK\Lib\vc12win32;$(ProjectDir)lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(ProjectDir)\lib;$(PhysXDir)\PhysXSDK\Lib\vc12win32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -57,6 +57,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -75,6 +76,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -5,7 +5,8 @@
 using namespace physx;
 
 Physics::Physics() {
-	//static PxDefaultErrorCallback gDefaultErrorCallback;
+	static PxDefaultErrorCallback gDefaultErrorCallback;
+
 }
 
 void Physics::startSim(GameState state) {
