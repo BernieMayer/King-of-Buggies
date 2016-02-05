@@ -3,6 +3,7 @@
 #include "InputManager.h"
 #include "Input.h"
 #include "camera.h"
+#include "Physics.h"
 
 #include "MeshInfo.h"
 
@@ -109,6 +110,12 @@ void inputTest(GLFWwindow* window) {
 	}
 }
 
+
+void physicsTest() {
+	Physics physics = Physics();
+
+	physics.shutdown();
+}
 
 void renderTest(GLFWwindow* window)
 {
@@ -233,6 +240,7 @@ int main() {
 		return -1;
 
 	//inputTest(window);
+	physicsTest();
 	renderTest(window);
 
 
