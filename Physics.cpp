@@ -20,6 +20,8 @@ PxScene* gScene = NULL;
 
 PxMaterial* mMaterial = NULL;
 
+//VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
+
 Physics::Physics() {
 	mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION,
 		gAllocator, gErrorCallback);
@@ -103,7 +105,27 @@ void Physics::initDefaultScene() {
 	aSphereActor->setLinearVelocity(PxVec3(0));
 
 	gScene->addActor(*aSphereActor);
+
+	initVehicle();
 }
+
+void Physics::initVehicle() {
+	PxInitVehicleSDK(*mPhysics);
+	// Up and forwards
+	PxVehicleSetBasisVectors(PxVec3(0, 1, 0), PxVec3(0, 0, 1));
+	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
+
+	// Create the batched scene queries for the supension raycasts
+	//gVehicleSceneQueryData
+
+	PxVehicleWheelsSimData* wheelsSimData = PxVehicleWheelsSimData::allocate(4);
+	PxVehicleDriveSimData4W driveSimData;
+
+	PxVehicleChassisData chassisData;
+	//createVehicle4WSimulationData(chassisMass, chasisConvexMesh, 20.0f, wheelConvexMeshs4,
+		//wheelCentreOffsets4, *wheelsSimData, driveSimData, chassisData);
+}
+
 
 void Physics::shutdown() {
 	mPhysics->release();

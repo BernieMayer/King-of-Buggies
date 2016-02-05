@@ -20,6 +20,9 @@
       <Filter>Materials</Filter>
     </ClCompile>
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="MeshInfo.cpp" />
+    <ClCompile Include="MeshInfoLoader.cpp" />
+    <ClCompile Include="MeshObject.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

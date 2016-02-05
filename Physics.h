@@ -14,6 +14,7 @@ public:
 	Entity* getCollisions();
 private:
 	void initDefaultScene();
+	void initVehicle();
 };
 
 #endif // PHYSICS_H
