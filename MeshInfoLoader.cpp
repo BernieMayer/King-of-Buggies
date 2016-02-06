@@ -4,6 +4,8 @@
 #include <string>
 #include <iostream>
 
+#pragma warning(disable:4996)
+
 using namespace std;
 using namespace glm;
 
@@ -15,7 +17,7 @@ void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, 
 
 	faces.clear();
 
-	for (int i = 0; i<_faces.size(); i++)
+	for (unsigned int i = 0; i<_faces.size(); i++)
 	{
 		int vi = _faces[i];
 		int ni = _nFaces[i];
@@ -99,6 +101,8 @@ bool MeshInfoLoader::loadModel(char *filename)
 	sharedIndices(_faces, _nfaces, _normals, vertices, normals, indices);
 
 	printf("Closing file\n");
+
+	return true;
 }
 
 void MeshInfoLoader::clearData() {
@@ -181,12 +185,12 @@ indices[i+2] = temp;
 vec3 MeshInfoLoader::getCenter(){
 	vec3 center;
 
-	for (int i = 0; i<vertices.size(); i++)
+	for (unsigned int i = 0; i<vertices.size(); i++)
 	{
 		center = center + vertices[i];
 	}
 
-	float divisor = (1.0 / (vertices.size()));
+	float divisor = (1.f / (vertices.size()));
 
 	return center * divisor;
 }
@@ -194,7 +198,7 @@ vec3 MeshInfoLoader::getCenter(){
 float MeshInfoLoader::getBottom(){
 	float bottom = 1000.0;
 
-	for (int i = 0; i<vertices.size(); i++)
+	for (unsigned int i = 0; i<vertices.size(); i++)
 	{
 		bottom = std::min(bottom, vertices[i].z);
 	}
@@ -207,7 +211,7 @@ float MeshInfoLoader::getBoundingRadius()
 	vec3 center = getCenter();
 	float boundingRadius = 0.0;
 
-	for (int i = 0; i<vertices.size(); i++)
+	for (unsigned int i = 0; i<vertices.size(); i++)
 	{
 		vec3 point = vertices[i];
 		float distance = length(center - point);

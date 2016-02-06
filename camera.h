@@ -6,10 +6,10 @@
 
 #include <cstdio>
 
-const float minZoom = 0.05;
-const float maxZoom = 5.0;
+const float minZoom = 0.05f;
+const float maxZoom = 5.f;
 
-const float maxY = 0.8;		//Determines maximum y value of camera direction (To prevent bugs associated with looking straight up)
+const float maxY = 0.8f;		//Determines maximum y value of camera direction (To prevent bugs associated with looking straight up)
 
 const int FREEROAM_CAMERA = 0;
 const int MODELVIEWER_CAMERA = 1;

@@ -36,13 +36,13 @@ Renderer::ObjectInfo::ObjectInfo()
 	indices = NULL;
 	mat = NULL;
 	shadowBehaviour = SHADOW_BEHAVIOUR::NONE;
-	color = vec3(1.0, 1.0, 1.0);
+	color = vec3(1.f, 1.f, 1.f);
 	deleted = false;
 
-	transform = mat4(1.0);
+	transform = mat4(1.f);
 }
 
-Renderer::LightInfo::LightInfo() : pos(vec3(0.0, 0.0, 0.0)), deleted(false)
+Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
 {
 
 }
@@ -59,7 +59,7 @@ Renderer::Renderer(GLFWwindow* _window) :window(_window), debugging(false)
 	glEnable(GL_DEPTH_TEST);
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glClearColor(1.f, 1.f, 1.f, 1.f);
 
 	initializeVAOs();
 
@@ -239,7 +239,7 @@ void Renderer::draw(unsigned int id)
 						camera->getPos(), light.pos, object.color);	
 	else
 		object.mat->loadUniforms(projection*modelview*object.transform, object.transform,
-						vec3(0.0, 0.0, 0.0), light.pos, object.color);
+						vec3(0.f, 0.f, 0.f), light.pos, object.color);
 
 
 	loadBuffers(object);
@@ -530,7 +530,7 @@ void Renderer::assignCube(	unsigned int id, float width,
 							vector<unsigned int>* indices)
 {
 
-	float halfWidth = 0.5*width;
+	float halfWidth = 0.5f*width;
 	//Front face
 	mesh->push_back(vec3(-halfWidth, halfWidth, 0.f));
 	mesh->push_back(vec3(-halfWidth, -halfWidth, 0.f));
@@ -542,10 +542,10 @@ void Renderer::assignCube(	unsigned int id, float width,
 	mesh.push_back(vec3(halfWidth, -halfWidth, -halfWidth));
 	mesh.push_back(vec3(-halfWidth, -halfWidth, -halfWidth));*/
 
-	normals->push_back(vec3(0.0, 0.0, -1.0));
-	normals->push_back(vec3(0.0, 0.0, -1.0));
-	normals->push_back(vec3(0.0, 0.0, -1.0));
-	normals->push_back(vec3(0.0, 0.0, -1.0));
+	normals->push_back(vec3(0.f, 0.f, -1.f));
+	normals->push_back(vec3(0.f, 0.f, -1.f));
+	normals->push_back(vec3(0.f, 0.f, -1.f));
+	normals->push_back(vec3(0.f, 0.f, -1.f));
 
 	indices->push_back(0);
 	indices->push_back(1);
@@ -557,11 +557,11 @@ void Renderer::assignCube(	unsigned int id, float width,
 	assignMesh(id, mesh);
 	assignNormals(id, normals);
 	assignIndices(id, indices);
-	assignColor(id, vec3(1.0, 0.0, 0.0));
+	assignColor(id, vec3(1.f, 0.f, 0.f));
 
 }
 
-void Renderer::assignSphere(unsigned int id, float radius, int divisions,
+void Renderer::assignSphere(unsigned int id, float radius, unsigned int divisions,
 	vector<vec3>* mesh,
 	vector<vec3>* normals,
 	vector<unsigned int>* indices)
@@ -571,21 +571,21 @@ void Renderer::assignSphere(unsigned int id, float radius, int divisions,
 	normals->clear();
 	indices->clear();
 
-	int yDivisions = divisions;
-	int xDivisions = 2*divisions;
+	unsigned int yDivisions = divisions;
+	unsigned int xDivisions = 2*divisions;
 
 	float uInc = 2.f*M_PI/(float)xDivisions;
 	float vInc = M_PI / (float)yDivisions;
 
 	//Front face
 	float u = 0.f;
-	for (int i = 0; i <= xDivisions; i++)
+	for (unsigned int i = 0; i <= xDivisions; i++)
 	{
 		float x_base = cos(u);
 		float z_base = sin(u);
 
 		float v = -M_PI*0.5;
-		for (int j = 0; j <= yDivisions; j++)
+		for (unsigned int j = 0; j <= yDivisions; j++)
 		{
 
 			float x = x_base*cos(v);
@@ -615,7 +615,7 @@ void Renderer::assignSphere(unsigned int id, float radius, int divisions,
 	assignMesh(id, mesh);
 	assignNormals(id, normals);
 	assignIndices(id, indices);
-	assignColor(id, vec3(1.0, 0.0, 0.0));
+	assignColor(id, vec3(1.f, 0.f, 0.f));
 
 }
 

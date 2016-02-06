@@ -120,7 +120,7 @@ bool Gamepad::LStick_InDeadzone()
 {
 	// Obtain the X & Y axes of the stick
 	float sX = LeftStick_X();
-	short sY = LeftStick_Y();
+	float sY = LeftStick_Y();
 
 	// X axis is outside of deadzone
 	if (sX > xDeadZone ||
@@ -142,8 +142,8 @@ bool Gamepad::LStick_InDeadzone()
 bool Gamepad::RStick_InDeadzone()
 {
 	// Obtain the X & Y axes of the stick
-	short sX = RightStick_X();
-	short sY = RightStick_Y();
+	float sX = RightStick_X();
+	float sY = RightStick_Y();
 
 	// X axis is outside of deadzone
 	if (sX > xDeadZone ||

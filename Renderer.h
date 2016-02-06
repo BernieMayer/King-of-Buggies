@@ -18,7 +18,7 @@
 using namespace std;
 using namespace glm;
 
-#define M_PI  3.14159265358979323846
+#define M_PI  3.14159265358979323846f
 
 struct SHADOW_BEHAVIOUR{
 	enum { CAST = 0, RECEIVE, CAST_AND_RECEIVE, NONE };
@@ -121,7 +121,7 @@ public:
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
 					vector<unsigned int>* indices);
-	void assignSphere(unsigned int object, float radius, int divisions,
+	void assignSphere(unsigned int object, float radius, unsigned int divisions,
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
 					vector<unsigned int>* indices);

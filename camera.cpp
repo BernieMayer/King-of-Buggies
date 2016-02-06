@@ -39,11 +39,11 @@ mat4 rotZ(float theta)
 
 
 Camera::Camera():
-	dir(vec3 (0.0, 0.0, -1.0)),
-	up(vec3 (0.0, 1.0, 0.0)),
-	right(vec3 (1.0, 0.0, 0.0)),
-	pos(vec3 (0.0, 0.0, 0.0)),
-	viewCenter(vec3(0.0, 0.0, 0.0)),
+	dir(vec3 (0.f, 0.f, -1.f)),
+	up(vec3 (0.f, 1.f, 0.f)),
+	right(vec3 (1.f, 0.f, 0.f)),
+	pos(vec3 (0.f, 0.f, 0.f)),
+	viewCenter(vec3(0.f, 0.f, 0.f)),
 	cameraMode(FREEROAM_CAMERA) {}
 
 Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos):
@@ -80,7 +80,7 @@ void Camera::changeDir(vec3 _dir)
 		dir = normalize(dir);
 	}
 
-	up = vec3(0.0, 1.0, 0.0);
+	up = vec3(0.f, 1.f, 0.f);
 
 	right = normalize(cross(dir, up));
 	up = normalize(cross(right, dir));

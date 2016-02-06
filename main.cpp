@@ -131,7 +131,7 @@ void renderTest(GLFWwindow* window)
 	// Object creation
 	Diffuse mat = Diffuse();
 	Specular shinyMat = Specular(20.f);
-	TorranceSparrow tsMat = TorranceSparrow(0.5f);
+	TorranceSparrow tsMat = TorranceSparrow(8.f);
 	
 	unsigned int model = render.generateObjectID();
 	
@@ -217,10 +217,10 @@ void renderTest(GLFWwindow* window)
 	{
 		Input in = im.getInput(1);		//Get input
 
-		float scale = 0.001;
+		float scale = 0.001f;
 		cam.rotateView(in.turn*scale, in.forward*scale);
 		
-		theta += 0.0001;
+		theta += 0.0001f;
 		translation[3][1] = 0.5f*sin(theta);
 		translation[3][2] = 0.5f*cos(theta);
 		render.assignTransform(model, translation);

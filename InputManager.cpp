@@ -20,9 +20,13 @@ float map(float value, float min, float max, float newMin, float newMax) {
 	return (value - min) * ((newMax - newMin) / (max - min)) + newMin;
 }
 
+
 // Handles mouse movement
 void mousePosition(GLFWwindow *sender, double x, double y) {
-	float deltaX = x - lastMouseX;
+	float f_x = (float)x;
+	float f_y = (float)y;
+
+	float deltaX = f_x - lastMouseX;
 	float maxDeltaX = 500;
 	float minDeltaX = -500;
 	if (deltaX > maxDeltaX) {
@@ -32,9 +36,9 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 		deltaX = minDeltaX;
 	}
 	kCamH = map(deltaX, minDeltaX, maxDeltaX, -1.0, 1.0);
-	currentMouseX = x;
+	currentMouseX = f_x;
 
-	float deltaY = y - lastMouseY;
+	float deltaY = f_y - lastMouseY;
 	float maxDeltaY = 500;
 	float minDeltaY = -500;
 	if (deltaY > maxDeltaY) {
@@ -44,7 +48,7 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 		deltaY = minDeltaY;
 	}
 	kCamV = map(deltaY, minDeltaY, maxDeltaY, -1.0, 1.0);
-	currentMouseY = y;
+	currentMouseY = f_y;
 }
 
 // Handles mouse button input
