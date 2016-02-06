@@ -10,7 +10,7 @@ out vec3 fragNormal;
 
 void main()
 {
-	fragNormal = (objectTransform*vec4(vertexNormal, 1)).xyz;
+	fragNormal = (objectTransform*vec4(vertexNormal, 0)).xyz;
     worldPosition = (objectTransform*vec4(vertexPosition, 1)).xyz;
  	gl_Position =  transform*vec4(vertexPosition, 1);
 }

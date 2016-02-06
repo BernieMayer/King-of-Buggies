@@ -131,7 +131,7 @@ void renderTest(GLFWwindow* window)
 	// Object creation
 	Diffuse mat = Diffuse();
 	Specular shinyMat = Specular(20.f);
-	TorranceSparrow tsMat = TorranceSparrow(5.f);
+	TorranceSparrow tsMat = TorranceSparrow(0.5f);
 	
 	unsigned int model = render.generateObjectID();
 	
@@ -157,7 +157,7 @@ void renderTest(GLFWwindow* window)
 	render.assignMesh(disco, &mesh2);
 	render.assignNormals(disco, &normals2);
 	render.assignIndices(disco, &indices2);
-	render.assignMaterial(disco, &shinyMat);
+	render.assignMaterial(disco, &tsMat);
 	render.assignColor(disco, vec3(1.0, 0.0, 1.0));
 
 	vector<vec3> mesh3;
@@ -172,7 +172,7 @@ void renderTest(GLFWwindow* window)
 	render.assignMesh(plane, &mesh3);
 	render.assignNormals(plane, &normals3);
 	render.assignIndices(plane, &indices3);
-	render.assignMaterial(plane, &mat);
+	render.assignMaterial(plane, &tsMat);
 	render.assignColor(plane, vec3(0.65, 0.65, 0.65));
 
 	/*
@@ -195,8 +195,10 @@ void renderTest(GLFWwindow* window)
 	//Light creation
 	//unsigned int light = render.generateLightObject();
 	//render.setLightPosition(light, vec3(0.0, 0.0, -5.0));
+	vec3 lightPos(5.0, 5.0, 5.0);
+
 	unsigned int light = render.generateLightObject();
-	render.setLightPosition(light, vec3(5.0, 5.0, -2.5));
+	render.setLightPosition(light, lightPos);
 
 
 	InputManager im(window);
@@ -204,9 +206,12 @@ void renderTest(GLFWwindow* window)
 	Camera cam (vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0),
 							MODELVIEWER_CAMERA);
 
-	render.loadPerspectiveTransform(0.1f, 20.f, 90.f);
+	render.loadPerspectiveTransform(0.1f, 20.f, 90.f);		//Near, far, fov
 
+	render.loadCamera(&cam);
 	
+	mat4 translation;
+	float theta = 0.0;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -214,7 +219,11 @@ void renderTest(GLFWwindow* window)
 
 		float scale = 0.001;
 		cam.rotateView(in.turn*scale, in.forward*scale);
-		render.loadCamera(&cam);
+		
+		theta += 0.0001;
+		translation[3][1] = 0.5f*sin(theta);
+		translation[3][2] = 0.5f*cos(theta);
+		render.assignTransform(model, translation);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

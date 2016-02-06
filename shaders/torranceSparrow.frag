@@ -1,6 +1,6 @@
 #version 330 core
  
-layout(location=0) out vec3 fragColor;
+out vec3 fragColor;
 
 in vec3 worldPosition;
 in vec3 fragNormal;
@@ -8,7 +8,7 @@ in vec3 fragNormal;
 uniform vec3 light;
 uniform vec3 color;
 uniform vec3 viewPos;
-uniform float shininess;
+uniform float shininess = 0.7;
 
 float ka = 0.1;
 float kd = 0.5;
@@ -29,10 +29,6 @@ float torranceSparrowLighting()
 
 void main(){
     
-    vec3 red = vec3(1.0, 0.0, 0.0);
-    vec3 lightDir = normalize(light-worldPosition);
-    //vec3 lightDir = normalize(light);
-
     fragColor = torranceSparrowLighting()*color;
 }
 

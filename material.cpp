@@ -5,6 +5,30 @@
 
 ShaderList shaderList;
 
+void glErrorCheckMaterial(const char* location)
+{
+	GLenum code = glGetError();
+
+	switch (code)
+	{
+	case GL_INVALID_ENUM:
+		cout << "GL_INVALID_ENUM - " << location << endl;
+		break;
+	case GL_INVALID_VALUE:
+		cout << "GL_INVALID_VALUE - " << location << endl;
+		break;
+	case GL_INVALID_OPERATION:
+		cout << "GL_INVALID_OPERATION - " << location << endl;
+		break;
+	case GL_INVALID_FRAMEBUFFER_OPERATION:
+		cout << "GL_INVALID_FRAMEBUFFER_OPERATION - " << location << endl;
+		break;
+	case GL_OUT_OF_MEMORY:
+		cout << "GL_OUT_OF_MEMORY - " << location << endl;
+		break;
+	}
+}
+
 void ShaderList::initShaders()
 {
 	shaderIDs[ShaderList::DIFFUSE] = GetShader("diffuse");
@@ -41,6 +65,13 @@ void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 
 	uniformLocation = glGetUniformLocation(programID, "color");
 	glUniform3f(uniformLocation, color.x, color.y, color.z);
+
+	glErrorCheckMaterial("Uniforms");
+
+	/*printf("viewer = (%f, %f, %f)\nLight = (%f, %f, %f)\nColor = (%f, %f, %f)\n\n",
+		viewer.x, viewer.y, viewer.z,
+		light.x, light.y, light.z,
+		color.x, color.y, color.z);*/
 	
 }
 

@@ -89,9 +89,9 @@ void Camera::changeDir(vec3 _dir)
 mat4 Camera::getMatrix()
 {
 
-	mat4 lookat (	right.x, up.x, dir.x, 0,
-					right.y, up.y, dir.y, 0,
-					right.z, up.z, dir.z, 0,
+	mat4 lookat (	right.x, up.x, -dir.x, 0,
+					right.y, up.y, -dir.y, 0,
+					right.z, up.z, -dir.z, 0,
 					0, 0, 0, 1);
 	/*mat4 lookat(right.x, right.y, right.z, 0,
 				up.x, up.y, up.z, 0,
@@ -101,7 +101,7 @@ mat4 Camera::getMatrix()
 	mat4 translation(	1, 0, 0, 0,
 						0, 1, 0, 0,
 						0, 0, 1, 0,
-						pos.x, pos.y, pos.z, 1);
+						-pos.x, -pos.y, -pos.z, 1);
 
 	//mat4 lookat{right.x, }
 	
@@ -201,6 +201,8 @@ void Camera::zoom(float scale)
 vec3 Camera::getPos(){ return pos; }
 
 vec3 Camera::getDir(){ return dir; }
+
+vec3 Camera::getUp(){ return up; }
 
 
 void Camera::changeViewCenter(vec3 _viewCenter)

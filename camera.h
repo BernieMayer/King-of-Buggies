@@ -37,6 +37,8 @@ public:
 
 	vec3 getDir();
 
+	vec3 getUp();
+
 	void changeDir(vec3 _dir);
 
 	void changePos(vec3 _pos);
