@@ -9,6 +9,11 @@ class GameState {
 private:
 	LevelInfo map;
 	PlayerInfo players[4];
+
+public:
+	GameState();
+
+
 };
 
 #endif // GAMESTATE_H

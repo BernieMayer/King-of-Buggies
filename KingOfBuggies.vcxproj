@@ -123,6 +123,7 @@
     <ClCompile Include="diffuse.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Gamepad.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshInfo.cpp" />
@@ -131,6 +132,7 @@
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />
+    <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="specular.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
   </ItemGroup>

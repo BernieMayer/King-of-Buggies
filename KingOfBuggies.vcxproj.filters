@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
-    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -23,13 +22,18 @@
     <ClCompile Include="MeshInfo.cpp" />
     <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="MeshObject.cpp" />
+    <ClCompile Include="GameState.cpp" />
+    <ClCompile Include="Entity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerInfo.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="Coin.h" />
     <ClInclude Include="DrivingController.h" />
-    <ClInclude Include="Entity.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
@@ -43,9 +47,6 @@
     <ClInclude Include="MeshInfoLoader.h" />
     <ClInclude Include="MeshObject.h" />
     <ClInclude Include="Physics.h" />
-    <ClInclude Include="PlayerInfo.h" />
-    <ClInclude Include="Powerup.h" />
-    <ClInclude Include="PowerupBox.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Timer.h" />
@@ -62,10 +63,28 @@
     <ClInclude Include="torranceSparrow.h">
       <Filter>Materials</Filter>
     </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerInfo.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Powerup.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="PowerupBox.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Coin.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">
       <UniqueIdentifier>{e519f910-bb3c-4be1-a2cc-e0c9f105d2dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Entities">
+      <UniqueIdentifier>{680fcdc6-9465-4923-9220-90fe15c23bb1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -132,7 +132,7 @@ void Physics::shutdown() {
 	mFoundation->release();
 }
 
-void Physics::startSim(GameState state) {
+void Physics::startSim(const GameState& state) {
 	// Simulate at 60 fps... probably what it means
 	gScene->simulate(1.0f / 60.0f);
 }

@@ -131,7 +131,7 @@ void renderTest(GLFWwindow* window)
 	// Object creation
 	Diffuse mat = Diffuse();
 	Specular shinyMat = Specular(20.f);
-	TorranceSparrow tsMat = TorranceSparrow(0.5f);
+	TorranceSparrow tsMat = TorranceSparrow(5.f);
 	
 	unsigned int model = render.generateObjectID();
 	
