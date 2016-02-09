@@ -6,6 +6,8 @@
 
 #include "PxPhysicsAPI.h"
 
+#define MAX_NUM_ACTOR_SHAPES 128
+
 using namespace physx;
 
 PxDefaultAllocator gAllocator;
@@ -151,6 +153,20 @@ GameState Physics::getSim() {
 
 	// How to get rotation
 	PxQuat rotation = aSphereActor->getGlobalPose().q;
+
+	// Get number of shapes
+	const PxU32 nbShapes = aSphereActor->getNbShapes();
+	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+	aSphereActor->getShapes(shapes, nbShapes);
+	// Get geometry
+	PxGeometryHolder geo = shapes[0]->getGeometry();
+	// Find type (Box, Capsule, convex mesh, heightfield, plane, sphere or triangle mesh)
+	geo.getType();
+	// Get actual sphere
+	PxSphereGeometry sphere = geo.sphere();
+	// This will contain stuff about the shape of the object
+	// In the case of a sphere, only the radius
+	
 
 	return GameState();
 }
