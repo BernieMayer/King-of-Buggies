@@ -20,6 +20,9 @@ PxScene* gScene = NULL;
 
 PxMaterial* mMaterial = NULL;
 
+PxRigidStatic* plane;
+PxRigidDynamic* aSphereActor;
+
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
 Physics::Physics() {
@@ -86,7 +89,7 @@ void Physics::initDefaultScene() {
 	}
 
 	// Add static ground plane to the scene
-	PxRigidStatic* plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
+	plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
 		*mMaterial);
 	if (!plane) {
 		// Fatal error
@@ -95,18 +98,18 @@ void Physics::initDefaultScene() {
 	gScene->addActor(*plane);
 
 	// Add dynamic thrown ball to scene
-	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 1, 0)));
+	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 1, 0)));
 	// 0.5 = radius
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(0.5), *mMaterial);
 	// 1.0f = density
 	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
 
-	// I don't know what effect a 0 vector will have on velocity
-	aSphereActor->setLinearVelocity(PxVec3(0));
+	// I don't know what effect a 3 vector will have on velocity
+	aSphereActor->setLinearVelocity(PxVec3(3));
 
 	gScene->addActor(*aSphereActor);
 
-	initVehicle();
+	//initVehicle();
 }
 
 void Physics::initVehicle() {
@@ -141,6 +144,14 @@ GameState Physics::getSim() {
 	// Will get the simulation results
 	// True means that it will wait until the simulation is done if needed
 	gScene->fetchResults(true);
+
+	// An example of how to get position
+	PxVec3 pos = aSphereActor->getGlobalPose().p;
+	std::cout << "Sphere Y: " << pos.y << "\n";
+
+	// How to get rotation
+	PxQuat rotation = aSphereActor->getGlobalPose().q;
+
 	return GameState();
 }
 

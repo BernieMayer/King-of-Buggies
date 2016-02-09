@@ -114,6 +114,11 @@ void inputTest(GLFWwindow* window) {
 void physicsTest() {
 	Physics physics = Physics();
 
+	for (int i = 0; i < 100; i++) {
+		physics.startSim(GameState());
+		physics.getSim();
+	}
+
 	physics.shutdown();
 }
 
