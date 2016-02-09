@@ -6,12 +6,14 @@
 
 class PlayerInfo: public Entity {
 public:
+	PlayerInfo();
 	bool isGoldenBuggie();
 
 private:
 	int powerup;
 	int numCoins;
 	int powerupCounter;
+	bool goldenBuggie;
 	float timeGolden;
 };
 

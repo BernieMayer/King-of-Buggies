@@ -114,6 +114,11 @@ void inputTest(GLFWwindow* window) {
 void physicsTest() {
 	Physics physics = Physics();
 
+	for (int i = 0; i < 100; i++) {
+		physics.startSim(GameState());
+		physics.getSim();
+	}
+
 	physics.shutdown();
 }
 
@@ -123,6 +128,9 @@ void renderTest(GLFWwindow* window)
 
 	Renderer render = Renderer(window);
 	MeshInfo meshLoader = MeshInfo();
+
+	// Loads the indices of meshes contained in MeshInfo
+	enum { CUBE = 0, SPHERE, PLANE, COUNT };
 
 	vector<vec3> mesh;
 	vector<vec3> normals;
@@ -135,9 +143,9 @@ void renderTest(GLFWwindow* window)
 	
 	unsigned int model = render.generateObjectID();
 	
-	mesh = meshLoader.getMeshVertices(model);
-	normals = meshLoader.getMeshNormals(model);
-	indices = meshLoader.getMeshIndices(model);
+	mesh = meshLoader.getMeshVertices(CUBE);
+	normals = meshLoader.getMeshNormals(CUBE);
+	indices = meshLoader.getMeshIndices(CUBE);
 
 	render.assignMesh(model, &mesh);
 	render.assignNormals(model, &normals);
@@ -148,26 +156,29 @@ void renderTest(GLFWwindow* window)
 	vector<vec3> mesh2;
 	vector<vec3> normals2;
 	vector<unsigned int> indices2;
+	mat4 translation2;
+	translation2[3][2] = -0.7f;
 
 	unsigned int disco = render.generateObjectID();
-	mesh2 = meshLoader.getMeshVertices(disco);
-	normals2 = meshLoader.getMeshNormals(disco);
-	indices2 = meshLoader.getMeshIndices(disco);
+	mesh2 = meshLoader.getMeshVertices(SPHERE);
+	normals2 = meshLoader.getMeshNormals(SPHERE);
+	indices2 = meshLoader.getMeshIndices(SPHERE);
 
 	render.assignMesh(disco, &mesh2);
 	render.assignNormals(disco, &normals2);
 	render.assignIndices(disco, &indices2);
 	render.assignMaterial(disco, &tsMat);
 	render.assignColor(disco, vec3(1.0, 0.0, 1.0));
+	render.assignTransform(disco, translation2);
 
 	vector<vec3> mesh3;
 	vector<vec3> normals3;
 	vector<unsigned int> indices3;
 
 	unsigned int plane = render.generateObjectID();
-	mesh3 = meshLoader.getMeshVertices(plane);
-	normals3 = meshLoader.getMeshNormals(plane);
-	indices3 = meshLoader.getMeshIndices(plane);
+	mesh3 = meshLoader.getMeshVertices(PLANE);
+	normals3 = meshLoader.getMeshNormals(PLANE);
+	indices3 = meshLoader.getMeshIndices(PLANE);
 
 	render.assignMesh(plane, &mesh3);
 	render.assignNormals(plane, &normals3);

@@ -9,7 +9,7 @@ class Physics {
 public:
 	Physics();
 	void shutdown();
-	void startSim(GameState);
+	void startSim(const GameState&);
 	GameState getSim();
 	Entity* getCollisions();
 private:

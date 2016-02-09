@@ -6,6 +6,8 @@
 
 #include "PxPhysicsAPI.h"
 
+#define MAX_NUM_ACTOR_SHAPES 128
+
 using namespace physx;
 
 PxDefaultAllocator gAllocator;
@@ -19,6 +21,9 @@ PxDefaultCpuDispatcher* mDispatcher = NULL;
 PxScene* gScene = NULL;
 
 PxMaterial* mMaterial = NULL;
+
+PxRigidStatic* plane;
+PxRigidDynamic* aSphereActor;
 
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
@@ -86,7 +91,7 @@ void Physics::initDefaultScene() {
 	}
 
 	// Add static ground plane to the scene
-	PxRigidStatic* plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
+	plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
 		*mMaterial);
 	if (!plane) {
 		// Fatal error
@@ -95,18 +100,18 @@ void Physics::initDefaultScene() {
 	gScene->addActor(*plane);
 
 	// Add dynamic thrown ball to scene
-	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 1, 0)));
+	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 1, 0)));
 	// 0.5 = radius
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(0.5), *mMaterial);
 	// 1.0f = density
 	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
 
-	// I don't know what effect a 0 vector will have on velocity
-	aSphereActor->setLinearVelocity(PxVec3(0));
+	// I don't know what effect a 3 vector will have on velocity
+	aSphereActor->setLinearVelocity(PxVec3(3));
 
 	gScene->addActor(*aSphereActor);
 
-	initVehicle();
+	//initVehicle();
 }
 
 void Physics::initVehicle() {
@@ -132,7 +137,7 @@ void Physics::shutdown() {
 	mFoundation->release();
 }
 
-void Physics::startSim(GameState state) {
+void Physics::startSim(const GameState& state) {
 	// Simulate at 60 fps... probably what it means
 	gScene->simulate(1.0f / 60.0f);
 }
@@ -141,6 +146,28 @@ GameState Physics::getSim() {
 	// Will get the simulation results
 	// True means that it will wait until the simulation is done if needed
 	gScene->fetchResults(true);
+
+	// An example of how to get position
+	PxVec3 pos = aSphereActor->getGlobalPose().p;
+	std::cout << "Sphere Y: " << pos.y << "\n";
+
+	// How to get rotation
+	PxQuat rotation = aSphereActor->getGlobalPose().q;
+
+	// Get number of shapes
+	const PxU32 nbShapes = aSphereActor->getNbShapes();
+	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+	aSphereActor->getShapes(shapes, nbShapes);
+	// Get geometry
+	PxGeometryHolder geo = shapes[0]->getGeometry();
+	// Find type (Box, Capsule, convex mesh, heightfield, plane, sphere or triangle mesh)
+	geo.getType();
+	// Get actual sphere
+	PxSphereGeometry sphere = geo.sphere();
+	// This will contain stuff about the shape of the object
+	// In the case of a sphere, only the radius
+	
+
 	return GameState();
 }
 
