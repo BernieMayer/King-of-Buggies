@@ -20,6 +20,12 @@ MeshInfo::MeshInfo() {
 	meshes.push_back(planeObject);
 
 	meshLoader.clearData();
+
+	meshLoader.loadModel("models\\cube.obj");
+	MeshObject cubeObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
+	meshes.push_back(cubeObject);
+
+	meshLoader.clearData();
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {

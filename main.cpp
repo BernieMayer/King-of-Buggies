@@ -228,9 +228,9 @@ void renderTest(GLFWwindow* window)
 	
 	unsigned int model = render.generateObjectID();
 	
-	mesh = meshLoader.getMeshVertices(CUBE);
-	normals = meshLoader.getMeshNormals(CUBE);
-	indices = meshLoader.getMeshIndices(CUBE);
+	mesh = meshLoader.getMeshVertices(BRICK);
+	normals = meshLoader.getMeshNormals(BRICK);
+	indices = meshLoader.getMeshIndices(BRICK);
 
 	render.assignMesh(model, &mesh);
 	render.assignNormals(model, &normals);
