@@ -155,4 +155,6 @@ public:
 void displayVec4(const vec4& vec);
 void displayMat4(const mat4& mat);
 
+void resizeFunc(GLFWwindow* window, int width, int height);
+
 #endif // RENDERER_H

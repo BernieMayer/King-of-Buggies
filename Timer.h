@@ -2,6 +2,7 @@
 #define TIMER_H
 
 #include <time.h>
+#include <Windows.h>
 #include <sys/timeb.h>
 
 class Timer {

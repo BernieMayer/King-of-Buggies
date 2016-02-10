@@ -102,7 +102,7 @@ void Physics::initDefaultScene() {
 	}
 
 	// staticfriction, dynamic friction, restitution
-	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.1f);
+	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.9f);
 	if (!mMaterial) {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
@@ -125,7 +125,7 @@ void Physics::initDefaultScene() {
 	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
 
 	// I don't know what effect a 3 vector will have on velocity
-	//aSphereActor->setLinearVelocity(PxVec3(3));
+	aSphereActor->setLinearVelocity(PxVec3(0.2f, 0.f, 0.f));
 
 	gScene->addActor(*aSphereActor);
 
@@ -157,12 +157,12 @@ void Physics::shutdown() {
 
 void Physics::startSim(const GameState& state) {
 	// Simulate at 60 fps... probably what it means
-	float timeElapsed = clock.getElapsedTime();
+	/*float timeElapsed = clock.getElapsedTime();
 
-	gScene->simulate(max(timeElapsed, 0.001f));
-	/*float frameTime = 1 / 60.f;
+	gScene->simulate(max(timeElapsed, 0.001f));*/
+	float frameTime = 1 / 60.f;
 	clock.waitUntil(frameTime);
-	gScene->simulate(frameTime);*/
+	gScene->simulate(frameTime);
 }
 
 GameState Physics::getSim() {

@@ -134,7 +134,7 @@ void physicsAndRenderTest(GLFWwindow* window)
 	// Object creation
 	Diffuse mat = Diffuse();
 	Specular shinyMat = Specular(20.f);
-	TorranceSparrow tsMat = TorranceSparrow(8.f);
+	TorranceSparrow tsMat = TorranceSparrow(3.f);
 
 	//Create plane
 	unsigned int plane = render.generateObjectID();
@@ -144,15 +144,6 @@ void physicsAndRenderTest(GLFWwindow* window)
 	render.assignPlane(plane, 8.f, &meshPlane, &normalsPlane, &indicesPlane);
 	render.assignMaterial(plane, &tsMat);
 	render.assignColor(plane, vec3(0.5f, 0.5f, 0.5f));
-	/*vector<vec3> mesh2 = meshLoader.getMeshVertices(PLANE);
-	vector<vec3> normals2 = meshLoader.getMeshNormals(PLANE);
-	vector<unsigned int> indices2 = meshLoader.getMeshIndices(PLANE);
-
-	render.assignMesh(plane, &mesh2);
-	render.assignNormals(plane, &normals2);
-	render.assignIndices(plane, &indices2);
-	render.assignMaterial(plane, &tsMat);
-	render.assignColor(plane, vec3(0.65, 0.65, 0.65));*/
 
 	//Create sphere
 	vector<vec3> mesh;

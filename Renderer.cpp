@@ -3,6 +3,8 @@
 
 #include "Renderer.h"
 
+mat4 winRatio (1.f);		//Only to be modified by resizeFunc
+
 void glErrorCheck(const char* location)
 {
 	GLenum code = glGetError();
@@ -47,11 +49,14 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
 
 }
 
-Renderer::Renderer(GLFWwindow* _window) :window(_window), debugging(false)
+Renderer::Renderer(GLFWwindow* _window) : window(_window), debugging(false), 
+projection(1.f), modelview(1.f)
 {
 	shaderList.initShaders();
 
 	window = _window;
+
+	glfwSetWindowSizeCallback(window, resizeFunc);
 
 	glGenVertexArrays(VAO::COUNT, vao);
 	glGenBuffers(VBO::COUNT, vbo);
@@ -210,7 +215,6 @@ void Renderer::loadCamera(Camera* _camera)
 }
 
 
-
 /**
 * Rendering functionality
 **/
@@ -235,10 +239,10 @@ void Renderer::draw(unsigned int id)
 	object.mat->useShader();
 
 	if (camera != NULL)
-		object.mat->loadUniforms(projection*modelview*camera->getMatrix()*object.transform, object.transform, 
+		object.mat->loadUniforms(winRatio*projection*modelview*camera->getMatrix()*object.transform, object.transform, 
 						camera->getPos(), light.pos, object.color);	
 	else
-		object.mat->loadUniforms(projection*modelview*object.transform, object.transform,
+		object.mat->loadUniforms(winRatio*projection*modelview*object.transform, object.transform,
 						vec3(0.f, 0.f, 0.f), light.pos, object.color);
 
 
@@ -678,6 +682,20 @@ void displayMat4(const mat4& mat)
 	{
 		displayVec4(mat[i]);
 	}
+}
+
+
+/////////////
+//Callbacks
+////////////
+
+void resizeFunc(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+
+	float minDim = min((float)width, (float)height);
+	winRatio[0][0] = minDim / (float)width;
+	winRatio[1][1] = minDim / (float)height;
 }
 
 #endif // RENDERER_CPP
