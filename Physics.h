@@ -8,7 +8,7 @@
 #include "PxPhysicsAPI.h"
 #include "Timer.h"
 
-const float gravity = -20.f;
+const float gravity = -9.81f;
 
 class Physics {
 public:

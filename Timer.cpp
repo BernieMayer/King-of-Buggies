@@ -20,5 +20,14 @@ float Timer::getElapsedTime()
 	return ((float)diff)*0.001f;
 }
 
+void Timer::waitUntil(float targetTime)
+{
+	float timeElapsed = 0.f;
+	while (timeElapsed < targetTime)
+	{
+		timeElapsed += getElapsedTime();
+	}
+}
+
 
 #endif // TIMER_CPP

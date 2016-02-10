@@ -12,6 +12,7 @@ public:
 	Timer();
 
 	float getElapsedTime();		//In seconds
+	void waitUntil(float targetTime);		//Don't use! Hogs CPU
 
 };
 

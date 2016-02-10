@@ -194,8 +194,8 @@ void physicsAndRenderTest(GLFWwindow* window)
 		//cam.rotateView(in.turn*scale, in.forward*scale);
 		if (in.powerup)
 			cam.rotateView(-in.camH*scale, in.camV*scale);
-		//if (in.drift)
-			//cam.zoom(in.camV*0.5f + 1.f);
+		if (in.drift)
+			cam.zoom(in.camV*0.95f + 1.f);
 
 		physx::PxRigidActor* sphereActor = getSphere();
 		render.assignTransform(sphere, getMat4(sphereActor->getGlobalPose()));

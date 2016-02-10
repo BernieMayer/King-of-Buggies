@@ -159,7 +159,10 @@ void Physics::startSim(const GameState& state) {
 	// Simulate at 60 fps... probably what it means
 	float timeElapsed = clock.getElapsedTime();
 
-	gScene->simulate(max(timeElapsed, 0.0001f));
+	gScene->simulate(max(timeElapsed, 0.001f));
+	/*float frameTime = 1 / 60.f;
+	clock.waitUntil(frameTime);
+	gScene->simulate(frameTime);*/
 }
 
 GameState Physics::getSim() {
