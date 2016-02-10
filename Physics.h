@@ -7,6 +7,7 @@
 #include "GameState.h"
 #include "PxPhysicsAPI.h"
 #include "Timer.h"
+#include "Input.h"
 
 const float gravity = -9.81f;
 
@@ -48,6 +49,7 @@ public:
 	void startSim(const GameState&);
 	GameState getSim();
 	Entity* getCollisions();
+	void giveInput(Input input, int playerNum);
 private:
 	Timer clock;
 	void initDefaultScene();
