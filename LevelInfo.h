@@ -4,13 +4,20 @@
 #include <glm/glm.hpp>
 
 #include "LevelInfoLoader.h"
+#include "MeshObject.h"
 
 using namespace glm;
 
 class LevelInfo {
 private:
-	float** arena;
+	MeshObject* arena;
 	vec3 powerUpLocations;
+public:
+	LevelInfo();
+	LevelInfo(MeshObject* mesh);
+
+	MeshObject* getMeshObject();
+
 };
 
 #endif // LEVELINFO_H

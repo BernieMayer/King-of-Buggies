@@ -3,10 +3,11 @@
 
 #include "GameState.h"
 #include "LevelInfo.h"
+#include "Input.h"
 
 class AIManager {
 public:
-	Input* updateAI(GameState state);
+	Input* updateAI(GameState* state);
 };
 
 #endif // AIMANAGER_H
