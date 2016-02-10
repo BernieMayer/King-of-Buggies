@@ -134,6 +134,7 @@
     <ClCompile Include="material.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="specular.cpp" />
+    <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -4,7 +4,6 @@
 #include <stdio.h>  
 #include <stdlib.h>  
 
-#include "PxPhysicsAPI.h"
 
 #define MAX_NUM_ACTOR_SHAPES 128
 
@@ -26,6 +25,25 @@ PxRigidStatic* plane;
 PxRigidDynamic* aSphereActor;
 
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
+
+//TEMPORARY FUNCTION
+PxRigidActor* getSphere() { return aSphereActor; }
+
+vec4 getVec4(const PxVec4& vec)
+{
+	return vec4(vec.x, vec.y, vec.z, vec.w);
+}
+
+mat4 getMat4(const PxTransform& transform)
+{
+	PxMat44 physxMatrix = PxMat44(transform);
+	mat4 finalMatrix(	getVec4(physxMatrix[0]), 
+						getVec4(physxMatrix[1]), 
+						getVec4(physxMatrix[2]), 
+						getVec4(physxMatrix[3]));
+
+	return finalMatrix;
+}
 
 Physics::Physics() {
 	mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION,
@@ -63,7 +81,7 @@ Physics::Physics() {
 
 void Physics::initDefaultScene() {
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, gravity, 0.0f);
 
 	// May need to change this number
 	PxU32 numWorkers = 1;
@@ -100,14 +118,14 @@ void Physics::initDefaultScene() {
 	gScene->addActor(*plane);
 
 	// Add dynamic thrown ball to scene
-	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 1, 0)));
+	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 5.f, 0)));
 	// 0.5 = radius
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(0.5), *mMaterial);
 	// 1.0f = density
 	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
 
 	// I don't know what effect a 3 vector will have on velocity
-	aSphereActor->setLinearVelocity(PxVec3(3));
+	//aSphereActor->setLinearVelocity(PxVec3(3));
 
 	gScene->addActor(*aSphereActor);
 
@@ -139,7 +157,9 @@ void Physics::shutdown() {
 
 void Physics::startSim(const GameState& state) {
 	// Simulate at 60 fps... probably what it means
-	gScene->simulate(1.0f / 60.0f);
+	float timeElapsed = clock.getElapsedTime();
+
+	gScene->simulate(max(timeElapsed, 0.0001f));
 }
 
 GameState Physics::getSim() {
@@ -149,7 +169,7 @@ GameState Physics::getSim() {
 
 	// An example of how to get position
 	PxVec3 pos = aSphereActor->getGlobalPose().p;
-	std::cout << "Sphere Y: " << pos.y << "\n";
+	//std::cout << "Sphere Y: " << pos.y << "\n";
 
 	// How to get rotation
 	PxQuat rotation = aSphereActor->getGlobalPose().q;

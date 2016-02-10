@@ -142,7 +142,7 @@ void Camera::rotateView(float x, float y)
 			pos = _dir*pos_length;
 		}
 
-		changeDir(viewCenter-pos);
+		changeDir(normalize(viewCenter-pos));
 	}
 
 }

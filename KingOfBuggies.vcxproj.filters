@@ -29,6 +29,7 @@
     <ClCompile Include="PlayerInfo.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

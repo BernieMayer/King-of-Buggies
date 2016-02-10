@@ -121,6 +121,10 @@ public:
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
 					vector<unsigned int>* indices);
+	void assignPlane(unsigned int object, float width,
+					vector<vec3>* mesh,
+					vector<vec3>* normals,
+					vector<unsigned int>* indices);
 	void assignSphere(unsigned int object, float radius, unsigned int divisions,
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
@@ -147,5 +151,8 @@ public:
 	void deleteIDs();
 
 };
+
+void displayVec4(const vec4& vec);
+void displayMat4(const mat4& mat);
 
 #endif // RENDERER_H

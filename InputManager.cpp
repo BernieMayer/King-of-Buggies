@@ -20,9 +20,9 @@ float map(float value, float min, float max, float newMin, float newMax) {
 	return (value - min) * ((newMax - newMin) / (max - min)) + newMin;
 }
 
-
 // Handles mouse movement
 void mousePosition(GLFWwindow *sender, double x, double y) {
+
 	float f_x = (float)x;
 	float f_y = (float)y;
 
@@ -135,6 +135,7 @@ InputManager::InputManager(GLFWwindow* w)
 
 InputManager::~InputManager()
 {
+
 }
 
 // Updates and returns input for all players
@@ -184,6 +185,8 @@ Input InputManager::getInput(int playerNum)
 		input.menu = kMenu;
 		lastMouseX = currentMouseX;
 		lastMouseY = currentMouseY;
+
+		kCamH = kCamV = 0.f;
 	} else {
 		input.forward = 0;
 		input.turn = 0;

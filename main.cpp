@@ -122,6 +122,101 @@ void physicsTest() {
 	physics.shutdown();
 }
 
+void physicsAndRenderTest(GLFWwindow* window)
+{
+	printf("Begin physics and rendering test\n");
+
+	Physics physics = Physics();
+
+	Renderer render = Renderer(window);
+	MeshInfo meshLoader = MeshInfo();
+
+	// Object creation
+	Diffuse mat = Diffuse();
+	Specular shinyMat = Specular(20.f);
+	TorranceSparrow tsMat = TorranceSparrow(8.f);
+
+	//Create plane
+	unsigned int plane = render.generateObjectID();
+	vector<vec3> meshPlane;
+	vector<vec3> normalsPlane;
+	vector<unsigned int> indicesPlane;
+	render.assignPlane(plane, 8.f, &meshPlane, &normalsPlane, &indicesPlane);
+	render.assignMaterial(plane, &tsMat);
+	render.assignColor(plane, vec3(0.5f, 0.5f, 0.5f));
+	/*vector<vec3> mesh2 = meshLoader.getMeshVertices(PLANE);
+	vector<vec3> normals2 = meshLoader.getMeshNormals(PLANE);
+	vector<unsigned int> indices2 = meshLoader.getMeshIndices(PLANE);
+
+	render.assignMesh(plane, &mesh2);
+	render.assignNormals(plane, &normals2);
+	render.assignIndices(plane, &indices2);
+	render.assignMaterial(plane, &tsMat);
+	render.assignColor(plane, vec3(0.65, 0.65, 0.65));*/
+
+	//Create sphere
+	vector<vec3> mesh;
+	vector<vec3> normals;
+	vector<unsigned int> indices;
+	
+	unsigned int sphere = render.generateObjectID();
+	render.assignSphere(sphere, 0.5f, 20, &mesh, &normals, &indices);
+	render.assignMaterial(sphere, &tsMat);
+
+	//Light creation
+	vec3 lightPos(5.0, 5.0, 5.0);
+	unsigned int light = render.generateLightObject();
+	render.setLightPosition(light, lightPos);
+
+
+	InputManager im(window);
+
+	//Starting direction, up vector, starting position
+	Camera cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0),
+		MODELVIEWER_CAMERA);
+
+	render.loadPerspectiveTransform(0.1f, 20.f, 90.f);		//Near, far, fov
+
+	render.loadCamera(&cam);
+
+	mat4 translation;
+	float theta = 0.0;
+
+	while (!glfwWindowShouldClose(window))
+	{
+		//Physics sim
+		physics.startSim(GameState());
+		physics.getSim();
+
+		Input in = im.getInput(1);		//Get input
+
+		float scale = 1.f;
+		//cam.rotateView(in.turn*scale, in.forward*scale);
+		if (in.powerup)
+			cam.rotateView(-in.camH*scale, in.camV*scale);
+		//if (in.drift)
+			//cam.zoom(in.camV*0.5f + 1.f);
+
+		physx::PxRigidActor* sphereActor = getSphere();
+		render.assignTransform(sphere, getMat4(sphereActor->getGlobalPose()));
+		//displayMat4(getMat4(sphereActor->getGlobalPose()));
+
+		render.clearDrawBuffers();
+
+		render.drawAll();
+
+		//Swap buffers  
+		glfwSwapBuffers(window);
+		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
+
+	printf("End rendering test\n");
+}
+
 void renderTest(GLFWwindow* window)
 {
 	printf("Begin rendering test\n");
@@ -129,8 +224,7 @@ void renderTest(GLFWwindow* window)
 	Renderer render = Renderer(window);
 	MeshInfo meshLoader = MeshInfo();
 
-	// Loads the indices of meshes contained in MeshInfo
-	enum { CUBE = 0, SPHERE, PLANE, COUNT };
+	
 
 	vector<vec3> mesh;
 	vector<vec3> normals;
@@ -138,7 +232,7 @@ void renderTest(GLFWwindow* window)
 
 	// Object creation
 	Diffuse mat = Diffuse();
-	Specular shinyMat = Specular(20.f);
+	Specular shinyMat = Specular(20.f);	
 	TorranceSparrow tsMat = TorranceSparrow(8.f);
 	
 	unsigned int model = render.generateObjectID();
@@ -260,8 +354,10 @@ int main() {
 		return -1;
 
 	//inputTest(window);
-	physicsTest();
-	renderTest(window);
+	//physicsTest();
+	//renderTest(window);
+
+	physicsAndRenderTest(window);
 
 
 	return 0;

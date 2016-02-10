@@ -561,6 +561,43 @@ void Renderer::assignCube(	unsigned int id, float width,
 
 }
 
+void Renderer::assignPlane(unsigned int id, float width,
+	vector<vec3>* mesh,
+	vector<vec3>* normals,
+	vector<unsigned int>* indices)
+{
+
+	float halfWidth = 0.5f*width;
+	//Front face
+	mesh->push_back(vec3(-halfWidth, 0.f, halfWidth));
+	mesh->push_back(vec3(-halfWidth, 0.f, - halfWidth));
+	mesh->push_back(vec3(halfWidth, 0.f, -halfWidth));
+	mesh->push_back(vec3(halfWidth, 0.f, halfWidth));
+	/*//Back face
+	mesh.push_back(vec3(-halfWidth, halfWidth, -halfWidth));
+	mesh.push_back(vec3(halfWidth, halfWidth, -halfWidth));
+	mesh.push_back(vec3(halfWidth, -halfWidth, -halfWidth));
+	mesh.push_back(vec3(-halfWidth, -halfWidth, -halfWidth));*/
+
+	normals->push_back(vec3(0.f, 1.f, 0.f));
+	normals->push_back(vec3(0.f, 1.f, 0.f));
+	normals->push_back(vec3(0.f, 1.f, 0.f));
+	normals->push_back(vec3(0.f, 1.f, 0.f));
+
+	indices->push_back(0);
+	indices->push_back(1);
+	indices->push_back(2);
+	indices->push_back(2);
+	indices->push_back(3);
+	indices->push_back(0);
+
+	assignMesh(id, mesh);
+	assignNormals(id, normals);
+	assignIndices(id, indices);
+	assignColor(id, vec3(1.f, 0.f, 0.f));
+
+}
+
 void Renderer::assignSphere(unsigned int id, float radius, unsigned int divisions,
 	vector<vec3>* mesh,
 	vector<vec3>* normals,
@@ -629,6 +666,18 @@ void Renderer::debug_message(string message)
 {
 	if (true)
 		printf("Renderer>> %s\n", message.c_str());
+}
+
+void displayVec4(const vec4& vec)
+{
+	printf("[%f, %f, %f, %f]\n", vec.x, vec.y, vec.z, vec.w);
+}
+void displayMat4(const mat4& mat)
+{
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		displayVec4(mat[i]);
+	}
 }
 
 #endif // RENDERER_CPP
