@@ -154,6 +154,22 @@ void physicsAndRenderTest(GLFWwindow* window)
 	render.assignSphere(sphere, 0.5f, 20, &mesh, &normals, &indices);
 	render.assignMaterial(sphere, &tsMat);
 
+	MeshObject carMesh = meshLoader.getMesh(CUBE);
+	vector<vec3> carVerts = carMesh.getVertices();
+	vector<vec3> carNormals = carMesh.getNormals();
+	vector<unsigned int> carIndices = carMesh.getIndices();
+
+	unsigned int car = render.generateObjectID();
+	render.assignMesh(car, &carVerts);
+	render.assignNormals(car, &carNormals);
+	render.assignIndices(car, &carIndices);
+	render.assignMaterial(car, &tsMat);
+
+
+	printf("Vertices = %d, Normals %d, Indices %d\n", (carMesh.getVertices()).size()
+		, (carMesh.getNormals()).size(), (carMesh.getIndices()).size());
+
+
 	//Light creation
 	vec3 lightPos(5.0, 5.0, 5.0);
 	unsigned int light = render.generateLightObject();
@@ -173,6 +189,11 @@ void physicsAndRenderTest(GLFWwindow* window)
 	mat4 translation;
 	float theta = 0.0;
 
+	mat4 carScaling(1.f);
+	carScaling[0][0] = 1.25f;
+	carScaling[1][1] = 1.f;
+	carScaling[2][2] = 2.f;
+
 	while (!glfwWindowShouldClose(window))
 	{
 		//Physics sim
@@ -189,7 +210,10 @@ void physicsAndRenderTest(GLFWwindow* window)
 			cam.zoom(in.camV*0.95f + 1.f);
 
 		physx::PxRigidActor* sphereActor = getSphere();
+		physx::PxRigidDynamic* carActor = getCar();
+
 		render.assignTransform(sphere, getMat4(sphereActor->getGlobalPose()));
+		render.assignTransform(car, getMat4(carActor->getGlobalPose())*carScaling);
 		//displayMat4(getMat4(sphereActor->getGlobalPose()));
 
 		render.clearDrawBuffers();
@@ -215,8 +239,6 @@ void renderTest(GLFWwindow* window)
 	Renderer render = Renderer(window);
 	MeshInfo meshLoader = MeshInfo();
 
-	
-
 	vector<vec3> mesh;
 	vector<vec3> normals;
 	vector<unsigned int> indices;
@@ -228,9 +250,9 @@ void renderTest(GLFWwindow* window)
 	
 	unsigned int model = render.generateObjectID();
 	
-	mesh = meshLoader.getMeshVertices(CUBE);
-	normals = meshLoader.getMeshNormals(CUBE);
-	indices = meshLoader.getMeshIndices(CUBE);
+	mesh = meshLoader.getMeshVertices(BRICK);
+	normals = meshLoader.getMeshNormals(BRICK);
+	indices = meshLoader.getMeshIndices(BRICK);
 
 	render.assignMesh(model, &mesh);
 	render.assignNormals(model, &normals);

@@ -7,6 +7,7 @@
 #include "GameState.h"
 #include "PxPhysicsAPI.h"
 #include "Timer.h"
+#include "Input.h"
 
 const float gravity = -9.81f;
 
@@ -48,10 +49,13 @@ public:
 	void startSim(const GameState&);
 	GameState getSim();
 	Entity* getCollisions();
+	void giveInput(Input input, int playerNum);
 private:
 	Timer clock;
 	void initDefaultScene();
 	PxVehicleDrive4W* initVehicle();
+	PxRigidDynamic* initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims, 
+		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset);
 	PxConvexMesh* createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking);
 	PxConvexMesh* createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking);
 	PxRigidDynamic* createVehicleActor
@@ -59,7 +63,8 @@ private:
 		PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,
 		PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes,
 		PxPhysics& physics);
-	void computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 numWheels, PxVec3* wheelCentreOffsets);
+	void computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, 
+		const PxU32 numWheels, PxVec3* wheelCentreOffsets);
 	void setupWheelsSimulationData
 		(const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth,
 		const PxU32 numWheels, const PxVec3* wheelCenterActorOffsets,

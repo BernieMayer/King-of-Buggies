@@ -7,6 +7,57 @@
 
 #define MAX_NUM_ACTOR_SHAPES 128
 
+PxVehicleKeySmoothingData gKeySmoothingData =
+{
+	{
+		3.0f,   //rise rate eANALOG_INPUT_ACCEL
+		3.0f,   //rise rate eANALOG_INPUT_BRAKE
+		10.0f,  //rise rate eANALOG_INPUT_HANDBRAKE
+		2.5f,   //rise rate eANALOG_INPUT_STEER_LEFT
+		2.5f,   //rise rate eANALOG_INPUT_STEER_RIGHT
+	},
+	{
+		5.0f,   //fall rate eANALOG_INPUT__ACCEL
+		5.0f,   //fall rate eANALOG_INPUT__BRAKE
+		10.0f,  //fall rate eANALOG_INPUT__HANDBRAKE
+		5.0f,   //fall rate eANALOG_INPUT_STEER_LEFT
+		5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+	}
+};
+
+PxVehiclePadSmoothingData gCarPadSmoothingData =
+{
+	{
+		6.0f,   //rise rate eANALOG_INPUT_ACCEL
+		6.0f,   //rise rate eANALOG_INPUT_BRAKE
+		12.0f,  //rise rate eANALOG_INPUT_HANDBRAKE
+		2.5f,   //rise rate eANALOG_INPUT_STEER_LEFT
+		2.5f,   //rise rate eANALOG_INPUT_STEER_RIGHT
+	},
+	{
+		10.0f,  //fall rate eANALOG_INPUT_ACCEL
+		10.0f,  //fall rate eANALOG_INPUT_BRAKE
+		12.0f,  //fall rate eANALOG_INPUT_HANDBRAKE
+		5.0f,   //fall rate eANALOG_INPUT_STEER_LEFT
+		5.0f    //fall rate eANALOG_INPUT_STEER_RIGHT
+	}
+};
+
+PxF32 gSteerVsForwardSpeedData[2 * 8] =
+{
+	0.0f, 0.75f,
+	5.0f, 0.75f,
+	30.0f, 0.125f,
+	120.0f, 0.1f,
+	PX_MAX_F32, PX_MAX_F32,
+	PX_MAX_F32, PX_MAX_F32,
+	PX_MAX_F32, PX_MAX_F32,
+	PX_MAX_F32, PX_MAX_F32
+};
+PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4);
+
+
+
 PxDefaultAllocator gAllocator;
 PxDefaultErrorCallback gErrorCallback;
 
@@ -23,6 +74,8 @@ PxRigidStatic* plane;
 PxRigidDynamic* aSphereActor;
 
 PxVehicleDrive4W* vehicle;
+
+PxVehicleDrive4WRawInputData* inputs[4];
 
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
@@ -77,6 +130,10 @@ Physics::Physics() {
 	}
 
 	initDefaultScene();
+
+}
+
+void Physics::giveInput(Input input, int playernum) {
 
 }
 
@@ -142,7 +199,7 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	// Create the batched scene queries for the supension raycasts
 	//gVehicleSceneQueryData
 
-	const PxVec3 chassisDims(2.5f, 2.0f, 5.0f);
+	const PxVec3 chassisDims(1.25f, 1.0f, 2.0f);
 	const PxF32 wheelWidth = 0.4f;
 	const PxF32 wheelRadius = 0.5f;
 	const PxU32 nbWheels = 4;
@@ -162,53 +219,7 @@ PxVehicleDrive4W* Physics::initVehicle() {
 		(chassisDims.x*chassisDims.x + chassisDims.y*chassisDims.y)*chassisMass / 12.0f);
 	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
 
-	PxRigidDynamic* veh4WActor = NULL;
-	{
-
-		
-
-		//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
-		//Moment of inertia is just the moment of inertia of a cylinder.
-		
-		PxMaterial* wheelMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
-
-		//Construct a convex mesh for a cylindrical wheel.
-		PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
-		//Assume all wheels are identical for simplicity.
-		PxConvexMesh* wheelConvexMeshes[PX_MAX_NB_WHEELS];
-		PxMaterial* wheelMaterials[PX_MAX_NB_WHEELS];
-
-		//Set the meshes and materials for the driven wheels.
-		for (PxU32 i = PxVehicleDrive4WWheelOrder::eFRONT_LEFT; i <= PxVehicleDrive4WWheelOrder::eREAR_RIGHT; i++)
-		{
-			wheelConvexMeshes[i] = wheelMesh;
-			wheelMaterials[i] = wheelMaterial;
-		}
-		//Set the meshes and materials for the non-driven wheels
-		for (PxU32 i = PxVehicleDrive4WWheelOrder::eREAR_RIGHT + 1; i < nbWheels; i++)
-		{
-			wheelConvexMeshes[i] = wheelMesh;
-			wheelMaterials[i] = wheelMaterial;
-		}
-
-		PxMaterial* chassisMaterial = wheelMaterial;
-		//Chassis just has a single convex shape for simplicity.
-		PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *mPhysics, *mCooking);
-		PxConvexMesh* chassisConvexMeshes[1] = { chassisConvexMesh };
-		PxMaterial* chassisMaterials[1] = { chassisMaterial };
-
-		//Rigid body data.
-		PxVehicleChassisData rigidBodyData;
-		rigidBodyData.mMOI = chassisMOI;
-		rigidBodyData.mMass = chassisMass;
-		rigidBodyData.mCMOffset = chassisCMOffset;
-
-		veh4WActor = createVehicleActor
-			(rigidBodyData,
-			wheelMaterials, wheelConvexMeshes, nbWheels,
-			chassisMaterials, chassisConvexMeshes, 1,
-			*mPhysics);
-	}
+	PxRigidDynamic* veh4WActor = initVehicleActor(wheelWidth, wheelRadius, nbWheels, chassisDims, chassisMOI, chassisMass, chassisCMOffset);
 
 	//Set up the sim data for the wheels.
 	PxVehicleWheelsSimData* wheelsSimData = PxVehicleWheelsSimData::allocate(nbWheels);
@@ -276,6 +287,55 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	gScene->addActor(*veh4WActor);
 
 	return vehDrive4W;
+}
+
+PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims, 
+	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset) {
+
+	PxRigidDynamic* veh4WActor = NULL;
+
+	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
+	//Moment of inertia is just the moment of inertia of a cylinder.
+	PxMaterial* wheelMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+
+	//Construct a convex mesh for a cylindrical wheel.
+	PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
+	//Assume all wheels are identical for simplicity.
+	PxConvexMesh* wheelConvexMeshes[PX_MAX_NB_WHEELS];
+	PxMaterial* wheelMaterials[PX_MAX_NB_WHEELS];
+
+	//Set the meshes and materials for the driven wheels.
+	for (PxU32 i = PxVehicleDrive4WWheelOrder::eFRONT_LEFT; i <= PxVehicleDrive4WWheelOrder::eREAR_RIGHT; i++)
+	{
+		wheelConvexMeshes[i] = wheelMesh;
+		wheelMaterials[i] = wheelMaterial;
+	}
+	//Set the meshes and materials for the non-driven wheels
+	for (PxU32 i = PxVehicleDrive4WWheelOrder::eREAR_RIGHT + 1; i < nbWheels; i++)
+	{
+		wheelConvexMeshes[i] = wheelMesh;
+		wheelMaterials[i] = wheelMaterial;
+	}
+
+	PxMaterial* chassisMaterial = wheelMaterial;
+	//Chassis just has a single convex shape for simplicity.
+	PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *mPhysics, *mCooking);
+	PxConvexMesh* chassisConvexMeshes[1] = { chassisConvexMesh };
+	PxMaterial* chassisMaterials[1] = { chassisMaterial };
+
+	//Rigid body data.
+	PxVehicleChassisData rigidBodyData;
+	rigidBodyData.mMOI = chassisMOI;
+	rigidBodyData.mMass = chassisMass;
+	rigidBodyData.mCMOffset = chassisCMOffset;
+
+	veh4WActor = createVehicleActor
+		(rigidBodyData,
+		wheelMaterials, wheelConvexMeshes, nbWheels,
+		chassisMaterials, chassisConvexMeshes, 1,
+		*mPhysics);
+
+	return veh4WActor;
 }
 
 void Physics::setupWheelsSimulationData
@@ -484,7 +544,7 @@ PxPhysics& physics)
 {
 	//We need a rigid body actor for the vehicle.
 	//Don't forget to add the actor to the scene after setting up the associated vehicle.
-	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxIdentity));
+	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxVec3(0.f, 1.f, 0.f)));//PxIdentity));
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;
