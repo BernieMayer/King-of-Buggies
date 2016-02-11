@@ -79,7 +79,7 @@ PxVehicleDrive4WRawInputData* inputs[4];
 
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
-//TEMPORARY FUNCTIONS
+//TEMPORARY FUNCTION
 PxRigidActor* getSphere() { return aSphereActor; }
 PxRigidDynamic* getCar() { return vehicle->getRigidDynamicActor(); }
 
@@ -91,10 +91,10 @@ vec4 getVec4(const PxVec4& vec)
 mat4 getMat4(const PxTransform& transform)
 {
 	PxMat44 physxMatrix = PxMat44(transform);
-	mat4 finalMatrix(	getVec4(physxMatrix[0]), 
-						getVec4(physxMatrix[1]), 
-						getVec4(physxMatrix[2]), 
-						getVec4(physxMatrix[3]));
+	mat4 finalMatrix(getVec4(physxMatrix[0]),
+		getVec4(physxMatrix[1]),
+		getVec4(physxMatrix[2]),
+		getVec4(physxMatrix[3]));
 
 	return finalMatrix;
 }
@@ -110,14 +110,14 @@ Physics::Physics() {
 
 	// May need to replace null with a ProfileZoneManager
 	// Is supposed to be optional
-	mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation, 
+	mPhysics = PxCreatePhysics(PX_PHYSICS_VERSION, *mFoundation,
 		PxTolerancesScale(), recordMemoryAllocations, NULL);
 	if (!mPhysics) {
 		// Fatal error
 		std::cout << "Physics creation failure\n";
 	}
 
-	mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation,	
+	mCooking = PxCreateCooking(PX_PHYSICS_VERSION, *mFoundation,
 		PxCookingParams(PxTolerancesScale()));
 	if (!mCooking) {
 		// Fatal error
@@ -222,60 +222,11 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	PxRigidDynamic* veh4WActor = initVehicleActor(wheelWidth, wheelRadius, nbWheels, chassisDims, chassisMOI, chassisMass, chassisCMOffset);
 
 	//Set up the sim data for the wheels.
-	PxVehicleWheelsSimData* wheelsSimData = PxVehicleWheelsSimData::allocate(nbWheels);
-	{
-		//Compute the wheel center offsets from the origin.
-		PxVec3 wheelCenterActorOffsets[PX_MAX_NB_WHEELS];
-		const PxF32 frontZ = chassisDims.z*0.3f;
-		const PxF32 rearZ = -chassisDims.z*0.3f;
-		computeWheelCenterActorOffsets4W(frontZ, rearZ, chassisDims, wheelWidth, wheelRadius, nbWheels, wheelCenterActorOffsets);
-
-		//Set up the simulation data for all wheels.
-		setupWheelsSimulationData
-			(wheelMass, wheelMOI, wheelRadius, wheelWidth,
-			nbWheels, wheelCenterActorOffsets,
-			chassisCMOffset, chassisMass,
-			wheelsSimData);
-	}
+	PxVehicleWheelsSimData* wheelsSimData = initWheelSimData(nbWheels, chassisDims, wheelWidth, wheelRadius, wheelMass,
+		wheelMOI, chassisCMOffset, chassisMass);
 
 	//Set up the sim data for the vehicle drive model.
-	PxVehicleDriveSimData4W driveSimData;
-	{
-		//Diff
-		PxVehicleDifferential4WData diff;
-		diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
-		driveSimData.setDiffData(diff);
-
-		//Engine
-		PxVehicleEngineData engine;
-		engine.mPeakTorque = 500.0f;
-		engine.mMaxOmega = 600.0f;//approx 6000 rpm
-		driveSimData.setEngineData(engine);
-
-		//Gears
-		PxVehicleGearsData gears;
-		gears.mSwitchTime = 0.5f;
-		driveSimData.setGearsData(gears);
-
-		//Clutch
-		PxVehicleClutchData clutch;
-		clutch.mStrength = 10.0f;
-		driveSimData.setClutchData(clutch);
-
-		//Ackermann steer accuracy
-		PxVehicleAckermannGeometryData ackermann;
-		ackermann.mAccuracy = 1.0f;
-		ackermann.mAxleSeparation =
-			wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).z -
-			wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).z;
-		ackermann.mFrontWidth =
-			wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_RIGHT).x -
-			wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).x;
-		ackermann.mRearWidth =
-			wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_RIGHT).x -
-			wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).x;
-		driveSimData.setAckermannGeometryData(ackermann);
-	}
+	PxVehicleDriveSimData4W driveSimData = initDriveSimData(wheelsSimData);
 
 	//Create a vehicle from the wheels and drive sim data.
 	PxVehicleDrive4W* vehDrive4W = PxVehicleDrive4W::allocate(nbWheels);
@@ -289,7 +240,68 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	return vehDrive4W;
 }
 
-PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims, 
+PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheelsSimData) {
+	PxVehicleDriveSimData4W driveSimData;
+
+	//Diff
+	PxVehicleDifferential4WData diff;
+	diff.mType = PxVehicleDifferential4WData::eDIFF_TYPE_LS_4WD;
+	driveSimData.setDiffData(diff);
+
+	//Engine
+	PxVehicleEngineData engine;
+	engine.mPeakTorque = 500.0f;
+	engine.mMaxOmega = 600.0f;//approx 6000 rpm
+	driveSimData.setEngineData(engine);
+
+	//Gears
+	PxVehicleGearsData gears;
+	gears.mSwitchTime = 0.5f;
+	driveSimData.setGearsData(gears);
+
+	//Clutch
+	PxVehicleClutchData clutch;
+	clutch.mStrength = 10.0f;
+	driveSimData.setClutchData(clutch);
+
+	//Ackermann steer accuracy
+	PxVehicleAckermannGeometryData ackermann;
+	ackermann.mAccuracy = 1.0f;
+	ackermann.mAxleSeparation =
+		wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).z -
+		wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).z;
+	ackermann.mFrontWidth =
+		wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_RIGHT).x -
+		wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eFRONT_LEFT).x;
+	ackermann.mRearWidth =
+		wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_RIGHT).x -
+		wheelsSimData->getWheelCentreOffset(PxVehicleDrive4WWheelOrder::eREAR_LEFT).x;
+	driveSimData.setAckermannGeometryData(ackermann);
+
+	return driveSimData;
+}
+
+PxVehicleWheelsSimData* Physics::initWheelSimData(int nbWheels, const PxVec3 chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxF32 wheelMass,
+	const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass) {
+	PxVehicleWheelsSimData* wheelsSimData = PxVehicleWheelsSimData::allocate(nbWheels);
+
+	//Compute the wheel center offsets from the origin.
+	PxVec3 wheelCenterActorOffsets[PX_MAX_NB_WHEELS];
+	const PxF32 frontZ = chassisDims.z*0.3f;
+	const PxF32 rearZ = -chassisDims.z*0.3f;
+	computeWheelCenterActorOffsets4W(frontZ, rearZ, chassisDims, wheelWidth, wheelRadius, nbWheels, wheelCenterActorOffsets);
+
+	//Set up the simulation data for all wheels.
+	setupWheelsSimulationData
+		(wheelMass, wheelMOI, wheelRadius, wheelWidth,
+		nbWheels, wheelCenterActorOffsets,
+		chassisCMOffset, chassisMass,
+		wheelsSimData);
+
+	return wheelsSimData;
+}
+
+PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
 	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset) {
 
 	PxRigidDynamic* veh4WActor = NULL;
@@ -544,7 +556,7 @@ PxPhysics& physics)
 {
 	//We need a rigid body actor for the vehicle.
 	//Don't forget to add the actor to the scene after setting up the associated vehicle.
-	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxVec3(0.f, 1.f, 0.f)));//PxIdentity));
+	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxVec3(0.f, 1.5f, 0.f)));
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;
@@ -632,7 +644,7 @@ GameState Physics::getSim() {
 	PxSphereGeometry sphere = geo.sphere();
 	// This will contain stuff about the shape of the object
 	// In the case of a sphere, only the radius
-	
+
 
 	return GameState();
 }
