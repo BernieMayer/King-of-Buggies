@@ -26,6 +26,12 @@ MeshInfo::MeshInfo() {
 	meshes.push_back(cubeObject);
 
 	meshLoader.clearData();
+
+	meshLoader.loadModel("models\\wheel.obj");
+	MeshObject wheelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
+	meshes.push_back(wheelObject);
+
+	meshLoader.clearData();
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
