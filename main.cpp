@@ -165,6 +165,27 @@ void physicsAndRenderTest(GLFWwindow* window)
 	render.assignIndices(car, &carIndices);
 	render.assignMaterial(car, &tsMat);
 
+	MeshObject wheelMesh = meshLoader.getMesh(WHEEL);
+	vector<vec3> wheelVerts= wheelMesh.getVertices();
+	vector<vec3> wheelNormals = wheelMesh.getNormals();
+	vector<unsigned int> wheelIndices = wheelMesh.getIndices();
+
+	unsigned int wheels[4];
+	mat4 wheelScaling(1.f);
+	wheelScaling[0][0] = 0.4f;
+	wheelScaling[1][1] = 0.5f;
+	wheelScaling[2][2] = 0.5f;
+
+	for (int i = 0; i < 4; i++)
+	{
+		wheels[i] = render.generateObjectID();
+		render.assignMesh(wheels[i], &wheelVerts);
+		render.assignNormals(wheels[i], &wheelNormals);
+		render.assignIndices(wheels[i], &wheelIndices);
+		render.assignMaterial(wheels[i], &tsMat);
+		render.assignScale(wheels[i], wheelScaling);
+	}
+
 
 	printf("Vertices = %d, Normals %d, Indices %d\n", (carMesh.getVertices()).size()
 		, (carMesh.getNormals()).size(), (carMesh.getIndices()).size());
@@ -190,9 +211,12 @@ void physicsAndRenderTest(GLFWwindow* window)
 	float theta = 0.0;
 
 	mat4 carScaling(1.f);
-	carScaling[0][0] = 1.25f;
-	carScaling[1][1] = 1.f;
-	carScaling[2][2] = 2.f;
+	carScaling[0][0] = 1.25f*0.5f;
+	carScaling[1][1] = 1.f*0.5f;
+	carScaling[2][2] = 2.f*0.5f;
+	render.assignScale(car, carScaling);
+
+	
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -202,10 +226,10 @@ void physicsAndRenderTest(GLFWwindow* window)
 
 		Input in = im.getInput(1);		//Get input
 
-		float scale = 1.f;
+		float scale = 0.1f;
 		//cam.rotateView(in.turn*scale, in.forward*scale);
-		if (in.powerup)
-			cam.rotateView(-in.camH*scale, in.camV*scale);
+		if (!in.drift)//in.powerup)
+			cam.rotateView(in.camH*scale, in.camV*scale);
 		if (in.drift)
 			cam.zoom(in.camV*0.95f + 1.f);
 
@@ -213,7 +237,17 @@ void physicsAndRenderTest(GLFWwindow* window)
 		physx::PxRigidDynamic* carActor = getCar();
 
 		render.assignTransform(sphere, getMat4(sphereActor->getGlobalPose()));
-		render.assignTransform(car, getMat4(carActor->getGlobalPose())*carScaling);
+		render.assignTransform(car, getMat4(carActor->getGlobalPose()));
+
+		//Wheel transformations
+		PxShape* wheelShapes[4];
+		getWheels(wheelShapes);
+		for (int i = 0; i < 4; i++)
+		{
+			render.assignTransform(wheels[i], getMat4(carActor->getGlobalPose())*getMat4(wheelShapes[i]->getLocalPose()));
+		}
+		
+
 		//displayMat4(getMat4(sphereActor->getGlobalPose()));
 
 		render.clearDrawBuffers();

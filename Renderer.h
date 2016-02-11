@@ -52,6 +52,7 @@ private:
 
 		//Information about object orientation
 		mat4 transform;
+		mat4 scaling;
 	};
 
 	class LightInfo
@@ -116,6 +117,7 @@ public:
 	void setShadowBehaviour(int object, int behaviour);
 	void assignMaterial(unsigned int object, Material* mat);
 	void assignTransform(unsigned int object, const mat4& transform);
+	void assignScale(unsigned int object, const mat4& scaling);
 	
 	void assignCube(unsigned int object, float width, 
 					vector<vec3>* mesh,

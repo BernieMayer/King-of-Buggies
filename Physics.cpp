@@ -82,6 +82,11 @@ PxVehicleDrive4WRawInputData* inputs[4];
 //TEMPORARY FUNCTION
 PxRigidActor* getSphere() { return aSphereActor; }
 PxRigidDynamic* getCar() { return vehicle->getRigidDynamicActor(); }
+void getWheels(physx::PxShape** wheels)
+{
+	getCar()->getShapes(wheels, 4, 0);
+}
+
 
 vec4 getVec4(const PxVec4& vec)
 {

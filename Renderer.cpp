@@ -42,6 +42,7 @@ Renderer::ObjectInfo::ObjectInfo()
 	deleted = false;
 
 	transform = mat4(1.f);
+	scaling = mat4(1.f);
 }
 
 Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
@@ -155,6 +156,13 @@ void Renderer::assignTransform(unsigned int id, const mat4& transform)
 	objects[id].transform = transform;
 }
 
+void Renderer::assignScale(unsigned int id, const mat4& scaling)
+{
+	if ((id >= objects.size()) || (objects[id].deleted))
+		return;
+	objects[id].scaling = scaling;
+}
+
 /**
 * Lights
 **/
@@ -239,10 +247,10 @@ void Renderer::draw(unsigned int id)
 	object.mat->useShader();
 
 	if (camera != NULL)
-		object.mat->loadUniforms(winRatio*projection*modelview*camera->getMatrix()*object.transform, object.transform, 
+		object.mat->loadUniforms(winRatio*projection*modelview*camera->getMatrix()*object.transform*object.scaling, object.transform*object.scaling, 
 						camera->getPos(), light.pos, object.color);	
 	else
-		object.mat->loadUniforms(winRatio*projection*modelview*object.transform, object.transform,
+		object.mat->loadUniforms(winRatio*projection*modelview*object.transform*object.scaling, object.transform*object.scaling,
 						vec3(0.f, 0.f, 0.f), light.pos, object.color);
 
 
