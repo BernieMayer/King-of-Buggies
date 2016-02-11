@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <stdio.h>  
-#include <stdlib.h>  
+#include <stdlib.h> 
 
 
 #define MAX_NUM_ACTOR_SHAPES 128
@@ -139,7 +139,27 @@ Physics::Physics() {
 }
 
 void Physics::giveInput(Input input, int playernum) {
+	
+	/*
+	PxVehicleDrive4WRawInputData* pxInput;
 
+	if (!input.isKeyboard) {
+		pxInput
+	}
+	else {
+
+	}
+	*/
+}
+
+void Physics::handleInput(Input* input){
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
+
+	//The code below is used to handle the braking, leftSteer, rightSteer
+
+	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);
+	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANOLOG_INPUT_STEER_LEFT, input->leftSteer);
+	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANOLOG_INPUT_STEER_RIGHT, input->rightSteer);
 }
 
 void Physics::initDefaultScene() {
@@ -165,7 +185,7 @@ void Physics::initDefaultScene() {
 	}
 
 	// staticfriction, dynamic friction, restitution
-	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.9f);
+	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 	if (!mMaterial) {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
@@ -313,7 +333,7 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	PxMaterial* wheelMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	PxMaterial* wheelMaterial = mMaterial;
 
 	//Construct a convex mesh for a cylindrical wheel.
 	PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
