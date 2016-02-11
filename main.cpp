@@ -15,8 +15,6 @@
 #include <stdlib.h>  
 #include <vector>
 
-
-
 GLFWwindow* initializeWindow()
 {
 
@@ -48,6 +46,8 @@ GLFWwindow* initializeWindow()
 
 	//This function makes the context of the specified window current on the calling thread.   
 	glfwMakeContextCurrent(window);
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
 	//Initialize GLEW  
 	GLenum err = glewInit();

@@ -29,8 +29,8 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 	float f_y = (float)y;
 
 	float deltaX = f_x - lastMouseX;
-	float maxDeltaX = 500;
-	float minDeltaX = -500;
+	float maxDeltaX = 50;
+	float minDeltaX = -50;
 	if (deltaX > maxDeltaX) {
 		deltaX = maxDeltaX;
 	}
@@ -41,8 +41,8 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 	currentMouseX = f_x;
 
 	float deltaY = f_y - lastMouseY;
-	float maxDeltaY = 500;
-	float minDeltaY = -500;
+	float maxDeltaY = 50;
+	float minDeltaY = -50;
 	if (deltaY > maxDeltaY) {
 		deltaY = maxDeltaY;
 	}
@@ -100,6 +100,11 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	}
 	else if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
 		kMenu = false;
+	}
+	else if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
+		// Temporary way to close window
+		glfwDestroyWindow(sender);
+		glfwTerminate();
 	}
 }
 
@@ -200,8 +205,18 @@ Input InputManager::getInput(int playerNum)
 		input.menu = kMenu;
 		input.isKeyboard = true;
 
-		lastMouseX = currentMouseX;
-		lastMouseY = currentMouseY;
+
+		int widthP = 0;
+		int heightP = 0;
+		glfwGetWindowSize(window, &widthP, &heightP);
+
+		widthP = widthP / 2;
+		heightP = heightP / 2;
+
+		glfwSetCursorPos(window, widthP, heightP);
+		
+		lastMouseX = widthP;
+		lastMouseY = heightP;
 
 		kCamH = kCamV = 0.f;
 	} else {
