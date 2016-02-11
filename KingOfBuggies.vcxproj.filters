@@ -32,6 +32,8 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="LevelInfo.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="SnippetVehicleTireFriction.cpp" />
+    <ClCompile Include="VehicleSceneQueryData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -81,6 +83,8 @@
     <ClInclude Include="Coin.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="SnippetVehicleTireFriction.h" />
+    <ClInclude Include="VehicleSceneQueryData.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

@@ -1,3 +1,5 @@
+#ifndef PHYSICS_CPP
+#define PHYSICS_CPP
 #include "Physics.h"
 
 #include <iostream>
@@ -56,7 +58,11 @@ PxF32 gSteerVsForwardSpeedData[2 * 8] =
 };
 PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4);
 
-
+static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
+{
+	//NORMAL,	WORN
+	{ 1.00f, 0.1f }//TARMAC
+};
 
 PxDefaultAllocator gAllocator;
 PxDefaultErrorCallback gErrorCallback;
@@ -76,6 +82,11 @@ PxRigidDynamic* aSphereActor;
 PxVehicleDrive4W* vehicle;
 
 PxVehicleDrive4WRawInputData* inputs[4];
+
+PxBatchQuery*			gBatchQuery = NULL;
+PxVehicleDrivableSurfaceToTireFrictionPairs* gFrictionPairs = NULL;
+
+VehicleSceneQueryData*	gVehicleSceneQueryData = NULL;
 
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
@@ -187,6 +198,7 @@ void Physics::giveInput(Input input, int playernum) {
 void Physics::handleInput(Input* input){
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
 
+	std::cout << "Movement should be happening" << "\n";
 	//The code below is used to handle the braking, leftSteer, rightSteer
 
 	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);
@@ -222,6 +234,12 @@ void Physics::initDefaultScene() {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
 	}
+
+	//Create the batched scene queries for the suspension raycasts.
+	gVehicleSceneQueryData = VehicleSceneQueryData::allocate(1, PX_MAX_NB_WHEELS, 1, gAllocator);
+	gBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *gVehicleSceneQueryData, gScene);
+
+	gFrictionPairs = createFrictionPairs(mMaterial);
 
 	// Add static ground plane to the scene
 	plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
@@ -671,12 +689,29 @@ void Physics::shutdown() {
 }
 
 void Physics::startSim(const GameState& state) {
+	
+	
+
 	// Simulate at 60 fps... probably what it means
 	/*float timeElapsed = clock.getElapsedTime();
 
 	gScene->simulate(max(timeElapsed, 0.001f));*/
 	float frameTime = 1 / 60.f;
 	clock.waitUntil(frameTime);
+
+	PxVehicleWheels* vehicles[1] = { vehicle }; // TODO: Once we add more vehicles this line will need to be changed
+	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
+	PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+
+
+
+	const PxVec3 grav = gScene->getGravity();
+	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicle->mWheelsSimData.getNbWheels() } };
+	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults);
+
 	gScene->simulate(frameTime);
 }
 
@@ -705,10 +740,34 @@ GameState Physics::getSim() {
 	// This will contain stuff about the shape of the object
 	// In the case of a sphere, only the radius
 
-
 	return GameState();
 }
 
 Entity* Physics::getCollisions() {
 	return NULL;
 }
+
+PxVehicleDrivableSurfaceToTireFrictionPairs* Physics::createFrictionPairs(const PxMaterial* defaultMaterial)
+{
+	PxVehicleDrivableSurfaceType surfaceTypes[1];
+	surfaceTypes[0].mType = SURFACE_TYPE_TARMAC;
+
+	const PxMaterial* surfaceMaterials[1];
+	surfaceMaterials[0] = defaultMaterial;
+
+	PxVehicleDrivableSurfaceToTireFrictionPairs* surfaceTirePairs =
+		PxVehicleDrivableSurfaceToTireFrictionPairs::allocate(MAX_NUM_TIRE_TYPES, MAX_NUM_SURFACE_TYPES);
+
+	surfaceTirePairs->setup(MAX_NUM_TIRE_TYPES, MAX_NUM_SURFACE_TYPES, surfaceMaterials, surfaceTypes);
+
+	for (PxU32 i = 0; i < MAX_NUM_SURFACE_TYPES; i++)
+	{
+		for (PxU32 j = 0; j < MAX_NUM_TIRE_TYPES; j++)
+		{
+			surfaceTirePairs->setTypePairFriction(i, j, gTireFrictionMultipliers[i][j]);
+		}
+	}
+	return surfaceTirePairs;
+}
+
+#endif 

@@ -6,8 +6,10 @@
 #include "LevelInfo.h"
 #include "GameState.h"
 #include "PxPhysicsAPI.h"
+#include "VehicleSceneQueryData.h"
 #include "Timer.h"
 #include "Input.h"
+
 
 const float gravity = -9.81f;
 
@@ -27,19 +29,25 @@ enum
 	COLLISION_FLAG_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_WHEEL | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
 	COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
 };
-
+/*
 enum
 {
 	DRIVABLE_SURFACE = 0xffff0000,
 	UNDRIVABLE_SURFACE = 0x0000ffff
 };
-
+*/
 //Tire types.
 enum
 {
 	TIRE_TYPE_NORMAL = 0,
 	TIRE_TYPE_WORN,
 	MAX_NUM_TIRE_TYPES
+};
+
+enum
+{
+	SURFACE_TYPE_TARMAC,
+	MAX_NUM_SURFACE_TYPES
 };
 
 class Physics {
@@ -76,6 +84,7 @@ private:
 		PxVehicleWheelsSimData* wheelsSimData);
 	void setupNonDrivableSurface(PxFilterData& filterData);
 	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);
+	PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const PxMaterial* defaultMaterial);
 };
 
 physx::PxRigidActor* getSphere();	//TEMPORARY FUNCTION
