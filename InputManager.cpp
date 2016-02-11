@@ -174,6 +174,8 @@ Input InputManager::getInput(int playerNum)
 		input.menu = gamepads[playerNum].GetButtonPressed(12);
 
 		gamepads[playerNum].RefreshState();
+
+		input.isKeyboard = false;
 	} else if (playerNum == 0) {
 		// use Keyboard
 		input.forward = kForward;
@@ -183,6 +185,8 @@ Input InputManager::getInput(int playerNum)
 		input.drift = kDrift;
 		input.powerup = kPowerup;
 		input.menu = kMenu;
+		input.isKeyboard = true;
+
 		lastMouseX = currentMouseX;
 		lastMouseY = currentMouseY;
 
@@ -195,6 +199,7 @@ Input InputManager::getInput(int playerNum)
 		input.drift = false;
 		input.powerup = false;
 		input.menu = false;
+		input.isKeyboard = false;
 	}
 
 

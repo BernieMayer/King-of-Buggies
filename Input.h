@@ -11,6 +11,8 @@ struct Input
 	bool drift;
 	bool powerup;
 	bool menu;
+
+	bool isKeyboard;
 };
 
 #endif //INPUT_H
