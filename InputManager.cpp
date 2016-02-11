@@ -5,7 +5,9 @@
 #include "Gamepad.h"
 
 float kForward;
-float kTurn;
+float kBackward;
+float kTurnL;
+float kTurnR;
 float lastMouseX;
 float currentMouseX;
 float kCamH;
@@ -76,22 +78,22 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 		kForward -= 1;
 	}
 	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-		kForward -= 1;
+		kBackward += 1;
 	}
 	else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
-		kForward += 1;
+		kBackward -= 1;
 	}
 	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		kTurn -= 1;
+		kTurnL += 1;
 	}
 	else if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
-		kTurn += 1;
+		kTurnL -= 1;
 	}
 	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		kTurn += 1;
+		kTurnR += 1;
 	}
 	else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
-		kTurn -= 1;
+		kTurnR -= 1;
 	}
 	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		kMenu = true;
@@ -108,8 +110,8 @@ InputManager::InputManager(GLFWwindow* w)
 	glfwSetKeyCallback(window, keyboard);
 	glfwSetMouseButtonCallback(window, mouseClick);
 	glfwSetCursorPosCallback(window, mousePosition);
-	kForward = 0;
-	kTurn = 0;
+	kForward = kBackward = 0;
+	kTurnL = kTurnR = 0;
 	kCamH = 0;
 	kCamV = 0;
 	kDrift = false;
@@ -149,12 +151,21 @@ Input InputManager::getInput(int playerNum)
 
 	if (gamepads[playerNum].Connected()) {
 		input.forward = gamepads[playerNum].RightTrigger();
-		input.forward -= gamepads[playerNum].LeftTrigger();
+		input.backward = gamepads[playerNum].LeftTrigger();
 
 		if (gamepads[playerNum].LStick_InDeadzone()) {
-			input.turn = 0;
+			input.turnL = 0;
+			input.turnR = 0;
 		} else {
-			input.turn = gamepads[playerNum].LeftStick_X();
+			float turn = gamepads[playerNum].LeftStick_X();
+			if (turn <= 0) {
+				input.turnL = turn;
+				input.turnR = 0;
+			}
+			else {
+				input.turnL = 0;
+				input.turnR = turn;
+			}
 		}
 
 		if (gamepads[playerNum].RStick_InDeadzone()) {
@@ -179,7 +190,9 @@ Input InputManager::getInput(int playerNum)
 	} else if (playerNum == 0) {
 		// use Keyboard
 		input.forward = kForward;
-		input.turn = kTurn;
+		input.backward = kBackward;
+		input.turnL = kTurnL;
+		input.turnR = kTurnR;
 		input.camH = kCamH;
 		input.camV = kCamV;
 		input.drift = kDrift;
@@ -193,7 +206,9 @@ Input InputManager::getInput(int playerNum)
 		kCamH = kCamV = 0.f;
 	} else {
 		input.forward = 0;
-		input.turn = 0;
+		input.backward = 0;
+		input.turnL = 0;
+		input.turnR = 0;
 		input.camH = 0;
 		input.camV = 0;
 		input.drift = false;

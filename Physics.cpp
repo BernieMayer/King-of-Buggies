@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <stdio.h>  
-#include <stdlib.h>  
+#include <stdlib.h> 
 
 
 #define MAX_NUM_ACTOR_SHAPES 128
@@ -134,7 +134,17 @@ Physics::Physics() {
 }
 
 void Physics::giveInput(Input input, int playernum) {
+	
+	/*
+	PxVehicleDrive4WRawInputData* pxInput;
 
+	if (!input.isKeyboard) {
+		pxInput
+	}
+	else {
+
+	}
+	*/
 }
 
 void Physics::handleInput(Input* input){

@@ -4,7 +4,9 @@
 struct Input
 {
 	float forward;
-	float turn;
+	float backward;
+	float turnL;
+	float turnR;
 	float camV;
 	float camH;
 

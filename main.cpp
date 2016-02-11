@@ -103,8 +103,8 @@ void inputTest(GLFWwindow* window) {
 			std::cout << "Forward: " << forward << "\n";
 		}
 
-		if (input.turn != turn) {
-			turn = input.turn;
+		if (input.turnL != turn) {
+			turn = input.turnL;
 			std::cout << "Turn: " << turn << "\n";
 		}
 	}
@@ -336,7 +336,9 @@ void renderTest(GLFWwindow* window)
 		Input in = im.getInput(1);		//Get input
 
 		float scale = 0.001f;
-		cam.rotateView(in.turn*scale, in.forward*scale);
+		float forward = in.forward - in.backward;
+		float turn = in.turnR - in.turnL;
+		cam.rotateView(turn*scale, forward*scale);
 		
 		theta += 0.0001f;
 		translation[3][1] = 0.5f*sin(theta);
