@@ -16,6 +16,14 @@ vec3 Entity::getPos() { return pos; }
 vec3 Entity::getForward() { return forward; }
 vec3 Entity::getUp(){ return up; }
 
+void Entity::setRenderID(unsigned int newID){ 
+	renderID = newID;
+}
+
+void Entity::setPhysicsID(unsigned int newID){ 
+	physicsID = newID;
+}
+
 int Entity::getRenderID(){ return renderID; }
 int Entity::getPhysicsID(){ return physicsID; }
 

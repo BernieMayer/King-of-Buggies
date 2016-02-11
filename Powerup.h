@@ -1,10 +1,13 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef POWERUP_H
+#define POWERUP_H
 
 #include "Entity.h"
 
 class Powerup : public Entity {
 	int type;
+
+public:
+	Powerup() {};
 };
 
-#endif //ENTITY_H
+#endif //POWERUP_H

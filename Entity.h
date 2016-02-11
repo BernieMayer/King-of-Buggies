@@ -15,6 +15,7 @@ protected:
 	int renderID;
 	int physicsID;
 	Entity();
+	
 public:
 	void setTransform(const mat4& _tranform);
 	mat4 getTransform();
@@ -23,8 +24,8 @@ public:
 	vec3 getForward();
 	vec3 getUp();
 
-	void setRenderID();
-	void setPhysicsID();
+	void setRenderID(unsigned int newID);
+	void setPhysicsID(unsigned int newID);
 
 	int getRenderID();
 	int getPhysicsID();

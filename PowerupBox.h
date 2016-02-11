@@ -1,10 +1,11 @@
-#ifndef ENTITY_H
-#define ENTITY_H
+#ifndef POWERUPBOX_H
+#define POWERUPBOX_H
 
 #include "Entity.h"
 
 class PowerupBox: public Entity {
-
+public:
+	PowerupBox() {};
 };
 
-#endif //ENTITY_H
+#endif //POWERUPBOX_H
