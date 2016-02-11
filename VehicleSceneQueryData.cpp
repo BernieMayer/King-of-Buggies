@@ -4,6 +4,31 @@
 #include "VehicleSceneQueryData.h"
 #include "PxPhysicsAPI.h"
 
+void setupDrivableSurface(PxFilterData& filterData)
+{
+	filterData.word3 = (PxU32)DRIVABLE_SURFACE;
+}
+
+void setupNonDrivableSurface(PxFilterData& filterData)
+{
+	filterData.word3 = UNDRIVABLE_SURFACE;
+}
+
+PxQueryHitType::Enum WheelRaycastPreFilter
+(PxFilterData filterData0, PxFilterData filterData1,
+const void* constantBlock, PxU32 constantBlockSize,
+PxHitFlags& queryFlags)
+{
+	//filterData0 is the vehicle suspension raycast.
+	//filterData1 is the shape potentially hit by the raycast.
+	PX_UNUSED(constantBlockSize);
+	PX_UNUSED(constantBlock);
+	PX_UNUSED(filterData0);
+	PX_UNUSED(queryFlags);
+	return ((0 == (filterData1.word3 & DRIVABLE_SURFACE)) ? PxQueryHitType::eNONE : PxQueryHitType::eBLOCK);
+}
+
+
 VehicleSceneQueryData::VehicleSceneQueryData()
 	: mNumRaycastsPerBatch(0),
 	mSqResults(NULL),
