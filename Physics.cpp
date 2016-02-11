@@ -180,7 +180,7 @@ void Physics::initDefaultScene() {
 	}
 
 	// staticfriction, dynamic friction, restitution
-	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.9f);
+	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 	if (!mMaterial) {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
@@ -328,7 +328,7 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
-	PxMaterial* wheelMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	PxMaterial* wheelMaterial = mMaterial;
 
 	//Construct a convex mesh for a cylindrical wheel.
 	PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
