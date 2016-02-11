@@ -137,6 +137,16 @@ void Physics::giveInput(Input input, int playernum) {
 
 }
 
+void Physics::handleInput(Input* input){
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
+
+	//The code below is used to handle the braking, leftSteer, rightSteer
+
+	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);
+	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANOLOG_INPUT_STEER_LEFT, input->leftSteer);
+	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANOLOG_INPUT_STEER_RIGHT, input->rightSteer);
+}
+
 void Physics::initDefaultScene() {
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, gravity, 0.0f);
