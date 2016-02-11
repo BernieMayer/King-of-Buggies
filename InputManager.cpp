@@ -18,11 +18,20 @@ bool kPowerup;
 bool kDrift;
 bool kMenu;
 
+/**
+ * Takes a value between two numbers and converts it to another value between two different numbers
+ * maintaining its proportional place between the first two numbers.
+ */
 float map(float value, float min, float max, float newMin, float newMax) {
 	return (value - min) * ((newMax - newMin) / (max - min)) + newMin;
 }
 
-// Handles mouse movement
+/**
+ * Called on mouse movement
+ * Uses the current mouse position and the mouse position from the last frame and 
+ * calculates how much the camera should be rotated based on their differences
+ * Rotational values are between -1 and 1
+ */
 void mousePosition(GLFWwindow *sender, double x, double y) {
 
 	float f_x = (float)x;
@@ -53,7 +62,11 @@ void mousePosition(GLFWwindow *sender, double x, double y) {
 	currentMouseY = f_y;
 }
 
-// Handles mouse button input
+/**
+ * Called on mouse click
+ * Sets boolean values for powerup and drift based on mouse buttons being pressed
+ * May need to change to be frame based later...
+ */
 void mouseClick(GLFWwindow *sender, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		kPowerup = true;
@@ -69,7 +82,10 @@ void mouseClick(GLFWwindow *sender, int button, int action, int mods) {
 	}
 }
 
-// Handles keyboard input
+/**
+ * Called on keyboard input
+ * Increments or decrements floats based on keys being pressed
+ */
 void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		kForward += 1;
@@ -108,6 +124,14 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	}
 }
 
+/**
+ * Creates an instance of InputManager
+ * Counts the number of players based on # of conencted controllers
+ * at creation
+ * No numPlayers is not updated after creation, but it may be possible to
+ * simply connect another controller and have it work
+ * Always at least 1 player because of mouse and keyboard support
+ */
 InputManager::InputManager(GLFWwindow* w)
 {
 	window = w;
@@ -123,6 +147,18 @@ InputManager::InputManager(GLFWwindow* w)
 	kPowerup = false;
 	kMenu = false;
 
+	int widthP = 0;
+	int heightP = 0;
+	glfwGetWindowSize(window, &widthP, &heightP);
+
+	widthP = widthP / 2;
+	heightP = heightP / 2;
+
+	glfwSetCursorPos(window, widthP, heightP);
+
+	lastMouseX = (float)widthP;
+	lastMouseY = (float)heightP;
+
 	numPlayers = 1;
 
 	for (int i = 1; i < 5; i++) {
@@ -132,20 +168,28 @@ InputManager::InputManager(GLFWwindow* w)
 
 		if (temp.Connected()) {
 			// Allows for a player when no controllers connected
-			if (numPlayers != 1) {
+			if (i != 1) {
 				numPlayers += 1;
 			}
 		}
 	}
 }
 
-
+/**
+ * Deconstructor
+ * Maybe needs to do something?
+ */
 InputManager::~InputManager()
 {
 
 }
 
-// Updates and returns input for all players
+/**
+ * Returns the input of the given player in a Input structure.
+ * Input returned can be handled the same no matter if it was 
+ * given by controller or keyboard
+ * If the player is not connected input for no actions are returned
+ */
 Input InputManager::getInput(int playerNum)
 {
 	playerNum -= 1;
@@ -215,8 +259,8 @@ Input InputManager::getInput(int playerNum)
 
 		glfwSetCursorPos(window, widthP, heightP);
 		
-		lastMouseX = widthP;
-		lastMouseY = heightP;
+		lastMouseX = (float)widthP;
+		lastMouseY = (float)heightP;
 
 		kCamH = kCamV = 0.f;
 	} else {
@@ -236,7 +280,9 @@ Input InputManager::getInput(int playerNum)
 	return input;
 }
 
-// Returns the number of players
+/**
+ * Returns the number of players
+ */
 int InputManager::getNumPlayers() {
 	return numPlayers;
 }
