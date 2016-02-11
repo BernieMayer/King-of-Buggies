@@ -70,6 +70,7 @@ private:
 };
 
 physx::PxRigidActor* getSphere();	//TEMPORARY FUNCTION
+physx::PxRigidDynamic* getCar();		//TEMPORARY FUNCTION
 
 mat4 getMat4(const physx::PxTransform& transform);
 vec4 getVec4(const physx::PxVec4& vec);

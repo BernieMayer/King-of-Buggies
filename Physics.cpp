@@ -26,8 +26,9 @@ PxVehicleDrive4W* vehicle;
 
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
-//TEMPORARY FUNCTION
+//TEMPORARY FUNCTIONS
 PxRigidActor* getSphere() { return aSphereActor; }
+PxRigidDynamic* getCar() { return vehicle->getRigidDynamicActor(); }
 
 vec4 getVec4(const PxVec4& vec)
 {
