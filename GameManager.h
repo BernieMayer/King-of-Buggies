@@ -6,21 +6,23 @@
 #include "DrivingController.h"
 #include "InputManager.h"
 #include "SoundManager.h"
-#include "InterfaceManager.h"
+//#include "InterfaceManager.h"
 
 class GameManager {
-public:
-	void gameLoop();
-	void gameInit();
-	void quitGame(); // should this take arguments? 
-
 private:
 	Renderer renderer;
 	AIManager ai;
 	DrivingController dc;
 	InputManager input;
 	SoundManager sound;
-	InterfaceManager interface;
+	//InterfaceManager interface;
+
+public:
+	void gameLoop();
+	void gameInit();
+	void quitGame(); // should this take arguments? 
+
+
 };
 
 #endif // GAMEMANAGER_H

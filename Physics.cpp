@@ -75,6 +75,8 @@ PxRigidDynamic* aSphereActor;
 
 PxVehicleDrive4W* vehicle;
 
+PxVehicleDrive4WRawInputData* inputs[4];
+
 //VehicleSceneQueryData* gVehicleSceneQueryData = NULL;
 
 //TEMPORARY FUNCTION
@@ -127,6 +129,10 @@ Physics::Physics() {
 	}
 
 	initDefaultScene();
+
+}
+
+void Physics::giveInput(Input input, int playernum) {
 
 }
 
@@ -327,6 +333,8 @@ PxVehicleDrive4W* Physics::initVehicle() {
 
 	return vehDrive4W;
 }
+
+
 
 void Physics::setupWheelsSimulationData
 (const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth,

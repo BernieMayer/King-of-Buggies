@@ -122,6 +122,7 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="diffuse.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="InputManager.cpp" />
@@ -133,6 +134,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
+    <ClCompile Include="LevelInfo.cpp" />
     <ClCompile Include="specular.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
