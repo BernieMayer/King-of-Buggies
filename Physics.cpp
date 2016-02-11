@@ -138,18 +138,50 @@ Physics::Physics() {
 
 }
 
+/**
+ * Converts the input from input manager
+ */
 void Physics::giveInput(Input input, int playernum) {
 	
-	/*
+	
 	PxVehicleDrive4WRawInputData* pxInput;
 
-	if (!input.isKeyboard) {
-		pxInput
+	if (input.isKeyboard) {
+		if (input.forward > 0) {
+			pxInput->setDigitalAccel(true);
+		}
+		else {
+			pxInput->setDigitalAccel(false);
+		}
+
+		if (input.backward > 0) {
+			pxInput->setDigitalBrake(true);
+		}
+		else {
+			pxInput->setDigitalBrake(false);
+		}
+		
+		if (input.turnL > 1) {
+			pxInput->setDigitalSteerLeft(true);
+		}
+		else {
+			pxInput->setDigitalSteerLeft(false);
+		}
+		
+		if (input.turnR > 1) {
+			pxInput->setDigitalSteerRight(true);
+		}
+		else {
+			pxInput->setDigitalSteerRight(false);
+		}
 	}
 	else {
-
+		pxInput->setAnalogAccel(input.forward);
+		pxInput->setAnalogBrake(input.backward);
+		pxInput->setAnalogSteer(input.turnR - input.turnL);
 	}
-	*/
+	
+	inputs[playernum] = pxInput;
 }
 
 void Physics::handleInput(Input* input){
