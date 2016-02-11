@@ -311,6 +311,9 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 	engine.mMaxOmega = 600.0f;//approx 6000 rpm
 	driveSimData.setEngineData(engine);
 
+
+	// TODO: Don't want gears. Will
+	// Changing switch time to 0 be good enough for that?
 	//Gears
 	PxVehicleGearsData gears;
 	gears.mSwitchTime = 0.5f;
