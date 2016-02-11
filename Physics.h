@@ -50,6 +50,7 @@ public:
 	GameState getSim();
 	Entity* getCollisions();
 	void giveInput(Input input, int playerNum);
+	void handleInput(Input* input);
 private:
 	Timer clock;
 	void initDefaultScene();
