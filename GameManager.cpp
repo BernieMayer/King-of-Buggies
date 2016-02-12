@@ -86,6 +86,7 @@ void GameManager::physicsAndRenderTest()
 	carScaling[2][2] = 2.f*0.5f;
 	renderer.assignScale(car, carScaling);
 
+	//cam.changeCenterAndPos(vec3(0.5f, 0.5f, 0.5f));
 
 
 	while (!glfwWindowShouldClose(window))
@@ -110,6 +111,12 @@ void GameManager::physicsAndRenderTest()
 
 		renderer.assignTransform(sphere, getMat4(sphereActor->getGlobalPose()));
 		renderer.assignTransform(car, getMat4(carActor->getGlobalPose()));
+
+		vec4 cameraPosition = getMat4(carActor->getGlobalPose())*vec4(0.f, 0.f, 0.f, 1.f);
+		vec3 cPos = vec3(cameraPosition) / cameraPosition.w;
+
+		if (cPos != cam.getViewCenter())
+			cam.changeCenterAndPos(cPos - cam.getViewCenter());
 
 		//Wheel transformations
 		PxShape* wheelShapes[4];

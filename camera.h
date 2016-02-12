@@ -39,11 +39,15 @@ public:
 
 	vec3 getUp();
 
+	vec3 getViewCenter();
+
 	void changeDir(vec3 _dir);
 
 	void changePos(vec3 _pos);
 
 	void changeViewCenter(vec3 _viewCenter);
+
+	void changeCenterAndPos(vec3 movement);
 
 	mat4 getMatrix();
 

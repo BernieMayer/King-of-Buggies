@@ -67,7 +67,7 @@ void Camera::changeDir(vec3 _dir)
 
 	dir = normalize(_dir);
 
-	if (abs(_dir.y) > maxY)
+	/*if (abs(_dir.y) > maxY)
 	{
 		if (dir.y < 0)
 			dir.y = -maxY;
@@ -78,7 +78,7 @@ void Camera::changeDir(vec3 _dir)
 		dir.x *= s;
 		dir.z *= s;
 		dir = normalize(dir);
-	}
+	}*/
 
 	up = vec3(0.f, 1.f, 0.f);
 
@@ -124,8 +124,8 @@ void Camera::rotateView(float x, float y)
 	{
 		pos =  vec3(rotZ(thetaZ)*rotX(thetaX)*rotY(thetaY) * vec4(pos - viewCenter, 1)) + viewCenter;	//Rotate position around center
 
-		float pos_length = length(pos);
-		vec3 _dir = normalize(pos);
+		float pos_length = length(pos-viewCenter);
+		vec3 _dir = normalize(pos-viewCenter);
 
 		if (abs(_dir.y) > maxY)
 		{
@@ -139,7 +139,7 @@ void Camera::rotateView(float x, float y)
 			_dir.z *= s;
 			_dir = normalize(_dir);
 
-			pos = _dir*pos_length;
+			pos = viewCenter+_dir*pos_length;
 		}
 
 		changeDir(normalize(viewCenter-pos));
@@ -204,6 +204,8 @@ vec3 Camera::getDir(){ return dir; }
 
 vec3 Camera::getUp(){ return up; }
 
+vec3 Camera::getViewCenter(){ return viewCenter; }
+
 
 void Camera::changeViewCenter(vec3 _viewCenter)
 {
@@ -213,6 +215,14 @@ void Camera::changeViewCenter(vec3 _viewCenter)
 
 	printf("viewCenter - (%f, %f, %f)\n", viewCenter.x, viewCenter.y, viewCenter.z);
 	changeDir(viewCenter - pos);
+}
+
+void Camera::changeCenterAndPos(vec3 movement)
+{
+	viewCenter += movement;
+	pos += movement;
+
+	//changeDir(viewCenter - pos);
 }
 
 

@@ -754,15 +754,8 @@ void Physics::startSim(const GameState& state) {
 
 	const PxVec3 grav = gScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	std::cout << wheelQueryResults[0].tireFriction << "\n";
-	wheelQueryResults[0].tireFriction = 1;
-	wheelQueryResults[1].tireFriction = 1;
-	wheelQueryResults[2].tireFriction = 1;
-	wheelQueryResults[3].tireFriction = 1;
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicle->mWheelsSimData.getNbWheels() } };
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
-
-	std::cout << vehicleQueryResults[0].wheelQueryResults[0].tireFriction << "\n";
 
 	gScene->simulate(frameTime);
 }
