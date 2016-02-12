@@ -8,7 +8,6 @@
 
 #include "SnippetVehicleFilterShader.h"
 
-
 //Is the surface drivable?
 //Is the force being applied big enough?
 //Are we using the right constants?
@@ -204,6 +203,18 @@ void Physics::giveInput(Input input, int playernum) {
 }
 
 void Physics::handleInput(Input* input){
+
+	/*
+	if ( ! input->isKeyboard)
+	{
+		//PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, (1.0f/60.0f), gIsVehicleInAir, *gVehicle4W);
+	}
+	else
+	{
+		//PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gPadSmoothingData, gSteerVsForwardSpeedTable, gVehicleInputData, timestep, gIsVehicleInAir, *gVehicle4W);
+	}
+	*/
+
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
