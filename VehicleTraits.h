@@ -7,6 +7,9 @@ using namespace physx;
 
 class VehicleTraits {
 private:
+	
+public:
+	VehicleTraits(PxMaterial*);
 	PxF32 chassisMass;
 	PxVec3 chassisDims;
 	PxVec3 chassisMOI;
