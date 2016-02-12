@@ -32,7 +32,6 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="LevelInfo.cpp" />
     <ClCompile Include="GameManager.cpp" />
-    <ClCompile Include="SnippetVehicleTireFriction.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
   </ItemGroup>
   <ItemGroup>

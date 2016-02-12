@@ -402,6 +402,8 @@ int main() {
 	if (window == NULL)
 		return -1;
 
+	glfwSetWindowPos(window, 500, 500);
+
 	//inputTest(window);
 	//physicsTest();
 	//renderTest(window);
