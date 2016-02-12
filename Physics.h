@@ -15,6 +15,7 @@ const float gravity = -9.81f;
 
 using namespace physx;
 
+/*
 enum
 {
 	COLLISION_FLAG_GROUND = 1 << 0,
@@ -29,6 +30,7 @@ enum
 	COLLISION_FLAG_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_WHEEL | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
 	COLLISION_FLAG_DRIVABLE_OBSTACLE_AGAINST = COLLISION_FLAG_GROUND | COLLISION_FLAG_CHASSIS | COLLISION_FLAG_OBSTACLE | COLLISION_FLAG_DRIVABLE_OBSTACLE,
 };
+*/
 /*
 enum
 {
@@ -40,7 +42,8 @@ enum
 enum
 {
 	TIRE_TYPE_NORMAL = 0,
-	TIRE_TYPE_WORN,
+	TIRE_TYPE_
+	,
 	MAX_NUM_TIRE_TYPES
 };
 
@@ -63,6 +66,7 @@ private:
 	Timer clock;
 	void initDefaultScene();
 	PxVehicleDrive4W* initVehicle();
+	PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics);
 	PxVehicleDriveSimData4W initDriveSimData(PxVehicleWheelsSimData* wheelsSimData);
 	PxVehicleWheelsSimData* initWheelSimData(int nbWheels, const PxVec3 chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxF32 wheelMass,
 		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);
