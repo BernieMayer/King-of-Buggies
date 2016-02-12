@@ -89,6 +89,9 @@ private:
 	void setupNonDrivableSurface(PxFilterData& filterData);
 	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);
 	PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const PxMaterial* defaultMaterial);
+
+	void setupObstacleCollisionHandling(PxRigidActor* actor);
+
 };
 
 physx::PxRigidActor* getSphere();	//TEMPORARY FUNCTION

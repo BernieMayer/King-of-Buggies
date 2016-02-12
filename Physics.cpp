@@ -260,6 +260,8 @@ void Physics::initDefaultScene() {
 	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 5.f, 0)));
 	// 0.5 = radius
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(0.5), *mMaterial);
+	setupObstacleCollisionHandling(aSphereActor);
+
 	// 1.0f = density
 	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
 
@@ -553,6 +555,18 @@ PxVehicleWheelsSimData* wheelsSimData)
 		wheelsSimData->setSceneQueryFilterData(i, qryFilterData);
 		wheelsSimData->setWheelShapeMapping(i, i);
 	}
+}
+
+void Physics::setupObstacleCollisionHandling(PxRigidActor* actor)
+{
+	PxShape* shapes[1];
+	actor->getShapes(shapes, 1);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_OBSTACLE;
+	simFilterData.word1 = COLLISION_FLAG_OBSTACLE_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
 }
 
 PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics)
