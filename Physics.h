@@ -40,6 +40,7 @@ public:
 	Entity* getCollisions();
 	void giveInput(Input input, int playerNum);
 	void handleInput(Input* input);
+	VehicleTraits getVehicleTraits();
 private:
 	Timer clock;
 	void initDefaultScene();

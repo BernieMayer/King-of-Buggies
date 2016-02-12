@@ -99,6 +99,8 @@ VehicleSceneQueryData*	gVehicleSceneQueryData = NULL;
 
 VehicleTraits traits = NULL;
 
+bool forwards = true;
+
 
 //TEMPORARY FUNCTION
 PxRigidActor* getSphere() { return aSphereActor; }
@@ -157,6 +159,10 @@ Physics::Physics() {
 
 	initDefaultScene();
 
+}
+
+VehicleTraits getVehicleTraits() {
+	return traits;
 }
 
 /**
@@ -219,8 +225,31 @@ void Physics::handleInput(Input* input){
 			gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);	
 	*/
 
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+	PxVec3 velocity = vehicle->getRigidDynamicActor()->getAngularVelocity();
+
+	if (velocity.x == 0 && velocity.z == 0 && !forwards && (input->forward > input->backward)) {
+		// If not moving and was in reverse gear, but more forwards
+		// input than backwards, switch to forwards gear
+		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		std::cout << "Forwards\n";
+		forwards = true;
+	}
+	else if (velocity.x == 0 && velocity.z == 0 && forwards && (input->forward < input->backward)) {
+		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		std::cout << "Backwards\n";
+		forwards = false;
+	}
+
+	if (forwards) {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+	}
+	else {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
+	}
+
+	
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
 }
@@ -322,6 +351,7 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	gScene->addActor(*veh4WActor);
 
 	vehDrive4W->mDriveDynData.setUseAutoGears(true);
+	vehDrive4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 
 	return vehDrive4W;
 }
@@ -345,7 +375,7 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 	// Changing switch time to 0 be good enough for that?
 	//Gears
 	PxVehicleGearsData gears;
-	gears.mSwitchTime = 0.5f;
+	gears.mSwitchTime = 0.0f;
 	driveSimData.setGearsData(gears);
 
 	//Clutch
@@ -755,15 +785,8 @@ void Physics::startSim(const GameState& state) {
 
 	const PxVec3 grav = gScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	std::cout << wheelQueryResults[0].tireFriction << "\n";
-	wheelQueryResults[0].tireFriction = 1;
-	wheelQueryResults[1].tireFriction = 1;
-	wheelQueryResults[2].tireFriction = 1;
-	wheelQueryResults[3].tireFriction = 1;
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicle->mWheelsSimData.getNbWheels() } };
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
-
-	std::cout << vehicleQueryResults[0].wheelQueryResults[0].tireFriction << "\n";
 
 	gScene->simulate(frameTime);
 }
