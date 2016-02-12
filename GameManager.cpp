@@ -3,13 +3,149 @@
 
 #include "GameManager.h"
 
-#include <GLFW/glfw3.h>  
-
-GameManager::GameManager(GLFWwindow* window) : renderer(window), input(window), state()
+void GameManager::physicsAndRenderTest()
 {
-	
+	printf("Begin physics and rendering test\n");
+
+	//Object creation
+	//Create plane
+	unsigned int plane = renderer.generateObjectID();
+	vector<vec3> meshPlane;
+	vector<vec3> normalsPlane;
+	vector<unsigned int> indicesPlane;
+	renderer.assignPlane(plane, 8.f, &meshPlane, &normalsPlane, &indicesPlane);
+	renderer.assignMaterial(plane, &tsMat);
+	renderer.assignColor(plane, vec3(0.5f, 0.5f, 0.5f));
+
+	//Create sphere
+	vector<vec3> mesh;
+	vector<vec3> normals;
+	vector<unsigned int> indices;
+
+	unsigned int sphere = renderer.generateObjectID();
+	renderer.assignSphere(sphere, 0.5f, 20, &mesh, &normals, &indices);
+	renderer.assignMaterial(sphere, &tsMat);
+
+	MeshObject carMesh = meshInfo.getMesh(CUBE);
+	vector<vec3> carVerts = carMesh.getVertices();
+	vector<vec3> carNormals = carMesh.getNormals();
+	vector<unsigned int> carIndices = carMesh.getIndices();
+
+	unsigned int car = renderer.generateObjectID();
+	renderer.assignMesh(car, &carVerts);
+	renderer.assignNormals(car, &carNormals);
+	renderer.assignIndices(car, &carIndices);
+	renderer.assignMaterial(car, &tsMat);
+
+	MeshObject wheelMesh = meshInfo.getMesh(WHEEL);
+	vector<vec3> wheelVerts = wheelMesh.getVertices();
+	vector<vec3> wheelNormals = wheelMesh.getNormals();
+	vector<unsigned int> wheelIndices = wheelMesh.getIndices();
+
+	unsigned int wheels[4];
+	mat4 wheelScaling(1.f);
+	wheelScaling[0][0] = 0.4f;
+	wheelScaling[1][1] = 0.5f;
+	wheelScaling[2][2] = 0.5f;
+
+	for (int i = 0; i < 4; i++)
+	{
+		wheels[i] = renderer.generateObjectID();
+		renderer.assignMesh(wheels[i], &wheelVerts);
+		renderer.assignNormals(wheels[i], &wheelNormals);
+		renderer.assignIndices(wheels[i], &wheelIndices);
+		renderer.assignMaterial(wheels[i], &tsMat);
+		renderer.assignScale(wheels[i], wheelScaling);
+	}
+
+
+	printf("Vertices = %d, Normals %d, Indices %d\n", (carMesh.getVertices()).size()
+		, (carMesh.getNormals()).size(), (carMesh.getIndices()).size());
+
+
+	//Light creation
+	vec3 lightPos(5.0, 5.0, 5.0);
+	unsigned int light = renderer.generateLightObject();
+	renderer.setLightPosition(light, lightPos);
+
+
+	//Starting direction, up vector, starting position
+	Camera cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0),
+		MODELVIEWER_CAMERA);
+
+	renderer.loadPerspectiveTransform(0.1f, 20.f, 90.f);		//Near, far, fov
+
+	renderer.loadCamera(&cam);
+
+	mat4 translation;
+	float theta = 0.0;
+
+	mat4 carScaling(1.f);
+	carScaling[0][0] = 1.25f*0.5f;
+	carScaling[1][1] = 1.f*0.5f;
+	carScaling[2][2] = 2.f*0.5f;
+	renderer.assignScale(car, carScaling);
+
+
+
+	while (!glfwWindowShouldClose(window))
+	{
+
+		Input in = input.getInput(1);		//Get input
+		physics.handleInput(&in);
+
+		//Physics sim
+		physics.startSim(GameState());
+		physics.getSim();
+
+		float scale = 0.1f;
+		//cam.rotateView(in.turn*scale, in.forward*scale);
+		if (!in.drift)//in.powerup)
+			cam.rotateView(in.camH*scale, in.camV*scale);
+		if (in.drift)
+			cam.zoom(in.camV*0.95f + 1.f);
+
+		physx::PxRigidActor* sphereActor = getSphere();
+		physx::PxRigidDynamic* carActor = getCar();
+
+		renderer.assignTransform(sphere, getMat4(sphereActor->getGlobalPose()));
+		renderer.assignTransform(car, getMat4(carActor->getGlobalPose()));
+
+		//Wheel transformations
+		PxShape* wheelShapes[4];
+		getWheels(wheelShapes);
+		for (int i = 0; i < 4; i++)
+		{
+			renderer.assignTransform(wheels[i], getMat4(carActor->getGlobalPose())*getMat4(wheelShapes[i]->getLocalPose()));
+		}
+
+
+		//displayMat4(getMat4(sphereActor->getGlobalPose()));
+
+		renderer.clearDrawBuffers();
+
+		renderer.drawAll();
+
+		//Swap buffers  
+		glfwSwapBuffers(window);
+		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+		glfwPollEvents();
+	}
+
+	glfwDestroyWindow(window);
+	glfwTerminate();
+
+	printf("End rendering test\n");
 }
 
+GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics()
+{
+	window = newWindow;
+	mat = Diffuse();
+	shinyMat = Specular(20.f);
+	tsMat = TorranceSparrow(3.f);
+}
+/*
 void GameManager::createPlayers()
 {
 	int i = 0;
@@ -95,10 +231,10 @@ void GameManager::createPowerupBoxes()
 		i++;
 	}
 }
-
+*/
 void GameManager::gameLoop()
 {
-
+	physicsAndRenderTest();
 }
 
 void GameManager::gameInit()
