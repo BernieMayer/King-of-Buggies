@@ -9,7 +9,11 @@ class VehicleTraits {
 private:
 	
 public:
-	VehicleTraits(PxMaterial*);
+	VehicleTraits(PxMaterial* material);
+	VehicleTraits(PxF32 cMass, PxVec3 cDims,
+		PxVec3 cMOI, PxVec3 cCMOffset, PxMaterial* cMaterial,
+		PxF32 wMass, PxF32 wWidth, PxF32 wRadius, PxF32 wMOI,
+		PxMaterial* wMaterial, PxU32 nWheels);
 	PxF32 chassisMass;
 	PxVec3 chassisDims;
 	PxVec3 chassisMOI;

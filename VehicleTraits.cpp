@@ -22,4 +22,22 @@ VehicleTraits::VehicleTraits(PxMaterial* material) {
 	numWheels = 4;
 }
 
+VehicleTraits::VehicleTraits(PxF32 cMass, PxVec3 cDims,
+	PxVec3 cMOI, PxVec3 cCMOffset, PxMaterial* cMaterial,
+	PxF32 wMass, PxF32 wWidth, PxF32 wRadius, PxF32 wMOI,
+	PxMaterial* wMaterial, PxU32 nWheels) {
+	
+	chassisMass = cMass;
+	chassisDims = cDims;
+	chassisMOI = cMOI;
+	chassisCMOffset = cCMOffset;
+	chassisMaterial = cMaterial;
+	wheelMass = wMass;
+	wheelWidth = wWidth;
+	wheelRadius = wRadius;
+	wheelMOI = wMOI;
+	wheelMaterial = wMaterial;
+	numWheels = nWheels;
+}
+
 #endif
