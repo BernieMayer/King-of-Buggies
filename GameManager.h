@@ -1,43 +1,51 @@
 #ifndef GAMEMANAGER_H
 #define GAMEMANAGER_H
 
-#include "Renderer.h"
 #include "AIManager.h"
 #include "DrivingController.h"
-#include "InputManager.h"
-#include "SoundManager.h"
-#include "InterfaceManager.h"
 #include "GameState.h"
+#include "InputManager.h"
+#include "InterfaceManager.h"
 #include "MeshInfo.h"
+#include "Physics.h"
+#include "Renderer.h"
+#include "SoundManager.h"
+
+#include <GLFW/glfw3.h>  
 
 class GameManager {
 private:
-	// Object creation
-	Diffuse mat = Diffuse();
-	Specular shinyMat = Specular(20.f);
-	TorranceSparrow tsMat = TorranceSparrow(3.f);
+	// Object materials
+	Diffuse mat;
+	Specular shinyMat;
+	TorranceSparrow tsMat;
 
-	Renderer renderer;
 	AIManager ai;
 	DrivingController dc;
-	InputManager input;
-	SoundManager sound;
-	InterfaceManager _interface;
 	GameState state;
+	InputManager input;
+	InterfaceManager _interface;
 	MeshInfo meshInfo;
+	Physics physics;
+	Renderer renderer;
+	SoundManager sound;
+
+	GLFWwindow* window;
 
 public:
-	GameManager(GLFWwindow* window);
+	GameManager(GLFWwindow* newWindow);
 
 	// create physics and render objects through GameState
-	void createPlayers();
+	/*void createPlayers();
 	void createCoins();
 	void createPowerups();
 	void createPowerupBoxes();
-
+	*/
 	void gameLoop();
 	void gameInit();
 	void quitGame(); // should this take arguments? 
+
+	void physicsAndRenderTest();
 
 };
 
