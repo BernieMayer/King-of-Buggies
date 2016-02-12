@@ -213,7 +213,7 @@ Input InputManager::getInput(int playerNum)
 			}
 			else {
 				input.turnL = 0;
-				input.turnR = turn;
+				input.turnR = -turn;
 			}
 		}
 
