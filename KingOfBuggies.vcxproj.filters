@@ -33,7 +33,7 @@
     <ClCompile Include="LevelInfo.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
-    <ClCompile Include="..\PhysX-3.3\PhysXSDK\Snippets\SnippetVehicleCommon\SnippetVehicleFilterShader.cpp" />
+    <ClCompile Include="SnippetVehicleFilterShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -85,7 +85,7 @@
     </ClInclude>
     <ClInclude Include="SnippetVehicleTireFriction.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
-    <ClInclude Include="..\PhysX-3.3\PhysXSDK\Snippets\SnippetVehicleCommon\SnippetVehicleFilterShader.h" />
+    <ClInclude Include="SnippetVehicleFilterShader.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">
