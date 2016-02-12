@@ -115,6 +115,7 @@ mat4 getMat4(const PxTransform& transform)
 	return finalMatrix;
 }
 
+
 Physics::Physics() {
 	mFoundation = PxCreateFoundation(PX_PHYSICS_VERSION,
 		gAllocator, gErrorCallback);
@@ -195,10 +196,33 @@ void Physics::giveInput(Input input, int playernum) {
 	inputs[playernum] = pxInput;
 }
 
+PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics)
+{
+	//Add a plane to the scene.
+	PxRigidStatic* groundPlane = PxCreatePlane(*physics, PxPlane(0, 1, 0, 0), *material);
+
+	//Get the plane shape so we can set query and simulation filter data.
+	PxShape* shapes[1];
+	groundPlane->getShapes(shapes, 1);
+
+	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
+	physx::PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
+	shapes[0]->setQueryFilterData(qryFilterData);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_GROUND;
+	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	return groundPlane;
+}
+
 void Physics::handleInput(Input* input){
+
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
 
-	std::cout << "Movement should be happening" << "\n";
 	//The code below is used to handle the braking, leftSteer, rightSteer
 
 	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);
@@ -242,8 +266,9 @@ void Physics::initDefaultScene() {
 	gFrictionPairs = createFrictionPairs(mMaterial);
 
 	// Add static ground plane to the scene
-	plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
-		*mMaterial);
+	//plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
+		//*mMaterial);
+	plane = createDrivablePlane(mMaterial, mPhysics);
 	if (!plane) {
 		// Fatal error
 		std::cout << "Plane creation failure\n";
@@ -311,6 +336,10 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	wheelsSimData->free();
 
 	gScene->addActor(*veh4WActor);
+
+	vehDrive4W->setToRestState();
+	vehDrive4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+	vehDrive4W->mDriveDynData.setUseAutoGears(true);
 
 	return vehDrive4W;
 }
@@ -418,6 +447,7 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 	rigidBodyData.mMOI = chassisMOI;
 	rigidBodyData.mMass = chassisMass;
 	rigidBodyData.mCMOffset = chassisCMOffset;
+
 
 	veh4WActor = createVehicleActor
 		(rigidBodyData,
@@ -634,7 +664,7 @@ PxPhysics& physics)
 {
 	//We need a rigid body actor for the vehicle.
 	//Don't forget to add the actor to the scene after setting up the associated vehicle.
-	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxVec3(0.f, 1.5f, 0.f)));
+	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(PxVec3(0.f, 3.f, 0.f)));
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;

@@ -220,11 +220,13 @@ void physicsAndRenderTest(GLFWwindow* window)
 
 	while (!glfwWindowShouldClose(window))
 	{
+
+		Input in = im.getInput(1);		//Get input
+		physics.handleInput(&in);
+
 		//Physics sim
 		physics.startSim(GameState());
 		physics.getSim();
-
-		Input in = im.getInput(1);		//Get input
 
 		float scale = 0.1f;
 		//cam.rotateView(in.turn*scale, in.forward*scale);
