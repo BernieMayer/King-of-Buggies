@@ -143,6 +143,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
+    <ClCompile Include="VehicleTraits.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

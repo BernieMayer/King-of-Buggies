@@ -8,7 +8,6 @@
 
 #include "SnippetVehicleFilterShader.h"
 
-
 //Is the surface drivable?
 //Is the force being applied big enough?
 //Are we using the right constants?
@@ -98,6 +97,11 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* gFrictionPairs = NULL;
 
 VehicleSceneQueryData*	gVehicleSceneQueryData = NULL;
 
+VehicleTraits traits = NULL;
+
+bool forwards = true;
+
+
 //TEMPORARY FUNCTION
 PxRigidActor* getSphere() { return aSphereActor; }
 PxRigidDynamic* getCar() { return vehicle->getRigidDynamicActor(); }
@@ -157,6 +161,10 @@ Physics::Physics() {
 
 }
 
+VehicleTraits getVehicleTraits() {
+	return traits;
+}
+
 /**
  * Converts the input from input manager
  */
@@ -204,11 +212,46 @@ void Physics::giveInput(Input input, int playernum) {
 }
 
 void Physics::handleInput(Input* input){
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+
+	/*
+	if (!input->isKeyboard)
+	{
+		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, 
+			gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);
+	} 
+	else 
+	{
+		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gKeySmoothingData, 
+			gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);	
+	*/
+
+	PxVec3 velocity = vehicle->getRigidDynamicActor()->getAngularVelocity();
+
+	if (velocity.x == 0 && velocity.z == 0 && !forwards && (input->forward > input->backward)) {
+		// If not moving and was in reverse gear, but more forwards
+		// input than backwards, switch to forwards gear
+		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		std::cout << "Forwards\n";
+		forwards = true;
+	}
+	else if (velocity.x == 0 && velocity.z == 0 && forwards && (input->forward < input->backward)) {
+		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		std::cout << "Backwards\n";
+		forwards = false;
+	}
+
+	if (forwards) {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+	}
+	else {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
+	}
+
+	
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
-
 }
 
 void Physics::initDefaultScene() {
@@ -282,38 +325,25 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	// Create the batched scene queries for the supension raycasts
 	//gVehicleSceneQueryData
 
-	const PxVec3 chassisDims(1.25f, 1.0f, 2.0f);
-	const PxF32 wheelWidth = 0.4f;
-	const PxF32 wheelRadius = 0.5f;
-	const PxU32 nbWheels = 4;
+	traits = VehicleTraits(mMaterial);
 
-	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
-	//Moment of inertia is just the moment of inertia of a cylinder.
-	const PxF32 wheelMass = 20.0f;
-	const PxF32 wheelMOI = 0.5f*wheelMass*wheelRadius*wheelRadius;
-
-	//Set up the chassis mass, dimensions, moment of inertia, and center of mass offset.
-	//The moment of inertia is just the moment of inertia of a cuboid but modified for easier steering.
-	//Center of mass offset is 0.65m above the base of the chassis and 0.25m towards the front.
-	const PxF32 chassisMass = 1500.0f;
-	const PxVec3 chassisMOI
-		((chassisDims.y*chassisDims.y + chassisDims.z*chassisDims.z)*chassisMass / 12.0f,
-		(chassisDims.x*chassisDims.x + chassisDims.z*chassisDims.z)*0.8f*chassisMass / 12.0f,
-		(chassisDims.x*chassisDims.x + chassisDims.y*chassisDims.y)*chassisMass / 12.0f);
-	const PxVec3 chassisCMOffset(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
-
-	PxRigidDynamic* veh4WActor = initVehicleActor(wheelWidth, wheelRadius, nbWheels, chassisDims, chassisMOI, chassisMass, chassisCMOffset);
+	PxRigidDynamic* veh4WActor = initVehicleActor(traits.wheelWidth, traits.wheelRadius, 
+		traits.numWheels, traits.chassisDims, traits.chassisMOI, 
+		traits.chassisMass, traits.chassisCMOffset);
 
 	//Set up the sim data for the wheels.
-	PxVehicleWheelsSimData* wheelsSimData = initWheelSimData(nbWheels, chassisDims, wheelWidth, wheelRadius, wheelMass,
-		wheelMOI, chassisCMOffset, chassisMass);
+	PxVehicleWheelsSimData* wheelsSimData = initWheelSimData(traits.numWheels, 
+		traits.chassisDims, traits.wheelWidth, traits.wheelRadius, 
+		traits.wheelMass, traits.wheelMOI, traits.chassisCMOffset, 
+		traits.chassisMass);
 
 	//Set up the sim data for the vehicle drive model.
 	PxVehicleDriveSimData4W driveSimData = initDriveSimData(wheelsSimData);
 
 	//Create a vehicle from the wheels and drive sim data.
-	PxVehicleDrive4W* vehDrive4W = PxVehicleDrive4W::allocate(nbWheels);
-	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData, nbWheels - 4);
+	PxVehicleDrive4W* vehDrive4W = PxVehicleDrive4W::allocate(traits.numWheels);
+	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData, 
+		traits.numWheels - 4);
 
 	//Free the sim data because we don't need that any more.
 	wheelsSimData->free();
@@ -321,6 +351,7 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	gScene->addActor(*veh4WActor);
 
 	vehDrive4W->mDriveDynData.setUseAutoGears(true);
+	vehDrive4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 
 	return vehDrive4W;
 }
@@ -344,7 +375,7 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 	// Changing switch time to 0 be good enough for that?
 	//Gears
 	PxVehicleGearsData gears;
-	gears.mSwitchTime = 0.5f;
+	gears.mSwitchTime = 0.0f;
 	driveSimData.setGearsData(gears);
 
 	//Clutch
