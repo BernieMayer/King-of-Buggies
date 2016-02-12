@@ -225,16 +225,19 @@ void Physics::handleInput(Input* input){
 			gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);	
 	*/
 
-	PxVec3 velocity = vehicle->getRigidDynamicActor()->getAngularVelocity();
-
-	if (velocity.x == 0 && velocity.z == 0 && !forwards && (input->forward > input->backward)) {
+	float fSpeed = vehicle->computeForwardSpeed();
+	float sSpeed = vehicle->computeSidewaysSpeed();
+	
+	// May need to change speed checks to be something like between 0.1 and -0.1
+	// And then may need a timer to prevent rapid gear changes during wobbling
+	if (fSpeed == 0 && sSpeed == 0 && !forwards && (input->forward > input->backward)) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 		std::cout << "Forwards\n";
 		forwards = true;
 	}
-	else if (velocity.x == 0 && velocity.z == 0 && forwards && (input->forward < input->backward)) {
+	else if (fSpeed == 0 && sSpeed == 0 && forwards && (input->forward < input->backward)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 		std::cout << "Backwards\n";
 		forwards = false;
