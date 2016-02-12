@@ -7,6 +7,14 @@
 #include <stdlib.h> 
 
 
+//Is the surface drivable?
+//Is the force being applied big enough?
+//Are we using the right constants?
+//Is the movement system accurately affecting the car?
+//Have we set up Physics properly?
+//Are the wheels working against each other?
+//
+
 #define MAX_NUM_ACTOR_SHAPES 128
 
 PxVehicleKeySmoothingData gKeySmoothingData =
@@ -222,17 +230,14 @@ PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physi
 void Physics::handleInput(Input* input){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
-
-	//The code below is used to handle the braking, leftSteer, rightSteer
-
-	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->brake);
-	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANOLOG_INPUT_STEER_LEFT, input->leftSteer);
-	//vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANOLOG_INPUT_STEER_RIGHT, input->rightSteer);
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
 }
 
 void Physics::initDefaultScene() {
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f, gravity, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f,  gravity, 0.0f);
 
 	// May need to change this number
 	PxU32 numWorkers = 1;
@@ -740,7 +745,7 @@ void Physics::startSim(const GameState& state) {
 	const PxVec3 grav = gScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
 	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicle->mWheelsSimData.getNbWheels() } };
-	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults);
+	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
 
 	gScene->simulate(frameTime);
 }
