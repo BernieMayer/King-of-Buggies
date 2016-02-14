@@ -230,14 +230,14 @@ void Physics::handleInput(Input* input){
 	
 	// May need to change speed checks to be something like between 0.1 and -0.1
 	// And then may need a timer to prevent rapid gear changes during wobbling
-	if (fSpeed == 0 && sSpeed == 0 && !forwards && (input->forward > input->backward)) {
+	if (fSpeed > 0 && !forwards && (input->forward > input->backward)) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 		std::cout << "Forwards\n";
 		forwards = true;
 	}
-	else if (fSpeed == 0 && sSpeed == 0 && forwards && (input->forward < input->backward)) {
+	else if (fSpeed < 0 && forwards && (input->forward < input->backward)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 		std::cout << "Backwards\n";
 		forwards = false;
