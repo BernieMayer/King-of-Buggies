@@ -100,7 +100,7 @@ void GameManager::physicsAndRenderTest()
 		physics.getSim();
 
 		float scale = 0.1f;
-		//cam.rotateView(in.turn*scale, in.forward*scale);
+
 		if (!in.drift)//in.powerup)
 			cam.rotateView(in.camH*scale, in.camV*scale);
 		if (in.drift)
@@ -118,6 +118,12 @@ void GameManager::physicsAndRenderTest()
 		if (cPos != cam.getViewCenter())
 			cam.changeCenterAndPos(cPos - cam.getViewCenter());
 
+		//Track camera around front of vehicle
+		vec4 carDir = getMat4(carActor->getGlobalPose())*vec4(0.f, 0.f, 1.f, 0.f);
+		
+		//if (in.forward > 0.f)
+			cam.trackDirAroundY(vec3(carDir), 1.f / 60.f);
+
 		//Wheel transformations
 		PxShape* wheelShapes[4];
 		getWheels(wheelShapes);
@@ -125,9 +131,6 @@ void GameManager::physicsAndRenderTest()
 		{
 			renderer.assignTransform(wheels[i], getMat4(carActor->getGlobalPose())*getMat4(wheelShapes[i]->getLocalPose()));
 		}
-
-
-		//displayMat4(getMat4(sphereActor->getGlobalPose()));
 
 		renderer.clearDrawBuffers();
 

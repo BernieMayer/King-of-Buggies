@@ -14,6 +14,10 @@ const float maxY = 0.8f;		//Determines maximum y value of camera direction (To p
 const int FREEROAM_CAMERA = 0;
 const int MODELVIEWER_CAMERA = 1;
 
+const float PI = 3.14159265359f;
+
+const float trackingSpeed = PI;		//radii per second
+
 using namespace glm;
 
 class Camera
@@ -42,6 +46,10 @@ public:
 	vec3 getViewCenter();
 
 	void changeDir(vec3 _dir);
+
+	float trackingSpeedFunc(float angleDiff);
+
+	void trackDirAroundY(vec3 _dir, float timeStep);
 
 	void changePos(vec3 _pos);
 

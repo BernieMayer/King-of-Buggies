@@ -147,6 +147,37 @@ void Camera::rotateView(float x, float y)
 
 }
 
+float Camera::trackingSpeedFunc(float angleDiff)
+{
+	float clampedAngle = max(min(angleDiff, PI), 0.f);
+	float k = 0.1f;
+
+	return (clampedAngle / PI)*(1.f - k) + k;
+}
+
+void Camera::trackDirAroundY(vec3 _dir, float timeStep)
+{
+	vec3 flatDir = normalize(vec3(dir.x, 0.f, dir.z));
+	vec3 flat_Dir = normalize(vec3(_dir.x, 0.f, _dir.z));
+
+
+	float angleDiff = acos(dot(flatDir, flat_Dir));
+
+	if (angleDiff < 0.01f)
+		return;
+
+	float sign = 1.f;
+
+	if (dot(right, _dir) >= 0)
+		sign = -1.f;
+
+	float adjustedSpeed = trackingSpeed*timeStep*trackingSpeedFunc(angleDiff);
+
+	pos = vec3(rotY(sign*min(angleDiff, adjustedSpeed))*vec4(pos - viewCenter, 1.f))+viewCenter;
+	changeDir(viewCenter - pos);
+
+}
+
 void Camera::rotateViewAround(float x, float y)
 {
 	float thetaX = -y*right.x + x*up.x;
