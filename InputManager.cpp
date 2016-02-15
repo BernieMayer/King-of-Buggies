@@ -121,8 +121,7 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	}
 	else if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
 		// Temporary way to close window
-		glfwDestroyWindow(sender);
-		glfwTerminate();
+		glfwSetWindowShouldClose(sender, GL_TRUE);
 	}
 }
 
