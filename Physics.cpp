@@ -169,8 +169,7 @@ VehicleTraits getVehicleTraits() {
  * Converts the input from input manager
  */
 void Physics::giveInput(Input input, int playernum) {
-	
-	
+
 	PxVehicleDrive4WRawInputData* pxInput;
 
 	if (input.isKeyboard) {
@@ -188,14 +187,16 @@ void Physics::giveInput(Input input, int playernum) {
 			pxInput->setDigitalBrake(false);
 		}
 		
-		if (input.turnL > 1) {
+		if (input.turnL > 0.f) {
+			cout << "Turn left" << endl;
 			pxInput->setDigitalSteerLeft(true);
 		}
 		else {
 			pxInput->setDigitalSteerLeft(false);
 		}
 		
-		if (input.turnR > 1) {
+		if (input.turnR > 0.f) {
+			cout << "Turn right" << endl;
 			pxInput->setDigitalSteerRight(true);
 		}
 		else {
@@ -251,10 +252,13 @@ void Physics::handleInput(Input* input){
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
 	}
-
 	
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+
+	/*printf("Left = %f, Right = %f\n", vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT),
+		vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT));*/
+
 }
 
 void Physics::initDefaultScene() {

@@ -1,8 +1,10 @@
 #include <GL/glew.h>  
 #include <GLFW/glfw3.h>
+#include <cstdio>
 
 #include "InputManager.h"
 #include "Gamepad.h"
+#include "Keybindings.h"
 
 float kForward;
 float kBackward;
@@ -87,29 +89,29 @@ void mouseClick(GLFWwindow *sender, int button, int action, int mods) {
  * Increments or decrements floats based on keys being pressed
  */
 void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+	if (forwardKeyboard(key) && action == GLFW_PRESS) {
 		kForward += 1;
 	}
-	else if (key == GLFW_KEY_UP && action == GLFW_RELEASE) {
+	else if (forwardKeyboard(key) && action == GLFW_RELEASE) {
 		kForward -= 1;
 	}
-	else if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+	else if (backwardKeyboard(key) && action == GLFW_PRESS) {
 		kBackward += 1;
 	}
-	else if (key == GLFW_KEY_DOWN && action == GLFW_RELEASE) {
+	else if (backwardKeyboard(key) && action == GLFW_RELEASE) {
 		kBackward -= 1;
 	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		kTurnL += 1;
-	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_RELEASE) {
+	else if (leftKeyboard(key) && action == GLFW_PRESS) {
 		kTurnL -= 1;
 	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		kTurnR += 1;
+	else if (leftKeyboard(key) && action == GLFW_RELEASE) {
+		kTurnL += 1;
 	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_RELEASE) {
+	else if (rightKeyboard(key) && action == GLFW_PRESS) {
 		kTurnR -= 1;
+	}
+	else if (rightKeyboard(key) && action == GLFW_RELEASE) {
+		kTurnR += 1;
 	}
 	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		kMenu = true;
@@ -167,6 +169,7 @@ InputManager::InputManager(GLFWwindow* w)
 		gamepads[i - 1] = temp;
 
 		if (temp.Connected()) {
+			printf("Controller connected in port %d\n", i);
 			// Allows for a player when no controllers connected
 			if (i != 1) {
 				numPlayers += 1;

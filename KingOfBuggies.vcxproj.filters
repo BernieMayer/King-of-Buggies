@@ -87,6 +87,7 @@
     <ClInclude Include="SnippetVehicleTireFriction.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
     <ClInclude Include="SnippetVehicleFilterShader.h" />
+    <ClInclude Include="Keybindings.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

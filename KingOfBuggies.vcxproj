@@ -98,6 +98,7 @@
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameStateLoader.h" />
+    <ClInclude Include="Keybindings.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="InterfaceManager.h" />
