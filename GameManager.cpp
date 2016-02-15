@@ -242,6 +242,23 @@ void GameManager::createPowerupBoxes()
 	}
 }
 */
+void GameManager::createPlayer(vec3 position)
+{
+	VehicleTraits traits = VehicleTraits(physics.createMaterial(0.5f, 0.5f, 0.5f));		//Make argument to function later
+
+	unsigned int chassisRenderID = renderer.generateObjectID();
+	unsigned int phyiscsID = physics.vehicle_create(traits, vec3(position.x, position.y, position.z));
+
+	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
+	renderer.assignMeshObject(chassisRenderID, playerMesh);
+	
+	renderer.assignMaterial(chassisRenderID, &tsMat);
+	mat4 chassisScale = mat4(1.f);
+
+
+
+}
+
 void GameManager::gameLoop()
 {
 	physicsAndRenderTest();
@@ -250,6 +267,13 @@ void GameManager::gameLoop()
 void GameManager::gameInit()
 {
 
+
+
+}
+
+void GameManager::initTestScene()
+{
+	
 }
 
 void quitGame()

@@ -23,3 +23,17 @@ vector<vec3> MeshObject::getNormals() {
 vector<unsigned int> MeshObject::getIndices() {
 	return indices;
 }
+
+
+vector<vec3>* MeshObject::getVertexPointer()
+{
+	return &vertices;
+}
+vector<vec3>* MeshObject::getNormalPointer()
+{
+	return &normals;
+}
+vector<unsigned int>* MeshObject::getIndexPointer()
+{
+	return &indices;
+}

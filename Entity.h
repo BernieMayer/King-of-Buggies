@@ -9,11 +9,9 @@ using namespace glm;
 class Entity {
 protected:
 	vec3 forward;
-	vec3 up;
-	vec3 pos;
 	mat4 transform;
-	int renderID;
-	int physicsID;
+	unsigned int renderID;
+	unsigned int physicsID;
 	Entity();
 	
 public:
@@ -24,11 +22,13 @@ public:
 	vec3 getForward();
 	vec3 getUp();
 
+	void setPos(const vec3& _pos);
+
 	void setRenderID(unsigned int newID);
 	void setPhysicsID(unsigned int newID);
 
-	int getRenderID();
-	int getPhysicsID();
+	unsigned int getRenderID();
+	unsigned int getPhysicsID();
 };
 
 #endif //ENTITY_H

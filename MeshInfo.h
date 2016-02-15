@@ -12,6 +12,7 @@ public:
 	MeshInfo();
 
 	MeshObject getMesh(int objectType);
+	MeshObject* getMeshPointer(int objectType);
 	vector<vec3> getMeshVertices(int objectType);
 	vector<vec3> getMeshNormals(int objectType);
 	vector<unsigned int> getMeshIndices(int objectType);

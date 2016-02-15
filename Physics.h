@@ -41,11 +41,36 @@ public:
 	void giveInput(Input input, int playerNum);
 	void handleInput(Input* input);
 	VehicleTraits getVehicleTraits();
+
+	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle
+	void vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits);		//Modify vehicle traits
+	mat4 vehicle_getGlobalPose(unsigned int id);
+	mat4 vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum);
+
+	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
+	unsigned int ground_createGeneric(vec3 mesh);
+	
+	unsigned int dynamic_create(vec3 mesh, vec3 initPos);
+	unsigned int dynamic_createSphere(float radius, vec3 initPos);
+	mat4 dynamic_getGlobalPose(unsigned int id);
+
+	PxMaterial* createMaterial(float staticFriction, float dynamicFriction, float restitution);
+
+
 private:
 	Timer clock;
+	vector<PxVehicleDrive4W*> vehicleActors;
+	vector<PxRigidStatic*> groundActors;
+	vector<PxRigidDynamic*> dynamicActors;
+
+
 	void initDefaultScene();
+	void initScene();
 	PxVehicleDrive4W* initVehicle();
+	PxVehicleDrive4W* initVehicle(VehicleTraits traits, PxVec3 initPos);
 	PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics);
+	PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset);
+
 	PxVehicleDriveSimData4W initDriveSimData(PxVehicleWheelsSimData* wheelsSimData);
 	PxVehicleWheelsSimData* initWheelSimData(int nbWheels, const PxVec3 chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxF32 wheelMass,
 		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);
@@ -58,6 +83,9 @@ private:
 		PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,
 		PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes,
 		PxPhysics& physics);
+	PxRigidDynamic* createVehicleActor(const PxVehicleChassisData& chassisData,
+		PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,
+		PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, PxPhysics& physics, PxVec3 initPos);
 	void computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius,
 		const PxU32 numWheels, PxVec3* wheelCentreOffsets);
 	void setupWheelsSimulationData

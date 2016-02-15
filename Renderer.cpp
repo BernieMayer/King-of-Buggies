@@ -107,6 +107,15 @@ unsigned int Renderer::generateObjectID()
 	return objects.size() - 1;		//Handle for the object
 }
 
+void Renderer::assignMeshObject(unsigned int id, MeshObject* mesh)
+{
+	if ((id >= objects.size()) || (objects[id].deleted))
+		return;
+	assignMesh(id, mesh->getVertexPointer());
+	assignNormals(id, mesh->getNormalPointer());
+	assignIndices(id, mesh->getIndexPointer());
+}
+
 void Renderer::assignMesh(unsigned int id, vector<vec3>* mesh)
 {
 	if ((id >= objects.size()) || (objects[id].deleted))

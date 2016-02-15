@@ -157,8 +157,106 @@ Physics::Physics() {
 		std::cout << "Extensions failure\n";
 	}
 
+	PxInitVehicleSDK(*mPhysics);
+	// Up and forwards
+	PxVehicleSetBasisVectors(PxVec3(0, 1, 0), PxVec3(0, 0, 1));
+	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
+
 	initDefaultScene();
 
+}
+
+unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
+{
+	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
+	return vehicleActors.size() - 1;
+}
+
+void Physics::vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits)
+{ 
+	//To be implemented 
+}
+
+mat4 Physics::vehicle_getGlobalPose(unsigned int id)
+{
+	if (id >= vehicleActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return mat4(1.f);
+	}
+	return getMat4(vehicleActors[id]->getRigidDynamicActor()->getGlobalPose());
+}
+
+mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
+{
+	if (id >= vehicleActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return mat4(1.f);
+	}
+	else if (wheelNum > 3)
+	{
+		printf("Error: Wheel number must be between 0 and 3\n");
+		return mat4(1.f);
+	}
+
+	PxShape* wheelShape[1];
+	vehicleActors[id]->getRigidDynamicActor()->getShapes(wheelShape, 1, wheelNum);
+
+	return vehicle_getGlobalPose(id)*getMat4(wheelShape[0]->getLocalPose());
+}
+
+unsigned int Physics::ground_createPlane(vec3 normal, float offset)
+{
+	if (normal != vec3(0.f))
+	{
+		printf("Error: Normal can't be zero\n");
+		return ULLONG_MAX;
+	}
+
+	normal = normalize(normal);
+
+	groundActors.push_back(createDrivablePlane(mMaterial, mPhysics, PxVec3(normal.x, normal.y, normal.z), offset));
+
+	return groundActors.size() - 1;
+}
+
+unsigned int Physics::ground_createGeneric(vec3 mesh)
+{
+	//To be implemented
+	return 0;
+}
+
+unsigned int Physics::dynamic_create(vec3 mesh, vec3 initPos)
+{
+	//To be implemented
+	return 0;
+}
+
+unsigned int Physics::dynamic_createSphere(float radius, vec3 initPos)
+{
+	// Add dynamic thrown ball to scene
+	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(initPos.x, initPos.y, initPos.z)));
+	// 0.5 = radius
+	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
+	setupObstacleCollisionHandling(aSphereActor);
+
+	// 1.0f = density
+	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
+
+	// I don't know what effect a 3 vector will have on velocity
+	aSphereActor->setLinearVelocity(PxVec3(0.2f, 0.f, 0.f));
+
+	gScene->addActor(*aSphereActor);
+
+	dynamicActors.push_back(aSphereActor);
+
+	return dynamicActors.size() - 1;
+}
+
+PxMaterial* Physics::createMaterial(float staticFriction, float dynamicFriction, float restitution)
+{
+	return mPhysics->createMaterial(staticFriction, dynamicFriction, restitution);
 }
 
 VehicleTraits getVehicleTraits() {
@@ -261,9 +359,10 @@ void Physics::handleInput(Input* input){
 
 }
 
-void Physics::initDefaultScene() {
+void Physics::initScene()
+{
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
-	sceneDesc.gravity = PxVec3(0.0f,  gravity, 0.0f);
+	sceneDesc.gravity = PxVec3(0.0f, gravity, 0.0f);
 
 	// May need to change this number
 	PxU32 numWorkers = 1;
@@ -283,6 +382,7 @@ void Physics::initDefaultScene() {
 		std::cout << "Scene creation failure\n";
 	}
 
+	//Get rid of eventually
 	// staticfriction, dynamic friction, restitution
 	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
 	if (!mMaterial) {
@@ -295,6 +395,11 @@ void Physics::initDefaultScene() {
 	gBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *gVehicleSceneQueryData, gScene);
 
 	gFrictionPairs = createFrictionPairs(mMaterial);
+}
+
+void Physics::initDefaultScene() {
+
+	initScene();
 
 	// Add static ground plane to the scene
 	//plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
@@ -323,11 +428,41 @@ void Physics::initDefaultScene() {
 	vehicle = initVehicle();
 }
 
+PxVehicleDrive4W* Physics::initVehicle(VehicleTraits traits, PxVec3 initPos) {
+	
+	// Create the batched scene queries for the supension raycasts
+	//gVehicleSceneQueryData
+
+	PxRigidDynamic* veh4WActor = initVehicleActor(traits.wheelWidth, traits.wheelRadius,
+		traits.numWheels, traits.chassisDims, traits.chassisMOI,
+		traits.chassisMass, traits.chassisCMOffset);
+
+	//Set up the sim data for the wheels.
+	PxVehicleWheelsSimData* wheelsSimData = initWheelSimData(traits.numWheels,
+		traits.chassisDims, traits.wheelWidth, traits.wheelRadius,
+		traits.wheelMass, traits.wheelMOI, traits.chassisCMOffset,
+		traits.chassisMass);
+
+	//Set up the sim data for the vehicle drive model.
+	PxVehicleDriveSimData4W driveSimData = initDriveSimData(wheelsSimData);
+
+	//Create a vehicle from the wheels and drive sim data.
+	PxVehicleDrive4W* vehDrive4W = PxVehicleDrive4W::allocate(traits.numWheels);
+	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData,
+		traits.numWheels - 4);
+
+	//Free the sim data because we don't need that any more.
+	wheelsSimData->free();
+
+	gScene->addActor(*veh4WActor);
+
+	vehDrive4W->mDriveDynData.setUseAutoGears(true);
+	vehDrive4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+
+	return vehDrive4W;
+}
+
 PxVehicleDrive4W* Physics::initVehicle() {
-	PxInitVehicleSDK(*mPhysics);
-	// Up and forwards
-	PxVehicleSetBasisVectors(PxVec3(0, 1, 0), PxVec3(0, 0, 1));
-	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
 	// Create the batched scene queries for the supension raycasts
 	//gVehicleSceneQueryData
@@ -630,6 +765,32 @@ PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysi
 	return groundPlane;
 }
 
+PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset)
+{
+	//Add a plane to the scene.
+	PxRigidStatic* groundPlane = PxCreatePlane(*physics, 
+		PxPlane(normal.x, normal.y, normal.z, offset), *material);
+
+	//Get the plane shape so we can set query and simulation filter data.
+	PxShape* shapes[1];
+	groundPlane->getShapes(shapes, 1);
+
+	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
+	physx::PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
+	shapes[0]->setQueryFilterData(qryFilterData);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_GROUND;
+	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	return groundPlane;
+}
+
+
+
 void Physics::computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 numWheels, PxVec3* wheelCentreOffsets)
 {
 	//chassisDims.z is the distance from the rear of the chassis to the front of the chassis.
@@ -708,6 +869,57 @@ PxConvexMesh* Physics::createConvexMesh(const PxVec3* verts, const PxU32 numVert
 
 	return convexMesh;
 }
+
+PxRigidDynamic* Physics::createVehicleActor(const PxVehicleChassisData& chassisData,
+	PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,
+	PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, PxPhysics& physics, PxVec3 initPos)
+{
+	//We need a rigid body actor for the vehicle.
+	//Don't forget to add the actor to the scene after setting up the associated vehicle.
+	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(initPos));
+
+	//Wheel and chassis simulation filter data.
+	PxFilterData wheelSimFilterData;
+	wheelSimFilterData.word0 = COLLISION_FLAG_WHEEL;
+	wheelSimFilterData.word1 = COLLISION_FLAG_WHEEL_AGAINST;
+	PxFilterData chassisSimFilterData;
+	chassisSimFilterData.word0 = COLLISION_FLAG_CHASSIS;
+	chassisSimFilterData.word1 = COLLISION_FLAG_CHASSIS_AGAINST;
+
+	//Wheel and chassis query filter data.
+	//Optional: cars don't drive on other cars.
+	PxFilterData wheelQryFilterData;
+	setupNonDrivableSurface(wheelQryFilterData);
+	PxFilterData chassisQryFilterData;
+	setupNonDrivableSurface(chassisQryFilterData);
+
+	//Add all the wheel shapes to the actor.
+	for (PxU32 i = 0; i < numWheels; i++)
+	{
+		PxConvexMeshGeometry geom(wheelConvexMeshes[i]);
+		PxShape* wheelShape = vehActor->createShape(geom, *wheelMaterials[i]);
+		wheelShape->setQueryFilterData(wheelQryFilterData);
+		wheelShape->setSimulationFilterData(wheelSimFilterData);
+		wheelShape->setLocalPose(PxTransform(PxIdentity));
+	}
+
+	//Add the chassis shapes to the actor.
+	for (PxU32 i = 0; i < numChassisMeshes; i++)
+	{
+		PxShape* chassisShape = vehActor->createShape
+			(PxConvexMeshGeometry(chassisConvexMeshes[i]), *chassisMaterials[i]);
+		chassisShape->setQueryFilterData(chassisQryFilterData);
+		chassisShape->setSimulationFilterData(chassisSimFilterData);
+		chassisShape->setLocalPose(PxTransform(PxIdentity));
+	}
+
+	vehActor->setMass(chassisData.mMass);
+	vehActor->setMassSpaceInertiaTensor(chassisData.mMOI);
+	vehActor->setCMassLocalPose(PxTransform(chassisData.mCMOffset, PxQuat(PxIdentity)));
+
+	return vehActor;
+}
+
 
 PxRigidDynamic* Physics::createVehicleActor
 (const PxVehicleChassisData& chassisData,

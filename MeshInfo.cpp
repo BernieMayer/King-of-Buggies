@@ -44,6 +44,10 @@ MeshObject MeshInfo::getMesh(int objectType) {
 	return meshes[objectType];
 }
 
+MeshObject* MeshInfo::getMeshPointer(int objectType){
+	return &meshes[objectType];
+}
+
 vector<vec3> MeshInfo::getMeshVertices(int objectType) {
 	return meshes[objectType].getVertices();
 }

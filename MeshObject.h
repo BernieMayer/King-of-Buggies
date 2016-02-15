@@ -14,6 +14,10 @@ public:
 	vector<vec3> getNormals();
 	vector<unsigned int> getIndices();
 
+	vector<vec3>* getVertexPointer();
+	vector<vec3>* getNormalPointer();
+	vector<unsigned int>* getIndexPointer();
+
 private:
 	vector<vec3> vertices, normals;
 	vector<unsigned int> indices;

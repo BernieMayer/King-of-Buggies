@@ -36,13 +36,14 @@ public:
 	GameManager(GLFWwindow* newWindow);
 
 	// create physics and render objects through GameState
-	/*void createPlayers();
+	void createPlayer(vec3 position);		//Add forward parameter later, maybe also VehicleTraits
 	void createCoins();
 	void createPowerups();
 	void createPowerupBoxes();
-	*/
+	
 	void gameLoop();
 	void gameInit();
+	void initTestScene();
 	void quitGame(); // should this take arguments? 
 
 	void physicsAndRenderTest();

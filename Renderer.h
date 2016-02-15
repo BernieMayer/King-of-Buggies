@@ -109,6 +109,7 @@ public:
 
 	//Drawable objects
 	unsigned int generateObjectID();
+	void assignMeshObject(unsigned int id, MeshObject* mesh);
 	void assignMesh(unsigned int object, vector<vec3>* mesh);
 	void assignNormals(unsigned int object, vector<vec3>* normals);
 	void assignUVs(unsigned int object, vector<vec2>* uvs);
