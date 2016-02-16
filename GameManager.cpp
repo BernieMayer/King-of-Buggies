@@ -264,7 +264,7 @@ void GameManager::gameLoop()
 		}
 
 		//Update sphere -- TEMPORARY
-		//renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
+		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
 
 		//Update camera position
 		PlayerInfo* activePlayer = state.getPlayer(0);
@@ -308,6 +308,7 @@ void GameManager::initTestScene()
 {
 	createPlayer(vec3(0.f, 5.f, 0.f));
 	createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
+	createBall(0.5f);
 
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();

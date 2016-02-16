@@ -263,6 +263,16 @@ unsigned int Physics::dynamic_createSphere(float radius, vec3 initPos)
 	return dynamicActors.size() - 1;
 }
 
+mat4 Physics::dynamic_getGlobalPose(unsigned int id)
+{
+	if (id >= dynamicActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return mat4(1.f);
+	}
+	return getMat4(dynamicActors[id]->getGlobalPose());
+}
+
 PxMaterial* Physics::createMaterial(float staticFriction, float dynamicFriction, float restitution)
 {
 	return mPhysics->createMaterial(staticFriction, dynamicFriction, restitution);
