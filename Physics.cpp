@@ -73,6 +73,8 @@ static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES]
 	{ 1.00f, 0.1f }//TARMAC
 };
 
+
+//Need to get rid of all of these globals
 PxDefaultAllocator gAllocator;
 PxDefaultErrorCallback gErrorCallback;
 
@@ -162,7 +164,9 @@ Physics::Physics() {
 	PxVehicleSetBasisVectors(PxVec3(0, 1, 0), PxVec3(0, 0, 1));
 	PxVehicleSetUpdateMode(PxVehicleUpdateMode::eVELOCITY_CHANGE);
 
-	initDefaultScene();
+	initScene();
+
+	//initDefaultScene();
 
 }
 
@@ -208,7 +212,7 @@ mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
 
 unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 {
-	if (normal != vec3(0.f))
+	if (normal == vec3(0.f))
 	{
 		printf("Error: Normal can't be zero\n");
 		return ULLONG_MAX;
@@ -218,10 +222,15 @@ unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 
 	groundActors.push_back(createDrivablePlane(mMaterial, mPhysics, PxVec3(normal.x, normal.y, normal.z), offset));
 
+	if (!groundActors[groundActors.size() - 1])
+		printf("Error: Failed to create plane\n");
+
+	gScene->addActor(*groundActors[groundActors.size() - 1]);
+
 	return groundActors.size() - 1;
 }
 
-unsigned int Physics::ground_createGeneric(vec3 mesh)
+unsigned int Physics::ground_createGeneric(vector<vec3>* mesh)
 {
 	//To be implemented
 	return 0;
@@ -257,6 +266,11 @@ unsigned int Physics::dynamic_createSphere(float radius, vec3 initPos)
 PxMaterial* Physics::createMaterial(float staticFriction, float dynamicFriction, float restitution)
 {
 	return mPhysics->createMaterial(staticFriction, dynamicFriction, restitution);
+}
+
+PxMaterial* Physics::getMaterial()
+{
+	return mMaterial;
 }
 
 VehicleTraits getVehicleTraits() {
@@ -359,6 +373,57 @@ void Physics::handleInput(Input* input){
 
 }
 
+void Physics::handleInput(Input* input, unsigned int id){
+
+	PxVehicleDrive4W* vehicle = vehicleActors[id];
+
+	/*
+	if (!input->isKeyboard)
+	{
+	PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData,
+	gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);
+	}
+	else
+	{
+	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gKeySmoothingData,
+	gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);
+	*/
+
+	float fSpeed = vehicle->computeForwardSpeed();
+	float sSpeed = vehicle->computeSidewaysSpeed();
+
+	// May need to change speed checks to be something like between 0.1 and -0.1
+	// And then may need a timer to prevent rapid gear changes during wobbling
+	if (fSpeed > 0 && !forwards && (input->forward > input->backward)) {
+		// If not moving and was in reverse gear, but more forwards
+		// input than backwards, switch to forwards gear
+		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		std::cout << "Forwards\n";
+		forwards = true;
+	}
+	else if (fSpeed < 0 && forwards && (input->forward < input->backward)) {
+		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		std::cout << "Backwards\n";
+		forwards = false;
+	}
+
+	if (forwards) {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
+	}
+	else {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
+	}
+
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+
+	/*printf("Left = %f, Right = %f\n", vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT),
+	vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT));*/
+
+}
+
 void Physics::initScene()
 {
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
@@ -405,6 +470,7 @@ void Physics::initDefaultScene() {
 	//plane = PxCreatePlane(*mPhysics, PxPlane(PxVec3(0, 1, 0), 0),
 		//*mMaterial);
 	plane = createDrivablePlane(mMaterial, mPhysics);
+
 	if (!plane) {
 		// Fatal error
 		std::cout << "Plane creation failure\n";
@@ -983,14 +1049,11 @@ void Physics::shutdown() {
 	mFoundation->release();
 }
 
-void Physics::startSim(const GameState& state) {
+/*void Physics::startSim(const GameState& state) {
 	
 	
 
 	// Simulate at 60 fps... probably what it means
-	/*float timeElapsed = clock.getElapsedTime();
-
-	gScene->simulate(max(timeElapsed, 0.001f));*/
 	float frameTime = 1 / 60.f;
 	clock.waitUntil(frameTime);
 
@@ -1008,6 +1071,33 @@ void Physics::startSim(const GameState& state) {
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
 
 	gScene->simulate(frameTime);
+}*/
+
+void Physics::startSim(const GameState& state) {
+
+
+
+	// Simulate at 60 fps... probably what it means
+	/*float timeElapsed = clock.getElapsedTime();
+
+	gScene->simulate(max(timeElapsed, 0.001f));*/
+	float frameTime = 1 / 60.f;
+	clock.waitUntil(frameTime);
+
+	PxVehicleWheels* vehicles[1] = { vehicleActors[0] }; // TODO: Once we add more vehicles this line will need to be changed
+	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
+	PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+
+
+
+
+	const PxVec3 grav = gScene->getGravity();
+	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles[0]->mWheelsSimData.getNbWheels() } };
+	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
+
+	gScene->simulate(frameTime);
 }
 
 GameState Physics::getSim() {
@@ -1016,22 +1106,22 @@ GameState Physics::getSim() {
 	gScene->fetchResults(true);
 
 	// An example of how to get position
-	PxVec3 pos = aSphereActor->getGlobalPose().p;
+//	PxVec3 pos = aSphereActor->getGlobalPose().p;
 	//std::cout << "Sphere Y: " << pos.y << "\n";
 
 	// How to get rotation
-	PxQuat rotation = aSphereActor->getGlobalPose().q;
+//	PxQuat rotation = aSphereActor->getGlobalPose().q;
 
 	// Get number of shapes
-	const PxU32 nbShapes = aSphereActor->getNbShapes();
-	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-	aSphereActor->getShapes(shapes, nbShapes);
+//	const PxU32 nbShapes = aSphereActor->getNbShapes();
+//	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
+//	aSphereActor->getShapes(shapes, nbShapes);
 	// Get geometry
-	PxGeometryHolder geo = shapes[0]->getGeometry();
+//	PxGeometryHolder geo = shapes[0]->getGeometry();
 	// Find type (Box, Capsule, convex mesh, heightfield, plane, sphere or triangle mesh)
-	geo.getType();
+//	geo.getType();
 	// Get actual sphere
-	PxSphereGeometry sphere = geo.sphere();
+//	PxSphereGeometry sphere = geo.sphere();
 	// This will contain stuff about the shape of the object
 	// In the case of a sphere, only the radius
 

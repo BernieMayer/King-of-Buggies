@@ -26,6 +26,8 @@ PlayerInfo* GameState::getPlayer(unsigned int playerNum)
 		return NULL;
 }
 
+unsigned int GameState::numberOfPlayers(){ return players.size(); }
+
 void GameState::addCoin(const Coin& coin) { coins.push_back(coin); }
 
 void GameState::setCoin(unsigned int coinNum, const Coin& coin)
@@ -43,6 +45,8 @@ Coin* GameState::getCoin(unsigned int coinNum)
 	else
 		return NULL;
 }
+
+unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
 void GameState::addPowerup(const Powerup& powerup) { powerups.push_back(powerup); }
 
@@ -62,6 +66,8 @@ Powerup* GameState::getPowerup(unsigned int powerupNum)
 		return NULL;
 }
 
+unsigned int GameState::numberOfPowerups(){ return powerups.size(); }
+
 void GameState::addPowerupBox(const PowerupBox& box) { boxes.push_back(box); }
 
 void GameState::setPowerupBox(unsigned int boxNum, const PowerupBox& box)
@@ -79,5 +85,7 @@ PowerupBox* GameState::getPowerupBox(unsigned int boxNum)
 	else
 		return NULL;
 }
+
+unsigned int GameState::numberOfPowerupBoxes(){ return boxes.size(); }
 
 #endif // GAMESTATE_CPP

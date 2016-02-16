@@ -36,10 +36,12 @@ public:
 	Physics();
 	void shutdown();
 	void startSim(const GameState&);
+	//void startSim2(const GameState&);
 	GameState getSim();
 	Entity* getCollisions();
 	void giveInput(Input input, int playerNum);
 	void handleInput(Input* input);
+	void handleInput(Input* input, unsigned int id);
 	VehicleTraits getVehicleTraits();
 
 	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle
@@ -48,13 +50,14 @@ public:
 	mat4 vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum);
 
 	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
-	unsigned int ground_createGeneric(vec3 mesh);
+	unsigned int ground_createGeneric(vector<vec3>* mesh);
 	
 	unsigned int dynamic_create(vec3 mesh, vec3 initPos);
 	unsigned int dynamic_createSphere(float radius, vec3 initPos);
 	mat4 dynamic_getGlobalPose(unsigned int id);
 
 	PxMaterial* createMaterial(float staticFriction, float dynamicFriction, float restitution);
+	PxMaterial* getMaterial();
 
 
 private:
