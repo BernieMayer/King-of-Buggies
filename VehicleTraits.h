@@ -3,6 +3,12 @@
 
 #include "PxPhysicsAPI.h"
 
+#include <fstream>
+#include <string>
+#include <iostream>
+
+#pragma warning(disable:4996)
+
 using namespace physx;
 
 class VehicleTraits {
@@ -25,6 +31,8 @@ public:
 	PxF32 wheelMOI;
 	PxMaterial* wheelMaterial;
 	PxU32 numWheels;
+
+	bool loadConfiguration(string configFile);
 };
 
 #endif // VEHICLETRAITS_H

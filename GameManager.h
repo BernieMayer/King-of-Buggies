@@ -35,6 +35,8 @@ private:
 
 	GLFWwindow* window;
 
+	//void updateTransform(const Entity& )
+
 	unsigned int surfaceRenderID;		//TEMPORARY - Replace as soon as possible
 	unsigned int surfacePhysicsID;		//TEMPORARY
 

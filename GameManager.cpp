@@ -233,6 +233,9 @@ void GameManager::gameLoop()
 {
 	//physicsAndRenderTest();
 
+	VehicleTraits temp = VehicleTraits(physics.getMaterial());
+	temp.loadConfiguration("base");
+
 	while (!glfwWindowShouldClose(window))
 	{
 

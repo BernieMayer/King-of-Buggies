@@ -44,6 +44,10 @@ public:
 	void handleInput(Input* input, unsigned int id);
 	VehicleTraits getVehicleTraits();
 
+	/*
+	Split between vehicle, ground, and dynamic for the same of collision resolution
+	May need to split further at a later point of time
+	*/
 	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle
 	void vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits);		//Modify vehicle traits
 	mat4 vehicle_getGlobalPose(unsigned int id);
@@ -79,6 +83,8 @@ private:
 		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);
 	PxRigidDynamic* initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
 		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset);
+	PxRigidDynamic* initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, const PxVec3 initPos);
 	PxConvexMesh* createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking);
 	PxConvexMesh* createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking);
 	PxRigidDynamic* createVehicleActor
