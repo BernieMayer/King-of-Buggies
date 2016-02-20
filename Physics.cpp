@@ -357,12 +357,10 @@ void Physics::handleInput(Input* input){
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-		std::cout << "Forwards\n";
 		forwards = true;
 	}
 	else if (fSpeed < 0 && forwards && (input->forward < input->backward)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		std::cout << "Backwards\n";
 		forwards = false;
 	}
 
@@ -374,6 +372,10 @@ void Physics::handleInput(Input* input){
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
 	}
+
+	PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
+
+	std::cout << quat.getAngle() << "\n";
 	
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
@@ -408,12 +410,10 @@ void Physics::handleInput(Input* input, unsigned int id){
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-		std::cout << "Forwards\n";
 		forwards = true;
 	}
 	else if (fSpeed < 0 && forwards && (input->forward < input->backward)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		std::cout << "Backwards\n";
 		forwards = false;
 	}
 
@@ -428,6 +428,11 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+
+	PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
+	PxVec3 rotation = quat.getBasisVector1();
+
+	std::cout << "X: " << quat.x << " Y: " << quat.y << " Z: " << quat.z << "\n";
 
 	/*printf("Left = %f, Right = %f\n", vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT),
 	vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT));*/
@@ -488,7 +493,7 @@ void Physics::initDefaultScene() {
 	gScene->addActor(*plane);
 
 	// Add dynamic thrown ball to scene
-	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0, 5.f, 0)));
+	aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(0.0f, 5.0f, 0)));
 	// 0.5 = radius
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(0.5), *mMaterial);
 	setupObstacleCollisionHandling(aSphereActor);
@@ -547,7 +552,7 @@ PxVehicleDrive4W* Physics::initVehicle() {
 
 	PxRigidDynamic* veh4WActor = initVehicleActor(traits.wheelWidth, traits.wheelRadius, 
 		traits.numWheels, traits.chassisDims, traits.chassisMOI, 
-		traits.chassisMass, traits.chassisCMOffset);
+		traits.chassisMass, traits.chassisCMOffset, PxVec3(0.5, 0.5, 0.5));
 
 	//Set up the sim data for the wheels.
 	PxVehicleWheelsSimData* wheelsSimData = initWheelSimData(traits.numWheels, 
@@ -686,6 +691,58 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 
 	return veh4WActor;
 }
+
+PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, PxVec3 initPos) {
+
+	PxRigidDynamic* veh4WActor = NULL;
+
+	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
+	//Moment of inertia is just the moment of inertia of a cylinder.
+	PxMaterial* wheelMaterial = mMaterial;
+
+	//Construct a convex mesh for a cylindrical wheel.
+	PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
+	//Assume all wheels are identical for simplicity.
+	PxConvexMesh* wheelConvexMeshes[PX_MAX_NB_WHEELS];
+	PxMaterial* wheelMaterials[PX_MAX_NB_WHEELS];
+
+	//Set the meshes and materials for the driven wheels.
+	for (PxU32 i = PxVehicleDrive4WWheelOrder::eFRONT_LEFT; i <= PxVehicleDrive4WWheelOrder::eREAR_RIGHT; i++)
+	{
+		wheelConvexMeshes[i] = wheelMesh;
+		wheelMaterials[i] = wheelMaterial;
+	}
+	//Set the meshes and materials for the non-driven wheels
+	for (PxU32 i = PxVehicleDrive4WWheelOrder::eREAR_RIGHT + 1; i < nbWheels; i++)
+	{
+		wheelConvexMeshes[i] = wheelMesh;
+		wheelMaterials[i] = wheelMaterial;
+	}
+
+	PxMaterial* chassisMaterial = wheelMaterial;
+	//Chassis just has a single convex shape for simplicity.
+	PxConvexMesh* chassisConvexMesh = createChassisMesh(chassisDims, *mPhysics, *mCooking);
+	PxConvexMesh* chassisConvexMeshes[1] = { chassisConvexMesh };
+	PxMaterial* chassisMaterials[1] = { chassisMaterial };
+
+	//Rigid body data.
+	PxVehicleChassisData rigidBodyData;
+	rigidBodyData.mMOI = chassisMOI;
+	rigidBodyData.mMass = chassisMass;
+	rigidBodyData.mCMOffset = chassisCMOffset;
+
+	veh4WActor = createVehicleActor
+		(rigidBodyData,
+		wheelMaterials, wheelConvexMeshes, nbWheels,
+		chassisMaterials, chassisConvexMeshes, 1,
+		*mPhysics, initPos);
+
+	veh4WActor->setGlobalPose(PxTransform(initPos));
+
+	return veh4WActor;
+}
+
 
 void Physics::setupWheelsSimulationData
 (const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth,

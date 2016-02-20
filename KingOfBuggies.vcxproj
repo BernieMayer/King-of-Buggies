@@ -123,6 +123,7 @@
     <ClInclude Include="VehicleTraits.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AIManager.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="diffuse.cpp" />
     <ClCompile Include="Entity.cpp" />

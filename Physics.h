@@ -79,6 +79,8 @@ private:
 		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);
 	PxRigidDynamic* initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
 		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset);
+	PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, PxVec3 initPos);
 	PxConvexMesh* createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking);
 	PxConvexMesh* createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking);
 	PxRigidDynamic* createVehicleActor

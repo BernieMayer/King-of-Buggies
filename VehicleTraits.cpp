@@ -1,6 +1,6 @@
-#ifndef PHYSICS_CPP
-#define PHYSICS_CPP
-#include "Physics.h"
+#ifndef VEHICLETRAITS_CPP
+#define VEHICLETRAITS_CPP
+#include "VehicleTraits.h"
 
 // Gives default values from snippet
 VehicleTraits::VehicleTraits(PxMaterial* material) {

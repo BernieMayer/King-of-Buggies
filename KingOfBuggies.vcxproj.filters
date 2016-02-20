@@ -35,6 +35,7 @@
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="SnippetVehicleFilterShader.cpp" />
     <ClCompile Include="VehicleTraits.cpp" />
+    <ClCompile Include="AIManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
