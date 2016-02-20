@@ -48,7 +48,6 @@ GLFWwindow* initializeWindow()
 	return window;
 }
 
-// A quick example of how to use this
 int main() {
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
