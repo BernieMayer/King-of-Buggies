@@ -32,6 +32,7 @@ public:
 	//GLuint vertexBuffer, indexBuffer;
 
 	vector<vec3> vertices, normals;
+	vector<vec2> uvs;
 	vector<unsigned int> indices;
 protected:
 

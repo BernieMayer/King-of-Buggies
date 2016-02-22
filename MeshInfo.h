@@ -5,7 +5,7 @@
 #include "MeshInfoLoader.h"
 
 // Loads the indices of meshes contained in MeshInfo
-enum { BRICK = 0, SPHERE, PLANE, CUBE, WHEEL, BUGGY, COUNT };
+enum { BRICK = 0, CUBE, WHEEL, COIN, COUNT };
 
 class MeshInfo {
 public:

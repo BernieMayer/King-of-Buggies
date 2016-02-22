@@ -9,18 +9,6 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 	
-	meshLoader.loadModel("models\\sphere.obj");
-	MeshObject sphereObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
-	meshes.push_back(sphereObject);
-	
-	meshLoader.clearData();
-
-	meshLoader.loadModel("models\\plane.obj");
-	MeshObject planeObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
-	meshes.push_back(planeObject);
-
-	meshLoader.clearData();
-
 	meshLoader.loadModel("models\\cube.obj");
 	MeshObject cubeObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
 	meshes.push_back(cubeObject);
@@ -32,10 +20,16 @@ MeshInfo::MeshInfo() {
 	meshes.push_back(wheelObject);
 
 	meshLoader.clearData();
-
+	/*
 	meshLoader.loadModel("models\\buggy.obj");
 	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
 	meshes.push_back(buggyObject);
+
+	meshLoader.clearData();
+	*/
+	meshLoader.loadModel("models\\coin.obj");
+	MeshObject coinObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.indices);
+	meshes.push_back(coinObject);
 
 	meshLoader.clearData();
 }

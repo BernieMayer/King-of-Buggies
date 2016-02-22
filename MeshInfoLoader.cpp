@@ -53,6 +53,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 	//vector<GLv3f> vertices;
 	vector<vec3> _normals;
 	vector<unsigned int> _faces;
+	vector<unsigned int> _uvfaces;
 	vector<unsigned int> _nfaces;
 
 	while (true)
@@ -77,12 +78,19 @@ bool MeshInfoLoader::loadModel(char *filename)
 			fscanf(f, "%f %f %f\n", &norm.x, &norm.y, &norm.z);
 			_normals.push_back(norm);
 		}
+		else if (strcmp(text, "vt") == 0)
+		{
+			vec2 uv;
+
+			fscanf(f, "%f %f\n", &uv.x, &uv.y);
+			uvs.push_back(uv);
+		}
 		else if (strcmp(text, "f") == 0)
 		{
-			unsigned int vi1, vi2, vi3, ni1, ni2, ni3;
+			unsigned int vi1, vi2, vi3, ui1, ui2, ui3, ni1, ni2, ni3;
 
-			if (fscanf(f, "%d//%d %d//%d %d//%d\n",
-				&vi1, &ni1, &vi2, &ni2, &vi3, &ni3) != 6)
+			if (fscanf(f, "%d/%d/%d %d/%d/%d %d/%d/%d\n",
+				&vi1, &ui1, &ni1, &vi2, &ui2, &ni2, &vi3, &ui3, &ni3) != 9)
 			{
 				printf("Face couldn't be read\n");
 				return false;
@@ -91,6 +99,10 @@ bool MeshInfoLoader::loadModel(char *filename)
 			_faces.push_back(vi1 - 1);
 			_faces.push_back(vi2 - 1);
 			_faces.push_back(vi3 - 1);
+
+			_uvfaces.push_back(ui1 - 1);
+			_uvfaces.push_back(ui2 - 1);
+			_uvfaces.push_back(ui3 - 1);
 
 			_nfaces.push_back(ni1 - 1);
 			_nfaces.push_back(ni2 - 1);
