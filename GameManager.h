@@ -11,6 +11,7 @@
 #include "Renderer.h"
 #include "SoundManager.h"
 
+
 #include <GLFW/glfw3.h>  
 
 class GameManager {
@@ -56,6 +57,7 @@ public:
 
 	// create physics and render objects through GameState
 	void createPlayer(vec3 position);		//Add forward parameter later, maybe also VehicleTraits
+	void createAI(vec3 position);
 	void createGroundPlane(vec3 normal, float offset);
 	void createCoins();
 	void createPowerups();

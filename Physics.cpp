@@ -1054,28 +1054,29 @@ void Physics::shutdown() {
 
 void Physics::startSim(const GameState& state) {
 
-
-
-	// Simulate at 60 fps... probably what it means
-	/*float timeElapsed = clock.getElapsedTime();
-
-	gScene->simulate(max(timeElapsed, 0.001f));*/
 	float frameTime = 1 / 60.f;
-	clock.waitUntil(frameTime);
+	for (int i = 0; i < vehicleActors.size(); i++){
 
-	PxVehicleWheels* vehicles[1] = { vehicleActors[0] }; // TODO: Once we add more vehicles this line will need to be changed
-	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
-	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
-	PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
+		// Simulate at 60 fps... probably what it means
+		/*float timeElapsed = clock.getElapsedTime();
+
+		gScene->simulate(max(timeElapsed, 0.001f));*/
+		
+		clock.waitUntil(frameTime);
+
+		PxVehicleWheels* vehicles[1] = { vehicleActors[i] }; // TODO: Once we add more vehicles this line will need to be changed
+		PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
+		const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
+		PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
 
 
 
 
-	const PxVec3 grav = gScene->getGravity();
-	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles[0]->mWheelsSimData.getNbWheels() } };
-	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
-
+		const PxVec3 grav = gScene->getGravity();
+		PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+		PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles[0]->mWheelsSimData.getNbWheels() } };
+		PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
+	}
 	gScene->simulate(frameTime);
 }
 

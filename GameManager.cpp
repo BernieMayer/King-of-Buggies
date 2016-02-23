@@ -206,6 +206,37 @@ void GameManager::createPlayer(vec3 position)
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs));
 }
 
+void GameManager::createAI(vec3 position)
+{
+	VehicleTraits traits = VehicleTraits(physics.getMaterial());	//physics.createMaterial(0.5f, 0.5f, 0.5f));		//Make argument to function later
+
+	unsigned int chassisRenderID = renderer.generateObjectID();
+	unsigned int physicsID = physics.vehicle_create(traits, position);
+
+	MeshObject* playerMesh = meshInfo.getMeshPointer(CUBE);
+	renderer.assignMeshObject(chassisRenderID, playerMesh);
+	renderer.assignMaterial(chassisRenderID, &tsMat);
+	renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
+	renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
+
+	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
+	unsigned int wheelIDs[4];
+
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		wheelIDs[i] = renderer.generateObjectID();
+		renderer.assignMeshObject(wheelIDs[i], wheelMesh);
+		renderer.assignMaterial(wheelIDs[i], &matteMat);
+		renderer.assignScale(wheelIDs[i],
+			scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
+		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
+	}
+
+	state.addAI(PlayerInfo(chassisRenderID, physicsID, wheelIDs));
+
+
+}
+
 void GameManager::createGroundPlane(vec3 normal, float offset)
 {
 	surfacePhysicsID = physics.ground_createPlane(vec3(0.f, 1.f, 0.f), 0.f);
@@ -240,8 +271,35 @@ void GameManager::gameLoop()
 	{
 
 		Input in = input.getInput(1);		//Get input
+		
+		
+
 		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
 
+
+		if (state.numberOfPlayers() > 1){
+
+			//Change this to AI code
+			Input* ai_in = ai.updateAI(&state);
+			
+			
+			if (ai_in->forward > 0) {
+				cout << "ai_in->forward is " << ai_in->forward << "\n";
+				cout << "in->forward is " << in.forward << "\n";
+				in.forward = 1;
+				in.turnL = 1;
+
+			
+			}
+			else {
+
+				in.forward = 0;
+			}
+
+
+
+			physics.handleInput(&in, state.getPlayer(1)->getPhysicsID());
+		}
 		//Physics sim
 		physics.startSim(GameState());
 		physics.getSim();
@@ -264,7 +322,24 @@ void GameManager::gameLoop()
 				renderer.assignTransform(player->getWheelRenderID(j),
 					physics.vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));
 			}
+			state.setPlayer(i, *player);
 		}
+
+		//Update AI and transforms of the AI
+
+		for (unsigned int i = 0; i < state.numberOfAIs(); i++)
+		{
+			PlayerInfo* ai = state.getAI(i);
+			renderer.assignTransform(ai->getRenderID(),
+				physics.vehicle_getGlobalPose(ai->getPhysicsID()));
+			for (unsigned int j = 0; j < 4; j++)
+			{
+				renderer.assignTransform(ai->getWheelRenderID(j),
+					physics.vehicle_getGlobalPoseWheel(ai->getPhysicsID(), j));
+			}
+		}
+
+		
 
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
@@ -316,6 +391,9 @@ void GameManager::initTestScene()
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();
 	renderer.setLightPosition(lightID, lightPos);
+	
+	createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
+
 	
 }
 

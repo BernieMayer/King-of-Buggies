@@ -9,7 +9,7 @@ GameState::GameState()
 }
 
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
-
+void GameState::addAI(const PlayerInfo& pinfo){ ai.push_back(pinfo); }
 void GameState::setPlayer(unsigned int playerNum, const PlayerInfo& pinfo)
 {
 	if (playerNum < NUM_PLAYERS)
@@ -26,7 +26,16 @@ PlayerInfo* GameState::getPlayer(unsigned int playerNum)
 		return NULL;
 }
 
+PlayerInfo* GameState::getAI(unsigned int aiNum)
+{
+	if (aiNum < ai.size())
+		return &ai[aiNum];
+	else
+		return NULL;
+}
+
 unsigned int GameState::numberOfPlayers(){ return players.size(); }
+unsigned int GameState::numberOfAIs() { return ai.size(); }
 
 void GameState::addCoin(const Coin& coin) { coins.push_back(coin); }
 

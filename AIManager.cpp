@@ -2,8 +2,56 @@
 #define AIMANAGER_CPP
 #include "AIManager.h"
 
+void  AIManager::initAI() {
+	
+}
+
+
+
+
 Input* AIManager::updateAI(GameState* state) {
-	return NULL;
+
+	PlayerInfo* player = state->getPlayer(0);
+	vec3 posPlayer = player->getPos();
+
+	PlayerInfo* ai_state = state->getPlayer(1);
+	vec3 posAI = ai_state->getPos();
+
+	vec3 diff = posAI - posPlayer;
+
+	if (std::abs(diff.length()) <= 7.0f ){
+		cout << "diff.length() is " << diff.length() << "\n";
+		Input in = Input();
+		in.forward = 1;
+		in.backward = 0;
+		in.turnL = 0;
+		in.turnR = 0;
+		in.camV = 0;
+		in.camH = 0;
+
+		in.drift = false;
+		in.powerup = false;
+		in.menu = false;
+		
+		return &in;
+
+	}
+	else {
+		std::cout << "AI should not move \n";
+		Input in = Input();
+		in.forward = 0.0;
+		in.backward = 0;
+		in.turnL = 0;
+		in.turnR = 0;
+		in.camV = 0;
+		in.camH = 0;
+
+		in.drift = false;
+		in.powerup = false;
+		in.menu = false;
+
+		return &in;
+	}
 }
 
 Input AIManager::testAI(PxTransform ourTransform, PxTransform ballTransform) {
