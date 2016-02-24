@@ -1,3 +1,4 @@
+// File originally partially created by Troy Alderson for use in CPSC453 assignments. Reused with permission from Ben Stephenson
 
 #include "MeshInfoLoader.h"
 #include <fstream>
@@ -35,7 +36,6 @@ void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, 
 		}
 		else
 			faces.push_back(vi);
-
 	}
 }
 
@@ -232,13 +232,3 @@ float MeshInfoLoader::getBoundingRadius()
 
 	return boundingRadius;
 }
-
-// CPSC 453: Introduction to Computer Graphics
-//
-// Implementation file for a class to handle obj file data
-//
-// Created by Troy Alderson
-// Department of Computer Science
-// University of Calgary
-//
-// Used with permission for CPSC 453 HW3

@@ -5,7 +5,7 @@
 #include "MeshInfoLoader.h"
 
 // Loads the indices of meshes contained in MeshInfo
-enum { BRICK = 0, CUBE, WHEEL, COIN, COUNT };
+enum { BRICK = 0, CUBE, WHEEL, COIN, LEVEL, COUNT };
 
 class MeshInfo {
 public:
@@ -15,6 +15,7 @@ public:
 	MeshObject* getMeshPointer(int objectType);
 	vector<vec3> getMeshVertices(int objectType);
 	vector<vec3> getMeshNormals(int objectType);
+	vector<vec2> getMeshUvs(int objectType);
 	vector<unsigned int> getMeshIndices(int objectType);
 
 	MeshInfoLoader meshLoader;

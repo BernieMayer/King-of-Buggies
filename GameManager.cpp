@@ -136,8 +136,6 @@ void GameManager::gameLoop()
 
 			//Change this to AI code
 			Input ai_in = ai.updateAI(&state);
-			
-
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
