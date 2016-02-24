@@ -1,3 +1,5 @@
+// File originally partially created by Troy Alderson for use in CPSC453 assignments. Reused with permission from Ben Stephenson
+
 #ifndef MESHINFOLOADER_H
 #define MESHINFOLOADER_H
 
@@ -42,13 +44,3 @@ private:
 };
 
 #endif // MESHINFOLOADER_H
-
-// CPSC 453: Introduction to Computer Graphics
-//
-// Header file for a class to handle obj file data
-//
-// Created by Troy Alderson
-// Department of Computer Science
-// University of Calgary
-//
-// Used with permission for CPSC 453 HW3
