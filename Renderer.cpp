@@ -232,6 +232,28 @@ void Renderer::loadCamera(Camera* _camera)
 }
 
 
+void Renderer::updateObjectTransforms(GameState* state)
+{
+	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
+	{
+		PlayerInfo* player = state->getPlayer(i);
+		assignTransform(player->getRenderID(), player->getTransform());
+
+		for (unsigned int j = 0; j < 4; j++)
+		{
+			assignTransform(player->getWheelRenderID(j), player->getWheelTransform(j));
+		}
+	}
+
+	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
+	{
+		Powerup* powerup = state->getPowerup(i);
+		assignTransform(powerup->getRenderID(), powerup->getTransform());
+	}
+
+}
+
+
 /**
 * Rendering functionality
 **/

@@ -14,6 +14,7 @@
 #include "Specular.h"
 #include "diffuse.h"
 #include "torranceSparrow.h"
+#include "GameState.h"
 
 using namespace std;
 using namespace glm;
@@ -152,6 +153,9 @@ public:
 	void deleteDrawableObject(int object);
 	void deleteLightObject(int object);
 	void deleteIDs();
+
+	//Update
+	void updateObjectTransforms(GameState* state);
 
 };
 

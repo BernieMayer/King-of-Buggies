@@ -31,6 +31,7 @@ public:
 	PxF32 wheelMOI;
 	PxMaterial* wheelMaterial;
 	PxU32 numWheels;
+	int steerAngle;
 
 	bool loadConfiguration(std::string configFile);
 };

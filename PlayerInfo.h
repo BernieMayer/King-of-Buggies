@@ -11,9 +11,12 @@ public:
 	bool isGoldenBuggie();
 
 	unsigned int getWheelRenderID(unsigned int wheelNum);
+	mat4 getWheelTransform(unsigned int wheelNum);
+	void setWheelTransform(unsigned int wheelNum, const mat4& transform);
 
 protected:
 	unsigned int wheelRenderIDs[4];
+	mat4 wheelTransforms [4];
 
 	int powerup;
 	int numCoins;

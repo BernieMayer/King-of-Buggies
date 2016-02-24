@@ -19,6 +19,7 @@ goldenBuggie(false), timeGolden(0.f)
 	for (unsigned int i = 0; i < 4; i++)
 	{
 		wheelRenderIDs[i] = _wheelRenderIDs[i];
+		wheelTransforms[i] = mat4(1.f);
 	}
 
 }
@@ -31,5 +32,18 @@ unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 		return 100000;
 }
 
+mat4 PlayerInfo::getWheelTransform(unsigned int wheelNum)
+{
+	if (wheelNum < 4)
+		return wheelTransforms[wheelNum];
+	else
+		return mat4(1.f);
+}
+
+void PlayerInfo::setWheelTransform(unsigned int wheelNum, const mat4& transform)
+{
+	if (wheelNum < 4)
+		wheelTransforms[wheelNum] = transform;
+}
 
 #endif // PLAYERINFO_CPP

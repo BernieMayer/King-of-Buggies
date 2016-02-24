@@ -24,6 +24,7 @@ VehicleTraits::VehicleTraits(PxMaterial* material) {
 	wheelMOI = 0.5f*wheelMass*wheelRadius*wheelRadius;
 	wheelMaterial = material;
 	numWheels = 4;
+	steerAngle = 45;
 }
 
 VehicleTraits::VehicleTraits(PxF32 cMass, PxVec3 cDims,

@@ -35,7 +35,7 @@ class Physics {
 public:
 	Physics();
 	void shutdown();
-	void startSim(const GameState&);
+	void startSim(const GameState&, float frameTime);
 	//void startSim2(const GameState&);
 	GameState getSim();
 	Entity* getCollisions();
@@ -60,8 +60,11 @@ public:
 	unsigned int dynamic_createSphere(float radius, vec3 initPos);
 	mat4 dynamic_getGlobalPose(unsigned int id);
 
-	PxMaterial* createMaterial(float staticFriction, float dynamicFriction, float restitution);
+	unsigned int createMaterial(float staticFriction, float dynamicFriction, float restitution);
 	PxMaterial* getMaterial();
+	PxMaterial* getMaterial(unsigned int materialID);
+
+	void updateGameState(GameState* state);
 
 
 private:
@@ -69,6 +72,8 @@ private:
 	vector<PxVehicleDrive4W*> vehicleActors;
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
+
+	vector<PxMaterial*> materials;
 
 
 	void initDefaultScene();

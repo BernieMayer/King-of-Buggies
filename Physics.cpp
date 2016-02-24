@@ -70,7 +70,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
 {
 	//NORMAL,	WORN
-	{ 1.00f, 0.1f }//TARMAC
+	{ 2.f, 0.5f }//TARMAC
 };
 
 
@@ -273,9 +273,13 @@ mat4 Physics::dynamic_getGlobalPose(unsigned int id)
 	return getMat4(dynamicActors[id]->getGlobalPose());
 }
 
-PxMaterial* Physics::createMaterial(float staticFriction, float dynamicFriction, float restitution)
+unsigned int Physics::createMaterial(float staticFriction, float dynamicFriction, float restitution)
 {
-	return mPhysics->createMaterial(staticFriction, dynamicFriction, restitution);
+	materials.push_back(mPhysics->createMaterial(staticFriction, dynamicFriction, restitution));
+	
+	//Friction pairs
+
+	return materials.size() - 1;
 }
 
 PxMaterial* Physics::getMaterial()
@@ -285,6 +289,26 @@ PxMaterial* Physics::getMaterial()
 
 VehicleTraits getVehicleTraits() {
 	return traits;
+}
+
+void Physics::updateGameState(GameState* state)
+{
+	for (unsigned int i = 0; i < state->numberOfPlayers();  i++)
+	{
+		PlayerInfo* player = state->getPlayer(i);
+		player->setTransform(vehicle_getGlobalPose(player->getPhysicsID()));
+		
+		for (unsigned int j = 0; j < 4; j++)
+		{
+			player->setWheelTransform(j, vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));
+		}
+	}
+
+	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
+	{
+		Powerup* powerup = state->getPowerup(i);
+		powerup->setTransform(dynamic_getGlobalPose(powerup->getPhysicsID()));
+	}
 }
 
 /**
@@ -373,9 +397,9 @@ void Physics::handleInput(Input* input){
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
 	}
 
-	PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
+	//PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
 
-	std::cout << quat.getAngle() << "\n";
+	//std::cout << quat.getAngle() << "\n";
 	
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
@@ -429,10 +453,10 @@ void Physics::handleInput(Input* input, unsigned int id){
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
 
-	PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
+	/*PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
 	PxVec3 rotation = quat.getBasisVector1();
 
-	std::cout << "X: " << quat.x << " Y: " << quat.y << " Z: " << quat.z << "\n";
+	std::cout << "X: " << quat.x << " Y: " << quat.y << " Z: " << quat.z << "\n";*/
 
 	/*printf("Left = %f, Right = %f\n", vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT),
 	vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT));*/
@@ -464,7 +488,7 @@ void Physics::initScene()
 
 	//Get rid of eventually
 	// staticfriction, dynamic friction, restitution
-	mMaterial = mPhysics->createMaterial(0.5f, 0.5f, 0.6f);
+	mMaterial = mPhysics->createMaterial(0.f, 0.f, 0.6f);
 	if (!mMaterial) {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
@@ -659,6 +683,8 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 	//Moment of inertia is just the moment of inertia of a cylinder.
 	PxMaterial* wheelMaterial = mMaterial;
 
+	printf("Material %f %f\n", mMaterial->getStaticFriction(), mMaterial->getDynamicFriction());
+
 	//Construct a convex mesh for a cylindrical wheel.
 	PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
 	//Assume all wheels are identical for simplicity.
@@ -721,8 +747,8 @@ PxVehicleWheelsSimData* wheelsSimData)
 		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque = 4000.0f;
 		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 4000.0f;
 		//Enable steering for the front wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.3333f;
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.3333f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.25f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.25f;
 	}
 
 	//Set up the tires.
@@ -1028,53 +1054,27 @@ void Physics::shutdown() {
 	mFoundation->release();
 }
 
-/*void Physics::startSim(const GameState& state) {
-	
-	
+void Physics::startSim(const GameState& state, float frameTime) {
 
-	// Simulate at 60 fps... probably what it means
-	float frameTime = 1 / 60.f;
-	clock.waitUntil(frameTime);
+	clock.waitUntil(frameTime);		//Get rid of wait inside function - Should be in gamestate
 
-	PxVehicleWheels* vehicles[1] = { vehicle }; // TODO: Once we add more vehicles this line will need to be changed
+	//PxVehicleWheels* vehicles[1] = { vehicleActors[0] }; // TODO: Once we add more vehicles this line will need to be changed
+	vector<PxVehicleWheels*> vehicles;
+	for (unsigned int i = 0; i < vehicleActors.size(); i++)
+		vehicles.push_back(vehicleActors[i]);			//Fix!
+
 	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
-	PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
-
-
-
+	PxVehicleSuspensionRaycasts(gBatchQuery, vehicles.size(), &vehicles[0], raycastResultsSize, raycastResults);
 
 	const PxVec3 grav = gScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicle->mWheelsSimData.getNbWheels() } };
-	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
+//	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles[0]->mWheelsSimData.getNbWheels() } };
+	vector<PxVehicleWheelQueryResult> vehicleQueryResults;
+	for (unsigned int i = 0; i < vehicles.size(); i++)
+		vehicleQueryResults.push_back({ wheelQueryResults, vehicles[i]->mWheelsSimData.getNbWheels() });
 
-	gScene->simulate(frameTime);
-}*/
-
-void Physics::startSim(const GameState& state) {
-
-
-
-	// Simulate at 60 fps... probably what it means
-	/*float timeElapsed = clock.getElapsedTime();
-
-	gScene->simulate(max(timeElapsed, 0.001f));*/
-	float frameTime = 1 / 60.f;
-	clock.waitUntil(frameTime);
-
-	PxVehicleWheels* vehicles[1] = { vehicleActors[0] }; // TODO: Once we add more vehicles this line will need to be changed
-	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
-	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
-	PxVehicleSuspensionRaycasts(gBatchQuery, 1, vehicles, raycastResultsSize, raycastResults);
-
-
-
-
-	const PxVec3 grav = gScene->getGravity();
-	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles[0]->mWheelsSimData.getNbWheels() } };
-	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, 1, vehicles, vehicleQueryResults); //TODO not have 1 as a magic number
+	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); //TODO not have 1 as a magic number
 
 	gScene->simulate(frameTime);
 }

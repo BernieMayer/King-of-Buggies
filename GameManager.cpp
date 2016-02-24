@@ -3,7 +3,7 @@
 
 #include "GameManager.h"
 
-void GameManager::physicsAndRenderTest()
+/*void GameManager::physicsAndRenderTest()
 {
 	printf("Begin physics and rendering test\n");
 
@@ -146,7 +146,7 @@ void GameManager::physicsAndRenderTest()
 	glfwTerminate();
 
 	printf("End rendering test\n");
-}
+}*/
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
 	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
@@ -242,8 +242,10 @@ void GameManager::gameLoop()
 		Input in = input.getInput(1);		//Get input
 		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
 
+		float frameTime = 1.f / 60.f;
+
 		//Physics sim
-		physics.startSim(GameState());
+		physics.startSim(GameState(), frameTime);
 		physics.getSim();
 
 		float scale = 0.1f;
@@ -253,18 +255,9 @@ void GameManager::gameLoop()
 		if (in.drift)
 			cam.zoom(in.camV*0.95f + 1.f);
 
-		//Update transform of vehicles
-		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
-		{
-			PlayerInfo* player = state.getPlayer(i);
-			renderer.assignTransform(player->getRenderID(),
-				physics.vehicle_getGlobalPose(player->getPhysicsID()));
-			for (unsigned int j = 0; j < 4; j++)
-			{
-				renderer.assignTransform(player->getWheelRenderID(j),
-					physics.vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));
-			}
-		}
+		//Update game state and renderer
+		physics.updateGameState(&state);
+		renderer.updateObjectTransforms(&state);
 
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
@@ -310,6 +303,7 @@ void GameManager::gameInit()
 void GameManager::initTestScene()
 {
 	createPlayer(vec3(0.f, 5.f, 0.f));
+	createPlayer(vec3(5.f, 5.f, 0.f));
 	createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createBall(0.5f);
 
