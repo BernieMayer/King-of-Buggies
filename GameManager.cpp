@@ -135,18 +135,21 @@ void GameManager::gameLoop()
 		if (state.numberOfPlayers() > 1){
 
 			//Change this to AI code
-			Input* ai_in = ai.updateAI(&state);
+			Input ai_in = ai.updateAI(&state);
 			
-			if (ai_in->forward > 0) {
-				cout << "ai_in->forward is " << ai_in->forward << "\n";
-				cout << "in->forward is " << in.forward << "\n";
-				in.forward = 1;
-				in.turnL = 1;
+			if (ai_in.forward > 0) {
+				cout << "ai_in.forward is " << ai_in.forward << "\n";
+				cout << "in.forward is " << in.forward << "\n";
+				ai_in.forward = 1;
+				ai_in.turnL = 1;
 			}
 			else 
-				in.forward = 0;
+				ai_in.forward = 0;
 
-			physics.handleInput(&in, state.getPlayer(1)->getPhysicsID());
+			ai_in.forward = 1;
+			ai_in.turnL = 1;
+
+			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
 
 		float frameTime = 1.f / 60.f;

@@ -9,7 +9,7 @@ void  AIManager::initAI() {
 
 
 
-Input* AIManager::updateAI(GameState* state) {
+Input AIManager::updateAI(GameState* state) {
 
 	PlayerInfo* player = state->getPlayer(0);
 	vec3 posPlayer = player->getPos();
@@ -33,7 +33,7 @@ Input* AIManager::updateAI(GameState* state) {
 		in.powerup = false;
 		in.menu = false;
 		
-		return &in;
+		return in;
 
 	}
 	else {
@@ -50,7 +50,7 @@ Input* AIManager::updateAI(GameState* state) {
 		in.powerup = false;
 		in.menu = false;
 
-		return &in;
+		return in;
 	}
 }
 
