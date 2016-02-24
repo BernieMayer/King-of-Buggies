@@ -1068,11 +1068,14 @@ void Physics::startSim(const GameState& state, float frameTime) {
 	PxVehicleSuspensionRaycasts(gBatchQuery, vehicles.size(), &vehicles[0], raycastResultsSize, raycastResults);
 
 	const PxVec3 grav = gScene->getGravity();
-	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
+	vector<PxWheelQueryResult> wheelQueryResults;
+	wheelQueryResults.resize(vehicles.size()*PX_MAX_NB_WHEELS);
 
 	vector<PxVehicleWheelQueryResult> vehicleQueryResults;
 	for (unsigned int i = 0; i < vehicles.size(); i++)
-		vehicleQueryResults.push_back({ wheelQueryResults, vehicles[i]->mWheelsSimData.getNbWheels() });
+		vehicleQueryResults.push_back({ &wheelQueryResults[i*PX_MAX_NB_WHEELS], vehicles[i]->mWheelsSimData.getNbWheels() });
+		
+	
 
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); 
 
