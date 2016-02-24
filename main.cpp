@@ -1,9 +1,24 @@
+#include "Gamepad.h"
+#include "Renderer.h"
+#include "InputManager.h"
+#include "Input.h"
+#include "camera.h"
+#include "Physics.h"
 #include "GameManager.h"
 
+#include "MeshInfo.h"
+
+#include <iostream>
+#include <GL/glew.h>  
 #include <GLFW/glfw3.h>  
+#include <glm/glm.hpp>
+#include <stdio.h>  
+#include <stdlib.h>  
+#include <vector>
 
 GLFWwindow* initializeWindow()
 {
+
 	//Initialize GLFW  
 	if (!glfwInit())
 	{
@@ -46,19 +61,17 @@ GLFWwindow* initializeWindow()
 	}
 
 	return window;
+
 }
+
 
 int main() {
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
 		return -1;
-
-	glfwSetWindowPos(window, 500, 500);
-
+	glfwSetWindowPos(window, 500, 500);    
 	GameManager manager(window);
-	
-	// Enter main game loop
-	manager.gameLoop();
 
-	return 0;
+	// Enter main game loop
+	manager.gameLoop();    return 0;
 }

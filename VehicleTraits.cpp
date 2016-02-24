@@ -9,7 +9,7 @@ const std::string extension = ".conf";
 VehicleTraits::VehicleTraits(PxMaterial* material) {
 	chassisMass = 1500.0f;
 	// X used to be 1.25
-	chassisDims = PxVec3(1.75, 1.0f, 2.0f);
+	chassisDims = PxVec3(2.f, 1.0f, 3.0f);
 
 	chassisMOI = PxVec3((chassisDims.y*chassisDims.y + chassisDims.z*chassisDims.z)*chassisMass / 12.0f,
 		(chassisDims.x*chassisDims.x + chassisDims.z*chassisDims.z)*0.8f*chassisMass / 12.0f,

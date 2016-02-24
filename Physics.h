@@ -75,6 +75,9 @@ private:
 
 	vector<PxMaterial*> materials;
 
+	//
+	vector<bool> vehicleForwards;
+
 
 	void initDefaultScene();
 	void initScene();

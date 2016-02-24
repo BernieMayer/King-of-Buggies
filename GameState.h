@@ -19,6 +19,7 @@ class GameState {
 private:
 	LevelInfo map;
 
+	vector<PlayerInfo> ai;
 	vector<PlayerInfo> players;
 	vector<Coin> coins;
 	vector<Powerup> powerups;
@@ -31,9 +32,12 @@ public:
 	GameState();
 
 	void addPlayer(const PlayerInfo& pinfo);
+	void addAI(const PlayerInfo& pinfo);
 	void setPlayer(unsigned int playerNum, const PlayerInfo& pinfo);
 	PlayerInfo* getPlayer(unsigned int playerNum);
+	PlayerInfo* getAI(unsigned int aiNum);
 	unsigned int numberOfPlayers();
+	unsigned int numberOfAIs();
 
 	void addCoin(const Coin& coin);
 	void setCoin(unsigned int coinNum, const Coin& coin);

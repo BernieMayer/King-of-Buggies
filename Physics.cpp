@@ -173,6 +173,7 @@ Physics::Physics() {
 unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
+	vehicleForwards.push_back(false);
 	return vehicleActors.size() - 1;
 }
 
@@ -430,18 +431,18 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	// May need to change speed checks to be something like between 0.1 and -0.1
 	// And then may need a timer to prevent rapid gear changes during wobbling
-	if (fSpeed > 0 && !forwards && (input->forward > input->backward)) {
+	if (fSpeed > 0 && !vehicleForwards[id] && (input->forward > input->backward)) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-		forwards = true;
+		vehicleForwards[id] = true;
 	}
-	else if (fSpeed < 0 && forwards && (input->forward < input->backward)) {
+	else if (fSpeed < 0 && vehicleForwards[id] && (input->forward < input->backward)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		forwards = false;
+		vehicleForwards[id] = false;
 	}
 
-	if (forwards) {
+	if (vehicleForwards[id]) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
 	}
@@ -1058,10 +1059,9 @@ void Physics::startSim(const GameState& state, float frameTime) {
 
 	clock.waitUntil(frameTime);		//Get rid of wait inside function - Should be in gamestate
 
-	//PxVehicleWheels* vehicles[1] = { vehicleActors[0] }; // TODO: Once we add more vehicles this line will need to be changed
 	vector<PxVehicleWheels*> vehicles;
 	for (unsigned int i = 0; i < vehicleActors.size(); i++)
-		vehicles.push_back(vehicleActors[i]);			//Fix!
+		vehicles.push_back(vehicleActors[i]);	
 
 	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
@@ -1069,12 +1069,12 @@ void Physics::startSim(const GameState& state, float frameTime) {
 
 	const PxVec3 grav = gScene->getGravity();
 	PxWheelQueryResult wheelQueryResults[PX_MAX_NB_WHEELS];
-//	PxVehicleWheelQueryResult vehicleQueryResults[1] = { { wheelQueryResults, vehicles[0]->mWheelsSimData.getNbWheels() } };
+
 	vector<PxVehicleWheelQueryResult> vehicleQueryResults;
 	for (unsigned int i = 0; i < vehicles.size(); i++)
 		vehicleQueryResults.push_back({ wheelQueryResults, vehicles[i]->mWheelsSimData.getNbWheels() });
 
-	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); //TODO not have 1 as a magic number
+	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); 
 
 	gScene->simulate(frameTime);
 }
