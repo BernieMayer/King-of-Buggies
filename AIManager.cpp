@@ -20,7 +20,7 @@ Input* AIManager::updateAI(GameState* state) {
 	vec3 diff = posAI - posPlayer;
 
 	if (std::abs(diff.length()) <= 7.0f ){
-		cout << "diff.length() is " << diff.length() << "\n";
+		//cout << "diff.length() is " << diff.length() << "\n";
 		Input in = Input();
 		in.forward = 1;
 		in.backward = 0;
@@ -37,7 +37,7 @@ Input* AIManager::updateAI(GameState* state) {
 
 	}
 	else {
-		std::cout << "AI should not move \n";
+		//std::cout << "AI should not move \n";
 		Input in = Input();
 		in.forward = 0.0;
 		in.backward = 0;

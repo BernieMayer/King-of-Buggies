@@ -15,7 +15,8 @@ VehicleTraits::VehicleTraits(PxMaterial* material) {
 		(chassisDims.x*chassisDims.x + chassisDims.z*chassisDims.z)*0.8f*chassisMass / 12.0f,
 		(chassisDims.x*chassisDims.x + chassisDims.y*chassisDims.y)*chassisMass / 12.0f);
 
-	chassisCMOffset = PxVec3(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
+	//chassisCMOffset = PxVec3(0.0f, -chassisDims.y*0.5f + 0.65f, 0.25f);
+	chassisCMOffset = PxVec3(0.0f, -chassisDims.y, 0.25f);
 	
 	chassisMaterial = material;
 	wheelMass = 20.0f;

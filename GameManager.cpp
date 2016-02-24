@@ -33,9 +33,9 @@ mat4 scaleMatrix(vec3 scale)
 
 vec3 PxToVec3(PxVec3 vec) { return vec3(vec.x, vec.y, vec.z); }
 
-void GameManager::createPlayer(vec3 position)
+void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 {
-	VehicleTraits traits = VehicleTraits(physics.getMaterial());	//physics.createMaterial(0.5f, 0.5f, 0.5f));		//Make argument to function later
+	//Make argument to function later
 
 	unsigned int chassisRenderID = renderer.generateObjectID();
 	unsigned int physicsID = physics.vehicle_create(traits, position);
@@ -118,10 +118,6 @@ void GameManager::createBall(float radius)
 
 void GameManager::gameLoop()
 {
-	//physicsAndRenderTest();
-
-	VehicleTraits temp = VehicleTraits(physics.getMaterial());
-	temp.loadConfiguration("base");
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -138,10 +134,11 @@ void GameManager::gameLoop()
 			Input* ai_in = ai.updateAI(&state);
 			
 			if (ai_in->forward > 0) {
-				cout << "ai_in->forward is " << ai_in->forward << "\n";
-				cout << "in->forward is " << in.forward << "\n";
+				//cout << "ai_in->forward is " << ai_in->forward << "\n";
+				//cout << "in->forward is " << in.forward << "\n";
 				in.forward = 1;
 				in.turnL = 1;
+				in.turnR = 0;
 			}
 			else 
 				in.forward = 0;
@@ -208,8 +205,11 @@ void GameManager::gameInit()
 
 void GameManager::initTestScene()
 {
-	createPlayer(vec3(0.f, 5.f, 0.f));
-	createPlayer(vec3(5.f, 5.f, 0.f));
+	VehicleTraits traits = VehicleTraits(physics.getMaterial());
+	traits.loadConfiguration("base");
+
+	createPlayer(vec3(0.f, 5.f, 0.f), traits);
+	createPlayer(vec3(5.f, 5.f, 0.f), traits);
 	createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createBall(0.5f);
 
