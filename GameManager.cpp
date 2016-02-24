@@ -146,9 +146,6 @@ void GameManager::gameLoop()
 			else 
 				ai_in.forward = 0;
 
-			ai_in.forward = 1;
-			ai_in.turnL = 1;
-
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
 
