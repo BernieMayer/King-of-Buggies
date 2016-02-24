@@ -298,7 +298,7 @@ void Physics::updateGameState(GameState* state)
 	{
 		PlayerInfo* player = state->getPlayer(i);
 		player->setTransform(vehicle_getGlobalPose(player->getPhysicsID()));
-		
+	
 		for (unsigned int j = 0; j < 4; j++)
 		{
 			player->setWheelTransform(j, vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));

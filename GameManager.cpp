@@ -128,7 +128,7 @@ void GameManager::gameLoop()
 
 		Input in = input.getInput(1);		//Get input
 		
-		
+
 
 		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
 
@@ -137,24 +137,14 @@ void GameManager::gameLoop()
 			//Change this to AI code
 			Input ai_in = ai.updateAI(&state);
 			
-			if (ai_in.forward > 0) {
-				cout << "ai_in.forward is " << ai_in.forward << "\n";
-				cout << "in.forward is " << in.forward << "\n";
-				ai_in.forward = 1;
-				ai_in.turnL = 1;
-			}
-			else 
-				ai_in.forward = 0;
 
-			ai_in.forward = 1;
-			ai_in.turnL = 1;
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
 
 		float frameTime = 1.f / 60.f;
 		//Physics sim
-		physics.startSim(GameState(), frameTime);
+		physics.startSim(GameState(), frameTime); //Why a new gameState every time???
 		physics.getSim();
 
 		float scale = 0.1f;
@@ -168,6 +158,19 @@ void GameManager::gameLoop()
 		physics.updateGameState(&state);
 		renderer.updateObjectTransforms(&state);
 
+
+		//Test code...
+		PlayerInfo* player = state.getPlayer(0);
+		vec3 posPlayer = player->getPos();
+
+		PlayerInfo* ai_state = state.getPlayer(1);
+		vec3 posAI = ai_state->getPos();
+
+		vec3 diff = posAI - posPlayer;
+		
+		
+		cout << "testStuff.length() " << length(diff) << "\n";
+
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
 
@@ -179,6 +182,7 @@ void GameManager::gameLoop()
 
 		if (cPos != cam.getViewCenter())
 			cam.changeCenterAndPos(cPos - cam.getViewCenter());
+
 
 		//Track camera around front of vehicle
 		vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
