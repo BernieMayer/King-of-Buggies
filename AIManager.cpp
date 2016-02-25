@@ -2,7 +2,9 @@
 #define AIMANAGER_CPP
 #include "AIManager.h"
 
-void  AIManager::initAI() {
+void  AIManager::initAI(GameState state) {
+
+	prevPosition = state.getPlayer(0)->getPos();
 	
 }
 
@@ -13,6 +15,68 @@ void  AIManager::initAI() {
 
 
 */
+
+Input AIManager::testAIChase(GameState state){
+	/*
+	point vec=hispos-prevpos; 	// vec is the 1-frame position difference
+	vec=vec*N; 					// we project N frames into the future
+	point futurepos=hispos+vec; // and build the future projection
+	reaim(mypos,myyaw,futurepos);
+	mypos.x = mypos.x + cos(myyaw) * speed;
+	mypos.z = mypos.z + sin(myyaw) * speed;
+	*/
+	vec3 goldenBuggieLoc = state.getPlayer(0)->getPos();
+	prevPosition = goldenBuggieLoc;
+	vec3 myPos = state.getPlayer(1)->getPos();
+	vec3 vec = goldenBuggieLoc - prevPosition;
+	vec = vec * vec3(6, 6, 6); // we project N frames into the future
+
+	vec3 futurepos = goldenBuggieLoc + vec;
+	double dX_chaseAI = myPos.x;
+	double dY_chaseAI = myPos.y;
+	double dZ_chaseAI = myPos.z;
+
+	double yaw_chaseAI = atan2(dZ_chaseAI, dX_chaseAI);
+
+	double dX_golden = goldenBuggieLoc.x;
+	double dY_golden = goldenBuggieLoc.y;
+	double dZ_golden = goldenBuggieLoc.z;
+
+	double yaw_golden = atan2(dZ_golden, dX_golden);
+
+
+	Input input = Input();
+	input.forward = 0.5f;
+	input.backward = 0;
+	input.turnL = 0;
+	input.turnR = 0;
+
+	Entity* ai = state.getPlayer(1);
+	Entity* goldenBuggie = state.getPlayer(0);
+
+	float dot = facing(ai, goldenBuggie);
+	if (dot < 0.9){
+		if (dot > 0){
+			if (yaw_golden - yaw_chaseAI){
+				input.turnL = 1.0;
+			}
+			else {
+				input.turnR = 1.0;
+			}
+
+		}
+		else {
+			//TODO fix thus up
+			input.turnL = 0.5;
+
+
+		}
+	}
+
+	return input;
+	
+	
+}
 
 Input AIManager::updateAI(GameState* state) {
 

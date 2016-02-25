@@ -19,9 +19,11 @@ public:
 	vector<Input> inputs;
 	Input updateAI(GameState* state);
 	Input testAIEvade(GameState state);
-	void initAI();
+	Input testAIChase(GameState state);
+	void initAI(GameState state);
 
 private:
+	vec3 prevPosition;
 	float facing(Entity* object, Entity* target);
 	float lastDot = NULL;
 	float lastTurnL = false;
