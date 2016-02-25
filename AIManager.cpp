@@ -29,7 +29,7 @@ Input AIManager::testAIChase(GameState state){
 	prevPosition = goldenBuggieLoc;
 	vec3 myPos = state.getPlayer(1)->getPos();
 	vec3 vec = goldenBuggieLoc - prevPosition;
-	vec = vec * vec3(6, 6, 6); // we project N frames into the future
+	vec = vec * vec3(30, 30, 30); // we project N frames into the future
 
 	vec3 futurepos = goldenBuggieLoc + vec;
 	double dX_chaseAI = myPos.x;
@@ -57,18 +57,25 @@ Input AIManager::testAIChase(GameState state){
 	float dot = facing(ai, goldenBuggie);
 	if (dot < 0.9){
 		if (dot > 0){
-			if (yaw_golden - yaw_chaseAI){
-				input.turnL = 1.0;
+			float result = beside(ai, goldenBuggie);
+
+			if (result > 0){
+				input.turnR = -result;
 			}
-			else {
-				input.turnR = 1.0;
+			else{
+				input.turnL = result;
 			}
 
 		}
 		else {
-			//TODO fix thus up
-			input.turnL = 0.5;
+			float result = beside(ai, goldenBuggie);
 
+			if (result > 0){
+				input.turnR = -result;
+			}
+			else{
+				input.turnL = result;
+			}
 
 		}
 	}

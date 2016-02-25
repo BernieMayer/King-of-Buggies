@@ -34,6 +34,19 @@ PlayerInfo* GameState::getAI(unsigned int aiNum)
 		return NULL;
 }
 
+PlayerInfo* GameState::getGoldenBuggie()
+{
+	for (int i = 0; i < players.size(); i++)
+	{
+		PlayerInfo player = players[i];
+		if (player.isGoldenBuggie()){
+			return &player;
+		}
+
+	}
+	return NULL;
+}
+
 unsigned int GameState::numberOfPlayers(){ return players.size(); }
 unsigned int GameState::numberOfAIs() { return ai.size(); }
 

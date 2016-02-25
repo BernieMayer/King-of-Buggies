@@ -27,6 +27,8 @@ private:
 
 	unsigned int groundPhysicsID;
 	unsigned int groundRenderID;
+	
+	
 
 public:
 	GameState();
@@ -36,6 +38,7 @@ public:
 	void setPlayer(unsigned int playerNum, const PlayerInfo& pinfo);
 	PlayerInfo* getPlayer(unsigned int playerNum);
 	PlayerInfo* getAI(unsigned int aiNum);
+	PlayerInfo* getGoldenBuggie();
 	unsigned int numberOfPlayers();
 	unsigned int numberOfAIs();
 

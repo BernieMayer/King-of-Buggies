@@ -9,6 +9,7 @@ public:
 	PlayerInfo();
 	PlayerInfo(unsigned int renderID, unsigned int physicsID, unsigned int* wheelRenderIDs);
 	bool isGoldenBuggie();
+	bool isAI();
 
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);
@@ -22,6 +23,7 @@ protected:
 	int numCoins;
 	int powerupCounter;
 	bool goldenBuggie;
+	bool ai;
 	float timeGolden;
 };
 

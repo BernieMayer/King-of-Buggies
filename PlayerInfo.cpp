@@ -15,7 +15,7 @@ goldenBuggie(false), timeGolden(0.f)
 {
 	renderID = _renderID;
 	physicsID = _physicsID;
-
+	ai = false;
 	for (unsigned int i = 0; i < 4; i++)
 	{
 		wheelRenderIDs[i] = _wheelRenderIDs[i];
@@ -23,6 +23,9 @@ goldenBuggie(false), timeGolden(0.f)
 	}
 
 }
+
+bool PlayerInfo::isGoldenBuggie(){ return goldenBuggie; }
+bool PlayerInfo::isAI(){ return ai; }
 
 unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 {

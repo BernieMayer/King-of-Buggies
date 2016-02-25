@@ -122,6 +122,7 @@ void GameManager::gameLoop()
 	while (!glfwWindowShouldClose(window))
 	{
 
+		
 		Input in = input.getInput(1);		//Get input
 		
 
