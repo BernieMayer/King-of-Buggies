@@ -233,7 +233,7 @@ unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 
 unsigned int Physics::ground_createGeneric(vector<vec3>* mesh)
 {
-	//To be implemented
+	// implement later
 	return 0;
 }
 
@@ -298,7 +298,7 @@ void Physics::updateGameState(GameState* state)
 	{
 		PlayerInfo* player = state->getPlayer(i);
 		player->setTransform(vehicle_getGlobalPose(player->getPhysicsID()));
-		
+	
 		for (unsigned int j = 0; j < 4; j++)
 		{
 			player->setWheelTransform(j, vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));
@@ -359,72 +359,11 @@ void Physics::giveInput(Input input, int playernum) {
 	inputs[playernum] = pxInput;
 }
 
-void Physics::handleInput(Input* input){
 
-	/*
-	if (!input->isKeyboard)
-	{
-		PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData, 
-			gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);
-	} 
-	else 
-	{
-		PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gKeySmoothingData, 
-			gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);	
-	*/
-
-	float fSpeed = vehicle->computeForwardSpeed();
-	float sSpeed = vehicle->computeSidewaysSpeed();
-	
-	// May need to change speed checks to be something like between 0.1 and -0.1
-	// And then may need a timer to prevent rapid gear changes during wobbling
-	if (fSpeed > 0 && !forwards && (input->forward > input->backward)) {
-		// If not moving and was in reverse gear, but more forwards
-		// input than backwards, switch to forwards gear
-		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-		forwards = true;
-	}
-	else if (fSpeed < 0 && forwards && (input->forward < input->backward)) {
-		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		forwards = false;
-	}
-
-	if (forwards) {
-		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
-		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
-	}
-	else {
-		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
-		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
-	}
-
-	//PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
-
-	//std::cout << quat.getAngle() << "\n";
-	
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
-
-	/*printf("Left = %f, Right = %f\n", vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT),
-		vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT));*/
-
-}
 
 void Physics::handleInput(Input* input, unsigned int id){
 
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
-
-	/*
-	if (!input->isKeyboard)
-	{
-	PxVehicleDrive4WSmoothDigitalRawInputsAndSetAnalogInputs(gKeySmoothingData,
-	gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);
-	}
-	else
-	{
-	PxVehicleDrive4WSmoothAnalogRawInputsAndSetAnalogInputs(gKeySmoothingData,
-	gInputData, (1.0f/60.0f), gIsVehicleInAir, gVehicle4W);
-	*/
 
 	float fSpeed = vehicle->computeForwardSpeed();
 	float sSpeed = vehicle->computeSidewaysSpeed();
@@ -454,14 +393,6 @@ void Physics::handleInput(Input* input, unsigned int id){
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
 
-	/*PxQuat quat = vehicle->getRigidDynamicActor()->getGlobalPose().q;
-	PxVec3 rotation = quat.getBasisVector1();
-
-	std::cout << "X: " << quat.x << " Y: " << quat.y << " Z: " << quat.z << "\n";*/
-
-	/*printf("Left = %f, Right = %f\n", vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT),
-	vehicle->mDriveDynData.getAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT));*/
-
 }
 
 void Physics::initScene()
@@ -489,7 +420,7 @@ void Physics::initScene()
 
 	//Get rid of eventually
 	// staticfriction, dynamic friction, restitution
-	mMaterial = mPhysics->createMaterial(0.f, 0.f, 0.6f);
+	mMaterial = mPhysics->createMaterial(0.0f, 0.0f, 0.6f);
 	if (!mMaterial) {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
@@ -500,6 +431,7 @@ void Physics::initScene()
 	gBatchQuery = VehicleSceneQueryData::setUpBatchedSceneQuery(0, *gVehicleSceneQueryData, gScene);
 
 	gFrictionPairs = createFrictionPairs(mMaterial);
+	printf("Friction = %f\n", mMaterial->getDynamicFriction());
 }
 
 void Physics::initDefaultScene() {
@@ -683,8 +615,6 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 	//Set up the wheel mass, radius, width, moment of inertia, and number of wheels.
 	//Moment of inertia is just the moment of inertia of a cylinder.
 	PxMaterial* wheelMaterial = mMaterial;
-
-	printf("Material %f %f\n", mMaterial->getStaticFriction(), mMaterial->getDynamicFriction());
 
 	//Construct a convex mesh for a cylindrical wheel.
 	PxConvexMesh* wheelMesh = createWheelMesh(wheelWidth, wheelRadius, *mPhysics, *mCooking);
@@ -880,7 +810,7 @@ PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysi
 	return groundPlane;
 }
 
-PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset)
+PxRigidStatic* Physics::createDrivablePlane(PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset)
 {
 	//Add a plane to the scene.
 	PxRigidStatic* groundPlane = PxCreatePlane(*physics, 
@@ -985,6 +915,28 @@ PxConvexMesh* Physics::createConvexMesh(const PxVec3* verts, const PxU32 numVert
 	return convexMesh;
 }
 
+PxTriangleMesh* Physics::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxVec3* indices32, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking)
+{
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = numVerts;
+	meshDesc.points.stride = sizeof(PxVec3);
+	meshDesc.points.data = verts;
+
+	meshDesc.triangles.count = triCount;
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+	meshDesc.triangles.data = indices32;
+
+	PxTriangleMesh* triangleMesh = NULL;
+	PxDefaultMemoryOutputStream buffer;
+	if (cooking.cookTriangleMesh(meshDesc, buffer)) 
+	{
+		PxDefaultMemoryInputData id(buffer.getData(), buffer.getSize());
+		triangleMesh = physics.createTriangleMesh(id);
+	}
+
+	return triangleMesh;
+}
+
 PxRigidDynamic* Physics::createVehicleActor(const PxVehicleChassisData& chassisData,
 	PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,
 	PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, PxPhysics& physics, PxVec3 initPos)
@@ -1074,8 +1026,6 @@ void Physics::startSim(const GameState& state, float frameTime) {
 	vector<PxVehicleWheelQueryResult> vehicleQueryResults;
 	for (unsigned int i = 0; i < vehicles.size(); i++)
 		vehicleQueryResults.push_back({ &wheelQueryResults[i*PX_MAX_NB_WHEELS], vehicles[i]->mWheelsSimData.getNbWheels() });
-		
-	
 
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); 
 
@@ -1086,26 +1036,6 @@ GameState Physics::getSim() {
 	// Will get the simulation results
 	// True means that it will wait until the simulation is done if needed
 	gScene->fetchResults(true);
-
-	// An example of how to get position
-//	PxVec3 pos = aSphereActor->getGlobalPose().p;
-	//std::cout << "Sphere Y: " << pos.y << "\n";
-
-	// How to get rotation
-//	PxQuat rotation = aSphereActor->getGlobalPose().q;
-
-	// Get number of shapes
-//	const PxU32 nbShapes = aSphereActor->getNbShapes();
-//	PxShape* shapes[MAX_NUM_ACTOR_SHAPES];
-//	aSphereActor->getShapes(shapes, nbShapes);
-	// Get geometry
-//	PxGeometryHolder geo = shapes[0]->getGeometry();
-	// Find type (Box, Capsule, convex mesh, heightfield, plane, sphere or triangle mesh)
-//	geo.getType();
-	// Get actual sphere
-//	PxSphereGeometry sphere = geo.sphere();
-	// This will contain stuff about the shape of the object
-	// In the case of a sphere, only the radius
 
 	return GameState();
 }
