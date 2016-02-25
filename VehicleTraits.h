@@ -34,6 +34,7 @@ public:
 	int steerAngle;
 
 	bool loadConfiguration(std::string configFile);
+	void print();
 };
 
 #endif // VEHICLETRAITS_H

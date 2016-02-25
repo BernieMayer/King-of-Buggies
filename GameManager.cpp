@@ -165,7 +165,7 @@ void GameManager::gameLoop()
 		vec3 diff = posAI - posPlayer;
 		
 		
-		cout << "testStuff.length() " << length(diff) << "\n";
+		//cout << "testStuff.length() " << length(diff) << "\n";
 
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
@@ -212,7 +212,12 @@ void GameManager::gameInit()
 void GameManager::initTestScene()
 {
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
-	//traits.loadConfiguration("base");
+	traits.print();
+
+
+	VehicleTraits temp = VehicleTraits(physics.getMaterial());
+	traits.loadConfiguration("base");
+	temp.print();
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(5.f, 5.f, 0.f), traits);

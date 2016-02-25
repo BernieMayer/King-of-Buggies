@@ -108,6 +108,7 @@
     <ClInclude Include="MeshInfo.h" />
     <ClInclude Include="MeshInfoLoader.h" />
     <ClInclude Include="MeshObject.h" />
+    <ClInclude Include="NavMesh.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="PlayerInfo.h" />
     <ClInclude Include="Powerup.h" />
@@ -135,6 +136,7 @@
     <ClCompile Include="MeshInfo.cpp" />
     <ClCompile Include="MeshInfoLoader.cpp" />
     <ClCompile Include="MeshObject.cpp" />
+    <ClCompile Include="NavMesh.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />

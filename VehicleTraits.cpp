@@ -136,4 +136,18 @@ bool VehicleTraits::loadConfiguration(std::string configFile)
 
 }
 
+void VehicleTraits::print()
+{
+	printf("CHASSIS:\nMass %f\nDim %f %f %f\nMOI %f %f %f\nCMOffset %f %f %f\nDynamic %f\nStatic %f\nRestitution %f\n",
+		chassisMass, chassisDims.x, chassisDims.y, chassisDims.z,
+		chassisMOI.x, chassisMOI.y, chassisMOI.z,
+		chassisCMOffset.x, chassisCMOffset.y, chassisCMOffset.z,
+		chassisMaterial->getDynamicFriction(), chassisMaterial->getStaticFriction(),
+		chassisMaterial->getRestitution());
+	printf("WHEEL:\nMass %f\nWidth %f\nRadius %f\nMOI %f\nDynamic %f\nStatic %f\nRestitution %f\n",
+		wheelMass, wheelWidth, wheelRadius, wheelMOI,
+		wheelMaterial->getDynamicFriction(), wheelMaterial->getStaticFriction(),
+		wheelMaterial->getRestitution());
+}
+
 #endif

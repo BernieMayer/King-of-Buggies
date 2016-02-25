@@ -85,7 +85,7 @@ Input AIManager::testAIEvade(GameState state) {
 	
 	float dot = facing(ai, player);
 
-	cout << "Dot: " << dot << "\n";
+	//cout << "Dot: " << dot << "\n";
 	
 	Input input = Input();
 	input.forward = 0.5f;

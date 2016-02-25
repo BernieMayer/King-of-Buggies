@@ -36,6 +36,7 @@
     <ClCompile Include="VehicleTraits.cpp" />
     <ClCompile Include="AIManager.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="NavMesh.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -89,6 +90,7 @@
     <ClInclude Include="VehicleSceneQueryData.h" />
     <ClInclude Include="SnippetVehicleFilterShader.h" />
     <ClInclude Include="Keybindings.h" />
+    <ClInclude Include="NavMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

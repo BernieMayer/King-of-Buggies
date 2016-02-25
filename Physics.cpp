@@ -420,7 +420,7 @@ void Physics::initScene()
 
 	//Get rid of eventually
 	// staticfriction, dynamic friction, restitution
-	mMaterial = mPhysics->createMaterial(0.0f, 0.0f, 0.6f);
+	mMaterial = mPhysics->createMaterial(0.8f, 0.8f, 0.6f);
 	if (!mMaterial) {
 		// Fatal error
 		std::cout << ("Material creation failure\n");
