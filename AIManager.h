@@ -23,8 +23,9 @@ public:
 
 private:
 	float facing(Entity* object, Entity* target);
+	float beside(Entity* object, Entity* target);
 	float lastDot = NULL;
-	float lastTurnL = false;
+	bool lastTurnL = false;
 	float frameCounter = 0;
 	GameState lastState;
 };

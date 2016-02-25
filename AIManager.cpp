@@ -59,6 +59,7 @@ Input AIManager::updateAI(GameState* state) {
 
 // If result is negative, ai is facing away from player
 // If result is positive ai is facing player
+// Returns value between -1 and 1
 float AIManager::facing(Entity* object, Entity* target) {
 	vec3 targetPos = target->getPos();
 	vec3 objectPos = object->getPos();
@@ -72,20 +73,27 @@ float AIManager::facing(Entity* object, Entity* target) {
 	return result;
 }
 
+// Returns positive if target is to the right of object
+// Negative for left
+// Returns a value between -1 and 1
+float AIManager::beside(Entity* object, Entity* target) {
+	vec3 targetPos = target->getPos();
+	vec3 objectPos = object->getPos();
+	vec3 objectForward = object->getForward();
+	vec3 objectUp = object->getUp();
+	vec3 objectSide = cross(objectForward, objectUp);
+	objectSide = normalize(objectSide);
+
+	vec3 difference = targetPos - objectPos;
+	difference = normalize(difference);
+	float result = dot(difference, objectSide);
+
+	return result;
+}
+
 Input AIManager::testAIEvade(GameState state) {
 	Entity* ai = state.getPlayer(1);
-	Entity* player;
-	if (frameCounter == 0) {
-		 player = state.getPlayer(0);
-		 lastState = state;
-	}
-	else {
-		player = lastState.getPlayer(0);
-	}
-	
-	float dot = facing(ai, player);
-
-	//cout << "Dot: " << dot << "\n";
+	Entity* player = state.getPlayer(0);
 	
 	Input input = Input();
 	input.forward = 0.5f;
@@ -93,49 +101,20 @@ Input AIManager::testAIEvade(GameState state) {
 	input.turnL = 0;
 	input.turnR = 0;
 
+	float dot = facing(ai, player);
+	float side = beside(ai, player);
 
-	if (lastDot != NULL) {
-		// If not facing away from car
-		// turn
-		if (dot > -0.9f) {
-			// If last input turned towards car and was left
-			// turn right
-			if (lastDot < dot && lastTurnL) {
-				input.turnR = 1;
-				lastTurnL = false;
-			}
-			// If last input turned towards car and was right
-			// turn left
-			else if (lastDot < dot && !lastTurnL) {
-				input.turnL = 1;
-				lastTurnL = true;
-			}
-			else {
-				// If last input turned away from car and was left
-				// turn left
-				if (lastTurnL) {
-					input.turnL = 1;
-				}
-				// If last input turned away from car and was right
-				// turn right
-				else {
-					input.turnR = 1;
-				}
-			}
+	// If not facing away from car
+	// turn
+	if (dot > -0.9f) {
+		if (side > 0) {
+			input.turnR = 1;
 		}
 		else {
-			lastTurnL = false;
+			input.turnL = 1;
 		}
 	}
 
-	lastDot = dot;
-
-	if (frameCounter != 20) {
-		frameCounter++;
-	}
-	else {
-		frameCounter = 0;
-	}
 	
 	return input;
 }
