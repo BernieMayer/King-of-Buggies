@@ -19,9 +19,13 @@ public:
 	vector<Input> inputs;
 	Input updateAI(GameState* state);
 	Input testAIEvade(GameState state);
-	void initAI();
+	void initAI(int pNum);
+	int getPlayerNum() {
+		return playerNum;
+	};
 
 private:
+	int playerNum;
 	float facing(Entity* object, Entity* target);
 	float beside(Entity* object, Entity* target);
 	float lastDot = NULL;
