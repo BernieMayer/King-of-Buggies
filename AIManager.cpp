@@ -108,14 +108,13 @@ Input AIManager::testAIEvade(GameState state) {
 	// turn
 	if (dot > -0.9f) {
 		if (side > 0) {
-			input.turnR = 1;
+			input.turnR = side;
 		}
 		else {
-			input.turnL = 1;
+			input.turnL = -side;
 		}
 	}
 
-	
 	return input;
 }
 
