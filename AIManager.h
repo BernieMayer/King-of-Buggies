@@ -18,8 +18,12 @@ public:
 	PxVec3 rotationalTarget;
 	vector<Input> inputs;
 	Input updateAI(GameState* state);
-	Input testAI(PxTransform ourTransform, PxTransform ballTransform);
+	Input testAIEvade(GameState state);
 	void initAI();
+
+private:
+	float facingPlayer(GameState state);
+	float lastDot = NULL;
 };
 
 #endif // AIMANAGER_H

@@ -6,9 +6,6 @@ void  AIManager::initAI() {
 	
 }
 
-
-
-
 Input AIManager::updateAI(GameState* state) {
 
 	PlayerInfo* player = state->getPlayer(0);
@@ -20,7 +17,7 @@ Input AIManager::updateAI(GameState* state) {
 	vec3 diff = posAI - posPlayer;
 
 	if (std::abs(diff.length()) <= 7.0f ){
-		cout << "diff.length() is " << diff.length() << "\n";
+		//cout << "diff.length() is " << diff.length() << "\n";
 		Input in = Input();
 		in.forward = 1;
 		in.backward = 0;
@@ -54,28 +51,51 @@ Input AIManager::updateAI(GameState* state) {
 	}
 }
 
-Input AIManager::testAI(PxTransform ourTransform, PxTransform ballTransform) {
-	// Counter keeps track of how many frames have gone past since target last evaluated
-	if (updateCounter == 0) {
-		lastOurTransform = ourTransform;
-		lastBallTransform = ballTransform;
-		inputs.clear();
+// If result is negative, ai is facing away from player
+// If result is positive ai is facing player
+float AIManager::facingPlayer(GameState state) {
+	PlayerInfo* player = state.getPlayer(0);
+	PlayerInfo* ai = state.getPlayer(1);
 
-		// Find how much rotation is needed to turn towards ball
-		// Set rotation target to half this value
+	vec3 playerPos = player->getPos();
+	vec3 aiPos = ai->getPos();
+	vec3 aiForward = ai->getForward();
+
+	vec3 difference = playerPos - aiPos;
+	float result = dot(difference, aiForward);
+
+	return result;
+}
+
+Input AIManager::testAIEvade(GameState state) {
+	float dot = facingPlayer(state);
+	
+	Input input = Input();
+	input.forward = 1.0f;
+	input.backward = 0;
+	input.turnL = 0;
+	input.turnR = 0;
+
+
+	if (lastDot == NULL) {
+		lastDot = dot;
+
+		input.turnR = 1.0f;
+	}
+	else {
+		if (lastDot > dot) {
+			input.turnR = 1;
+		}
+		else {
+			input.turnL = 1;
+		}
+
+		lastDot = dot;
 	}
 
-	// If rotatation at rotation target
-	// Go through input in reverse
+	cout << input.forward << "\n";
 
-	// If not, find out which direction to turn and make input turn that way
-	// Give full forwards input
-	// Store input in inputs
-	// Increment counter
-	// return current input
-
-	updateCounter++;
-	return Input();
+	return input;
 }
 
 #endif
