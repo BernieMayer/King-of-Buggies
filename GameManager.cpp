@@ -16,6 +16,9 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	renderer.loadPerspectiveTransform(0.1f, 20.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam);
 
+	//TODO: Put this indexing somewhere useful;
+	ai.initAI(1);
+
 	gameInit();
 }
 
@@ -89,8 +92,6 @@ void GameManager::createAI(vec3 position)
 	}
 
 	state.addAI(PlayerInfo(chassisRenderID, physicsID, wheelIDs));
-
-
 }
 
 void GameManager::createGroundPlane(vec3 normal, float offset)
@@ -133,7 +134,7 @@ void GameManager::gameLoop()
 
 			//Change this to AI code
 			Input ai_in = ai.updateAI(&state);
-			ai_in = ai.testAIChase(state);
+			ai_in = ai.testAIEvade(state);
 			
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());

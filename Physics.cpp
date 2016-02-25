@@ -366,17 +366,16 @@ void Physics::handleInput(Input* input, unsigned int id){
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
 
 	float fSpeed = vehicle->computeForwardSpeed();
-	float sSpeed = vehicle->computeSidewaysSpeed();
 
 	// May need to change speed checks to be something like between 0.1 and -0.1
 	// And then may need a timer to prevent rapid gear changes during wobbling
-	if (fSpeed > 0 && !vehicleForwards[id] && (input->forward > input->backward)) {
+	if (fSpeed >= 0 && (input->forward > input->backward)) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 		vehicleForwards[id] = true;
 	}
-	else if (fSpeed < 0 && vehicleForwards[id] && (input->forward < input->backward)) {
+	else if (fSpeed <= 0 && (input->forward < input->backward)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 		vehicleForwards[id] = false;
 	}
@@ -495,7 +494,6 @@ PxVehicleDrive4W* Physics::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 	gScene->addActor(*veh4WActor);
 
 	vehDrive4W->mDriveDynData.setUseAutoGears(true);
-	vehDrive4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 
 	return vehDrive4W;
 }
@@ -531,7 +529,6 @@ PxVehicleDrive4W* Physics::initVehicle() {
 	gScene->addActor(*veh4WActor);
 
 	vehDrive4W->mDriveDynData.setUseAutoGears(true);
-	vehDrive4W->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 
 	return vehDrive4W;
 }

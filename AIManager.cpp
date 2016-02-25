@@ -2,10 +2,13 @@
 #define AIMANAGER_CPP
 #include "AIManager.h"
 
-void  AIManager::initAI(GameState state) {
 
+void  AIManager::initAI(int pNum) {
+	playerNum = pNum;
+}
+
+void  AIManager::initAI(GameState state) {
 	prevPosition = state.getPlayer(0)->getPos();
-	
 }
 
 
@@ -162,9 +165,26 @@ float AIManager::beside(Entity* object, Entity* target) {
 	return result;
 }
 
-Input AIManager::testAIEvade(GameState state) {
-	Entity* ai = state.getPlayer(1);
-	Entity* player = state.getPlayer(0);
+Input AIManager::testAIEvade(GameState state) {	
+	Entity* ai = state.getPlayer(playerNum);
+
+	Entity* player = NULL;
+	float greatestLength = 0;
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		if (i != playerNum) {
+			Entity* indexedPlayer = state.getPlayer(i);
+			vec3 playerPos = indexedPlayer->getPos();
+			vec3 aiPos = ai->getPos();
+			vec3 distance = playerPos - aiPos;
+
+			float len = length(distance);
+			if (len > greatestLength || player == NULL) {
+				greatestLength = len;
+				player = indexedPlayer;
+			}
+		}
+	}
+	
 	
 	Input input = Input();
 	input.forward = 0.5f;
