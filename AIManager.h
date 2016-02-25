@@ -18,14 +18,17 @@ public:
 	PxVec3 rotationalTarget;
 	vector<Input> inputs;
 	Input updateAI(GameState* state);
+	Input testAIChase(GameState state);
 	Input testAIEvade(GameState state);
 	void initAI(int pNum);
+	void initAI(GameState state);
 	int getPlayerNum() {
 		return playerNum;
 	};
 
 private:
 	int playerNum;
+	vec3 prevPosition;
 	float facing(Entity* object, Entity* target);
 	float beside(Entity* object, Entity* target);
 	float lastDot = NULL;

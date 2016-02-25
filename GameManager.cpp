@@ -133,7 +133,7 @@ void GameManager::gameLoop()
 
 			//Change this to AI code
 			Input ai_in = ai.updateAI(&state);
-			ai_in = ai.testAIEvade(state);
+			ai_in = ai.testAIChase(state);
 			
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
@@ -141,7 +141,7 @@ void GameManager::gameLoop()
 
 		float frameTime = 1.f / 60.f;
 		//Physics sim
-		physics.startSim(GameState(), frameTime); //Why a new gameState every time???
+		physics.startSim(GameState(), frameTime); 
 		physics.getSim();
 
 		float scale = 0.1f;
@@ -228,6 +228,8 @@ void GameManager::initTestScene()
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();
 	renderer.setLightPosition(lightID, lightPos);
+
+	ai.initAI(state);
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 
