@@ -22,8 +22,11 @@ public:
 	void initAI();
 
 private:
-	float facingPlayer(GameState state);
+	float facing(Entity* object, Entity* target);
 	float lastDot = NULL;
+	float lastTurnL = false;
+	float frameCounter = 0;
+	GameState lastState;
 };
 
 #endif // AIMANAGER_H

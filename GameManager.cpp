@@ -134,9 +134,6 @@ void GameManager::gameLoop()
 			Input ai_in = ai.updateAI(&state);
 			ai_in = ai.testAIEvade(state);
 			
-			
-
-			cout << "AI forwards: " << ai_in.forward << "\n";
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
