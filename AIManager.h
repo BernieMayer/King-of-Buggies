@@ -17,7 +17,7 @@ public:
 	PxTransform lastBallTransform;
 	PxVec3 rotationalTarget;
 	vector<Input> inputs;
-	Input* updateAI(GameState* state);
+	Input updateAI(GameState* state);
 	Input testAI(PxTransform ourTransform, PxTransform ballTransform);
 	void initAI();
 };

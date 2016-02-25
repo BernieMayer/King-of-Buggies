@@ -112,6 +112,7 @@ private:
 		PxVehicleWheelsSimData* wheelsSimData);
 	void setupNonDrivableSurface(PxFilterData& filterData);
 	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);
+	PxTriangleMesh* createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxVec3* indices32, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking);
 	PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const PxMaterial* defaultMaterial);
 
 	void setupObstacleCollisionHandling(PxRigidActor* actor);

@@ -7,9 +7,14 @@ void  AIManager::initAI() {
 }
 
 
+/*
 
 
-Input* AIManager::updateAI(GameState* state) {
+
+
+*/
+
+Input AIManager::updateAI(GameState* state) {
 
 	PlayerInfo* player = state->getPlayer(0);
 	vec3 posPlayer = player->getPos();
@@ -19,8 +24,8 @@ Input* AIManager::updateAI(GameState* state) {
 
 	vec3 diff = posAI - posPlayer;
 
-	if (std::abs(diff.length()) <= 7.0f ){
-		//cout << "diff.length() is " << diff.length() << "\n";
+
+	if (std::abs(length(diff)) <= 7.0f ){
 		Input in = Input();
 		in.forward = 1;
 		in.backward = 0;
@@ -33,8 +38,7 @@ Input* AIManager::updateAI(GameState* state) {
 		in.powerup = false;
 		in.menu = false;
 		
-		return &in;
-
+		return in;
 	}
 	else {
 		//std::cout << "AI should not move \n";
@@ -45,12 +49,12 @@ Input* AIManager::updateAI(GameState* state) {
 		in.turnR = 0;
 		in.camV = 0;
 		in.camH = 0;
-
+		
 		in.drift = false;
 		in.powerup = false;
 		in.menu = false;
 
-		return &in;
+		return in;
 	}
 }
 

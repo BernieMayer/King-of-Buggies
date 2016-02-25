@@ -233,7 +233,7 @@ unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 
 unsigned int Physics::ground_createGeneric(vector<vec3>* mesh)
 {
-	//To be implemented
+	// implement later
 	return 0;
 }
 
@@ -298,7 +298,7 @@ void Physics::updateGameState(GameState* state)
 	{
 		PlayerInfo* player = state->getPlayer(i);
 		player->setTransform(vehicle_getGlobalPose(player->getPhysicsID()));
-		
+	
 		for (unsigned int j = 0; j < 4; j++)
 		{
 			player->setWheelTransform(j, vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));
@@ -810,7 +810,7 @@ PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysi
 	return groundPlane;
 }
 
-PxRigidStatic* Physics::createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset)
+PxRigidStatic* Physics::createDrivablePlane(PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset)
 {
 	//Add a plane to the scene.
 	PxRigidStatic* groundPlane = PxCreatePlane(*physics, 
@@ -913,6 +913,28 @@ PxConvexMesh* Physics::createConvexMesh(const PxVec3* verts, const PxU32 numVert
 	}
 
 	return convexMesh;
+}
+
+PxTriangleMesh* Physics::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxVec3* indices32, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking)
+{
+	PxTriangleMeshDesc meshDesc;
+	meshDesc.points.count = numVerts;
+	meshDesc.points.stride = sizeof(PxVec3);
+	meshDesc.points.data = verts;
+
+	meshDesc.triangles.count = triCount;
+	meshDesc.triangles.stride = 3 * sizeof(PxU32);
+	meshDesc.triangles.data = indices32;
+
+	PxTriangleMesh* triangleMesh = NULL;
+	PxDefaultMemoryOutputStream buffer;
+	if (cooking.cookTriangleMesh(meshDesc, buffer)) 
+	{
+		PxDefaultMemoryInputData id(buffer.getData(), buffer.getSize());
+		triangleMesh = physics.createTriangleMesh(id);
+	}
+
+	return triangleMesh;
 }
 
 PxRigidDynamic* Physics::createVehicleActor(const PxVehicleChassisData& chassisData,
