@@ -33,7 +33,7 @@ private:
 	float frameCounter = 0;
 	GameState lastState;
 	bool reversing = false;
-	float carSpeed = 0.5;
+	float carSpeed = 0.3f;
 };
 
 #endif // AIMANAGER_H

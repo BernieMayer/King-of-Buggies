@@ -15,6 +15,9 @@ public:
 	mat4 getWheelTransform(unsigned int wheelNum);
 	void setWheelTransform(unsigned int wheelNum, const mat4& transform);
 
+	void setFSpeed(float speed) { fSpeed = speed; };
+	float getFSpeed() { return fSpeed; };
+
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
@@ -25,6 +28,7 @@ protected:
 	bool goldenBuggie;
 	bool ai;
 	float timeGolden;
+	float fSpeed;
 };
 
 #endif // PLAYERINFO_H

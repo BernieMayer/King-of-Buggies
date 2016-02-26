@@ -197,8 +197,7 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 
 
 	float distance = length(aiPos - player->getPos());
-	// TODO: refactor to use speed from PlayerInfo when implemented
-	float speed = length(aiPos - prevPosition);
+	float speed = ((PlayerInfo*)player)->getFSpeed();
 	
 
 	// If not facing away from car
@@ -209,13 +208,13 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 			input.forward = 0.0f;
 			input.backward = carSpeed;
 			// if still moving forwards
-			if (!reversing && speed >= 0.003) {
+			if (!reversing && speed > 0) {
 				// Do not turn as direction of turning will be changing soon
 				input.turnL = 0;
 				input.turnR = 0;
 			}
 			// If moving backwards
-			else if ((!reversing && speed < 0.003) || reversing) {
+			else if ((!reversing && speed <= 0) || reversing) {
 				reversing = true;
 
 				// Turn
@@ -229,12 +228,12 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 		}
 		else {
 			// If still moving backwards, do not turn as turning direction will be changing soon
-			if (reversing && speed >= 0.003) {
+			if (reversing && speed < 0) {
 				input.turnL = 0;
 				input.turnR = 0;
 			}
 			// If moving forwards
-			else if ((reversing && speed < 0.003) || !reversing) {
+			else if ((reversing && speed >= 0) || !reversing) {
 				reversing = false;
 
 				// Turn
