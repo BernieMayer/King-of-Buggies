@@ -3,7 +3,7 @@
 
 #include "NavMesh.h"
 
-string navMeshDirectory = "./models/";
+string navMeshDirectory = "./navigation/";
 
 Edges::Edges()
 {
@@ -113,7 +113,7 @@ bool NavMesh::loadNavMesh(string fileName)
 	std::ifstream f(fileName);
 	if (!f.is_open())
 	{
-		printf("Configuration file could not be opened\n");
+		printf("Navigation mesh could not be opened\n");
 		return false;
 	}
 

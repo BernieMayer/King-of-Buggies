@@ -5,6 +5,8 @@
 #include "camera.h"
 #include "Physics.h"
 #include "GameManager.h"
+#include "NavMesh.h"
+
 
 #include "MeshInfo.h"
 
@@ -66,6 +68,10 @@ GLFWwindow* initializeWindow()
 
 
 int main() {
+	NavMesh nav;
+	if (nav.loadNavMesh("NavigationMesh.obj"))
+		printf("Loaded succesffully\n");
+
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
 		return -1;
