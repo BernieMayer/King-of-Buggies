@@ -271,8 +271,8 @@ PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* phy
 	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
 	shapes[0]->setSimulationFilterData(simFilterData);
 
-	delete vertices;
-	delete indices;
+	delete[] vertices;
+	delete[] indices;
 
 	return groundLevel;
 }

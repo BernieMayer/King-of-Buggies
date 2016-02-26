@@ -19,15 +19,12 @@ public:
 	vector<Input> inputs;
 	Input updateAI(GameState* state);
 	Input testAIChase(GameState state);
-	Input testAIEvade(GameState state);
+	Input testAIEvade(GameState state, int playerNum);
 	void initAI(int pNum);
 	void initAI(GameState state);
-	int getPlayerNum() {
-		return playerNum;
-	};
 
 private:
-	int playerNum;
+	vector<int> playerNums;
 	vec3 prevPosition;
 	float facing(Entity* object, Entity* target);
 	float beside(Entity* object, Entity* target);
@@ -35,6 +32,8 @@ private:
 	bool lastTurnL = false;
 	float frameCounter = 0;
 	GameState lastState;
+	bool reversing = false;
+	float carSpeed = 0.5;
 };
 
 #endif // AIMANAGER_H

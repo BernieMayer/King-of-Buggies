@@ -144,7 +144,7 @@ void GameManager::gameLoop()
 		if (state.numberOfPlayers() > 1){
 
 			//Change this to AI code
-			Input ai_in = ai.testAIEvade(state);
+			Input ai_in = ai.testAIEvade(state, 1);
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
