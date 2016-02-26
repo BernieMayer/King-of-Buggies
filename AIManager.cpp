@@ -4,7 +4,7 @@
 
 
 void  AIManager::initAI(int pNum) {
-	playerNum = pNum;
+	playerNums.push_back(pNum);
 }
 
 void  AIManager::initAI(GameState state) {
@@ -165,7 +165,7 @@ float AIManager::beside(Entity* object, Entity* target) {
 	return result;
 }
 
-Input AIManager::testAIEvade(GameState state) {	
+Input AIManager::testAIEvade(GameState state, int playerNum) {	
 	Entity* ai = state.getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();
 
@@ -201,9 +201,7 @@ Input AIManager::testAIEvade(GameState state) {
 	
 
 	// If not facing away from car
-	// turn
 	if (dot > -0.9f) {
-		
 		// If facing car and very close
 		if (dot >= 0.9 && distance <= 10) {
 			// Go backwards
@@ -215,14 +213,16 @@ Input AIManager::testAIEvade(GameState state) {
 				input.turnL = 0;
 				input.turnR = 0;
 			}
+			// If moving backwards
 			else if ((!reversing && speed < 0.003) || reversing) {
 				reversing = true;
 
+				// Turn
 				if (side > 0) {
 					input.turnL = dot;
 				}
 				else {
-					input.turnR = -dot;
+					input.turnR = dot;
 				}
 			}
 		}
@@ -232,9 +232,11 @@ Input AIManager::testAIEvade(GameState state) {
 				input.turnL = 0;
 				input.turnR = 0;
 			}
+			// If moving forwards
 			else if ((reversing && speed < 0.003) || !reversing) {
 				reversing = false;
 
+				// Turn
 				if (side > 0) {
 					input.turnR = side;
 				}
