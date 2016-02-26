@@ -11,6 +11,7 @@ MeshObject::MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vect
 	normals = initNormals;
 	uvs = initUvs;
 	indices = initIndices;
+	createPhysicsMesh();
 }
 
 vector<vec3> MeshObject::getVertices() {
@@ -44,4 +45,24 @@ vector<vec2>* MeshObject::getUvPointer()
 vector<unsigned int>* MeshObject::getIndexPointer()
 {
 	return &indices;
+}
+
+vector<physx::PxVec3>* MeshObject::getPhysicsVertexPointer()
+{
+	return &physicsVertices;
+}
+
+void MeshObject::createPhysicsMesh() {
+	for (int i = 0; i < this->vertices.size(); i++) {
+		physx::PxF32 x = this->vertices[i].x;
+		physx::PxF32 y = this->vertices[i].y;
+		physx::PxF32 z = this->vertices[i].z;
+		physx::PxVec3 newVertex = physx::PxVec3(x, y, z);
+		physicsVertices.push_back(newVertex);
+	}
+}
+
+vector<physx::PxVec3> MeshObject::getPhysicsVertices()
+{
+	return physicsVertices;
 }

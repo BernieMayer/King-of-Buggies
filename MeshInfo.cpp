@@ -1,5 +1,11 @@
 #include "MeshInfo.h"
+// begin temp:
+#include <fstream>
+#include <string>
+#include <iostream>
 
+using namespace std;
+//end temp
 MeshInfo::MeshInfo() {
 	meshLoader = MeshInfoLoader();
 
@@ -33,7 +39,7 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
-	meshLoader.loadModel("models\\level.obj");
+	meshLoader.loadModel("models\\newlevel.obj");
 	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(levelObject);
 

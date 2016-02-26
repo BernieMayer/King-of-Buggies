@@ -59,6 +59,7 @@ public:
 	void createPlayer(vec3 position, VehicleTraits traits);		//Add forward parameter later, maybe also VehicleTraits
 	void createAI(vec3 position);
 	void createGroundPlane(vec3 normal, float offset);
+	void createTestLevel();
 	void createCoins();
 	void createPowerups();
 	void createPowerupBoxes();

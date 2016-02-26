@@ -54,7 +54,7 @@ public:
 	mat4 vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum);
 
 	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
-	unsigned int ground_createGeneric(vector<vec3>* mesh);
+	unsigned int ground_createGeneric(MeshObject* mesh);
 	
 	unsigned int dynamic_create(vec3 mesh, vec3 initPos);
 	unsigned int dynamic_createSphere(float radius, vec3 initPos);
@@ -85,6 +85,7 @@ private:
 	PxVehicleDrive4W* initVehicle(VehicleTraits traits, PxVec3 initPos);
 	PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics);
 	PxRigidStatic* createDrivablePlane(physx::PxMaterial* material, PxPhysics* physics, PxVec3 normal, PxReal offset);
+	PxRigidStatic* createDrivableLevel(PxMaterial* material, PxPhysics* physics, MeshObject* levelMesh);
 
 	PxVehicleDriveSimData4W initDriveSimData(PxVehicleWheelsSimData* wheelsSimData);
 	PxVehicleWheelsSimData* initWheelSimData(int nbWheels, const PxVec3 chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxF32 wheelMass,
@@ -111,8 +112,10 @@ private:
 		const PxVec3& chassisCMOffset, const PxF32 chassisMass,
 		PxVehicleWheelsSimData* wheelsSimData);
 	void setupNonDrivableSurface(PxFilterData& filterData);
+
 	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);
-	PxTriangleMesh* createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxVec3* indices32, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking);
+	PxTriangleMesh* createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* indices, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking);
+
 	PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const PxMaterial* defaultMaterial);
 
 	void setupObstacleCollisionHandling(PxRigidActor* actor);

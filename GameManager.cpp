@@ -104,6 +104,17 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 
 }
+void GameManager::createTestLevel() {
+	MeshObject* levelMesh = meshInfo.getMeshPointer(LEVEL);
+	surfacePhysicsID = physics.ground_createGeneric(levelMesh);
+
+	surfaceRenderID = renderer.generateObjectID();
+
+	renderer.assignMeshObject(surfaceRenderID, levelMesh);
+	renderer.assignMaterial(surfaceRenderID, &tsMat);
+	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
+
+}
 
 void GameManager::createBall(float radius)
 {
@@ -221,7 +232,8 @@ void GameManager::initTestScene()
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(5.f, 5.f, 0.f), traits);
-	createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
+	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
+	createTestLevel();
 	createBall(0.5f);
 
 	vec3 lightPos(60.f, 60.f, 60.f);
@@ -243,26 +255,6 @@ void quitGame()
 
 
 /*
-void GameManager::createPlayers()
-{
-int i = 0;
-while (i < NUM_PLAYERS) {
-unsigned int player = renderer.generateObjectID();
-state.getPlayer(i)->setRenderID(player);
-
-MeshObject playerMesh = meshInfo.getMesh(BUGGY);
-vector<vec3> playerVerts = playerMesh.getVertices();
-vector<vec3> playerNormals = playerMesh.getNormals();
-vector<unsigned int> playerIndices = playerMesh.getIndices();
-
-renderer.assignMesh(player, &playerVerts);
-renderer.assignNormals(player, &playerNormals);
-renderer.assignIndices(player, &playerIndices);
-renderer.assignMaterial(player, &tsMat);
-i++;
-}
-}
-
 void GameManager::createCoins()
 {
 int i = 0;

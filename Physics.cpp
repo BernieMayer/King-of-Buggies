@@ -231,11 +231,64 @@ unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 	return groundActors.size() - 1;
 }
 
-unsigned int Physics::ground_createGeneric(vector<vec3>* mesh)
+PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* physics, MeshObject* levelMesh)
 {
-	// implement later
-	return 0;
+	//Add a plane to the scene.
+	PxRigidStatic* groundLevel = mPhysics->createRigidStatic(PxTransform(PxIdentity));
+
+	vector<PxVec3> tempVertices = levelMesh->getPhysicsVertices();
+	vector<PxU32> tempIndices = levelMesh->getIndices();
+
+	unsigned int verticesSize = tempVertices.size();
+	unsigned int indicesSize = tempIndices.size();
+
+	PxVec3* vertices = new PxVec3[verticesSize];
+	//int i = 0;
+	for (int i = 0; i < verticesSize; i++) {
+		vertices[i] = tempVertices[i];
+	}
+
+	PxU32* indices = new PxU32[indicesSize];
+	for (int i = 0; i < indicesSize; i++) {
+		indices[i] = (PxU32)tempIndices[i];
+	}
+
+	PxTriangleMesh* triangleMesh = createTriangleMesh(vertices, verticesSize, indices, (indicesSize / 3), *mPhysics, *mCooking);
+	groundLevel->createShape(PxTriangleMeshGeometry(triangleMesh), *material);
+
+	//Get the plane shape so we can set query and simulation filter data.
+	PxShape* shapes[1];
+	groundLevel->getShapes(shapes, 1);
+
+	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
+	PxFilterData qryFilterData;
+	setupDrivableSurface(qryFilterData);
+	shapes[0]->setQueryFilterData(qryFilterData);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_GROUND;
+	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	delete vertices;
+	delete indices;
+
+	return groundLevel;
 }
+
+unsigned int Physics::ground_createGeneric(MeshObject* mesh)
+{
+	groundActors.push_back(createDrivableLevel(mMaterial, mPhysics, mesh));
+
+	if (!groundActors[groundActors.size() - 1])
+		printf("Error: Failed to create level\n");
+
+	gScene->addActor(*groundActors[groundActors.size() - 1]);
+
+	return groundActors.size() - 1;
+}
+
 
 unsigned int Physics::dynamic_create(vec3 mesh, vec3 initPos)
 {
@@ -912,7 +965,7 @@ PxConvexMesh* Physics::createConvexMesh(const PxVec3* verts, const PxU32 numVert
 	return convexMesh;
 }
 
-PxTriangleMesh* Physics::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxVec3* indices32, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking)
+PxTriangleMesh* Physics::createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* indices, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking)
 {
 	PxTriangleMeshDesc meshDesc;
 	meshDesc.points.count = numVerts;
@@ -921,14 +974,14 @@ PxTriangleMesh* Physics::createTriangleMesh(const PxVec3* verts, const PxU32 num
 
 	meshDesc.triangles.count = triCount;
 	meshDesc.triangles.stride = 3 * sizeof(PxU32);
-	meshDesc.triangles.data = indices32;
+	meshDesc.triangles.data = indices;
 
 	PxTriangleMesh* triangleMesh = NULL;
 	PxDefaultMemoryOutputStream buffer;
-	if (cooking.cookTriangleMesh(meshDesc, buffer)) 
+	if (cooking.cookTriangleMesh(meshDesc, buffer))
 	{
 		PxDefaultMemoryInputData id(buffer.getData(), buffer.getSize());
-		triangleMesh = physics.createTriangleMesh(id);
+		triangleMesh = mPhysics->createTriangleMesh(id);
 	}
 
 	return triangleMesh;
