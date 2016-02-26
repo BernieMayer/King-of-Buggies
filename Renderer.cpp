@@ -310,6 +310,28 @@ void Renderer::drawAll()
 	}
 }
 
+void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
+{
+	mat4 modelTransform = modelview*objectTransform;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(&projection[0][0]);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(&modelTransform[0][0]);
+
+	glBegin(GL_LINES);
+	glColor3f(color.x, color.y, color.z);
+	for (unsigned int i = 1; i < segments.size(); i+=2)
+	{
+		vec3 a = segments[i-1];
+		vec3 b = segments[i];
+		glVertex3f(a.x, a.y, a.z);
+		glVertex3f(b.x, b.y, b.z);
+	}
+	glEnd();
+		
+}
+
 
 bool Renderer::loadBuffers(const ObjectInfo& object)
 {

@@ -110,7 +110,7 @@ bool NavMesh::loadNavMesh(string fileName)
 
 	printf("Loading navigation mesh\n");
 	
-	std::ifstream f(fileName);
+	std::ifstream f(navMeshDirectory+fileName);
 	if (!f.is_open())
 	{
 		printf("Navigation mesh could not be opened\n");
@@ -134,9 +134,11 @@ bool NavMesh::loadNavMesh(string fileName)
 			cout << "f ";
 
 			vector<unsigned int> face;
-			unsigned int index;
+			int index;
 
 			stringstream stream(line);
+			stream.ignore(10, ' ');
+
 			while (stream >> index)
 			{
 				face.push_back(index-1);

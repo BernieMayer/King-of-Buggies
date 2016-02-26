@@ -13,7 +13,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	tsMat = TorranceSparrow(3.f);
 	matteMat = TorranceSparrow(0.5f);
 
-	renderer.loadPerspectiveTransform(0.1f, 20.f, 90.f);		//Near, far, fov
+	renderer.loadPerspectiveTransform(0.1f, 50.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam);
 
 	//TODO: Put this indexing somewhere useful;

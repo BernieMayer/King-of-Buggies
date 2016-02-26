@@ -148,6 +148,7 @@ public:
 	void draw(unsigned int object);
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
+	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 
 	//Delete objects
 	void deleteDrawableObject(int object);

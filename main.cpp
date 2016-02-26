@@ -72,6 +72,14 @@ int main() {
 	if (nav.loadNavMesh("NavigationMesh.obj"))
 		printf("Loaded succesffully\n");
 
+	stringstream stream("oiwjer 123456 12 534 54");
+	stream.ignore(10, ' ');
+
+	int num;
+	while (stream >> num)
+		cout << num << " ";
+	cout << endl;
+
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
 		return -1;
