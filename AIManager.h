@@ -35,6 +35,8 @@ private:
 	bool lastTurnL = false;
 	float frameCounter = 0;
 	GameState lastState;
+	bool reversing = false;
+	float carSpeed = 0.5;
 };
 
 #endif // AIMANAGER_H

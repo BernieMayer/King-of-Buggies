@@ -167,19 +167,19 @@ float AIManager::beside(Entity* object, Entity* target) {
 
 Input AIManager::testAIEvade(GameState state) {	
 	Entity* ai = state.getPlayer(playerNum);
+	vec3 aiPos = ai->getPos();
 
 	Entity* player = NULL;
-	float greatestLength = 0;
+	float shortestLength = 0;
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		if (i != playerNum) {
 			Entity* indexedPlayer = state.getPlayer(i);
 			vec3 playerPos = indexedPlayer->getPos();
-			vec3 aiPos = ai->getPos();
 			vec3 distance = playerPos - aiPos;
 
 			float len = length(distance);
-			if (len > greatestLength || player == NULL) {
-				greatestLength = len;
+			if (len < shortestLength || player == NULL) {
+				shortestLength = len;
 				player = indexedPlayer;
 			}
 		}
@@ -187,7 +187,7 @@ Input AIManager::testAIEvade(GameState state) {
 	
 	
 	Input input = Input();
-	input.forward = 0.5f;
+	input.forward = carSpeed;
 	input.backward = 0;
 	input.turnL = 0;
 	input.turnR = 0;
@@ -195,19 +195,57 @@ Input AIManager::testAIEvade(GameState state) {
 	float dot = facing(ai, player);
 	float side = beside(ai, player);
 
+
+	float distance = length(aiPos - player->getPos());
+	float speed = length(aiPos - prevPosition);
+	
+
 	// If not facing away from car
 	// turn
 	if (dot > -0.9f) {
-		if (side > 0) {
-			input.turnR = side;
+		
+		// If facing car and very close
+		if (dot >= 0.9 && distance <= 10) {
+			// Go backwards
+			input.forward = 0.0f;
+			input.backward = carSpeed;
+			// if still moving forwards
+			if (!reversing && speed >= 0.003) {
+				// Do not turn as direction of turning will be changing soon
+				input.turnL = 0;
+				input.turnR = 0;
+			}
+			else if ((!reversing && speed < 0.003) || reversing) {
+				reversing = true;
+
+				if (side > 0) {
+					input.turnL = dot;
+				}
+				else {
+					input.turnR = -dot;
+				}
+			}
 		}
 		else {
-			input.turnL = -side;
+			// If still moving backwards, do not turn as turning direction will be changing soon
+			if (reversing && speed >= 0.003) {
+				input.turnL = 0;
+				input.turnR = 0;
+			}
+			else if ((reversing && speed < 0.003) || !reversing) {
+				reversing = false;
+
+				if (side > 0) {
+					input.turnR = side;
+				}
+				else {
+					input.turnL = -side;
+				}
+			}
 		}
 	}
-	// If facing car and pretty close
-	// Break until stopped
-	// Then go backwards and turn
+
+	prevPosition = aiPos;
 
 	return input;
 }
