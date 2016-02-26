@@ -143,6 +143,7 @@
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="LevelInfo.cpp" />
     <ClCompile Include="SnippetVehicleFilterShader.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="specular.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />

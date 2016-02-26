@@ -197,6 +197,7 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 
 
 	float distance = length(aiPos - player->getPos());
+	// TODO: refactor to use speed from PlayerInfo when implemented
 	float speed = length(aiPos - prevPosition);
 	
 

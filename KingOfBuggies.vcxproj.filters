@@ -37,6 +37,7 @@
     <ClCompile Include="AIManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="NavMesh.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
