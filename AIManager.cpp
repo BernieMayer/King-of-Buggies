@@ -205,6 +205,9 @@ Input AIManager::testAIEvade(GameState state) {
 			input.turnL = -side;
 		}
 	}
+	// If facing car and pretty close
+	// Break until stopped
+	// Then go backwards and turn
 
 	return input;
 }
