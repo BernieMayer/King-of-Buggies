@@ -19,8 +19,6 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	//TODO: Put this indexing somewhere useful;
 	ai.initAI(1);
 
-	sound = SoundManager();
-
 	gameInit();
 }
 
@@ -167,6 +165,7 @@ void GameManager::gameLoop()
 		physics.updateGameState(&state);
 		renderer.updateObjectTransforms(&state);
 
+		sound.updateSounds(state);
 
 		//Test code...
 		PlayerInfo* player = state.getPlayer(0);
@@ -243,6 +242,7 @@ void GameManager::initTestScene()
 	renderer.setLightPosition(lightID, lightPos);
 
 	ai.initAI(state);
+	sound = SoundManager(state);
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 

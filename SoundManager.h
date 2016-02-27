@@ -18,12 +18,16 @@ using namespace glm;
 class SoundManager {
 public:
 	SoundManager();
+	SoundManager(GameState state);
 	bool loadMedia();
+	void updateSounds(GameState state);
 	void playAccelSound(GameState state, int playerNum);
 	void playSound(float file , vec3 location, float volume);
 	void adjustPitch(int, float);
 	void adjustVolume(int, float);
 	void stopSound(int);
+private:
+	float map(float value, float min, float max, float newMin, float newMax);
 };
 
 #endif // SOUNDMANAGER_H
