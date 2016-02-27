@@ -312,10 +312,13 @@ void Renderer::drawAll()
 
 void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
 {
-	mat4 modelTransform = modelview*objectTransform;
+	glUseProgram(0);
+
+	mat4 modelTransform = modelview*camera->getMatrix()*objectTransform;
+	mat4 projTransform = winRatio*projection;
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(&projection[0][0]);
+	glLoadMatrixf(&projTransform[0][0]);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(&modelTransform[0][0]);
 
@@ -325,13 +328,39 @@ void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& o
 	{
 		vec3 a = segments[i-1];
 		vec3 b = segments[i];
+		//glNormal3f(0.f, 0.f, 1.f);
 		glVertex3f(a.x, a.y, a.z);
+		//glNormal3f(0.f, 0.f, 1.f);
 		glVertex3f(b.x, b.y, b.z);
 	}
 	glEnd();
 		
 }
 
+
+void Renderer::drawPoints(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
+{
+	glUseProgram(0);
+	glPointSize(5.f);
+
+	mat4 modelTransform = modelview*camera->getMatrix()*objectTransform;
+	mat4 projTransform = winRatio*projection;
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadMatrixf(&projTransform[0][0]);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadMatrixf(&modelTransform[0][0]);
+
+	glBegin(GL_POINTS);
+	glColor3f(color.x, color.y, color.z);
+	for (unsigned int i = 1; i < segments.size(); i ++)
+	{
+		vec3 a = segments[i - 1];
+		glVertex3f(a.x, a.y, a.z);
+	}
+	glEnd();
+
+}
 
 bool Renderer::loadBuffers(const ObjectInfo& object)
 {

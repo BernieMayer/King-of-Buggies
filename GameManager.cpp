@@ -128,8 +128,59 @@ void GameManager::createBall(float radius)
 	
 }
 
+
+//Member function?
+void navMeshToLines(vector<vec3>* polygons, vector<vec3>* edges)
+{
+	NavMesh nav;
+	nav.loadNavMesh("NavigationMesh.obj");
+	nav.calculateImplicitEdges();
+
+	//Lines for polygons
+	for (unsigned int i = 0; i < nav.numNodes(); i++)
+	{
+		for (unsigned int j = 0; j < nav[i].numVertices(); j++)
+		{
+			polygons->push_back(nav[i][j]);
+			polygons->push_back(nav[i][(j + 1) % nav[i].numVertices()]);
+		}
+	}
+
+	//Edges between polygons
+	for (unsigned int i = 0; i < nav.edges.size(); i++)
+	{
+		for (unsigned int j = 0; j < nav.edges[i].size(); j++)
+		{
+			cout << nav.edges[i][j] << " ";
+
+			if (nav.edges[i][j] > 0.f)
+			{
+				edges->push_back(nav[i].getCenter());
+				edges->push_back(nav[j].getCenter());
+			}
+		}
+
+		cout << endl;
+	}
+}
+
 void GameManager::gameLoop()
 {
+	vector<vec3> polygons;
+	vector<vec3> edges;
+	navMeshToLines(&polygons, &edges);
+	mat4 lineTransform;
+	lineTransform[3][1] = -6.f;
+
+
+	NavMesh nav;
+	nav.loadNavMesh("NavigationMesh.obj");
+	vector<vec3> firstPoints;
+	for (unsigned int i = 0; i < nav.numNodes(); i++)
+	{
+		firstPoints.push_back(nav[i][0] + (nav[i].getCenter() - nav[i][0])*0.1f);
+	}
+	
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -201,6 +252,11 @@ void GameManager::gameLoop()
 		renderer.clearDrawBuffers();
 
 		renderer.drawAll();
+
+		//Debugging
+		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+		renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+		//renderer.drawPoints(firstPoints, vec3(1.f, 0.f, 0.f), lineTransform);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);

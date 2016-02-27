@@ -194,13 +194,29 @@ bool NavMesh::findSimilarEdge(const Node& a, const Node& b, unsigned int* a_inde
 	return false;
 
 found:
-	if (a[ind_a%a.numVertices()] == b[ind_b%b.numVertices()])
+	if (a[(ind_a+1)%a.numVertices()] == b[(ind_b+1)%b.numVertices()])
 	{
 		*a_index = ind_a;
 		*b_index = ind_b;
+		return true;
 	}
-
-	return true;
+	else if (a[(ind_a + 1) % a.numVertices()] == b[(ind_b + b.numVertices()- 1) % b.numVertices()])
+	{
+		*a_index = ind_a;
+		*b_index = ind_b;
+		return true;
+	}
+	else if (a[(ind_a + a.numVertices() - 1) % a.numVertices()] == b[(ind_b + 1) % b.numVertices()])
+	{
+		*a_index = (ind_a - 1)%a.numVertices();
+		*b_index = (ind_b + 1) % b.numVertices();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+		
 }
 
 void NavMesh::resizeEdges(unsigned int newSize)

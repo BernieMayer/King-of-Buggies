@@ -34,7 +34,7 @@ public:
 
 	unsigned int numVertices() const;
 
-	vec3 getCenter();
+	vec3 getCenter() const { return center; }
 	bool inPolygon(vec3 pos);
 };
 
@@ -64,16 +64,18 @@ class NavMesh
 {
 private:
 	vector<Node> nodes;
-	Edges edges;
 
 	vector<vector<vec3>> point_a;	//First point on edge
 	vector<vector<vec3>> point_b;	//Second point on edge
 
 public:
 	NavMesh();
+	Edges edges;
 
 	Node operator[] (unsigned int index) const { return nodes[index]; }
 	Node& operator[] (unsigned int index) { return nodes[index]; }
+
+	unsigned int numNodes() const { return nodes.size(); }
 
 	void add(Node newNode) { nodes.push_back(newNode); }
 	void clear();
