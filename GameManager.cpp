@@ -19,6 +19,8 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	//TODO: Put this indexing somewhere useful;
 	ai.initAI(1);
 
+	sound = SoundManager();
+
 	gameInit();
 }
 
