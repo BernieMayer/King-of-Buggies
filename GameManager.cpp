@@ -10,7 +10,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	window = newWindow;
 	mat = Diffuse();
 	shinyMat = Specular(20.f);
-	tsMat = TorranceSparrow(3.f);
+	tsMat = TorranceSparrow(10.f);
 	matteMat = TorranceSparrow(0.5f);
 
 	renderer.loadPerspectiveTransform(0.1f, 50.f, 90.f);		//Near, far, fov
@@ -128,53 +128,21 @@ void GameManager::createBall(float radius)
 	
 }
 
-
-//Member function?
-void navMeshToLines(vector<vec3>* polygons, vector<vec3>* edges)
-{
-	NavMesh nav;
-	nav.loadNavMesh("NavigationMesh.obj");
-	nav.calculateImplicitEdges();
-
-	//Lines for polygons
-	for (unsigned int i = 0; i < nav.numNodes(); i++)
-	{
-		for (unsigned int j = 0; j < nav[i].numVertices(); j++)
-		{
-			polygons->push_back(nav[i][j]);
-			polygons->push_back(nav[i][(j + 1) % nav[i].numVertices()]);
-		}
-	}
-
-	//Edges between polygons
-	for (unsigned int i = 0; i < nav.edges.size(); i++)
-	{
-		for (unsigned int j = 0; j < nav.edges[i].size(); j++)
-		{
-			cout << nav.edges[i][j] << " ";
-
-			if (nav.edges[i][j] > 0.f)
-			{
-				edges->push_back(nav[i].getCenter());
-				edges->push_back(nav[j].getCenter());
-			}
-		}
-
-		cout << endl;
-	}
-}
-
 void GameManager::gameLoop()
 {
 	vector<vec3> polygons;
 	vector<vec3> edges;
-	navMeshToLines(&polygons, &edges);
+	
 	mat4 lineTransform;
 	lineTransform[3][1] = -6.f;
 
-
 	NavMesh nav;
 	nav.loadNavMesh("NavigationMesh.obj");
+	nav.calculateImplicitEdges();
+	nav.navMeshToLines(&polygons, &edges);
+
+	vector<vec3> path;
+
 	vector<vec3> firstPoints;
 	for (unsigned int i = 0; i < nav.numNodes(); i++)
 	{
@@ -184,10 +152,7 @@ void GameManager::gameLoop()
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		
 		Input in = input.getInput(1);		//Get input
-		
 
 
 		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
@@ -250,13 +215,24 @@ void GameManager::gameLoop()
 
 		//Draw scene
 		renderer.clearDrawBuffers();
-
 		renderer.drawAll();
+
+		//Get path
+		path.clear();
+		nav.getPathLines(&path, state.getPlayer(0)->getPos(), state.getPlayer(1)->getPos());
+		vector<vec3> carPos;
+		vec3 p1 = state.getPlayer(0)->getPos();
+		vec3 p2 = state.getPlayer(1)->getPos();
+		p1.y = polygons[0].y;
+		p2.y = p1.y;
+		carPos.push_back(p1);
+		carPos.push_back(p2);
 
 		//Debugging
 		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+		renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
 		renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
-		//renderer.drawPoints(firstPoints, vec3(1.f, 0.f, 0.f), lineTransform);
+		renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
@@ -288,7 +264,7 @@ void GameManager::initTestScene()
 	temp.print();
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
-	createPlayer(vec3(5.f, 5.f, 0.f), traits);
+	createPlayer(vec3(5.f, 5.f, 15.f), traits);
 	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createTestLevel();
 	createBall(0.5f);
