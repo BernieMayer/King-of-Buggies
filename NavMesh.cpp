@@ -3,25 +3,40 @@
 
 #include "NavMesh.h"
 
-string navMeshDirectory = "./models/";
+const unsigned int NO_VALUE = UINT_MAX;
 
-Edges::Edges()
+string navMeshDirectory = "./navigation/";
+
+
+Edge::Edge() :index(0), weight(0.f)
+{
+}
+
+Edge::Edge(unsigned int _index) : index(_index), weight(1.f)
+{
+}
+
+Edge::Edge(unsigned int _index, float _weight) : index(_index), weight(_weight)
+{
+}
+
+EdgeMatrix::EdgeMatrix()
 {
 
 }
 
-void Edges::setSize(unsigned int size)
+void EdgeMatrix::setSize(unsigned int size)
 {
-	edgeMatrix.resize(size);
+	matrix.resize(size);
 	for (unsigned int i = 0; i < size; i++)
 	{
-		edgeMatrix[i].resize(size, 0);
+		matrix[i].resize(size, 0);
 	}
 }
 
-void Edges::clear() 
+void EdgeMatrix::clear() 
 {
-	edgeMatrix.clear();
+	matrix.clear();
 }
 
 Node::Node()
@@ -69,18 +84,20 @@ bool Node::inPolygon(vec3 pos)
 	float sign = 0.f;
 
 	vector<vec3>::iterator it = points.begin();
-	vec3 segment = *(it + 1) - *it;
+	vector<vec3>::iterator end = points.end()-1;
+
+	vec3 segment = *it - *end;
 	vec2 perp = vec2(-segment.z, segment.x);
-	vec2 toPos = vec2(segment.x - (*it).x, segment.z - (*it).z);
+	vec2 toPos = vec2(pos.x - (*end).x, pos.z - (*end).z);
 
 	sign = (dot(perp, toPos) > 0) ? 1.f : -1.f;
 		
 
-	for (it; it != points.end(); it++)
+	for (it; it+1 != points.end(); it++)
 	{
 		segment = *(it + 1) - *it;
 		perp = vec2(-segment.z, segment.x);
-		toPos = vec2(segment.x - (*it).x, segment.z - (*it).z);
+		toPos = vec2(pos.x - (*it).x, pos.z - (*it).z);
 
 		float dot_val = dot(perp, toPos);
 		//If point is on differnt side of this segment than the first, return false
@@ -89,6 +106,21 @@ bool Node::inPolygon(vec3 pos)
 	}
 
 	return true;
+}
+
+void Node::addEdge(unsigned int edge, float weight)
+{
+	edges.push_back(Edge(edge, weight));
+}
+
+vector<Edge>::iterator Node::getEdgeIterator()
+{
+	return edges.begin();
+}
+
+vector<Edge>::iterator Node::getEndIterator()
+{
+	return edges.end();
 }
 
 
@@ -110,10 +142,10 @@ bool NavMesh::loadNavMesh(string fileName)
 
 	printf("Loading navigation mesh\n");
 	
-	std::ifstream f(fileName);
+	std::ifstream f(navMeshDirectory+fileName);
 	if (!f.is_open())
 	{
-		printf("Configuration file could not be opened\n");
+		printf("Navigation mesh could not be opened\n");
 		return false;
 	}
 
@@ -134,9 +166,11 @@ bool NavMesh::loadNavMesh(string fileName)
 			cout << "f ";
 
 			vector<unsigned int> face;
-			unsigned int index;
+			int index;
 
 			stringstream stream(line);
+			stream.ignore(10, ' ');
+
 			while (stream >> index)
 			{
 				face.push_back(index-1);
@@ -192,13 +226,29 @@ bool NavMesh::findSimilarEdge(const Node& a, const Node& b, unsigned int* a_inde
 	return false;
 
 found:
-	if (a[ind_a%a.numVertices()] == b[ind_b%b.numVertices()])
+	if (a[(ind_a+1)%a.numVertices()] == b[(ind_b+1)%b.numVertices()])
 	{
 		*a_index = ind_a;
 		*b_index = ind_b;
+		return true;
 	}
-
-	return true;
+	else if (a[(ind_a + 1) % a.numVertices()] == b[(ind_b + b.numVertices()- 1) % b.numVertices()])
+	{
+		*a_index = ind_a;
+		*b_index = ind_b;
+		return true;
+	}
+	else if (a[(ind_a + a.numVertices() - 1) % a.numVertices()] == b[(ind_b + 1) % b.numVertices()])
+	{
+		*a_index = (ind_a - 1)%a.numVertices();
+		*b_index = (ind_b + 1) % b.numVertices();
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+		
 }
 
 void NavMesh::resizeEdges(unsigned int newSize)
@@ -224,10 +274,14 @@ void NavMesh::calculateImplicitEdges()
 	{
 		for (unsigned int j = i; j < nodes.size(); j++)
 		{
-			if (findSimilarEdge(nodes[i], nodes[j], &i_a, &i_b))
+			if ((i != j) && (findSimilarEdge(nodes[i], nodes[j], &i_a, &i_b)))
 			{
 				edges[i][j] = 1.f;
 				edges[j][i] = 1.f;
+
+				nodes[i].addEdge(j, 1.f);
+				nodes[j].addEdge(i, 1.f);
+
 
 				point_a[j][i] = point_a[i][j] = nodes[i][i_a];
 				point_b[j][i] = point_b[i][j] = nodes[i][(i_a+1)%nodes[i].numVertices()];
@@ -236,8 +290,170 @@ void NavMesh::calculateImplicitEdges()
 	}
 }
 
+unsigned int NavMesh::getPolygon(vec3 position)
+{
+	for (unsigned int i = 0; i < nodes.size(); i++)
+	{
+		if (nodes[i].inPolygon(position))
+			return i;
+	}
+
+	return NO_VALUE;
+}
+
+class IndexWeightPair
+{
+public:
+	unsigned int i;
+	float w;
+	IndexWeightPair(unsigned int index, float weight) :i(index), w(weight) {}
+};
+
+struct IndexWeightComparison
+{
+	bool operator()(const IndexWeightPair& a, const IndexWeightPair& b) const
+	{
+		return a.w > b.w;
+	}
+};
 
 
+//Cost for traversing edge from node i to node j
+float NavMesh::edgeCost(unsigned int i, unsigned int j)
+{
+	return edges[i][j];
+}
+
+float NavMesh::heuristic(unsigned int current, unsigned int finish)
+{
+	vec3 diff = nodes[current].getCenter() - nodes[finish].getCenter();
+	return abs(diff.x) + abs(diff.y) + abs(diff.z);
+}
+
+
+
+
+bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 target)
+{
+	unsigned int start = getPolygon(position);		//Index of polygon containing starting position
+	unsigned int finish = getPolygon(target);		//Index of polygon containing finishing position
+
+	if ((start == NO_VALUE) || (finish == NO_VALUE))
+		return false;
+
+	vector<unsigned int> came_from (nodes.size(), NO_VALUE);	//Stores node with shortest path to this one
+	vector<float> cost(nodes.size(), -1.f);		//Stores cost of node
+	//Priority queue storing outer ring of explored nodes
+	priority_queue<IndexWeightPair, vector<IndexWeightPair>, IndexWeightComparison> frontier;
+
+	cost[start] = 0;
+	frontier.push(IndexWeightPair(start, 0.f));
+
+	while (!frontier.empty())
+	{
+		IndexWeightPair current = frontier.top();
+		frontier.pop();
+
+		if (current.i == finish)
+			break;
+
+		//Iterate through adjacent nodes to current
+		vector<Edge>::iterator next = nodes[current.i].getEdgeIterator();
+		for (next; next != nodes[current.i].getEndIterator(); next++)
+		{
+			float newCost = cost[current.i] + edgeCost(current.i, next->index);
+
+			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))
+			{
+				cost[next->index] = newCost;
+				float priority = newCost + heuristic(next->index, finish);
+
+				frontier.push(IndexWeightPair(next->index, priority));
+				came_from[next->index] = current.i;
+			}
+		}
+
+	}
+
+	unsigned int index = finish;
+	vector<unsigned int> temp;
+
+	//Trace path from finish to start
+	while (index != NO_VALUE)
+	{
+		temp.push_back(index);
+		index = came_from[index];
+	}
+
+	//Make sure path reaches beginning
+	if (temp.at(temp.size() - 1) != start)
+		return false;
+
+	//Reverse path - consider swapping end and beginning to get already reversed path
+	for (unsigned int i = 0; i < temp.size(); i++)
+	{
+		path->push_back(temp[temp.size()-1-i]);
+	}
+
+	return true;
+}
+
+
+
+//Member function
+void NavMesh::navMeshToLines(vector<vec3>* polygons, vector<vec3>* outEdges)
+{
+
+	//Lines for polygons
+	for (unsigned int i = 0; i < numNodes(); i++)
+	{
+		for (unsigned int j = 0; j < nodes[i].numVertices(); j++)
+		{
+			polygons->push_back(nodes[i][j]);
+			polygons->push_back(nodes[i][(j + 1) % nodes[i].numVertices()]);
+		}
+	}
+
+	//Edges between polygons
+	for (unsigned int i = 0; i < edges.size(); i++)
+	{
+		for (unsigned int j = 0; j < edges[i].size(); j++)
+		{
+			if (edges[i][j] > 0.f)
+			{
+				outEdges->push_back(nodes[i].getCenter());
+				outEdges->push_back(nodes[j].getCenter());
+			}
+		}
+	}
+}
+
+bool NavMesh::getPathLines(vector<vec3>* path, vec3 position, vec3 target)
+{
+	vector<unsigned int> indices;
+	path->push_back(vec3(position.x, position.y+6.f, position.z));
+
+	if (getPath_AStar(&indices, position, target))
+	{
+		for (unsigned int i = 1; i < indices.size(); i++)
+		{
+			//path->push_back(nodes[indices[i - 1]].getCenter());
+			//path->push_back(nodes[indices[i]].getCenter());
+			vec3 a = point_a[indices[i - 1]][indices[i]];
+			vec3 b = point_b[indices[i - 1]][indices[i]];
+			vec3 midpoint = b + (a - b)*0.5f;
+
+			path->push_back(midpoint);
+			path->push_back(midpoint);
+		}
+
+		path->push_back(vec3(target.x, target.y+6.f, target.z));
+		
+		return true;
+	}
+	else
+		return false;
+}
 
 
 

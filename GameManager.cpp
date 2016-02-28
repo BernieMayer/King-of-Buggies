@@ -10,10 +10,10 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	window = newWindow;
 	mat = Diffuse();
 	shinyMat = Specular(20.f);
-	tsMat = TorranceSparrow(3.f);
+	tsMat = TorranceSparrow(10.f);
 	matteMat = TorranceSparrow(0.5f);
 
-	renderer.loadPerspectiveTransform(0.1f, 20.f, 90.f);		//Near, far, fov
+	renderer.loadPerspectiveTransform(0.1f, 50.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam);
 
 	//TODO: Put this indexing somewhere useful;
@@ -147,13 +147,29 @@ void GameManager::addCoin(int playerId)
 
 void GameManager::gameLoop()
 {
+	vector<vec3> polygons;
+	vector<vec3> edges;
+	
+	mat4 lineTransform;
+	lineTransform[3][1] = -6.f;
+
+	NavMesh nav;
+	nav.loadNavMesh("NavigationMesh.obj");
+	nav.calculateImplicitEdges();
+	nav.navMeshToLines(&polygons, &edges);
+
+	vector<vec3> path;
+
+	vector<vec3> firstPoints;
+	for (unsigned int i = 0; i < nav.numNodes(); i++)
+	{
+		firstPoints.push_back(nav[i][0] + (nav[i].getCenter() - nav[i][0])*0.1f);
+	}
+	
 
 	while (!glfwWindowShouldClose(window))
 	{
-
-		
 		Input in = input.getInput(1);		//Get input
-		
 
 		if (in.cheat_coin)
 			std::cout << "Cheated in a coin \n";
@@ -163,7 +179,8 @@ void GameManager::gameLoop()
 		if (state.numberOfPlayers() > 1){
 
 			//Change this to AI code
-			Input ai_in = ai.testAIChase(state);
+
+			Input ai_in = ai.testAIEvade(state, 1);
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}
@@ -184,6 +201,7 @@ void GameManager::gameLoop()
 		physics.updateGameState(&state);
 		renderer.updateObjectTransforms(&state);
 
+		sound.updateSounds(state);
 
 		//Test code...
 		PlayerInfo* player = state.getPlayer(0);
@@ -217,8 +235,24 @@ void GameManager::gameLoop()
 
 		//Draw scene
 		renderer.clearDrawBuffers();
-
 		renderer.drawAll();
+
+		//Get path
+		path.clear();
+		nav.getPathLines(&path, state.getPlayer(0)->getPos(), state.getPlayer(1)->getPos());
+		vector<vec3> carPos;
+		vec3 p1 = state.getPlayer(0)->getPos();
+		vec3 p2 = state.getPlayer(1)->getPos();
+		p1.y = polygons[0].y;
+		p2.y = p1.y;
+		carPos.push_back(p1);
+		carPos.push_back(p2);
+
+		//Debugging
+		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+		renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
+		renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+		renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
@@ -250,7 +284,7 @@ void GameManager::initTestScene()
 	temp.print();
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
-	createPlayer(vec3(5.f, 5.f, 0.f), traits);
+	createPlayer(vec3(5.f, 5.f, 15.f), traits);
 	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createTestLevel();
 	createBall(0.5f);
@@ -260,6 +294,7 @@ void GameManager::initTestScene()
 	renderer.setLightPosition(lightID, lightPos);
 
 	ai.initAI(state);
+	sound = SoundManager(state);
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 

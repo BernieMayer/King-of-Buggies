@@ -207,6 +207,15 @@ mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
 	return vehicle_getGlobalPose(id)*getMat4(wheelShape[0]->getLocalPose());
 }
 
+float Physics::vehicle_getFSpeed(unsigned int id) {
+	if (id >= vehicleActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return 0.0f;
+	}
+	return vehicleActors[id]->computeForwardSpeed();
+}
+
 unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 {
 	if (normal == vec3(0.f))
@@ -267,8 +276,8 @@ PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* phy
 	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
 	shapes[0]->setSimulationFilterData(simFilterData);
 
-	delete vertices;
-	delete indices;
+	delete[] vertices;
+	delete[] indices;
 
 	return groundLevel;
 }
@@ -352,6 +361,8 @@ void Physics::updateGameState(GameState* state)
 		{
 			player->setWheelTransform(j, vehicle_getGlobalPoseWheel(player->getPhysicsID(), j));
 		}
+
+		player->setFSpeed(vehicle_getFSpeed(player->getPhysicsID()));
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)

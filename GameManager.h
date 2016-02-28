@@ -10,6 +10,7 @@
 #include "Physics.h"
 #include "Renderer.h"
 #include "SoundManager.h"
+#include "NavMesh.h"
 
 
 #include <GLFW/glfw3.h>  
