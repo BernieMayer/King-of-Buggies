@@ -40,13 +40,13 @@ SoundManager::SoundManager(GameState state) {
 
 		// Sound for player 1
 		Mix_PlayChannel(2, idleSound, -1);
-		Mix_Volume(2, 50);
+		Mix_Volume(2, lowestIdleVolume);
 
 		int numPlayers = state.numberOfPlayers();
 
 		for (int i = 1; i < numPlayers; i++) {
 			Mix_PlayChannel(i + 2, idleSound, -1);
-			Mix_Volume(i + 2, 50);
+			Mix_Volume(i + 2, lowestIdleVolume);
 
 			vec3 player1Pos = state.getPlayer(0)->getPos();
 			vec3 otherPlayerPos = state.getPlayer(i)->getPos();
@@ -89,13 +89,13 @@ void SoundManager::updateSounds(GameState state) {
 
 	// TODO: change to be based on input so engine will make reving sound even if
 	// driveing into a wall with 0 speed
-	int volume = (int)map(player1Speed, 0, 16, 50, 128);
+	int volume = (int)map(player1Speed, 0, 16, lowestIdleVolume, 128);
 	Mix_Volume(2, volume);
 
 	for (int i = 1; i < numPlayers; i++) {
 		PlayerInfo* player = state.getPlayer(i);
 		float playerSpeed = abs(player->getFSpeed());
-		volume = (int)map(playerSpeed, 0, 16, 50, 128);
+		volume = (int)map(playerSpeed, 0, 16, lowestIdleVolume, 128);
 		Mix_Volume(i + 2, volume);
 
 		vec3 player1Pos = state.getPlayer(0)->getPos();

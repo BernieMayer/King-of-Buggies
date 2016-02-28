@@ -28,6 +28,7 @@ public:
 	void stopSound(int);
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
+	int lowestIdleVolume = 10;
 };
 
 #endif // SOUNDMANAGER_H
