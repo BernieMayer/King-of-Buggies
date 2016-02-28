@@ -2,6 +2,7 @@
 #define PHYSICS_H
 
 #include <math.h>
+#include "PxSimulationEventCallback.h"
 #include "MeshObject.h"
 #include "LevelInfo.h"
 #include "GameState.h"
@@ -11,6 +12,7 @@
 #include "Input.h"
 #include "VehicleTraits.h"
 
+//Hello World (Test commit)
 
 const float gravity = -9.81f;
 
@@ -31,7 +33,7 @@ enum
 	MAX_NUM_SURFACE_TYPES
 };
 
-class Physics {
+class Physics : public PxSimulationEventCallback {
 public:
 	Physics();
 	void shutdown();
@@ -65,6 +67,13 @@ public:
 	PxMaterial* getMaterial(unsigned int materialID);
 
 	void updateGameState(GameState* state);
+
+	// Implements PxSimulationEventCallback
+	virtual void  onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
+	virtual void  onTrigger(PxTriggerPair* pairs, PxU32 count){}
+	virtual void  onConstraintBreak(PxConstraintInfo*, PxU32) {}
+	virtual void  onWake(PxActor**, PxU32) {}
+	virtual void  onSleep(PxActor**, PxU32){}
 
 
 private:

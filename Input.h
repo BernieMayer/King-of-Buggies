@@ -13,6 +13,7 @@ struct Input
 	bool drift;
 	bool powerup;
 	bool menu;
+	bool cheat_coin;
 
 	bool isKeyboard;
 };

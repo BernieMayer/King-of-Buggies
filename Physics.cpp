@@ -8,13 +8,8 @@
 
 #include "SnippetVehicleFilterShader.h"
 
-//Is the surface drivable?
-//Is the force being applied big enough?
-//Are we using the right constants?
-//Is the movement system accurately affecting the car?
-//Have we set up Physics properly?
-//Are the wheels working against each other?
-//
+
+
 
 #define MAX_NUM_ACTOR_SHAPES 128
 
@@ -103,6 +98,7 @@ VehicleTraits traits = NULL;
 
 bool forwards = true;
 
+void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask);
 
 //TEMPORARY FUNCTION
 PxRigidActor* getSphere() { return aSphereActor; }
@@ -451,6 +447,7 @@ void Physics::initScene()
 {
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, gravity, 0.0f);
+	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
 
 	// May need to change this number
 	PxU32 numWorkers = 1;
@@ -462,6 +459,7 @@ void Physics::initScene()
 		sceneDesc.filterShader = gDefaultFilterShader;
 	}
 	// May want something like this later
+
 	sceneDesc.filterShader = VehicleFilterShader;
 
 	gScene = mPhysics->createScene(sceneDesc);
@@ -585,6 +583,7 @@ PxVehicleDrive4W* Physics::initVehicle() {
 
 	return vehDrive4W;
 }
+
 
 PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheelsSimData) {
 	PxVehicleDriveSimData4W driveSimData;
@@ -994,6 +993,7 @@ PxRigidDynamic* Physics::createVehicleActor(const PxVehicleChassisData& chassisD
 	//We need a rigid body actor for the vehicle.
 	//Don't forget to add the actor to the scene after setting up the associated vehicle.
 	PxRigidDynamic* vehActor = physics.createRigidDynamic(PxTransform(initPos));
+	vehActor->setRigidBodyFlag(PxRigidBodyFlag::eENABLE_CCD, true);
 
 	//Wheel and chassis simulation filter data.
 	PxFilterData wheelSimFilterData;
@@ -1116,5 +1116,24 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* Physics::createFrictionPairs(const 
 	}
 	return surfaceTirePairs;
 }
+
+void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
+{
+	std::cout  << "Callback has been called \n";
+	for (PxU32 i = 0; i < nbPairs; i++)
+	{
+		const PxContactPair& cp = pairs[i];
+
+		if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
+		{
+			if ((pairHeader.actors[0] == vehicleActors[0]->getRigidDynamicActor()) || (pairHeader.actors[1] == vehicleActors[1]->getRigidDynamicActor()))
+			{
+				cout << "A collission has been detected \n";
+				break;
+			}
+		}
+	}
+}
+
 
 #endif 

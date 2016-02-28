@@ -47,7 +47,8 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
 	renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
-	renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
+	renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
+	//renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
 	unsigned int wheelIDs[4];
@@ -128,6 +129,22 @@ void GameManager::createBall(float radius)
 	
 }
 
+void GameManager::addCoin(int playerId)
+{
+	//Add a coin into the player properties here
+
+	PlayerInfo* p = state.getPlayer(playerId);
+
+	int physID = p->getPhysicsID();
+
+	
+
+
+
+
+
+}
+
 void GameManager::gameLoop()
 {
 
@@ -138,13 +155,15 @@ void GameManager::gameLoop()
 		Input in = input.getInput(1);		//Get input
 		
 
+		if (in.cheat_coin)
+			std::cout << "Cheated in a coin \n";
 
 		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
 
 		if (state.numberOfPlayers() > 1){
 
 			//Change this to AI code
-			Input ai_in = ai.testAIEvade(state);
+			Input ai_in = ai.testAIChase(state);
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}

@@ -20,6 +20,9 @@ bool kPowerup;
 bool kDrift;
 bool kMenu;
 
+//Only to easily cheat in coins
+bool kCheat_coin;
+
 /**
  * Takes a value between two numbers and converts it to another value between two different numbers
  * maintaining its proportional place between the first two numbers.
@@ -122,6 +125,12 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	else if (key == GLFW_KEY_BACKSPACE && action == GLFW_PRESS) {
 		// Temporary way to close window
 		glfwSetWindowShouldClose(sender, GL_TRUE);
+	}
+	else if (key == GLFW_KEY_C && action == GLFW_PRESS){
+		kCheat_coin = true;
+	}
+	else if (key == GLFW_KEY_C && action == GLFW_RELEASE){
+		kCheat_coin = false;
 	}
 }
 
@@ -251,6 +260,8 @@ Input InputManager::getInput(int playerNum)
 		input.menu = kMenu;
 		input.isKeyboard = true;
 
+		//only to easily activate coins
+		input.cheat_coin = kCheat_coin;
 
 		int widthP = 0;
 		int heightP = 0;

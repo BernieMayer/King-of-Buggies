@@ -52,6 +52,8 @@ private:
 	vector<vec3> ballNormals;			//TEMPORARY
 	vector<unsigned int> ballIndices;	//TEMPORARY
 
+	void addCoin(int playerId);
+
 public:
 	GameManager(GLFWwindow* newWindow);
 
@@ -69,6 +71,8 @@ public:
 	void gameInit();
 	void initTestScene();
 	void quitGame(); // should this take arguments? 
+
+	
 
 	void physicsAndRenderTest();
 
