@@ -126,6 +126,7 @@
   <ItemGroup>
     <ClCompile Include="AIManager.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="Coin.cpp" />
     <ClCompile Include="diffuse.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="GameManager.cpp" />

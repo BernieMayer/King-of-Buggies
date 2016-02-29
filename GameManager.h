@@ -63,7 +63,7 @@ public:
 	void createAI(vec3 position);
 	void createGroundPlane(vec3 normal, float offset);
 	void createTestLevel();
-	void createCoins();
+	void createCoin(vec3 position);
 	void createPowerups();
 	void createPowerupBoxes();
 	void createBall(float radius);

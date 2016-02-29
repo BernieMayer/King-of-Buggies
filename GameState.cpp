@@ -110,4 +110,18 @@ PowerupBox* GameState::getPowerupBox(unsigned int boxNum)
 
 unsigned int GameState::numberOfPowerupBoxes(){ return boxes.size(); }
 
+void GameState::checkCoinCollision(vec3 playerPos) {
+	for (int i = 0; i < coins.size(); i++) {
+		vec3 pos = coins[i].getPos();
+		vec3 difference = pos - playerPos;
+		
+		if ((abs(difference.x) < 1) && (abs(difference.y) < 1) && (abs(difference.z) < 1)) {
+			vec3 newPos = pos;
+			newPos.z = -(pos.z);
+			coins[i].setPos(newPos);
+			coins[i].setCollided(true);
+		}
+	}
+}
+
 #endif // GAMESTATE_CPP

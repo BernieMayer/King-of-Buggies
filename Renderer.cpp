@@ -251,6 +251,12 @@ void Renderer::updateObjectTransforms(GameState* state)
 		assignTransform(powerup->getRenderID(), powerup->getTransform());
 	}
 
+	for (unsigned int i = 0; i < state->numberOfCoins(); i++)
+	{
+		Coin* coin = state->getCoin(i);
+		assignTransform(coin->getRenderID(), coin->getTransform());
+	}
+
 }
 
 

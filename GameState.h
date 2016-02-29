@@ -56,6 +56,8 @@ public:
 	void setPowerupBox(unsigned int boxNum, const PowerupBox& box);
 	PowerupBox* getPowerupBox(unsigned int boxNum);
 	unsigned int numberOfPowerupBoxes();
+
+	void checkCoinCollision(vec3 playerPos);
 };
 
 #endif // GAMESTATE_H

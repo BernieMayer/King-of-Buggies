@@ -136,13 +136,23 @@ void GameManager::addCoin(int playerId)
 	PlayerInfo* p = state.getPlayer(playerId);
 
 	int physID = p->getPhysicsID();
+}
 
-	
+// At least for now, coins are not being created as physics objects
+void GameManager::createCoin(vec3 position)
+{
+	Coin newCoin;
+	MeshObject* coinMesh = meshInfo.getMeshPointer(COIN);
 
+	unsigned int coin = renderer.generateObjectID();
+	renderer.assignMeshObject(coin, coinMesh);
+	renderer.assignMaterial(coin, &tsMat);
+	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
+	newCoin.setRenderID(coin);
+	newCoin.setPos(position);
 
-
-
+	state.addCoin(newCoin);
 }
 
 void GameManager::gameLoop()
@@ -197,6 +207,8 @@ void GameManager::gameLoop()
 		if (in.drift)
 			cam.zoom(in.camV*0.95f + 1.f);
 
+		
+
 		//Update game state and renderer
 		physics.updateGameState(&state);
 		renderer.updateObjectTransforms(&state);
@@ -217,6 +229,8 @@ void GameManager::gameLoop()
 
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
+
+		state.checkCoinCollision(state.getPlayer(0)->getPos());
 
 		//Update camera position
 		PlayerInfo* activePlayer = state.getPlayer(0);
@@ -289,6 +303,9 @@ void GameManager::initTestScene()
 	createTestLevel();
 	createBall(0.5f);
 
+	createCoin(vec3(10.f, -0.3f, 10.f));
+	createCoin(vec3(10.f, -0.3f, -10.f));
+
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();
 	renderer.setLightPosition(lightID, lightPos);
@@ -309,28 +326,6 @@ void quitGame()
 
 
 /*
-void GameManager::createCoins()
-{
-int i = 0;
-while (i < NUM_COINS) {
-unsigned int coin = renderer.generateObjectID();
-state.getCoin(i)->setRenderID(coin);
-
-// leave commented for now, there's no coin mesh
-//MeshObject coinMesh = meshInfo.getMesh(COIN);
-MeshObject coinMesh = meshInfo.getMesh(SPHERE);
-vector<vec3> coinVerts = coinMesh.getVertices();
-vector<vec3> coinNormals = coinMesh.getNormals();
-vector<unsigned int> coinIndices = coinMesh.getIndices();
-
-renderer.assignMesh(coin, &coinVerts);
-renderer.assignNormals(coin, &coinNormals);
-renderer.assignIndices(coin, &coinIndices);
-renderer.assignMaterial(coin, &tsMat);
-i++;
-}
-}
-
 void GameManager::createPowerups()
 {
 int i = 0;
