@@ -190,7 +190,11 @@ void GameManager::gameLoop()
 
 			//Change this to AI code
 
-			Input ai_in = ai.testAIEvade(state, 1);
+			vec3 testPos;
+			testPos.x = -13.0;
+			testPos.y = 0.5f;
+			testPos.z = -15.0f;
+			Input ai_in = ai.driveToPoint(state, 1, testPos);
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 		}

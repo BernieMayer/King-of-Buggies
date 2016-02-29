@@ -22,12 +22,15 @@ public:
 	Input testAIEvade(GameState state, int playerNum);
 	void initAI(int pNum);
 	void initAI(GameState state);
+	Input driveToPoint(GameState state, int playerNum, vec3 pos);
 
 private:
 	vector<int> playerNums;
 	vec3 prevPosition;
 	float facing(Entity* object, Entity* target);
+	float facing(Entity* object, vec3 targetPos);
 	float beside(Entity* object, Entity* target);
+	float beside(Entity* object, vec3 targetPos);
 	float lastDot = NULL;
 	bool lastTurnL = false;
 	float frameCounter = 0;
