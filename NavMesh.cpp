@@ -455,6 +455,28 @@ bool NavMesh::getPathLines(vector<vec3>* path, vec3 position, vec3 target)
 		return false;
 }
 
+//Use this one!
+bool NavMesh::getPathPoints(vector<vec3>* path, vec3 position, vec3 target)
+{
+	vector<unsigned int> indices;
+
+	if (getPath_AStar(&indices, position, target))
+	{
+		for (unsigned int i = 0; i < indices.size(); i++)
+		{
+			vec3 a = point_a[indices[i - 1]][indices[i]];
+			vec3 b = point_b[indices[i - 1]][indices[i]];
+			vec3 midpoint = b + (a - b)*0.5f;
+
+			path->push_back(midpoint);
+		}
+
+		return true;
+	}
+	else
+		return false;
+}
+
 
 
 

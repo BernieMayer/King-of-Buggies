@@ -112,6 +112,7 @@ public:
 	bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 target);
 
 	bool getPathLines(vector<vec3>* path, vec3 position, vec3 target);
+	bool getPathPoints(vector<vec3>* path, vec3 position, vec3 target);		//Use this one for AI
 
 
 };
