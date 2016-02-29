@@ -136,6 +136,11 @@ Input AIManager::updateAI(GameState* state) {
 // Returns value between -1 and 1
 float AIManager::facing(Entity* object, Entity* target) {
 	vec3 targetPos = target->getPos();
+	
+	return facing(object, targetPos);
+}
+
+float AIManager::facing(Entity* object, vec3 targetPos) {
 	vec3 objectPos = object->getPos();
 	vec3 objectForward = object->getForward();
 	objectForward = normalize(objectForward);
@@ -152,6 +157,11 @@ float AIManager::facing(Entity* object, Entity* target) {
 // Returns a value between -1 and 1
 float AIManager::beside(Entity* object, Entity* target) {
 	vec3 targetPos = target->getPos();
+	
+	return beside(object, targetPos);
+}
+
+float AIManager::beside(Entity* object, vec3 targetPos) {
 	vec3 objectPos = object->getPos();
 	vec3 objectForward = object->getForward();
 	vec3 objectUp = object->getUp();
@@ -185,7 +195,6 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 		}
 	}
 	
-	
 	Input input = Input();
 	input.forward = carSpeed;
 	input.backward = 0;
@@ -197,7 +206,7 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 
 
 	float distance = length(aiPos - player->getPos());
-	float speed = ((PlayerInfo*)player)->getFSpeed();
+	float speed = ((PlayerInfo*)ai)->getFSpeed();
 	
 
 	// If not facing away from car
@@ -244,6 +253,37 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 					input.turnL = -side;
 				}
 			}
+		}
+	}
+
+	prevPosition = aiPos;
+
+	return input;
+}
+
+Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
+	Entity* ai = state.getPlayer(playerNum);
+	vec3 aiPos = ai->getPos();
+
+	Input input = Input();
+	input.forward = carSpeed;
+	input.backward = 0;
+	input.turnL = 0;
+	input.turnR = 0;
+
+	float dot = facing(ai, pos);
+	float side = beside(ai, pos);
+
+	cout << "Dot: " << dot << "\n";
+
+	// If not facing towards point
+	if (dot < 0.95f) {
+		// Turn
+		if (side < 0) {
+			input.turnR = 1;
+		}
+		else {
+			input.turnL = 1;
 		}
 	}
 
