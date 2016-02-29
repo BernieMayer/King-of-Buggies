@@ -7,7 +7,6 @@ Mix_Chunk *idleSound;
 bool idlePlaying;
 
 SoundManager::SoundManager() {
-
 }
 
 SoundManager::SoundManager(GameState state) {

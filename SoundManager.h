@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include "GameState.h"
 
+#include <AL/al.h>
+#include <AL/alc.h>
+
 #include <SDL.h>
 #include <SDL_mixer.h>
 // Not sure what this does, or why we need it

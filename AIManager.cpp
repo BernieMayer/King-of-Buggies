@@ -114,7 +114,6 @@ Input AIManager::updateAI(GameState* state) {
 		return in;
 	}
 	else {
-		//std::cout << "AI should not move \n";
 		Input in = Input();
 		in.forward = 0.0;
 		in.backward = 0;
@@ -273,8 +272,6 @@ Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
 
 	float dot = facing(ai, pos);
 	float side = beside(ai, pos);
-
-	cout << "Dot: " << dot << "\n";
 
 	// If not facing towards point
 	if (dot < 0.95f) {
