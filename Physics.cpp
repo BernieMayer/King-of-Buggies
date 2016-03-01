@@ -13,6 +13,16 @@
 
 #define MAX_NUM_ACTOR_SHAPES 128
 
+struct FilterGroup
+{
+	enum Enum
+	{
+		eVEHICLE = (1 << 0),
+		eSPHERE  = (1 << 1),
+		eGROUND  = (1 << 2)
+	};
+};
+
 PxVehicleKeySmoothingData gKeySmoothingData =
 {
 	{
@@ -169,6 +179,11 @@ Physics::Physics() {
 unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
+
+	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggie
+	if (vehicleActors.size() == 1)
+		goldenBuggie = vehicleActors[0];
+
 	vehicleForwards.push_back(false);
 	return vehicleActors.size() - 1;
 }
@@ -275,6 +290,8 @@ PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* phy
 	simFilterData.word0 = COLLISION_FLAG_GROUND;
 	simFilterData.word1 = COLLISION_FLAG_GROUND_AGAINST;
 	shapes[0]->setSimulationFilterData(simFilterData);
+
+
 
 	delete[] vertices;
 	delete[] indices;
@@ -458,6 +475,7 @@ void Physics::initScene()
 {
 	PxSceneDesc sceneDesc(mPhysics->getTolerancesScale());
 	sceneDesc.gravity = PxVec3(0.0f, gravity, 0.0f);
+	sceneDesc.simulationEventCallback = this;
 	sceneDesc.flags |= PxSceneFlag::eENABLE_CCD;
 
 	// May need to change this number
@@ -550,8 +568,11 @@ PxVehicleDrive4W* Physics::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData,
 		traits.numWheels - 4);
 
+
 	//Free the sim data because we don't need that any more.
 	wheelsSimData->free();
+
+	//setupFiltering(veh4WActor, FilterGroup::eVEHICLE, FilterGroup::eVEHICLE ); //Setting up filtering... breaks the code :(
 
 	gScene->addActor(*veh4WActor);
 
@@ -664,6 +685,22 @@ PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wh
 	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset) {
 
 	return initVehicleActor(wheelWidth, wheelRadius, nbWheels, chassisDims, chassisMOI, chassisMass, chassisCMOffset, PxVec3(0.f, 0.f, 0.f));
+}
+
+void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
+{
+	PxFilterData filterData;
+	filterData.word0 = filterGroup; // word0 = own ID
+	filterData.word1 = filterMask;  // word1 = ID mask to filter pairs that trigger a contact callback;
+	const PxU32 numShapes = actor->getNbShapes();
+	PxShape** shapes = (PxShape**)malloc(sizeof(PxShape*)*numShapes);
+	actor->getShapes(shapes, numShapes);
+	for (PxU32 i = 0; i < numShapes; i++)
+	{
+		PxShape* shape = shapes[i];
+		shape->setSimulationFilterData(filterData);
+	}
+	free(shapes);
 }
 
 
@@ -1137,9 +1174,46 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 
 		if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 		{
-			if ((pairHeader.actors[0] == vehicleActors[0]->getRigidDynamicActor()) || (pairHeader.actors[1] == vehicleActors[1]->getRigidDynamicActor()))
+			if ((pairHeader.actors[0] == goldenBuggie->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggie->getRigidDynamicActor()))
 			{
-				cout << "A collission has been detected \n";
+				int pairIndexOfGoldenBuggie;
+				if (pairHeader.actors[0] == goldenBuggie->getRigidDynamicActor())
+					pairIndexOfGoldenBuggie = 0;
+				else
+					pairIndexOfGoldenBuggie = 1;
+
+				for (int i = 0; i < vehicleActors.size(); i++)
+				{
+					if (pairIndexOfGoldenBuggie == 0){
+						if (pairHeader.actors[1] == vehicleActors[i]->getRigidDynamicActor()) 
+						{
+							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
+							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
+							indexOfGoldenBuggie = i;
+							goldenBuggie = vehicleActors[i];
+							newGoldenBuggie = true;
+							break;
+						}
+					}
+					else {
+						if (pairHeader.actors[0] == vehicleActors[i]->getRigidDynamicActor())
+						{
+							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
+							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
+							indexOfGoldenBuggie = i;
+							goldenBuggie = vehicleActors[i];
+							newGoldenBuggie = true;
+							break;
+						}
+
+					}
+						
+						
+
+				}
+					
+
+				cout << "A collission with the goldenBuggie has been detected \n";
 				break;
 			}
 		}

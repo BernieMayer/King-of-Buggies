@@ -76,12 +76,18 @@ public:
 	virtual void  onWake(PxActor**, PxU32) {}
 	virtual void  onSleep(PxActor**, PxU32){}
 
+	bool newGoldenBuggie = false;
+	int indexOfGoldenBuggie = 0;
+	int indexOfOldGoldenBuggie = 0;
+
 
 private:
 	Timer clock;
 	vector<PxVehicleDrive4W*> vehicleActors;
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
+
+	PxVehicleDrive4W* goldenBuggie;
 
 	vector<PxMaterial*> materials;
 
