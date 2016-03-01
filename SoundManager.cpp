@@ -105,30 +105,30 @@ void SoundManager::updateMusic(GameState state) {
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
 }
 
-void SoundManager::updateEngineSounds(GameState state) {
+void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		PlayerInfo* player = state.getPlayer(i);
+	
+		bool forwardsGear = player->getForwardsGear();
+
+		float accelInput = 0;
+		if (forwardsGear) {
+			accelInput = map(inputs[i].forward, 0, 1, 1, 20);
+		}
+		else {
+			accelInput = map(inputs[i].backward, 0, 1, 1, 20);
+		}
 
 		ALfloat *SourcePos = vec3ToALfloat(player->getPos());
 		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity());
 
-		if (abs(player->getFSpeed()) < 1) {
-			alSourcef(engineSources[i], AL_PITCH, idleEnginePitch);
+		float pitchMod = accelInput / 14;
+		if (pitchMod < 1) {
+			pitchMod = 1;
 		}
-		else {
-			float pitchMod = abs(player->getFSpeed()) / 5;
-			if (pitchMod < 1) {
-				pitchMod = 1;
-			}
-			alSourcef(engineSources[i], AL_PITCH, idleEnginePitch * pitchMod);
-		}
-
-		if (abs(player->getFSpeed()) < 1) {
-			alSourcef(engineSources[i], AL_GAIN, idleEngineVolume);
-		}
-		else {
-			alSourcef(engineSources[i], AL_GAIN, idleEngineVolume * abs(player->getFSpeed()));
-		}
+		alSourcef(engineSources[i], AL_PITCH, idleEnginePitch * pitchMod);
+		
+		alSourcef(engineSources[i], AL_GAIN, idleEngineVolume * accelInput);
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
@@ -290,10 +290,10 @@ bool SoundManager::loadMedia() {
 	return success;
 }
 
-void SoundManager::updateSounds(GameState state) {
+void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateListener(state);
 	updateMusic(state);
-	updateEngineSounds(state);
+	updateEngineSounds(state, inputs);
 	
 	int numPlayers = state.numberOfPlayers();
 

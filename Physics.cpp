@@ -209,6 +209,16 @@ float Physics::vehicle_getSSpeed(unsigned int id) {
 	return vehicleActors[id]->computeSidewaysSpeed();
 }
 
+bool Physics::vehicle_getForwardsGear(unsigned int id) {
+	if (id >= vehicleActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return 0.0f;
+	}
+
+	return vehicleForwards[id];
+}
+
 unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 {
 	if (normal == vec3(0.f))
@@ -356,6 +366,7 @@ void Physics::updateGameState(GameState* state, float time)
 
 		player->setFSpeed(vehicle_getFSpeed(player->getPhysicsID()));
 		player->setSSpeed(vehicle_getSSpeed(player->getPhysicsID()));
+		player->setForwardsGear(vehicle_getForwardsGear(player->getPhysicsID()));
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)

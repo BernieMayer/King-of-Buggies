@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include "GameState.h"
+#include "Input.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -27,7 +28,7 @@ public:
 	SoundManager();
 	SoundManager(GameState state);
 	bool loadMedia();
-	void updateSounds(GameState state);
+	void updateSounds(GameState state, Input inputs[]);
 	void playAccelSound(GameState state, int playerNum);
 	void playSound(float file , vec3 location, float volume);
 	void adjustPitch(int, float);
@@ -43,7 +44,7 @@ private:
 	void startEngineSounds(GameState state);
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
-	void updateEngineSounds(GameState state);
+	void updateEngineSounds(GameState state, Input inputs[]);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint* buffer);
 	ALfloat* vec3ToALfloat(vec3 vec);
 	ALfloat* vec3ToALfloat(vec3 vector1, vec3 vector2);

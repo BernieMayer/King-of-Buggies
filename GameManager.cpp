@@ -179,7 +179,11 @@ void GameManager::gameLoop()
 
 	while (!glfwWindowShouldClose(window))
 	{
+		// 5 because of 4 players and the inital golden buggy which is not
+		// a player
+		Input inputs[5];
 		Input in = input.getInput(1);		//Get input
+		inputs[0] = in;
 
 		if (in.cheat_coin)
 			std::cout << "Cheated in a coin \n";
@@ -195,6 +199,7 @@ void GameManager::gameLoop()
 			testPos.y = 0.5f;
 			testPos.z = -15.0f;
 			Input ai_in = ai.driveToPoint(state, 1, testPos); //Test code?
+			inputs[1] = ai_in;
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 
@@ -239,7 +244,8 @@ void GameManager::gameLoop()
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 
-		sound.updateSounds(state);
+
+		sound.updateSounds(state, inputs);
 
 		//Test code...
 		PlayerInfo* player = state.getPlayer(0);

@@ -21,6 +21,8 @@ public:
 	void setSSpeed(float speed) { sSpeed = speed; };
 	float getSSpeed() { return sSpeed; };
 	vec3 getVelocity();
+	bool getForwardsGear() { return forwardsGear; }
+	void setForwardsGear(bool b) { forwardsGear = b; }
 
 protected:
 	unsigned int wheelRenderIDs[4];
@@ -35,6 +37,7 @@ protected:
 	float timeGolden;
 	float fSpeed;
 	float sSpeed;
+	bool forwardsGear;
 };
 
 #endif // PLAYERINFO_H
