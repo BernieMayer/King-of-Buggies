@@ -17,7 +17,8 @@ public:
 
 	void setFSpeed(float speed) { fSpeed = speed; };
 	float getFSpeed() { return fSpeed; };
-
+	void setSSpeed(float speed) { sSpeed = speed; };
+	float getSSpeed() { return sSpeed; };
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
@@ -29,6 +30,7 @@ protected:
 	bool ai;
 	float timeGolden;
 	float fSpeed;
+	float sSpeed;
 };
 
 #endif // PLAYERINFO_H

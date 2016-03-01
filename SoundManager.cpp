@@ -12,11 +12,11 @@ SoundManager::SoundManager() {
 
 
 SoundManager::SoundManager(GameState state) {
-	//initOpenAL();
+	//initOpenAL(state);
 	initSDL(state);
 }
 
-void SoundManager::initOpenAL() {
+void SoundManager::initOpenAL(GameState state) {
 	ALCdevice* device = alcOpenDevice(NULL);
 	if (!device) {
 		cout << "ALCDevice creation failed\n";
@@ -24,18 +24,16 @@ void SoundManager::initOpenAL() {
 	ALCcontext* context = alcCreateContext(device, NULL);
 	alcMakeContextCurrent(context);
 
-	alListener3f(AL_POSITION, 0, 0, 0);
-	alListener3f(AL_VELOCITY, 0, 0, 0);
-	alListener3f(AL_ORIENTATION, 0, 0, -1);
-
 	ALuint source;
 	ALuint buffer;
 
 	loadWavToBuf("Dogsong.wav", &source, &buffer);
 
-	ALfloat SourcePos[] = { 0.0, 0.0, 0.0 };
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
 	ALfloat SourceVel[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerPos[] = { 0.0, 0.0, 0.0 };
+	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos());
 	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
 
@@ -48,9 +46,14 @@ void SoundManager::initOpenAL() {
 	alSourcef(source, AL_GAIN, 1.0f);
 	alSourcefv(source, AL_POSITION, SourcePos);
 	alSourcefv(source, AL_VELOCITY, SourceVel);
-	alSourcei(source, AL_LOOPING, AL_FALSE);
+	alSourcei(source, AL_LOOPING, AL_TRUE);
 
 	alSourcePlay(source);
+}
+
+ALfloat* SoundManager::vec3ToALfloat(vec3 vec) {
+	ALfloat f[] = { vec.x, vec.y, vec.z };
+	return f;
 }
 
 void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer) {
