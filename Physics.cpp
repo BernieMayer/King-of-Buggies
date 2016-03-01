@@ -502,18 +502,10 @@ PxVehicleDrive4W* Physics::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData,
 		traits.numWheels - 4);
 
-<<<<<<< HEAD
 
 	//Free the sim data because we don't need that any more.
 	wheelsSimData->free();
 
-	//setupFiltering(veh4WActor, FilterGroup::eVEHICLE, FilterGroup::eVEHICLE ); //Setting up filtering... breaks the code :(
-
-=======
-	//Free the sim data because we don't need that any more.
-	wheelsSimData->free();
-
->>>>>>> 29193a85306be7171212618ea19a9cfbcaef75e3
 	gScene->addActor(*veh4WActor);
 
 	vehDrive4W->mDriveDynData.setUseAutoGears(true);

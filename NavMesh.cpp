@@ -474,6 +474,10 @@ bool NavMesh::getPathPoints(vector<vec3>* path, vec3 position, vec3 target)
 }
 
 
+unsigned int NavMesh::getRandomNode()
+{
+	return rand() % nodes.size();
+}
 
 
 

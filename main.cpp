@@ -17,6 +17,7 @@
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <vector>
+#include <random>
 
 GLFWwindow* initializeWindow()
 {
@@ -68,17 +69,7 @@ GLFWwindow* initializeWindow()
 
 
 int main() {
-	NavMesh nav;
-	if (nav.loadNavMesh("NavigationMesh.obj"))
-		printf("Loaded succesffully\n");
-
-	stringstream stream("oiwjer 123456 12 534 54");
-	stream.ignore(10, ' ');
-
-	int num;
-	while (stream >> num)
-		cout << num << " ";
-	cout << endl;
+	srand(time(0));
 
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)

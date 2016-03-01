@@ -5,7 +5,6 @@
 
 AIManager::AIManager() :updateCounter(0)
 {
-	srand(time(0));
 }
 
 void  AIManager::initAI(int pNum) {

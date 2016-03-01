@@ -6,8 +6,6 @@
 #include "Input.h"
 #include "PxPhysicsAPI.h"
 #include <iostream>
-#include <random>
-#include <ctime>
 
 using namespace physx;
 

@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <queue>
+#include <random>
 
 using namespace std;
 using namespace glm;
@@ -113,6 +114,8 @@ public:
 
 	bool getPathLines(vector<vec3>* path, vec3 position, vec3 target);
 	bool getPathPoints(vector<vec3>* path, vec3 position, vec3 target);		//Use this one for AI
+
+	unsigned int getRandomNode();
 
 
 };
