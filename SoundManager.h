@@ -4,8 +4,12 @@
 #include <glm/glm.hpp>
 #include "GameState.h"
 
-#include <AL/al.h>
-#include <AL/alc.h>
+#include <cstdlib>
+#include <iostream>
+#include <windows.h>
+#include <al/al.h>
+#include <al/alc.h>
+#include <cstdio>
 
 #include <SDL.h>
 #include <SDL_mixer.h>
@@ -29,6 +33,8 @@ public:
 	void adjustPitch(int, float);
 	void adjustVolume(int, float);
 	void stopSound(int);
+	void initOpenAL();
+	void initSDL(GameState state);
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
 	int lowestIdleVolume = 10;

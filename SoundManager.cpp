@@ -9,7 +9,117 @@ bool idlePlaying;
 SoundManager::SoundManager() {
 }
 
+
+
 SoundManager::SoundManager(GameState state) {
+	initOpenAL();
+	initSDL(state);
+}
+
+void SoundManager::initOpenAL() {
+	ALCdevice* device = alcOpenDevice(NULL);
+	if (!device) {
+		cout << "ALCDevice creation failed\n";
+	}
+	ALCcontext* context = alcCreateContext(device, NULL);
+	alcMakeContextCurrent(context);
+
+	alListener3f(AL_POSITION, 0, 0, 0);
+	alListener3f(AL_VELOCITY, 0, 0, 0);
+	alListener3f(AL_ORIENTATION, 0, 0, -1);
+
+	ALuint source;
+	alGenSources(1, &source);
+
+	// Speed of sound
+	// 1 = normal, <1 = slower
+	alSourcef(source, AL_PITCH, 1);
+	alSourcef(source, AL_GAIN, 1);
+	alSource3f(source, AL_POSITION, 0, 0, 0);
+	alSource3f(source, AL_VELOCITY, 0, 0, 0);
+	// Loops the sound
+	alSourcei(source, AL_LOOPING, AL_TRUE);
+
+	ALuint buffer;
+	alGenBuffers(1, &buffer);
+
+	//TODO load data to buffer
+
+	FILE* fp = fopen("Sounds/Dogsong.wav", "rb");
+	char type[4];
+	DWORD size, chunkSize;
+	short formatType, channels;
+	DWORD sampleRate, avgBytesPerSec;
+	short bytesPerSample, bitsPerSample;
+	DWORD dataSize;
+
+	fread(type, sizeof(char), 4, fp);
+	if (type[0] != 'R' || type[1] != 'I' || type[2] != 'F' || type[3] != 'F')
+	{
+		cout << "No RIFF\n";
+	}
+
+	fread(&size, sizeof(DWORD), 1, fp);
+	fread(type, sizeof(char), 4, fp);
+	if (type[0] != 'W' || type[1] != 'A' || type[2] != 'V' || type[3] != 'E')
+	{
+		cout << "Not WAVE\n";
+	}
+
+	fread(type, sizeof(char), 4, fp);
+	if (type[0] != 'f' || type[1] != 'm' || type[2] != 't' || type[3] != ' ')
+	{
+		cout << "Not fmt\n";
+	}
+
+	fread(&chunkSize, sizeof(DWORD), 1, fp);
+	fread(&formatType, sizeof(short), 1, fp);
+	fread(&channels, sizeof(short), 1, fp);
+	fread(&sampleRate, sizeof(DWORD), 1, fp);
+	fread(&avgBytesPerSec, sizeof(DWORD), 1, fp);
+	fread(&bytesPerSample, sizeof(short), 1, fp);
+	fread(&bitsPerSample, sizeof(short), 1, fp);
+
+	fread(type, sizeof(char), 4, fp);
+	if (type[0] != 'd' || type[1] != 'a' || type[2] != 't' || type[3] != 'a')
+	{
+		cout << "Missing DATA\n";
+	}
+
+	fread(&dataSize, sizeof(DWORD), 1, fp);
+
+	unsigned char *buf = new unsigned char[dataSize];
+	fread(buf, sizeof(BYTE), dataSize, fp);
+
+	ALuint frequency = sampleRate;
+	ALenum format = 0;
+
+	alGenBuffers(1, &buffer);
+	alGenSources(1, &source);
+
+	if (bitsPerSample == 8) {
+		if (channels == 1) {
+			format = AL_FORMAT_MONO8;
+		}
+		else if (channels == 2) {
+			format = AL_FORMAT_STEREO8;
+		}
+	}
+	else if (bitsPerSample == 16) {
+		if (channels == 1) {
+			format = AL_FORMAT_MONO16;
+		}
+		else if (channels == 2) {
+			format = AL_FORMAT_STEREO16;
+		}
+	}
+
+	alBufferData(buffer, format, buf, dataSize, frequency);
+
+	alSourcePlay(source);
+}
+
+void SoundManager::initSDL(GameState state) {
 	gMusic = NULL;
 	idleSound;
 	bool success = true;
@@ -57,12 +167,6 @@ SoundManager::SoundManager(GameState state) {
 			Mix_SetDistance(i + 2, distance);
 		}
 	}
-
-	ALCcontext *Context;
-	ALCdevice *Device;
-
-	const char * defname = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
-	Device = alcOpenDevice(defname);
 }
 
 bool SoundManager::loadMedia() {
