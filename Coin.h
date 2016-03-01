@@ -8,10 +8,15 @@ public:
 	Coin() : collided(false) {};
 
 	void setCollided(bool hasCollision);
-	bool getCollided();
+	bool isCollided();
+
+	void startCountdown();
+	void decrementCountdown();
+	int getCountdown();
 
 private:
 	bool collided;
+	int countdown;
 };
 
 #endif //COIN_H

@@ -146,7 +146,7 @@ void GameManager::createCoin(vec3 position)
 
 	unsigned int coin = renderer.generateObjectID();
 	renderer.assignMeshObject(coin, coinMesh);
-	renderer.assignMaterial(coin, &tsMat);
+	renderer.assignMaterial(coin, &shinyMat);
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
 	newCoin.setRenderID(coin);
@@ -234,6 +234,7 @@ void GameManager::gameLoop()
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
 
+		// Check for player/coin collisions, and coin respawns
 		state.checkCoinCollision(state.getPlayer(0)->getPos());
 
 		//Update camera position

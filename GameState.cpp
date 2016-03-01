@@ -113,13 +113,30 @@ unsigned int GameState::numberOfPowerupBoxes(){ return boxes.size(); }
 void GameState::checkCoinCollision(vec3 playerPos) {
 	for (int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
-		vec3 difference = pos - playerPos;
 		
-		if ((abs(difference.x) < 1) && (abs(difference.y) < 1) && (abs(difference.z) < 1)) {
-			vec3 newPos = pos;
-			newPos.z = -(pos.z);
-			coins[i].setPos(newPos);
-			coins[i].setCollided(true);
+		
+		if (coins[i].isCollided()) {
+			// countdown to coin respawn
+			coins[i].decrementCountdown();
+			if (coins[i].getCountdown() < 0) {
+				// reset coin to original spawn location
+				vec3 newPos = pos;
+				newPos.y = pos.y + 4;
+				coins[i].setPos(newPos);
+				coins[i].setCollided(false);
+			}
+		}
+		else {
+			vec3 difference = pos - playerPos;
+
+			//change coin to spawn below level if it is hit by a player
+			if ((abs(difference.x) < 1.4) && (abs(difference.y) < 1.4) && (abs(difference.z) < 1.4)) {
+				vec3 newPos = pos;
+				newPos.y = pos.y - 4;
+				coins[i].setPos(newPos);
+				coins[i].setCollided(true);
+				coins[i].startCountdown();
+			}
 		}
 	}
 }

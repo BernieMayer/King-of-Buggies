@@ -25,9 +25,9 @@ vec3 Entity::getUp(){
 
 void Entity::setPos(const vec3& _pos)
 {
-	transform[3][0] = -_pos.x;
-	transform[3][1] = -_pos.y;
-	transform[3][2] = -_pos.z;
+	transform[3][0] = _pos.x;
+	transform[3][1] = _pos.y;
+	transform[3][2] = _pos.z;
 }
 
 void Entity::setRenderID(unsigned int newID){ 

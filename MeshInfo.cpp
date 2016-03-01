@@ -1,11 +1,5 @@
 #include "MeshInfo.h"
-// begin temp:
-#include <fstream>
-#include <string>
-#include <iostream>
 
-using namespace std;
-//end temp
 MeshInfo::MeshInfo() {
 	meshLoader = MeshInfoLoader();
 
@@ -26,13 +20,7 @@ MeshInfo::MeshInfo() {
 	meshes.push_back(wheelObject);
 
 	meshLoader.clearData();
-	/*
-	meshLoader.loadModel("models\\buggy.obj");
-	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
-	meshes.push_back(buggyObject);
 
-	meshLoader.clearData();
-	*/
 	meshLoader.loadModel("models\\coin.obj");
 	MeshObject coinObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(coinObject);
