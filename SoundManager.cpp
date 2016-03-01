@@ -12,7 +12,7 @@ SoundManager::SoundManager() {
 
 
 SoundManager::SoundManager(GameState state) {
-	initOpenAL();
+	//initOpenAL();
 	initSDL(state);
 }
 
@@ -27,23 +27,6 @@ void SoundManager::initOpenAL() {
 	alListener3f(AL_POSITION, 0, 0, 0);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListener3f(AL_ORIENTATION, 0, 0, -1);
-
-	ALuint source;
-	alGenSources(1, &source);
-
-	// Speed of sound
-	// 1 = normal, <1 = slower
-	alSourcef(source, AL_PITCH, 1);
-	alSourcef(source, AL_GAIN, 1);
-	alSource3f(source, AL_POSITION, 0, 0, 0);
-	alSource3f(source, AL_VELOCITY, 0, 0, 0);
-	// Loops the sound
-	alSourcei(source, AL_LOOPING, AL_TRUE);
-
-	ALuint buffer;
-	alGenBuffers(1, &buffer);
-
-	//TODO load data to buffer
 
 	FILE* fp = fopen("Sounds/Dogsong.wav", "rb");
 	char type[4];
@@ -91,6 +74,8 @@ void SoundManager::initOpenAL() {
 	unsigned char *buf = new unsigned char[dataSize];
 	fread(buf, sizeof(BYTE), dataSize, fp);
 
+	ALuint source;
+	ALuint buffer;
 	ALuint frequency = sampleRate;
 	ALenum format = 0;
 
@@ -115,6 +100,23 @@ void SoundManager::initOpenAL() {
 	}
 
 	alBufferData(buffer, format, buf, dataSize, frequency);
+
+	ALfloat SourcePos[] = { 0.0, 0.0, 0.0 };
+	ALfloat SourceVel[] = { 0.0, 0.0, 0.0 };
+	ALfloat ListenerPos[] = { 0.0, 0.0, 0.0 };
+	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
+	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
+
+	alListenerfv(AL_POSITION, ListenerPos);
+	alListenerfv(AL_VELOCITY, ListenerVel);
+	alListenerfv(AL_ORIENTATION, ListenerOri);
+
+	alSourcei(source, AL_BUFFER, buffer);
+	alSourcef(source, AL_PITCH, 1.0f);
+	alSourcef(source, AL_GAIN, 1.0f);
+	alSourcefv(source, AL_POSITION, SourcePos);
+	alSourcefv(source, AL_VELOCITY, SourceVel);
+	alSourcei(source, AL_LOOPING, AL_FALSE);
 
 	alSourcePlay(source);
 }
