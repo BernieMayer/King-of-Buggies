@@ -28,7 +28,35 @@ void SoundManager::initOpenAL() {
 	alListener3f(AL_VELOCITY, 0, 0, 0);
 	alListener3f(AL_ORIENTATION, 0, 0, -1);
 
-	FILE* fp = fopen("Sounds/Dogsong.wav", "rb");
+	ALuint source;
+	ALuint buffer;
+
+	loadWavToBuf("Dogsong.wav", &source, &buffer);
+
+	ALfloat SourcePos[] = { 0.0, 0.0, 0.0 };
+	ALfloat SourceVel[] = { 0.0, 0.0, 0.0 };
+	ALfloat ListenerPos[] = { 0.0, 0.0, 0.0 };
+	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
+	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
+
+	alListenerfv(AL_POSITION, ListenerPos);
+	alListenerfv(AL_VELOCITY, ListenerVel);
+	alListenerfv(AL_ORIENTATION, ListenerOri);
+
+	alSourcei(source, AL_BUFFER, buffer);
+	alSourcef(source, AL_PITCH, 1.0f);
+	alSourcef(source, AL_GAIN, 1.0f);
+	alSourcefv(source, AL_POSITION, SourcePos);
+	alSourcefv(source, AL_VELOCITY, SourceVel);
+	alSourcei(source, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(source);
+}
+
+void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer) {
+	string name = "Sounds/" + fileName;
+	const char* fileNameChar = name.c_str();
+	FILE* fp = fopen(fileNameChar, "rb");
 	char type[4];
 	DWORD size, chunkSize;
 	short formatType, channels;
@@ -74,13 +102,11 @@ void SoundManager::initOpenAL() {
 	unsigned char *buf = new unsigned char[dataSize];
 	fread(buf, sizeof(BYTE), dataSize, fp);
 
-	ALuint source;
-	ALuint buffer;
 	ALuint frequency = sampleRate;
 	ALenum format = 0;
 
-	alGenBuffers(1, &buffer);
-	alGenSources(1, &source);
+	alGenBuffers(1, buffer);
+	alGenSources(1, source);
 
 	if (bitsPerSample == 8) {
 		if (channels == 1) {
@@ -99,26 +125,7 @@ void SoundManager::initOpenAL() {
 		}
 	}
 
-	alBufferData(buffer, format, buf, dataSize, frequency);
-
-	ALfloat SourcePos[] = { 0.0, 0.0, 0.0 };
-	ALfloat SourceVel[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerPos[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
-
-	alListenerfv(AL_POSITION, ListenerPos);
-	alListenerfv(AL_VELOCITY, ListenerVel);
-	alListenerfv(AL_ORIENTATION, ListenerOri);
-
-	alSourcei(source, AL_BUFFER, buffer);
-	alSourcef(source, AL_PITCH, 1.0f);
-	alSourcef(source, AL_GAIN, 1.0f);
-	alSourcefv(source, AL_POSITION, SourcePos);
-	alSourcefv(source, AL_VELOCITY, SourceVel);
-	alSourcei(source, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(source);
+	alBufferData(*buffer, format, buf, dataSize, frequency);
 }
 
 void SoundManager::initSDL(GameState state) {

@@ -38,6 +38,7 @@ public:
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
 	int lowestIdleVolume = 10;
+	void loadWavToBuf(string fileName, ALuint* source, ALuint* buffer);
 };
 
 #endif // SOUNDMANAGER_H
