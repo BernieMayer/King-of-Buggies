@@ -44,7 +44,6 @@ public:
 	void giveInput(Input input, int playerNum);
 	void handleInput(Input* input);
 	void handleInput(Input* input, unsigned int id);
-	//VehicleTraits getVehicleTraits();
 
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution
@@ -67,7 +66,7 @@ public:
 	PxMaterial* getMaterial();
 	PxMaterial* getMaterial(unsigned int materialID);
 
-	void updateGameState(GameState* state);
+	void updateGameState(GameState* state, float time);
 
 	// Implements PxSimulationEventCallback
 	virtual void  onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);

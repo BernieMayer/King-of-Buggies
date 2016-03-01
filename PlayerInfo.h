@@ -14,13 +14,16 @@ public:
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);
 	void setWheelTransform(unsigned int wheelNum, const mat4& transform);
+	void setTransform(const mat4& transform, float time);
 
 	void setFSpeed(float speed) { fSpeed = speed; };
 	float getFSpeed() { return fSpeed; };
+	vec3 getVelocity();
 
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
+	vec3 velocity;
 
 	int powerup;
 	int numCoins;

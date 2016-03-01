@@ -208,7 +208,7 @@ void GameManager::gameLoop()
 		
 
 		//Update game state and renderer
-		physics.updateGameState(&state);
+		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 
 		sound.updateSounds(state);

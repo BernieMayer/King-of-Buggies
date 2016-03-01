@@ -315,12 +315,12 @@ PxMaterial* Physics::getMaterial()
 }
 
 
-void Physics::updateGameState(GameState* state)
+void Physics::updateGameState(GameState* state, float time)
 {
 	for (unsigned int i = 0; i < state->numberOfPlayers();  i++)
 	{
 		PlayerInfo* player = state->getPlayer(i);
-		player->setTransform(vehicle_getGlobalPose(player->getPhysicsID()));
+		player->setTransform(vehicle_getGlobalPose(player->getPhysicsID()), time);
 	
 		for (unsigned int j = 0; j < 4; j++)
 		{
@@ -333,7 +333,7 @@ void Physics::updateGameState(GameState* state)
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
 	{
 		Powerup* powerup = state->getPowerup(i);
-		powerup->setTransform(dynamic_getGlobalPose(powerup->getPhysicsID()));
+		powerup->setTransform(dynamic_getGlobalPose(powerup->getPhysicsID()), time);
 	}
 }
 
