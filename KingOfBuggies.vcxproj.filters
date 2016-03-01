@@ -41,6 +41,9 @@
     <ClCompile Include="Coin.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Powerup.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

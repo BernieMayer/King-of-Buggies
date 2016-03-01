@@ -14,18 +14,13 @@ public:
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);
 	void setWheelTransform(unsigned int wheelNum, const mat4& transform);
-	void setTransform(const mat4& transform, float time);
 
 	void setFSpeed(float speed) { fSpeed = speed; };
 	float getFSpeed() { return fSpeed; };
-	void setSSpeed(float speed) { sSpeed = speed; };
-	float getSSpeed() { return sSpeed; };
-	vec3 getVelocity();
 
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
-	vec3 velocity;
 
 	int powerup;
 	int numCoins;
@@ -34,7 +29,6 @@ protected:
 	bool ai;
 	float timeGolden;
 	float fSpeed;
-	float sSpeed;
 };
 
 #endif // PLAYERINFO_H

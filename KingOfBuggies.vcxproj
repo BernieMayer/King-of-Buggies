@@ -139,6 +139,7 @@
     <ClCompile Include="MeshObject.cpp" />
     <ClCompile Include="NavMesh.cpp" />
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="Powerup.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />

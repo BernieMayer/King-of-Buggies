@@ -199,16 +199,6 @@ float Physics::vehicle_getFSpeed(unsigned int id) {
 	return vehicleActors[id]->computeForwardSpeed();
 }
 
-float Physics::vehicle_getSSpeed(unsigned int id) {
-	if (id >= vehicleActors.size())
-	{
-		printf("Error: Vehicle does not exist\n");
-		return 0.0f;
-	}
-
-	return vehicleActors[id]->computeSidewaysSpeed();
-}
-
 unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 {
 	if (normal == vec3(0.f))
@@ -355,7 +345,6 @@ void Physics::updateGameState(GameState* state, float time)
 		}
 
 		player->setFSpeed(vehicle_getFSpeed(player->getPhysicsID()));
-		player->setSSpeed(vehicle_getSSpeed(player->getPhysicsID()));
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
@@ -513,11 +502,11 @@ PxVehicleDrive4W* Physics::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData,
 		traits.numWheels - 4);
 
+
 	//Free the sim data because we don't need that any more.
 	wheelsSimData->free();
 
 	//setupFiltering(veh4WActor, FilterGroup::eVEHICLE, FilterGroup::eVEHICLE ); //Setting up filtering... breaks the code :(
-
 
 	gScene->addActor(*veh4WActor);
 
@@ -591,6 +580,12 @@ PxVehicleWheelsSimData* Physics::initWheelSimData(int nbWheels, const PxVec3 cha
 	return wheelsSimData;
 }
 
+PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+<<<<<<< HEAD
+	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset) {
+
+	return initVehicleActor(wheelWidth, wheelRadius, nbWheels, chassisDims, chassisMOI, chassisMass, chassisCMOffset, PxVec3(0.f, 0.f, 0.f));
+}
 
 void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 {
@@ -609,8 +604,9 @@ void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 }
 
 
-
 PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+=======
+>>>>>>> 29193a85306be7171212618ea19a9cfbcaef75e3
 	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, const PxVec3 initPos) {
 
 	PxRigidDynamic* veh4WActor = NULL;

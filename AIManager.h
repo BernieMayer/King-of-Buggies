@@ -6,13 +6,15 @@
 #include "Input.h"
 #include "PxPhysicsAPI.h"
 #include <iostream>
+#include <random>
+#include <ctime>
 
 using namespace physx;
 
 class AIManager {
 public:
-
-	int updateCounter = 0;
+	AIManager();
+	int updateCounter;
 	PxTransform lastOurTransform;
 	PxTransform lastBallTransform;
 	PxVec3 rotationalTarget;

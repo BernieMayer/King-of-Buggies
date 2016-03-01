@@ -47,12 +47,16 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
 	renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
-	renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
+	if (state.numberOfPlayers() == 0)
+		renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
+	else
+		renderer.assignColor(chassisRenderID, vec3(1.0, 0.0f, 0.0f));
 	//renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
 	unsigned int wheelIDs[4];
 
+	
 	for (unsigned int i = 0; i < 4; i++)
 	{
 		wheelIDs[i] = renderer.generateObjectID();
@@ -64,6 +68,8 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs));
+	
+
 }
 
 void GameManager::createAI(vec3 position)
@@ -146,7 +152,7 @@ void GameManager::createCoin(vec3 position)
 
 	unsigned int coin = renderer.generateObjectID();
 	renderer.assignMeshObject(coin, coinMesh);
-	renderer.assignMaterial(coin, &shinyMat);
+	renderer.assignMaterial(coin, &tsMat);
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
 	newCoin.setRenderID(coin);
@@ -164,17 +170,11 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -6.f;
 
 	NavMesh nav;
-	nav.loadNavMesh("NavigationMesh.obj");
+	nav.loadNavMesh("HiResNavigationMesh.obj");
 	nav.calculateImplicitEdges();
 	nav.navMeshToLines(&polygons, &edges);
 
 	vector<vec3> path;
-
-	vector<vec3> firstPoints;
-	for (unsigned int i = 0; i < nav.numNodes(); i++)
-	{
-		firstPoints.push_back(nav[i][0] + (nav[i].getCenter() - nav[i][0])*0.1f);
-	}
 	
 
 	while (!glfwWindowShouldClose(window))
@@ -194,9 +194,31 @@ void GameManager::gameLoop()
 			testPos.x = -13.0;
 			testPos.y = 0.5f;
 			testPos.z = -15.0f;
-			Input ai_in = ai.driveToPoint(state, 1, testPos);
+			Input ai_in = ai.driveToPoint(state, 1, testPos); //Test code?
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
+
+			if (physics.newGoldenBuggie){
+				physics.newGoldenBuggie = false;
+
+				//Switch the golden buggie
+				PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggie);
+				int chasisRenderId_goldenBuggie = p->getRenderID();
+				renderer.assignColor(chasisRenderId_goldenBuggie, vec3(1.0f, 0.84f, 0.0f));
+
+
+				//Switch the player that used to be the golden buggie
+				PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggie);
+				int chasisRenderId_reg = p_2->getRenderID();
+				renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
+
+
+				
+
+
+
+				
+			}
 		}
 
 		float frameTime = 1.f / 60.f;
@@ -214,7 +236,7 @@ void GameManager::gameLoop()
 		
 
 		//Update game state and renderer
-		physics.updateGameState(&state);
+		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 
 		sound.updateSounds(state);
