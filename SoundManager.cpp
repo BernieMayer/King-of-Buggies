@@ -12,11 +12,11 @@ SoundManager::SoundManager() {
 
 
 SoundManager::SoundManager(GameState state) {
-	//initOpenAL();
-	initSDL(state);
+	initOpenAL(state);
+	//initSDL(state);
 }
 
-void SoundManager::initOpenAL() {
+void SoundManager::initOpenAL(GameState state) {
 	ALCdevice* device = alcOpenDevice(NULL);
 	if (!device) {
 		cout << "ALCDevice creation failed\n";
@@ -24,33 +24,125 @@ void SoundManager::initOpenAL() {
 	ALCcontext* context = alcCreateContext(device, NULL);
 	alcMakeContextCurrent(context);
 
-	alListener3f(AL_POSITION, 0, 0, 0);
-	alListener3f(AL_VELOCITY, 0, 0, 0);
-	alListener3f(AL_ORIENTATION, 0, 0, -1);
+	initListener(state);
+	startMusic(state);
+	startEngineSounds(state);
+}
 
-	ALuint source;
-	ALuint buffer;
+void SoundManager::initListener(GameState state) {
+	PlayerInfo* p1 = state.getPlayer(0);
 
-	loadWavToBuf("Dogsong.wav", &source, &buffer);
-
-	ALfloat SourcePos[] = { 0.0, 0.0, 0.0 };
-	ALfloat SourceVel[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerPos[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
-	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0, 0.0, 1.0, 0.0 };
+	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos());
+	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity());
+	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp());
 
 	alListenerfv(AL_POSITION, ListenerPos);
 	alListenerfv(AL_VELOCITY, ListenerVel);
 	alListenerfv(AL_ORIENTATION, ListenerOri);
+}
 
-	alSourcei(source, AL_BUFFER, buffer);
-	alSourcef(source, AL_PITCH, 1.0f);
-	alSourcef(source, AL_GAIN, 1.0f);
-	alSourcefv(source, AL_POSITION, SourcePos);
-	alSourcefv(source, AL_VELOCITY, SourceVel);
-	alSourcei(source, AL_LOOPING, AL_FALSE);
+void SoundManager::startMusic(GameState state) {
+	ALuint buffer;
 
-	alSourcePlay(source);
+	loadWavToBuf("Dogsong.wav", &musicSource, &buffer);
+
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+
+	alSourcei(musicSource, AL_BUFFER, buffer);
+	alSourcef(musicSource, AL_PITCH, 1.0f);
+	alSourcef(musicSource, AL_GAIN, 1.0f);
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+	alSourcei(musicSource, AL_LOOPING, AL_TRUE);
+
+	alSourcePlay(musicSource);
+}
+
+void SoundManager::startEngineSounds(GameState state) {
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		ALuint buffer;
+
+		loadWavToBuf("Idle.wav", &engineSources[i], &buffer);
+
+		PlayerInfo* player = state.getPlayer(i);
+
+		ALfloat *SourcePos = vec3ToALfloat(player->getPos());
+		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity());
+
+		alSourcei(engineSources[i], AL_BUFFER, buffer);
+		alSourcef(engineSources[i], AL_PITCH, 1.0f);
+		alSourcef(engineSources[i], AL_GAIN, idleEngineVolume);
+		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
+		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
+		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
+
+		alSourcePlay(engineSources[i]);
+	}
+}
+
+void SoundManager::updateListener(GameState state) {
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos());
+	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity());
+	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp());
+
+	alListenerfv(AL_POSITION, ListenerPos);
+	alListenerfv(AL_VELOCITY, ListenerVel);
+	alListenerfv(AL_ORIENTATION, ListenerOri);
+}
+
+void SoundManager::updateMusic(GameState state) {
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+}
+
+void SoundManager::updateEngineSounds(GameState state) {
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		PlayerInfo* player = state.getPlayer(i);
+
+		ALfloat *SourcePos = vec3ToALfloat(player->getPos());
+		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity());
+
+		if (abs(player->getFSpeed()) < 1) {
+			alSourcef(engineSources[i], AL_PITCH, idleEnginePitch);
+		}
+		else {
+			float pitchMod = abs(player->getFSpeed()) / 5;
+			if (pitchMod < 1) {
+				pitchMod = 1;
+			}
+			alSourcef(engineSources[i], AL_PITCH, idleEnginePitch * pitchMod);
+		}
+
+		if (abs(player->getFSpeed()) < 1) {
+			alSourcef(engineSources[i], AL_GAIN, idleEngineVolume);
+		}
+		else {
+			alSourcef(engineSources[i], AL_GAIN, idleEngineVolume * abs(player->getFSpeed()));
+		}
+		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
+		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
+		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
+	}
+}
+
+ALfloat* SoundManager::vec3ToALfloat(vec3 vec) {
+	ALfloat f[] = { vec.x, vec.y, vec.z };
+	return f;
+}
+
+ALfloat* SoundManager::vec3ToALfloat(vec3 vector1, vec3 vector2) {
+	ALfloat f[] = { vector1.x, vector1.y, vector1.z, vector2.x, vector2.y, vector2.z };
+	return f;
 }
 
 void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer) {
@@ -199,6 +291,10 @@ bool SoundManager::loadMedia() {
 }
 
 void SoundManager::updateSounds(GameState state) {
+	updateListener(state);
+	updateMusic(state);
+	updateEngineSounds(state);
+	
 	int numPlayers = state.numberOfPlayers();
 
 	// Get player 1

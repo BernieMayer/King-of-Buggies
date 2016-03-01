@@ -54,6 +54,7 @@ public:
 	mat4 vehicle_getGlobalPose(unsigned int id);
 	mat4 vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum);
 	float vehicle_getFSpeed(unsigned int id);
+	float vehicle_getSSpeed(unsigned int id);
 
 	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
 	unsigned int ground_createGeneric(MeshObject* mesh);
