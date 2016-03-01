@@ -57,6 +57,12 @@ SoundManager::SoundManager(GameState state) {
 			Mix_SetDistance(i + 2, distance);
 		}
 	}
+
+	ALCcontext *Context;
+	ALCdevice *Device;
+
+	const char * defname = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
+	Device = alcOpenDevice(defname);
 }
 
 bool SoundManager::loadMedia() {
