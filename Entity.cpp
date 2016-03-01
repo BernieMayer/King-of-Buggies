@@ -11,6 +11,8 @@ Entity::Entity() :	transform(mat4(1.f)), renderID(-1), physicsID(-1)
 void Entity::setTransform(const mat4& _transform) { transform = _transform; }
 mat4 Entity::getTransform() { return transform; }
 
+vec3 Entity::getVelocity() { return vec3(0.f, 0.f, 0.f); }
+
 vec3 Entity::getPos() 
 {
 	vec4 pos = transform*vec4(0.f, 0.f, 0.f, 1.f);

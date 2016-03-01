@@ -152,7 +152,7 @@ void GameManager::createCoin(vec3 position)
 
 	unsigned int coin = renderer.generateObjectID();
 	renderer.assignMeshObject(coin, coinMesh);
-	renderer.assignMaterial(coin, &shinyMat);
+	renderer.assignMaterial(coin, &tsMat);
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
 	newCoin.setRenderID(coin);
@@ -170,17 +170,11 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -6.f;
 
 	NavMesh nav;
-	nav.loadNavMesh("NavigationMesh.obj");
+	nav.loadNavMesh("HiResNavigationMesh.obj");
 	nav.calculateImplicitEdges();
 	nav.navMeshToLines(&polygons, &edges);
 
 	vector<vec3> path;
-
-	vector<vec3> firstPoints;
-	for (unsigned int i = 0; i < nav.numNodes(); i++)
-	{
-		firstPoints.push_back(nav[i][0] + (nav[i].getCenter() - nav[i][0])*0.1f);
-	}
 	
 
 	while (!glfwWindowShouldClose(window))
@@ -242,7 +236,7 @@ void GameManager::gameLoop()
 		
 
 		//Update game state and renderer
-		physics.updateGameState(&state);
+		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 
 		sound.updateSounds(state);

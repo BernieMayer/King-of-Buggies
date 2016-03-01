@@ -580,6 +580,12 @@ PxVehicleWheelsSimData* Physics::initWheelSimData(int nbWheels, const PxVec3 cha
 	return wheelsSimData;
 }
 
+PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+<<<<<<< HEAD
+	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset) {
+
+	return initVehicleActor(wheelWidth, wheelRadius, nbWheels, chassisDims, chassisMOI, chassisMass, chassisCMOffset, PxVec3(0.f, 0.f, 0.f));
+}
 
 void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 {
@@ -599,6 +605,8 @@ void setupFiltering(PxRigidActor* actor, PxU32 filterGroup, PxU32 filterMask)
 
 
 PxRigidDynamic* Physics::initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
+=======
+>>>>>>> 29193a85306be7171212618ea19a9cfbcaef75e3
 	const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, const PxVec3 initPos) {
 
 	PxRigidDynamic* veh4WActor = NULL;

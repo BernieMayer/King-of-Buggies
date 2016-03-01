@@ -49,4 +49,13 @@ void PlayerInfo::setWheelTransform(unsigned int wheelNum, const mat4& transform)
 		wheelTransforms[wheelNum] = transform;
 }
 
+void PlayerInfo::setTransform(const mat4& _transform, float time)
+{
+	vec3 originalPos = getPos();
+	transform = _transform;
+	velocity = (getPos() - originalPos) / time;
+}
+
+vec3 PlayerInfo::getVelocity() { return velocity; }
+
 #endif // PLAYERINFO_CPP

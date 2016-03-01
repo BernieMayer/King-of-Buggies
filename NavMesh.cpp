@@ -163,8 +163,6 @@ bool NavMesh::loadNavMesh(string fileName)
 		//Add index
 		else if (line.find("f") != string::npos)
 		{
-			cout << "f ";
-
 			vector<unsigned int> face;
 			int index;
 
@@ -174,12 +172,10 @@ bool NavMesh::loadNavMesh(string fileName)
 			while (stream >> index)
 			{
 				face.push_back(index-1);
-				cout << index - 1 << " ";
 			}
 
 			if (face.size() >= 3)
 				indices.push_back(face);
-			cout << endl;
 		}
 	}
 
