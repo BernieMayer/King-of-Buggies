@@ -45,6 +45,9 @@ public:
 	void handleInput(Input* input);
 	void handleInput(Input* input, unsigned int id);
 
+	void modifySpeed(unsigned int vehicleNum, double modSpeed);
+	void setSpeed(unsigned int vehicleNum, double speed);
+
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution
 	May need to split further at a later point of time
@@ -80,6 +83,7 @@ public:
 	bool newGoldenBuggie = false;
 	int indexOfGoldenBuggie = 0;
 	int indexOfOldGoldenBuggie = 0;
+	double initVehicleSpeed = 500.0f;
 
 
 private:

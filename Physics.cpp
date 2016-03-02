@@ -149,11 +149,30 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
 
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggie
-	if (vehicleActors.size() == 1)
+	if (vehicleActors.size() == 1){
 		goldenBuggie = vehicleActors[0];
-
+		modifySpeed(0, 3);
+	}
 	vehicleForwards.push_back(-1);
 	return vehicleActors.size() - 1;
+}
+void Physics::modifySpeed(unsigned int vehicleNum , double modSpeed)
+{
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
+	engine.mPeakTorque = engine.mPeakTorque + modSpeed * engine.mPeakTorque;
+	veh->mDriveSimData.setEngineData(engine);
+	
+
+}
+
+void Physics::setSpeed(unsigned int vehicleNum, double speed)
+{
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
+	engine.mPeakTorque = speed;
+	veh->mDriveSimData.setEngineData(engine);
+
 }
 
 void Physics::vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits)
@@ -1101,9 +1120,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 						{
 							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
+							setSpeed(indexOfOldGoldenBuggie, initVehicleSpeed);
 							indexOfGoldenBuggie = i;
 							goldenBuggie = vehicleActors[i];
 							newGoldenBuggie = true;
+							modifySpeed(i, 3); 
 							break;
 						}
 					}
@@ -1112,9 +1133,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 						{
 							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
+							setSpeed(indexOfOldGoldenBuggie, initVehicleSpeed);
 							indexOfGoldenBuggie = i;
 							goldenBuggie = vehicleActors[i];
 							newGoldenBuggie = true;
+							modifySpeed(i, 3);
 							break;
 						}
 
