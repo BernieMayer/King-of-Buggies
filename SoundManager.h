@@ -37,6 +37,7 @@ private:
 	void updateEngineSounds(GameState state, Input inputs[]);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSecret(GameState state);
+	void playSecret2(GameState state);
 	ALfloat* vec3ToALfloat(vec3 vec);
 	ALfloat* vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
@@ -48,6 +49,7 @@ private:
 	float idleEnginePitch = 1.0;
 
 	bool secretPlaying = false;
+	bool secret2Unlocked = false;
 };
 
 #endif // SOUNDMANAGER_H

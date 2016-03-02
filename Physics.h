@@ -112,7 +112,7 @@ private:
 	VehicleSceneQueryData*	gVehicleSceneQueryData = NULL;
 
 	//
-	vector<bool> vehicleForwards;
+	vector<int> vehicleForwards;
 
 
 	void initScene();

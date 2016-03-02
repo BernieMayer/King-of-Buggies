@@ -152,7 +152,7 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 	if (vehicleActors.size() == 1)
 		goldenBuggie = vehicleActors[0];
 
-	vehicleForwards.push_back(false);
+	vehicleForwards.push_back(-1);
 	return vehicleActors.size() - 1;
 }
 
@@ -216,7 +216,12 @@ bool Physics::vehicle_getForwardsGear(unsigned int id) {
 		return 0.0f;
 	}
 
-	return vehicleForwards[id];
+	if (vehicleForwards[id] == 1) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 
@@ -434,22 +439,22 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	// May need to change speed checks to be something like between 0.1 and -0.1
 	// And then may need a timer to prevent rapid gear changes during wobbling
-	if (fSpeed >= 0 && (input->forward > input->backward) && vehicleForwards[id] == false) {
+	if ((input->forward > input->backward) && (vehicleForwards[id] == 0 || vehicleForwards[id] == -1)) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-		vehicleForwards[id] = true;
+		vehicleForwards[id] = 1;
 	}
-	else if (fSpeed <= 0 && (input->forward < input->backward)) {
+	else if ((input->forward < input->backward) && (vehicleForwards[id] == 1 || vehicleForwards[id] == -1)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-		vehicleForwards[id] = false;
+		vehicleForwards[id] = 0;
 	}
 
-	if (vehicleForwards[id]) {
+	if (vehicleForwards[id] == 1) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->backward);
 	}
-	else {
+	else if (vehicleForwards[id] == 0) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->backward);
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
 	}

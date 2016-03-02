@@ -1,6 +1,10 @@
+#ifndef INPUTMANAGER_CPP
+#define INPUTMANAGER_CPP
+
 #include <GL/glew.h>  
 #include <GLFW/glfw3.h>
 #include <cstdio>
+#include <iostream>
 
 #include "InputManager.h"
 
@@ -180,6 +184,10 @@ InputManager::InputManager(GLFWwindow* w)
 			if (i != 1) {
 				numPlayers += 1;
 			}
+			rumbleCounters[i - 1] = 0;
+			rumbleTargets[i - 1] = 0;
+
+			rumble(i, 0.5f, 5);
 		}
 
 		smoothers[i - 1] = InputSmoother();
@@ -248,6 +256,16 @@ Input InputManager::getInput(int playerNum)
 		gamepads[playerNum].RefreshState();
 
 		input.isKeyboard = false;
+
+		rumbleCounters[playerNum] += 1;
+		if (rumbleCounters[playerNum] == rumbleTargets[playerNum]) {
+			gamepads[playerNum].Rumble(0.0f, 0.0f);
+			rumbleCounters[playerNum] = 0;
+		}
+		// To prevent overflow
+		else if (rumbleCounters[playerNum] > 300) {
+			rumbleCounters[playerNum] = 0;
+		}
 	} else if (playerNum == 0) {
 		// use Keyboard
 		input.forward = kForward;
@@ -301,3 +319,15 @@ int InputManager::getNumPlayers() {
 	return numPlayers;
 }
 
+
+void InputManager::rumble(int playerNum, float strength, int timeFrames) {
+	if (!gamepads[playerNum - 1].Connected()) {
+		return;
+	}
+	gamepads[playerNum - 1].Rumble(strength, 0.0f);
+
+	rumbleCounters[playerNum - 1] = 0;
+	rumbleTargets[playerNum - 1] = timeFrames;
+}
+
+#endif

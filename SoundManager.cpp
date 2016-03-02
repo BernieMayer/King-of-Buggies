@@ -307,6 +307,26 @@ void SoundManager::playSecret(GameState state) {
 	alSourcePlay(musicSource);
 }
 
+void SoundManager::playSecret2(GameState state) {
+	alSourcePause(musicSource);
+	ALuint buffer;
+
+	loadWavToBuf("Dogstorm.wav", &musicSource, &buffer);
+
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+
+	alSourcei(musicSource, AL_BUFFER, buffer);
+	alSourcef(musicSource, AL_PITCH, 1.0f);
+	alSourcef(musicSource, AL_GAIN, musicVolume);
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+	alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(musicSource);
+}
 
 /*
  * Updates all sounds
@@ -321,20 +341,37 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	else if (inputs[0].menu) {
 		playDingSound(state.getPlayer(0)->getPos());
 	}
-	else if (inputs[0].drift && !secretPlaying) {
+	else if (inputs[0].drift && !secretPlaying && !secret2Unlocked) {
 		secretPlaying = true;
 		playSecret(state);
 	}
-	else if (inputs[0].drift && secretPlaying) {
+	else if (inputs[0].drift && secretPlaying && !secret2Unlocked) {
 		secretPlaying = false;
+		alSourcePause(musicSource);
+		startMusic(state);
+	}
+	else if (inputs[0].drift && !secretPlaying && secret2Unlocked) {
+		secretPlaying = true;
+		playSecret2(state);
+	}
+	else if (inputs[0].drift && secretPlaying && secret2Unlocked) {
+		secretPlaying = false;
+		secret2Unlocked = false;
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
 
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
-	if (musicState == AL_STOPPED && secretPlaying) {
+	if (musicState == AL_STOPPED && secretPlaying && !secret2Unlocked) {
 		secretPlaying = false;
+		secret2Unlocked = true;
+		alSourcePause(musicSource);
+		startMusic(state);
+	}
+	else if (musicState == AL_STOPPED && secretPlaying && secret2Unlocked) {
+		secretPlaying = false;
+		secret2Unlocked = false;
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
