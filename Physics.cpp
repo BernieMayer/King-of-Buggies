@@ -429,9 +429,6 @@ void Physics::giveInput(Input input, int playernum) {
 void Physics::handleInput(Input* input, unsigned int id){
 
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
-	if (id == 0)
-		cout << "Engine = " << vehicle->mDriveDynData.getEngineRotationSpeed() <<
-				"Gear = " << vehicle->mDriveDynData.getCurrentGear() << endl;
 
 	float fSpeed = vehicle->computeForwardSpeed();
 

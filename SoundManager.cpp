@@ -246,6 +246,9 @@ void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer)
 	alBufferData(*buffer, format, buf, dataSize, frequency);
 }
 
+/*
+ * Loads and plays a bump sound once at the given position
+ */
 void SoundManager::playBumpSound(vec3 pos) {
 	ALuint bumpSource;
 	ALuint buffer;
@@ -263,6 +266,28 @@ void SoundManager::playBumpSound(vec3 pos) {
 	alSourcePlay(bumpSource);
 }
 
+void SoundManager::playSecret(GameState state) {
+	alSourcePause(musicSource);
+	ALuint buffer;
+
+	loadWavToBuf("Secret.wav", &musicSource, &buffer);
+
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+
+	alSourcei(musicSource, AL_BUFFER, buffer);
+	alSourcef(musicSource, AL_PITCH, 1.0f);
+	alSourcef(musicSource, AL_GAIN, 1.0f);
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+	alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(musicSource);
+}
+
+
 /*
  * Updates all sounds
  */
@@ -272,6 +297,23 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateEngineSounds(state, inputs);
 	if (inputs[0].powerup) {
 		playBumpSound(state.getPlayer(0)->getPos());
+	}
+	else if (inputs[0].drift && !secretPlaying) {
+		secretPlaying = true;
+		playSecret(state);
+	}
+	else if (inputs[0].drift && secretPlaying) {
+		secretPlaying = false;
+		alSourcePause(musicSource);
+		startMusic(state);
+	}
+
+	ALint musicState;
+	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
+	if (musicState == AL_STOPPED && secretPlaying) {
+		secretPlaying = false;
+		alSourcePause(musicSource);
+		startMusic(state);
 	}
 }
 

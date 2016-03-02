@@ -22,6 +22,7 @@ public:
 	SoundManager();
 	SoundManager(GameState state);
 	void updateSounds(GameState state, Input inputs[]);
+	void playBumpSound(vec3 pos);
 	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
@@ -33,8 +34,8 @@ private:
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);
-	void playBumpSound(vec3 pos);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
+	void playSecret(GameState state);
 	ALfloat* vec3ToALfloat(vec3 vec);
 	ALfloat* vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
@@ -43,6 +44,8 @@ private:
 
 	float idleEngineVolume = 0.1;
 	float idleEnginePitch = 1.0;
+
+	bool secretPlaying = false;
 };
 
 #endif // SOUNDMANAGER_H

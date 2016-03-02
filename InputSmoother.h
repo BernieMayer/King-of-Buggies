@@ -17,14 +17,20 @@ private:
 	float lastTurnR = 0;
 	// Set higher to have faster changes
 	// Lower to have smoother changes
-	float accelStep = 0.01;
-	float turnStep = 0.05;
+	float accelStep = 0.08;
+	float turnStep = 0.08;
 
 	bool menuLock = false;
-	float menuFrameCounter = 0;
+	int menuFrameCounter = 0;
+	int menuCounterMax = 5;
 
 	bool powerupLock = false;
-	float powerupFrameCounter = 0;
+	int powerupFrameCounter = 0;
+	int powerupCounterMax = 5;
+
+	bool driftLock = false;
+	int driftFrameCounter = 0;
+	int driftCounterMax = 5;
 };
 
 #endif // INPUTSMOOTHER_H

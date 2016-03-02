@@ -68,7 +68,7 @@ Input InputSmoother::smooth(Input in) {
 		out.menu = false;
 		menuFrameCounter += 1;
 	}
-	if (menuFrameCounter == 20) {
+	if (menuFrameCounter == menuCounterMax) {
 		menuFrameCounter = 0;
 		menuLock = false;
 	}
@@ -80,9 +80,21 @@ Input InputSmoother::smooth(Input in) {
 		out.powerup = false;
 		powerupFrameCounter += 1;
 	}
-	if (powerupFrameCounter == 20) {
+	if (powerupFrameCounter == powerupCounterMax) {
 		powerupFrameCounter = 0;
 		powerupLock = false;
+	}
+
+	if (out.drift && !driftLock) {
+		driftLock = true;
+	}
+	else if (driftLock) {
+		out.drift = false;
+		driftFrameCounter += 1;
+	}
+	if (driftFrameCounter == driftCounterMax) {
+		driftFrameCounter = 0;
+		driftLock = false;
 	}
 
 	return out;

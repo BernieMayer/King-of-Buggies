@@ -96,15 +96,15 @@ Input AIManager::updateAI(GameState state, int playerNum, bool switchType, vec3 
 	if (switchType) {
 		if (aiType == 2) {
 			aiType = 0;
-			cout << "Evade\n";
+			cout << "Drive to point\n";
 		}
 		else if (aiType == 1) {
 			aiType += 1;
-			cout << "Drive to point\n";
+			cout << "Evade\n";
 		}
 		else {
 			aiType += 1;
-			cout << "Chase\n";
+			cout << "Chase";
 		}
 	}
 
@@ -196,50 +196,44 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 	float distance = length(aiPos - player->getPos());
 	float speed = ((PlayerInfo*)ai)->getFSpeed();
 	
-
-	// If not facing away from car
-	if (dot > -0.9f) {
-		// If facing car and very close
-		if (dot >= 0.9 && distance <= 10) {
-			// Go backwards
-			input.forward = 0.0f;
-			input.backward = carSpeed;
-			// if still moving forwards
-			if (!reversing && speed > 0) {
-				// Do not turn as direction of turning will be changing soon
-				input.turnL = 0;
-				input.turnR = 0;
-			}
-			// If moving backwards
-			else if ((!reversing && speed <= 0) || reversing) {
-				reversing = true;
-
+	// If facing car and very close
+	if (dot >= 0.8 && distance <= 10) {
+		// Go backwards
+		input.forward = 0.0f;
+		input.backward = carSpeed;
+		// if still moving forwards
+		if (!reversing && speed > 0) {
+			// Do not turn as direction of turning will be changing soon
+			input.turnL = 0;
+			input.turnR = 0;
+		}
+		// If moving backwards
+		else if ((!reversing && speed <= 0) || reversing) {
+			reversing = true;
 				// Turn
-				if (side > 0) {
-					input.turnL = dot;
-				}
-				else {
-					input.turnR = dot;
-				}
+			if (side > 0) {
+				input.turnL = dot;
+			}
+			else {
+				input.turnR = dot;
 			}
 		}
-		else {
-			// If still moving backwards, do not turn as turning direction will be changing soon
-			if (reversing && speed < 0) {
-				input.turnL = 0;
-				input.turnR = 0;
-			}
-			// If moving forwards
-			else if ((reversing && speed >= 0) || !reversing) {
-				reversing = false;
-
+	}
+	else if (dot > -0.9) {
+		// If still moving backwards, do not turn as turning direction will be changing soon
+		if (reversing && speed < 0) {
+			input.turnL = 0;
+			input.turnR = 0;
+		}
+		// If moving forwards
+		else if ((reversing && speed >= 0) || !reversing) {
+			reversing = false;
 				// Turn
-				if (side > 0) {
-					input.turnR = side;
-				}
-				else {
-					input.turnL = -side;
-				}
+			if (side > 0) {
+				input.turnR = side;
+			}
+			else {
+				input.turnL = -side;
 			}
 		}
 	}
