@@ -32,6 +32,12 @@ MeshInfo::MeshInfo() {
 	meshes.push_back(levelObject);
 
 	meshLoader.clearData();
+
+	meshLoader.loadModel("models\\buggy.obj");
+	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	meshes.push_back(buggyObject);
+
+	meshLoader.clearData();
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {

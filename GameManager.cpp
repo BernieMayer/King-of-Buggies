@@ -45,10 +45,10 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	unsigned int chassisRenderID = renderer.generateObjectID();
 	unsigned int physicsID = physics.vehicle_create(traits, position);
 
-	MeshObject* playerMesh = meshInfo.getMeshPointer(CUBE);
+	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
-	renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
+	//renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
 	if (state.numberOfPlayers() == 0)
 		renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
 	else
