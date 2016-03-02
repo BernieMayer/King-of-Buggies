@@ -270,7 +270,9 @@ void GameManager::gameLoop()
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
 
 		// Check for player/coin collisions, and coin respawns
-		state.checkCoinCollision(state.getPlayer(0)->getPos());
+		for (int i = 0; i < state.numberOfPlayers(); i++) {
+			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+		}
 
 		//Update camera position
 		PlayerInfo* activePlayer = state.getPlayer(0);

@@ -59,6 +59,7 @@ public:
 	float vehicle_getFSpeed(unsigned int id);
 	float vehicle_getSSpeed(unsigned int id);
 	bool vehicle_getForwardsGear(unsigned int id);
+	float vehicle_getWheelRotationSpeed(unsigned int id);
 
 	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
 	unsigned int ground_createGeneric(MeshObject* mesh);
