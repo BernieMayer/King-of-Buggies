@@ -54,7 +54,7 @@ void SoundManager::startMusic(GameState state) {
 
 	alSourcei(musicSource, AL_BUFFER, buffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
-	alSourcef(musicSource, AL_GAIN, 1.0f);
+	alSourcef(musicSource, AL_GAIN, musicVolume);
 	alSourcefv(musicSource, AL_POSITION, SourcePos);
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
 	alSourcei(musicSource, AL_LOOPING, AL_TRUE);
@@ -299,7 +299,7 @@ void SoundManager::playSecret(GameState state) {
 
 	alSourcei(musicSource, AL_BUFFER, buffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
-	alSourcef(musicSource, AL_GAIN, 1.0f);
+	alSourcef(musicSource, AL_GAIN, musicVolume);
 	alSourcefv(musicSource, AL_POSITION, SourcePos);
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
 	alSourcei(musicSource, AL_LOOPING, AL_FALSE);

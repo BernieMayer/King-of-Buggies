@@ -43,6 +43,7 @@ private:
 	ALuint engineSources[5];
 	ALuint listener;
 
+	float musicVolume = 1.0;
 	float idleEngineVolume = 0.1;
 	float idleEnginePitch = 1.0;
 
