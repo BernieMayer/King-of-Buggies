@@ -3,16 +3,21 @@
 #include "AIManager.h"
 
 
-AIManager::AIManager() :updateCounter(0)
+AIManager::AIManager(GameState* state) :updateCounter(0), state(state)
 {
+}
+
+bool AIManager::loadNavMesh(const char* fileName)
+{
+	return nav.loadNavMesh(fileName);
 }
 
 void  AIManager::initAI(int pNum) {
 	playerNums.push_back(pNum);
 }
 
-void  AIManager::initAI(GameState state) {
-	prevPosition = state.getPlayer(0)->getPos();
+void  AIManager::initAI() {
+	prevPosition = state->getPlayer(0)->getPos();
 }
 
 
@@ -23,7 +28,7 @@ void  AIManager::initAI(GameState state) {
 
 */
 
-Input AIManager::testAIChase(GameState state){
+Input AIManager::testAIChase(){
 	/*
 	point vec=hispos-prevpos; 	// vec is the 1-frame position difference
 	vec=vec*N; 					// we project N frames into the future
@@ -32,9 +37,9 @@ Input AIManager::testAIChase(GameState state){
 	mypos.x = mypos.x + cos(myyaw) * speed;
 	mypos.z = mypos.z + sin(myyaw) * speed;
 	*/
-	vec3 goldenBuggieLoc = state.getPlayer(0)->getPos();
+	vec3 goldenBuggieLoc = state->getPlayer(0)->getPos();
 	prevPosition = goldenBuggieLoc;
-	vec3 myPos = state.getPlayer(1)->getPos();
+	vec3 myPos = state->getPlayer(1)->getPos();
 	vec3 vec = goldenBuggieLoc - prevPosition;
 	vec = vec * vec3(30, 30, 30); // we project N frames into the future
 
@@ -58,8 +63,8 @@ Input AIManager::testAIChase(GameState state){
 	input.turnL = 0;
 	input.turnR = 0;
 
-	Entity* ai = state.getPlayer(1);
-	Entity* goldenBuggie = state.getPlayer(0);
+	Entity* ai = state->getPlayer(1);
+	Entity* goldenBuggie = state->getPlayer(0);
 
 	float dot = facing(ai, goldenBuggie);
 	if (dot < 0.9){
@@ -92,7 +97,7 @@ Input AIManager::testAIChase(GameState state){
 	
 }
 
-Input AIManager::updateAI(GameState state, int playerNum, bool switchType, vec3 pos) {
+Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 	if (switchType) {
 		if (aiType == 2) {
 			aiType = 0;
@@ -109,13 +114,13 @@ Input AIManager::updateAI(GameState state, int playerNum, bool switchType, vec3 
 	}
 
 	if (aiType == 0) {
-		return driveToPoint(state, playerNum, pos);
+		return driveToPoint(playerNum, pos);
 	}
 	else if (aiType == 1) {
-		return testAIChase(state);
+		return testAIChase();
 	}
 	else {
-		return testAIEvade(state, playerNum);
+		return testAIEvade(playerNum);
 	}
 }
 
@@ -163,15 +168,15 @@ float AIManager::beside(Entity* object, vec3 targetPos) {
 	return result;
 }
 
-Input AIManager::testAIEvade(GameState state, int playerNum) {	
-	Entity* ai = state.getPlayer(playerNum);
+Input AIManager::testAIEvade(int playerNum) {	
+	Entity* ai = state->getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();
 
 	Entity* player = NULL;
 	float shortestLength = 0;
-	for (int i = 0; i < state.numberOfPlayers(); i++) {
+	for (int i = 0; i < state->numberOfPlayers(); i++) {
 		if (i != playerNum) {
-			Entity* indexedPlayer = state.getPlayer(i);
+			Entity* indexedPlayer = state->getPlayer(i);
 			vec3 playerPos = indexedPlayer->getPos();
 			vec3 distance = playerPos - aiPos;
 
@@ -243,12 +248,12 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 	return smoother.smooth(input);
 }
 
-Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
+Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	lastDriveToPos = pos;
 
 	
 	
-	Entity* ai = state.getPlayer(playerNum);
+	Entity* ai = state->getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();
 
 	Input input = Input();
@@ -276,8 +281,8 @@ Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
 	return smoother.smooth(input);
 }
 
-bool AIManager::atPoint(GameState state, int playerNum, vec3 pos) {
-	PlayerInfo* ai = state.getPlayer(playerNum);
+bool AIManager::atPoint(int playerNum, vec3 pos) {
+	PlayerInfo* ai = state->getPlayer(playerNum);
 
 	float distance = length(ai->getPos() - pos);
 	if (distance < 3) {

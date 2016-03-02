@@ -23,9 +23,9 @@ private:
 	TorranceSparrow tsMat;
 	TorranceSparrow matteMat;
 
-	AIManager ai;
-	DrivingController dc;
 	GameState state;
+	AIManager ai = AIManager(&state);
+	DrivingController dc;
 	InputManager input;
 	InterfaceManager _interface;
 	MeshInfo meshInfo;

@@ -6,29 +6,42 @@
 #include "Input.h"
 #include "InputSmoother.h"
 #include "PxPhysicsAPI.h"
+#include "NavMesh.h"
 #include <iostream>
 
 using namespace physx;
 
 class AIManager {
 public:
-	AIManager();
+	AIManager(GameState* state);
+
+	bool loadNavMesh(const char* fileName);
+
 	int updateCounter;
 	PxTransform lastOurTransform;
 	PxTransform lastBallTransform;
 	PxVec3 rotationalTarget;
 	vector<Input> inputs;
-	Input updateAI(GameState state, int playerNum, bool switchType, vec3 pos);
-	Input testAIChase(GameState state);
-	Input testAIEvade(GameState state, int playerNum);
+	Input updateAI(int playerNum, bool switchType, vec3 pos);
+	Input testAIChase();
+	Input testAIEvade(int playerNum);
 	void initAI(int pNum);
-	void initAI(GameState state);
-	Input driveToPoint(GameState state, int playerNum, vec3 pos);
-	bool atPoint(GameState state, int playerNum, vec3 pos);
+	void initAI();
+	Input driveToPoint(int playerNum, vec3 pos);
+	bool atPoint(int playerNum, vec3 pos);
 
 private:
+	NavMesh nav;
+	vector<vec3> pathToGoal;
+	GameState* state;
+
+	//Navigation mesh functions
+	void findNewPath(vec3 target);		//Not yet implemented
+	void updatePathProgress();			//Not yet implemented
+
 	vector<int> playerNums;
 	vec3 prevPosition;
+
 	float facing(Entity* object, Entity* target);
 	float facing(Entity* object, vec3 targetPos);
 	float beside(Entity* object, Entity* target);

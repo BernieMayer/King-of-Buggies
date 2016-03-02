@@ -16,6 +16,8 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	renderer.loadPerspectiveTransform(0.1f, 50.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam);
 
+	ai = AIManager(&state);
+
 	//TODO: Put this indexing somewhere useful;
 	ai.initAI(1);
 
@@ -177,6 +179,7 @@ void GameManager::gameLoop()
 	vector<vec3> path;
 	
 
+	
 	while (!glfwWindowShouldClose(window))
 	{
 		// 5 because of 4 players and the inital golden buggy which is not
@@ -190,6 +193,7 @@ void GameManager::gameLoop()
 
 		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
 
+	
 		if (state.numberOfPlayers() > 1){
 
 			//Change this to AI code
@@ -198,8 +202,8 @@ void GameManager::gameLoop()
 			testPos.x = -10.0;
 			testPos.y = 0.5f;
 			testPos.z = -15.0f;
-			Input ai_in = ai.updateAI(state, 1, in.menu, testPos); //Test code?
-			if (ai.atPoint(state, 1, testPos)) {
+			Input ai_in = ai.updateAI(1, in.menu, testPos); //Test code?
+			if (ai.atPoint(1, testPos)) {
 				cout << "At point\n";
 			}
 			inputs[1] = ai_in;
@@ -346,7 +350,7 @@ void GameManager::initTestScene()
 	unsigned int lightID = renderer.generateLightObject();
 	renderer.setLightPosition(lightID, lightPos);
 
-	ai.initAI(state);
+	ai.initAI();
 	sound = SoundManager(state);
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
