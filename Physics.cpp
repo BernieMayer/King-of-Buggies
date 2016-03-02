@@ -475,7 +475,6 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (input->drift) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 1);
-		cout << "Drifting\n";
 	}
 	else {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 0);
