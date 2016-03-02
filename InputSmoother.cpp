@@ -85,6 +85,7 @@ Input InputSmoother::smooth(Input in) {
 		powerupLock = false;
 	}
 
+	/*
 	if (out.drift && !driftLock) {
 		driftLock = true;
 	}
@@ -96,6 +97,7 @@ Input InputSmoother::smooth(Input in) {
 		driftFrameCounter = 0;
 		driftLock = false;
 	}
+	*/
 
 	return out;
 }

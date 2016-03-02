@@ -224,6 +224,16 @@ bool Physics::vehicle_getForwardsGear(unsigned int id) {
 	}
 }
 
+float Physics::vehicle_getWheelRotationSpeed(unsigned int id) {
+	if (id >= vehicleActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return 0.0f;
+	}
+
+	return vehicleActors[id]->mWheelsDynData.getWheelRotationSpeed(0);
+}
+
 
 unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 {
@@ -373,6 +383,7 @@ void Physics::updateGameState(GameState* state, float time)
 		player->setFSpeed(vehicle_getFSpeed(player->getPhysicsID()));
 		player->setSSpeed(vehicle_getSSpeed(player->getPhysicsID()));
 		player->setForwardsGear(vehicle_getForwardsGear(player->getPhysicsID()));
+		player->setWheelRotationSpeed(vehicle_getWheelRotationSpeed(player->getPhysicsID()));
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
@@ -461,6 +472,14 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+
+	if (input->drift) {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 1);
+		cout << "Drifting\n";
+	}
+	else {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 0);
+	}
 
 }
 

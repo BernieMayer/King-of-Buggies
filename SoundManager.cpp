@@ -127,17 +127,12 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		bool forwardsGear = player->getForwardsGear();
 
 		float accelInput = 0;
-		if (forwardsGear) {
-			accelInput = map(inputs[i].forward, 0, 1, 1, 20);
-		}
-		else {
-			accelInput = map(inputs[i].backward, 0, 1, 1, 20);
-		}
+		accelInput = abs(player->getWheelRotationSpeed());
 
 		ALfloat *SourcePos = vec3ToALfloat(player->getPos());
 		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity());
 
-		float pitchMod = accelInput / 14;
+		float pitchMod = map(accelInput, 0, 16, 1, 2);
 		if (pitchMod < 1) {
 			pitchMod = 1;
 		}
@@ -357,24 +352,31 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	else if (inputs[0].menu) {
 		playDingSound(state.getPlayer(0)->getPos());
 	}
-	else if (inputs[0].drift && !secretPlaying && !secret2Unlocked) {
+	else if (inputs[0].drift && !secretPlaying && !secret2Unlocked && !driftDown) {
 		secretPlaying = true;
+		driftDown = true;
 		playSecret(state);
 	}
-	else if (inputs[0].drift && secretPlaying && !secret2Unlocked) {
+	else if (inputs[0].drift && secretPlaying && !secret2Unlocked && !driftDown) {
 		secretPlaying = false;
+		driftDown = true;
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
-	else if (inputs[0].drift && !secretPlaying && secret2Unlocked) {
+	else if (inputs[0].drift && !secretPlaying && secret2Unlocked && !driftDown) {
 		secretPlaying = true;
+		driftDown = true;
 		playSecret2(state);
 	}
-	else if (inputs[0].drift && secretPlaying && secret2Unlocked) {
+	else if (inputs[0].drift && secretPlaying && secret2Unlocked && !driftDown) {
 		secretPlaying = false;
 		secret2Unlocked = false;
+		driftDown = true;
 		alSourcePause(musicSource);
 		startMusic(state);
+	}
+	else if (!inputs[0].drift && driftDown) {
+		driftDown = false;
 	}
 
 	ALint musicState;
