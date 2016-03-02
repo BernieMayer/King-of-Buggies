@@ -24,6 +24,7 @@ public:
 	void initAI(int pNum);
 	void initAI(GameState state);
 	Input driveToPoint(GameState state, int playerNum, vec3 pos);
+	bool atPoint(GameState state, int playerNum, vec3 pos);
 
 private:
 	vector<int> playerNums;

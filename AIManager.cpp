@@ -282,4 +282,16 @@ Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
 	return smoother.smooth(input);
 }
 
+bool AIManager::atPoint(GameState state, int playerNum, vec3 pos) {
+	PlayerInfo* ai = state.getPlayer(playerNum);
+
+	float distance = length(ai->getPos() - pos);
+	if (distance < 3) {
+		return true;
+	}
+	else {
+		 return false;
+	}
+}
+
 #endif

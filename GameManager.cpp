@@ -195,10 +195,13 @@ void GameManager::gameLoop()
 			//Change this to AI code
 
 			vec3 testPos;
-			testPos.x = -13.0;
+			testPos.x = -10.0;
 			testPos.y = 0.5f;
 			testPos.z = -15.0f;
 			Input ai_in = ai.updateAI(state, 1, in.menu, testPos); //Test code?
+			if (ai.atPoint(state, 1, testPos)) {
+				cout << "At point\n";
+			}
 			inputs[1] = ai_in;
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
