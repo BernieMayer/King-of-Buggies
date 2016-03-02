@@ -2,10 +2,6 @@
 #define SOUNDMANAGER_CPP
 #include "SoundManager.h"
 
-Mix_Music *gMusic;
-Mix_Chunk *idleSound;
-bool idlePlaying;
-
 SoundManager::SoundManager() {
 }
 
@@ -13,7 +9,6 @@ SoundManager::SoundManager() {
 
 SoundManager::SoundManager(GameState state) {
 	initOpenAL(state);
-	//initSDL(state);
 }
 
 void SoundManager::initOpenAL(GameState state) {
@@ -29,6 +24,9 @@ void SoundManager::initOpenAL(GameState state) {
 	startEngineSounds(state);
 }
 
+/*
+ * Initializes the listener at the location of the player
+ */
 void SoundManager::initListener(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
@@ -41,6 +39,9 @@ void SoundManager::initListener(GameState state) {
 	alListenerfv(AL_ORIENTATION, ListenerOri);
 }
 
+/*
+ * Initializes the music to be playing at the location of the player
+ */
 void SoundManager::startMusic(GameState state) {
 	ALuint buffer;
 
@@ -61,6 +62,9 @@ void SoundManager::startMusic(GameState state) {
 	alSourcePlay(musicSource);
 }
 
+/*
+ * Initializes engines sounds to play at the location of players
+ */
 void SoundManager::startEngineSounds(GameState state) {
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		ALuint buffer;
@@ -83,6 +87,10 @@ void SoundManager::startEngineSounds(GameState state) {
 	}
 }
 
+
+/*
+ * Updates the location of the listener so it is still the location of the player
+ */
 void SoundManager::updateListener(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
@@ -95,6 +103,9 @@ void SoundManager::updateListener(GameState state) {
 	alListenerfv(AL_ORIENTATION, ListenerOri);
 }
 
+/*
+ * Updates the music so it is still playing at the location of the player
+ */
 void SoundManager::updateMusic(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
@@ -105,6 +116,10 @@ void SoundManager::updateMusic(GameState state) {
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
 }
 
+/*
+ * Updates the engines sounds' location as well as volume and pitch based
+ * on input
+ */
 void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		PlayerInfo* player = state.getPlayer(i);
@@ -135,16 +150,27 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 	}
 }
 
+/*
+ * Converts a vec3 to an array of ALfloats
+ */
 ALfloat* SoundManager::vec3ToALfloat(vec3 vec) {
 	ALfloat f[] = { vec.x, vec.y, vec.z };
 	return f;
 }
 
+/*
+ * Converts two vec3s to an aray of ALfloats
+ */
 ALfloat* SoundManager::vec3ToALfloat(vec3 vector1, vec3 vector2) {
 	ALfloat f[] = { vector1.x, vector1.y, vector1.z, vector2.x, vector2.y, vector2.z };
 	return f;
 }
 
+/*
+ * Loads a wav file to the given buffer and loads that buffer into the source
+ * No need to add "Sounds\" to the file name. This method will do that
+ * Just give "sound.wav"
+ */
 void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer) {
 	string name = "Sounds/" + fileName;
 	const char* fileNameChar = name.c_str();
@@ -220,106 +246,32 @@ void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer)
 	alBufferData(*buffer, format, buf, dataSize, frequency);
 }
 
-void SoundManager::initSDL(GameState state) {
-	gMusic = NULL;
-	idleSound;
-	bool success = true;
-	idlePlaying = false;
+void SoundManager::playBumpSound(vec3 pos) {
+	ALuint bumpSource;
+	ALuint buffer;
 
-	if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-		cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << "\n";
-		success = false;
-	}
+	loadWavToBuf("Bump.wav", &bumpSource, &buffer);
 
-	// Init SDL_Mixer
-	// Sound frequency, sample format, number of hardware channels (2 = stereo),
-	// size of chucks of audio in bytes (may need to play with this number)
-	if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-		cout << "SDL_mixer could not intialize! SDL_mixer Error: " << Mix_GetError() << "\n";
-		success = false;
-	}
+	ALfloat *SourcePos = vec3ToALfloat(pos);
 
-	if (success) {
-		success = loadMedia();
-	}
+	alSourcei(bumpSource, AL_BUFFER, buffer);
+	alSourcef(bumpSource, AL_PITCH, 1.0f);
+	alSourcef(bumpSource, AL_GAIN, 1.0f);
+	alSourcefv(bumpSource, AL_POSITION, SourcePos);
+	alSourcei(bumpSource, AL_LOOPING, AL_FALSE);
 
-	if (success) {
-		// Number is number of times music is repeated
-		// -1 means loop
-		Mix_PlayMusic(gMusic, -1);
-
-		// Sound for player 1
-		Mix_PlayChannel(2, idleSound, -1);
-		Mix_Volume(2, lowestIdleVolume);
-
-		int numPlayers = state.numberOfPlayers();
-
-		for (int i = 1; i < numPlayers; i++) {
-			Mix_PlayChannel(i + 2, idleSound, -1);
-			Mix_Volume(i + 2, lowestIdleVolume);
-
-			vec3 player1Pos = state.getPlayer(0)->getPos();
-			vec3 otherPlayerPos = state.getPlayer(i)->getPos();
-
-			float distance = length(player1Pos - otherPlayerPos);
-			if (distance > 255) {
-				distance = 255;
-			}
-			Mix_SetDistance(i + 2, distance);
-		}
-	}
+	alSourcePlay(bumpSource);
 }
 
-bool SoundManager::loadMedia() {
-	bool success = true;
-
-	// Load music
-	gMusic = Mix_LoadMUS("Sounds/Dogsong.wav");
-	if (gMusic == NULL) {
-		cout << "Failed to load music! SDL_mixer Error: " << Mix_GetError() << "\n";
-		success = false;
-	}
-
-	// Load idle
-	idleSound = Mix_LoadWAV("Sounds/Idle.wav");
-	if (idleSound == NULL) {
-		cout << "Failed to load idle sound! SDL_mixer Error: " << Mix_GetError() << "\n";
-		success = false;
-	}
-
-	return success;
-}
-
+/*
+ * Updates all sounds
+ */
 void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateListener(state);
 	updateMusic(state);
 	updateEngineSounds(state, inputs);
-	
-	int numPlayers = state.numberOfPlayers();
-
-	// Get player 1
-	PlayerInfo* player1 = state.getPlayer(0);
-	float player1Speed = abs(player1->getFSpeed());
-
-	// TODO: change to be based on input so engine will make reving sound even if
-	// driveing into a wall with 0 speed
-	int volume = (int)map(player1Speed, 0, 16, lowestIdleVolume, 128);
-	Mix_Volume(2, volume);
-
-	for (int i = 1; i < numPlayers; i++) {
-		PlayerInfo* player = state.getPlayer(i);
-		float playerSpeed = abs(player->getFSpeed());
-		volume = (int)map(playerSpeed, 0, 16, lowestIdleVolume, 128);
-		Mix_Volume(i + 2, volume);
-
-		vec3 player1Pos = state.getPlayer(0)->getPos();
-		vec3 otherPlayerPos = state.getPlayer(i)->getPos();
-
-		float distance = length(player1Pos - otherPlayerPos);
-		if (distance > 255) {
-			distance = 255;
-		}
-		Mix_SetDistance(i + 2, distance);
+	if (inputs[0].powerup) {
+		playBumpSound(state.getPlayer(0)->getPos());
 	}
 }
 

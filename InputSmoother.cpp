@@ -59,6 +59,8 @@ Input InputSmoother::smooth(Input in) {
 	// Otherwise, do not change
 	lastTurnR = out.turnR;
 
+	// Menu can only be "pressed" once every 20 frames to prevent
+	// effects triggering on button pressed happening too often
 	if (out.menu && !menuLock) {
 		menuLock = true;
 	}
@@ -69,6 +71,18 @@ Input InputSmoother::smooth(Input in) {
 	if (menuFrameCounter == 20) {
 		menuFrameCounter = 0;
 		menuLock = false;
+	}
+
+	if (out.powerup && !powerupLock) {
+		powerupLock = true;
+	}
+	else if (powerupLock) {
+		out.powerup = false;
+		powerupFrameCounter += 1;
+	}
+	if (powerupFrameCounter == 20) {
+		powerupFrameCounter = 0;
+		powerupLock = false;
 	}
 
 	return out;

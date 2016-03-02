@@ -22,6 +22,9 @@ private:
 
 	bool menuLock = false;
 	float menuFrameCounter = 0;
+
+	bool powerupLock = false;
+	float powerupFrameCounter = 0;
 };
 
 #endif // INPUTSMOOTHER_H

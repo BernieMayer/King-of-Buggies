@@ -12,12 +12,6 @@
 #include <al/alc.h>
 #include <cstdio>
 
-#include <SDL.h>
-#include <SDL_mixer.h>
-// Not sure what this does, or why we need it
-// but we do
-#undef main
-
 #include <stdio.h>
 #include <iostream>
 
@@ -27,25 +21,20 @@ class SoundManager {
 public:
 	SoundManager();
 	SoundManager(GameState state);
-	bool loadMedia();
 	void updateSounds(GameState state, Input inputs[]);
-	void playAccelSound(GameState state, int playerNum);
-	void playSound(float file , vec3 location, float volume);
-	void adjustPitch(int, float);
-	void adjustVolume(int, float);
-	void stopSound(int);
-	void initOpenAL(GameState state);
-	void initSDL(GameState state);
+	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
 	int lowestIdleVolume = 10;
+	void initOpenAL(GameState state);
 	void initListener(GameState state);
 	void startMusic(GameState state);
 	void startEngineSounds(GameState state);
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);
-	void loadWavToBuf(string fileName, ALuint* source, ALuint* buffer);
+	void playBumpSound(vec3 pos);
+	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	ALfloat* vec3ToALfloat(vec3 vec);
 	ALfloat* vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
