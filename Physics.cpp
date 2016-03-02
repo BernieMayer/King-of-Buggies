@@ -75,7 +75,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
 {
 	//NORMAL,	WORN
-	{ 1.f, 0.5f }//TARMAC
+	{ 1.4f, 0.5f }//TARMAC
 };
 
 
@@ -218,6 +218,7 @@ bool Physics::vehicle_getForwardsGear(unsigned int id) {
 
 	return vehicleForwards[id];
 }
+
 
 unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 {
@@ -428,12 +429,15 @@ void Physics::giveInput(Input input, int playernum) {
 void Physics::handleInput(Input* input, unsigned int id){
 
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
+	if (id == 0)
+		cout << "Engine = " << vehicle->mDriveDynData.getEngineRotationSpeed() <<
+				"Gear = " << vehicle->mDriveDynData.getCurrentGear() << endl;
 
 	float fSpeed = vehicle->computeForwardSpeed();
 
 	// May need to change speed checks to be something like between 0.1 and -0.1
 	// And then may need a timer to prevent rapid gear changes during wobbling
-	if (fSpeed >= 0 && (input->forward > input->backward)) {
+	if (fSpeed >= 0 && (input->forward > input->backward) && vehicleForwards[id] == false) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
@@ -524,11 +528,9 @@ PxVehicleDrive4W* Physics::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData,
 		traits.numWheels - 4);
 
+
 	//Free the sim data because we don't need that any more.
 	wheelsSimData->free();
-
-	//setupFiltering(veh4WActor, FilterGroup::eVEHICLE, FilterGroup::eVEHICLE ); //Setting up filtering... breaks the code :(
-
 
 	gScene->addActor(*veh4WActor);
 
@@ -557,7 +559,7 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 	// Changing switch time to 0 be good enough for that?
 	//Gears
 	PxVehicleGearsData gears;
-	gears.mSwitchTime = 0.0f;
+	gears.mSwitchTime = 0.1f;
 	driveSimData.setGearsData(gears);
 
 	//Clutch
