@@ -38,6 +38,7 @@ private:
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSecret(GameState state);
 	void playSecret2(GameState state);
+	void updateMusicPitch(GameState state, Input input);
 	ALfloat* vec3ToALfloat(vec3 vec);
 	ALfloat* vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;

@@ -328,6 +328,22 @@ void SoundManager::playSecret2(GameState state) {
 	alSourcePlay(musicSource);
 }
 
+void SoundManager::updateMusicPitch(GameState state, Input input) {
+	PlayerInfo* player = state.getPlayer(0);
+
+	bool forwardsGear = player->getForwardsGear();
+
+	float accelInput = 0;
+	if (forwardsGear) {
+		accelInput = map(input.forward, 0, 1, 0.5, 2);
+	}
+	else {
+		accelInput = map(input.backward, 0, 1, 0.5, 2);
+	}
+
+	alSourcef(musicSource, AL_PITCH, 1 * accelInput);
+}
+
 /*
  * Updates all sounds
  */
@@ -375,6 +391,9 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
+
+	// Feel free to remove this. It has no purpose, just sounds funny
+	updateMusicPitch(state, inputs[0]);
 }
 
 /**
