@@ -393,7 +393,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	}
 
 	// Feel free to remove this. It has no purpose, just sounds funny
-	updateMusicPitch(state, inputs[0]);
+	//updateMusicPitch(state, inputs[0]);
 }
 
 /**
