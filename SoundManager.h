@@ -23,6 +23,7 @@ public:
 	SoundManager(GameState state);
 	void updateSounds(GameState state, Input inputs[]);
 	void playBumpSound(vec3 pos);
+	void playDingSound(vec3 pos);
 	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);

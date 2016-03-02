@@ -266,6 +266,26 @@ void SoundManager::playBumpSound(vec3 pos) {
 	alSourcePlay(bumpSource);
 }
 
+/*
+* Loads and plays a bump sound once at the given position
+*/
+void SoundManager::playDingSound(vec3 pos) {
+	ALuint dingSource;
+	ALuint buffer;
+
+	loadWavToBuf("Ding.wav", &dingSource, &buffer);
+
+	ALfloat *SourcePos = vec3ToALfloat(pos);
+
+	alSourcei(dingSource, AL_BUFFER, buffer);
+	alSourcef(dingSource, AL_PITCH, 1.0f);
+	alSourcef(dingSource, AL_GAIN, 1.0f);
+	alSourcefv(dingSource, AL_POSITION, SourcePos);
+	alSourcei(dingSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(dingSource);
+}
+
 void SoundManager::playSecret(GameState state) {
 	alSourcePause(musicSource);
 	ALuint buffer;
@@ -297,6 +317,9 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateEngineSounds(state, inputs);
 	if (inputs[0].powerup) {
 		playBumpSound(state.getPlayer(0)->getPos());
+	}
+	else if (inputs[0].menu) {
+		playDingSound(state.getPlayer(0)->getPos());
 	}
 	else if (inputs[0].drift && !secretPlaying) {
 		secretPlaying = true;
