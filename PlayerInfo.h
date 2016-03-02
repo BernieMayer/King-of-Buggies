@@ -32,6 +32,7 @@ protected:
 	int powerup;
 	int numCoins;
 	int powerupCounter;
+	int score;
 	bool goldenBuggie;
 	bool ai;
 	float timeGolden;

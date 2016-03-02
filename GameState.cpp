@@ -110,11 +110,13 @@ PowerupBox* GameState::getPowerupBox(unsigned int boxNum)
 
 unsigned int GameState::numberOfPowerupBoxes(){ return boxes.size(); }
 
-void GameState::checkCoinCollision(vec3 playerPos) {
+bool GameState::checkCoinCollision(vec3 playerPos) {
+	bool collided = false;
 	for (int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
 		
-		
+		coins[i].setTransform(coins[i].getRotation());
+
 		if (coins[i].isCollided()) {
 			// countdown to coin respawn
 			coins[i].decrementCountdown();
@@ -136,9 +138,12 @@ void GameState::checkCoinCollision(vec3 playerPos) {
 				coins[i].setPos(newPos);
 				coins[i].setCollided(true);
 				coins[i].startCountdown();
+
+				collided = true;
 			}
 		}
 	}
+	return collided;
 }
 
 #endif // GAMESTATE_CPP
