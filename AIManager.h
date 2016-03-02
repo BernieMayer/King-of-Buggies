@@ -4,6 +4,7 @@
 #include "GameState.h"
 #include "LevelInfo.h"
 #include "Input.h"
+#include "InputSmoother.h"
 #include "PxPhysicsAPI.h"
 #include <iostream>
 #include <random>
@@ -19,7 +20,7 @@ public:
 	PxTransform lastBallTransform;
 	PxVec3 rotationalTarget;
 	vector<Input> inputs;
-	Input updateAI(GameState* state);
+	Input updateAI(GameState state, int playerNum, bool switchType, vec3 pos);
 	Input testAIChase(GameState state);
 	Input testAIEvade(GameState state, int playerNum);
 	void initAI(int pNum);
@@ -39,6 +40,10 @@ private:
 	GameState lastState;
 	bool reversing = false;
 	float carSpeed = 0.3f;
+	// Default drive to position
+	vec3 lastDriveToPos = vec3(-13, 0.5, -15);
+	InputSmoother smoother = InputSmoother();
+	float aiType = 0;
 };
 
 #endif // AIMANAGER_H

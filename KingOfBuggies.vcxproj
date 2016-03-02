@@ -98,6 +98,7 @@
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameStateLoader.h" />
+    <ClInclude Include="InputSmoother.h" />
     <ClInclude Include="Keybindings.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InputManager.h" />
@@ -133,6 +134,7 @@
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="InputSmoother.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshInfo.cpp" />
     <ClCompile Include="MeshInfoLoader.cpp" />

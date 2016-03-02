@@ -6,6 +6,8 @@
 
 #include "Input.h"
 #include "Gamepad.h"
+#include "Keybindings.h"
+#include "InputSmoother.h"
 
 class InputManager
 {
@@ -20,7 +22,7 @@ private:
 	GLFWwindow* window;
 	Gamepad gamepads[4];
 	int numPlayers;
-
+	InputSmoother smoothers[4];
 	
 };
 

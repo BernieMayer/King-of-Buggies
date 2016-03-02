@@ -3,8 +3,6 @@
 #include <cstdio>
 
 #include "InputManager.h"
-#include "Gamepad.h"
-#include "Keybindings.h"
 
 float kForward;
 float kBackward;
@@ -183,6 +181,8 @@ InputManager::InputManager(GLFWwindow* w)
 				numPlayers += 1;
 			}
 		}
+
+		smoothers[i - 1] = InputSmoother();
 	}
 }
 
@@ -203,6 +203,7 @@ InputManager::~InputManager()
  */
 Input InputManager::getInput(int playerNum)
 {
+	int smootherNum = playerNum;
 	playerNum -= 1;
 
 	Input input = Input();
@@ -290,7 +291,7 @@ Input InputManager::getInput(int playerNum)
 	}
 
 
-	return input;
+	return smoothers[smootherNum].smooth(input);
 }
 
 /**

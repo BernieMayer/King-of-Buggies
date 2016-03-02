@@ -44,6 +44,7 @@
     <ClCompile Include="Powerup.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="InputSmoother.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -98,6 +99,7 @@
     <ClInclude Include="SnippetVehicleFilterShader.h" />
     <ClInclude Include="Keybindings.h" />
     <ClInclude Include="NavMesh.h" />
+    <ClInclude Include="InputSmoother.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

@@ -88,50 +88,35 @@ Input AIManager::testAIChase(GameState state){
 		}
 	}
 
-	return input;
+	return smoother.smooth(input);
 	
 	
 }
 
-Input AIManager::updateAI(GameState* state) {
+Input AIManager::updateAI(GameState state, int playerNum, bool switchType, vec3 pos) {
+	if (switchType) {
+		if (aiType == 2) {
+			aiType = 0;
+			cout << "Evade\n";
+		}
+		else if (aiType == 1) {
+			aiType += 1;
+			cout << "Drive to point\n";
+		}
+		else {
+			aiType += 1;
+			cout << "Chase\n";
+		}
+	}
 
-	PlayerInfo* player = state->getPlayer(0);
-	vec3 posPlayer = player->getPos();
-
-	PlayerInfo* ai_state = state->getPlayer(1);
-	vec3 posAI = ai_state->getPos();
-
-	vec3 diff = posAI - posPlayer;
-
-	if (std::abs(length(diff)) <= 7.0f ){
-		Input in = Input();
-		in.forward = 1;
-		in.backward = 0;
-		in.turnL = 0;
-		in.turnR = 0;
-		in.camV = 0;
-		in.camH = 0;
-
-		in.drift = false;
-		in.powerup = false;
-		in.menu = false;
-		
-		return in;
+	if (aiType == 0) {
+		return driveToPoint(state, playerNum, pos);
+	}
+	else if (aiType == 1) {
+		return testAIChase(state);
 	}
 	else {
-		Input in = Input();
-		in.forward = 0.0;
-		in.backward = 0;
-		in.turnL = 0;
-		in.turnR = 0;
-		in.camV = 0;
-		in.camH = 0;
-		
-		in.drift = false;
-		in.powerup = false;
-		in.menu = false;
-
-		return in;
+		return testAIEvade(state, playerNum);
 	}
 }
 
@@ -262,10 +247,14 @@ Input AIManager::testAIEvade(GameState state, int playerNum) {
 
 	prevPosition = aiPos;
 
-	return input;
+	return smoother.smooth(input);
 }
 
 Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
+	lastDriveToPos = pos;
+
+	
+	
 	Entity* ai = state.getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();
 
@@ -291,7 +280,7 @@ Input AIManager::driveToPoint(GameState state, int playerNum, vec3 pos) {
 
 	prevPosition = aiPos;
 
-	return input;
+	return smoother.smooth(input);
 }
 
 #endif
