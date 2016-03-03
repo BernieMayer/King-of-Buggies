@@ -1058,11 +1058,9 @@ void Physics::shutdown() {
 
 void Physics::startSim(const GameState& state, float frameTime) {
 
-	clock.waitUntil(frameTime);		//Get rid of wait inside function - Should be in gamestate
-
 	vector<PxVehicleWheels*> vehicles;
 	for (unsigned int i = 0; i < vehicleActors.size(); i++)
-		vehicles.push_back(vehicleActors[i]);	
+		vehicles.push_back(vehicleActors[i]);
 
 	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();

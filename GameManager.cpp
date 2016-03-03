@@ -262,12 +262,11 @@ void GameManager::gameLoop()
 		vec3 posAI = ai_state->getPos();
 
 		vec3 diff = posAI - posPlayer;
-		
-		
-		//cout << "testStuff.length() " << length(diff) << "\n";
 
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
+
+
 
 		// Check for player/coin collisions, and coin respawns
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
@@ -317,6 +316,9 @@ void GameManager::gameLoop()
 		glfwSwapBuffers(window);
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
 		glfwPollEvents();
+
+		//Wait until end of frame
+		clock.waitUntil(frameTime);		//Get rid of wait inside function - Should be in gamestate
 	}
 
 	glfwDestroyWindow(window);

@@ -11,6 +11,7 @@
 #include "Renderer.h"
 #include "SoundManager.h"
 #include "NavMesh.h"
+#include "Timer.h"
 
 
 #include <GLFW/glfw3.h>  
@@ -32,6 +33,8 @@ private:
 	Physics physics;
 	Renderer renderer;
 	SoundManager sound;
+
+	Timer clock;
 
 	Camera cam;
 

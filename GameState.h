@@ -9,6 +9,7 @@
 #include "PowerupBox.h"
 #include "GameStateLoader.h"
 #include "LevelInfo.h"
+#include "Events.h"
 
 const unsigned int NUM_PLAYERS = 4;
 const unsigned int NUM_COINS = 10;
@@ -24,6 +25,7 @@ private:
 	vector<Coin> coins;
 	vector<Powerup> powerups;
 	vector<PowerupBox> boxes;
+	vector<Event> events;
 
 	unsigned int buggyPlayer;
 	unsigned int groundPhysicsID;
@@ -36,8 +38,12 @@ private:
 public:
 	GameState();
 
+	//Event management
+	void pushEvent(Event newEvent);
+	Event getEvent(unsigned int eventNum);
+	void clearEvents();
 
-
+	//Player management
 	void addPlayer(const PlayerInfo& pinfo);
 	void addAI(const PlayerInfo& pinfo);
 	void setPlayer(unsigned int playerNum, const PlayerInfo& pinfo);
@@ -46,19 +52,21 @@ public:
 	void setGoldenBuggy(unsigned int playerNum);		//Use instead of accessing entity directly
 	unsigned int numberOfPlayers();
 	unsigned int numberOfAIs();
-
 	PlayerInfo* getGoldenBuggy();
 
+	//Coin management
 	void addCoin(const Coin& coin);
 	void setCoin(unsigned int coinNum, const Coin& coin);
 	Coin* getCoin(unsigned int coinNum);
 	unsigned int numberOfCoins();
 
+	//Powerup management
 	void addPowerup(const Powerup& powerup);
 	void setPowerup(unsigned int powerupNum, const Powerup& powerup);
 	Powerup* getPowerup(unsigned int powerupNum);
 	unsigned int numberOfPowerups();
 
+	//Powerup box management
 	void addPowerupBox(const PowerupBox& box);
 	void setPowerupBox(unsigned int boxNum, const PowerupBox& box);
 	PowerupBox* getPowerupBox(unsigned int boxNum);
