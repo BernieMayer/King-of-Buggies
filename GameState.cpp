@@ -46,7 +46,7 @@ void GameState::setGoldenBuggy(unsigned int playerNum)
 
 PlayerInfo* GameState::getGoldenBuggy()
 {
-	if (goldenBuggy > players.size())
+	if (goldenBuggy >= players.size())
 		return NULL;
 	else
 		return &players[goldenBuggy];

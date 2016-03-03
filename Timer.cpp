@@ -5,6 +5,11 @@
 
 Timer::Timer()
 {
+	start();
+}
+
+void Timer::start()
+{
 	ftime(&previous);
 }
 

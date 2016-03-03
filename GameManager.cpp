@@ -179,7 +179,14 @@ void GameManager::gameLoop()
 	vector<vec3> path;
 	
 
-	
+	clock.start();
+	float timeProgressed = 0.f;
+	unsigned int frameCount = 0;
+
+	float frameTime = 1.f / 60.f;
+
+	physics.startSim(frameTime);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// 5 because of 4 players and the inital golden buggy which is not
@@ -223,20 +230,14 @@ void GameManager::gameLoop()
 				PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
 				int chasisRenderId_reg = p_2->getRenderID();
 				renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
-
-
-				
-
-
-
 				
 			}
 		}
 
-		float frameTime = 1.f / 60.f;
-		//Physics sim
-		physics.startSim(GameState(), frameTime); 
+		//Physics sim 
 		physics.getSim();
+
+		physics.startSim(frameTime);
 
 		float scale = 0.1f;
 
@@ -265,7 +266,6 @@ void GameManager::gameLoop()
 
 		//Update sphere -- TEMPORARY
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
-
 
 
 		// Check for player/coin collisions, and coin respawns
@@ -318,7 +318,19 @@ void GameManager::gameLoop()
 		glfwPollEvents();
 
 		//Wait until end of frame
-		clock.waitUntil(frameTime);		//Get rid of wait inside function - Should be in gamestate
+		float timeElapsed = clock.getElapsedTime();
+		if (frameTime > timeElapsed)
+			clock.waitUntil(frameTime - timeElapsed);
+		
+		//Display FPS
+		timeProgressed += max(timeElapsed, frameTime);
+		frameCount++;
+		if (timeProgressed > 1.f)
+		{
+			printf("FPS = %d\n", frameCount);
+			frameCount = 0;
+			timeProgressed = 0.f;
+		}
 	}
 
 	glfwDestroyWindow(window);

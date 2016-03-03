@@ -37,7 +37,7 @@ class Physics : public PxSimulationEventCallback {
 public:
 	Physics();
 	void shutdown();
-	void startSim(const GameState&, float frameTime);
+	void startSim(float frameTime);
 	//void startSim2(const GameState&);
 	GameState getSim();
 	Entity* getCollisions();

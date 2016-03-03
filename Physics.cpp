@@ -465,7 +465,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
 
-	cout << "Engine speed: " << vehicle->mDriveDynData.getEngineRotationSpeed() << "\n";
+	//cout << "Engine speed: " << vehicle->mDriveDynData.getEngineRotationSpeed() << "\n";
 
 	float fSpeed = vehicle->computeForwardSpeed();
 
@@ -1056,7 +1056,7 @@ void Physics::shutdown() {
 	mFoundation->release();
 }
 
-void Physics::startSim(const GameState& state, float frameTime) {
+void Physics::startSim(float frameTime) {
 
 	vector<PxVehicleWheels*> vehicles;
 	for (unsigned int i = 0; i < vehicleActors.size(); i++)
