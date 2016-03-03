@@ -45,6 +45,7 @@
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="InputSmoother.cpp" />
+    <ClCompile Include="Events.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -100,6 +101,7 @@
     <ClInclude Include="Keybindings.h" />
     <ClInclude Include="NavMesh.h" />
     <ClInclude Include="InputSmoother.h" />
+    <ClInclude Include="Events.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

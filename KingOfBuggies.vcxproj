@@ -94,6 +94,7 @@
     <ClInclude Include="diffuse.h" />
     <ClInclude Include="DrivingController.h" />
     <ClInclude Include="Entity.h" />
+    <ClInclude Include="Events.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
@@ -130,6 +131,7 @@
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="diffuse.cpp" />
     <ClCompile Include="Entity.cpp" />
+    <ClCompile Include="Events.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GameState.cpp" />
