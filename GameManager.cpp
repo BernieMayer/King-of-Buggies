@@ -272,6 +272,9 @@ void GameManager::gameLoop()
 		// Check for player/coin collisions, and coin respawns
 		for (int i = 0; i < state.numberOfPlayers(); i++) {
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+			if (hasCoinCollision){
+				physics.modifySpeed(i, 0.3333f);
+			}
 		}
 
 		//Update camera position
