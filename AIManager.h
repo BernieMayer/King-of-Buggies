@@ -23,7 +23,7 @@ public:
 	PxVec3 rotationalTarget;
 	vector<Input> inputs;
 	Input updateAI(int playerNum, bool switchType, vec3 pos);
-	Input testAIChase();
+	Input testAIChase(unsigned int aiNum);
 	Input testAIEvade(int playerNum);
 	void initAI(int pNum);
 	void initAI();
@@ -32,15 +32,17 @@ public:
 
 private:
 	NavMesh nav;
-	vector<vec3> pathToGoal;
+	vector<unsigned int> playerNums;		//Indices of AI in gameManager
+	vector<vector<vec3>> pathToGoal;
+	vector<unsigned int> pointOnPath;
+	vector<vec3> prevPosition;
+
 	GameState* state;
 
 	//Navigation mesh functions
 	void findNewPath(vec3 target);		//Not yet implemented
 	void updatePathProgress();			//Not yet implemented
 
-	vector<int> playerNums;
-	vec3 prevPosition;
 
 	float facing(Entity* object, Entity* target);
 	float facing(Entity* object, vec3 targetPos);

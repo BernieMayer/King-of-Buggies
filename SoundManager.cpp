@@ -66,7 +66,7 @@ void SoundManager::startMusic(GameState state) {
  * Initializes engines sounds to play at the location of players
  */
 void SoundManager::startEngineSounds(GameState state) {
-	for (int i = 0; i < state.numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 		ALuint buffer;
 
 		loadWavToBuf("Idle.wav", &engineSources[i], &buffer);
@@ -121,7 +121,7 @@ void SoundManager::updateMusic(GameState state) {
  * on input
  */
 void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
-	for (int i = 0; i < state.numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 		PlayerInfo* player = state.getPlayer(i);
 	
 		bool forwardsGear = player->getForwardsGear();

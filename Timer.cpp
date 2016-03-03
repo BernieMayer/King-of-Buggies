@@ -22,7 +22,7 @@ float Timer::getElapsedTime()
 
 void Timer::waitUntil(float targetTime)
 {
-	Sleep(targetTime*1000);
+	Sleep(targetTime*1000.f);
 }
 
 

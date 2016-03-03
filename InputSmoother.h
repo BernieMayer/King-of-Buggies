@@ -17,8 +17,8 @@ private:
 	float lastTurnR = 0;
 	// Set higher to have faster changes
 	// Lower to have smoother changes
-	float accelStep = 0.08;
-	float turnStep = 0.08;
+	float accelStep = 0.08f;
+	float turnStep = 0.08f;
 
 	bool menuLock = false;
 	int menuFrameCounter = 0;

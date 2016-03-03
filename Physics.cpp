@@ -148,15 +148,15 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
 
-	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggie
+	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggy
 	if (vehicleActors.size() == 1){
-		goldenBuggie = vehicleActors[0];
+		goldenBuggy = vehicleActors[0];
 		modifySpeed(0, 3);
 	}
 	vehicleForwards.push_back(-1);
 	return vehicleActors.size() - 1;
 }
-void Physics::modifySpeed(unsigned int vehicleNum , double modSpeed)
+void Physics::modifySpeed(unsigned int vehicleNum , float modSpeed)
 {
 	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
 	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
@@ -166,7 +166,7 @@ void Physics::modifySpeed(unsigned int vehicleNum , double modSpeed)
 
 }
 
-void Physics::setSpeed(unsigned int vehicleNum, double speed)
+void Physics::setSpeed(unsigned int vehicleNum, float speed)
 {
 	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
 	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
@@ -287,12 +287,12 @@ PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* phy
 
 	PxVec3* vertices = new PxVec3[verticesSize];
 	//int i = 0;
-	for (int i = 0; i < verticesSize; i++) {
+	for (unsigned int i = 0; i < verticesSize; i++) {
 		vertices[i] = tempVertices[i];
 	}
 
 	PxU32* indices = new PxU32[indicesSize];
-	for (int i = 0; i < indicesSize; i++) {
+	for (unsigned int i = 0; i < indicesSize; i++) {
 		indices[i] = (PxU32)tempIndices[i];
 	}
 
@@ -1125,25 +1125,25 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 
 		if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 		{
-			if ((pairHeader.actors[0] == goldenBuggie->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggie->getRigidDynamicActor()))
+			if ((pairHeader.actors[0] == goldenBuggy->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggy->getRigidDynamicActor()))
 			{
-				int pairIndexOfGoldenBuggie;
-				if (pairHeader.actors[0] == goldenBuggie->getRigidDynamicActor())
-					pairIndexOfGoldenBuggie = 0;
+				int pairIndexOfGoldenBuggy;
+				if (pairHeader.actors[0] == goldenBuggy->getRigidDynamicActor())
+					pairIndexOfGoldenBuggy = 0;
 				else
-					pairIndexOfGoldenBuggie = 1;
+					pairIndexOfGoldenBuggy = 1;
 
-				for (int i = 0; i < vehicleActors.size(); i++)
+				for (unsigned int i = 0; i < vehicleActors.size(); i++)
 				{
-					if (pairIndexOfGoldenBuggie == 0){
+					if (pairIndexOfGoldenBuggy == 0){
 						if (pairHeader.actors[1] == vehicleActors[i]->getRigidDynamicActor()) 
 						{
 							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
-							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
-							setSpeed(indexOfOldGoldenBuggie, initVehicleSpeed);
-							indexOfGoldenBuggie = i;
-							goldenBuggie = vehicleActors[i];
-							newGoldenBuggie = true;
+							indexOfOldGoldenBuggy = indexOfGoldenBuggy;
+							setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
+							indexOfGoldenBuggy = i;
+							goldenBuggy = vehicleActors[i];
+							newGoldenBuggy = true;
 							modifySpeed(i, 3); 
 							break;
 						}
@@ -1152,11 +1152,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 						if (pairHeader.actors[0] == vehicleActors[i]->getRigidDynamicActor())
 						{
 							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
-							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
-							setSpeed(indexOfOldGoldenBuggie, initVehicleSpeed);
-							indexOfGoldenBuggie = i;
-							goldenBuggie = vehicleActors[i];
-							newGoldenBuggie = true;
+							indexOfOldGoldenBuggy = indexOfGoldenBuggy;
+							setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
+							indexOfGoldenBuggy = i;
+							goldenBuggy = vehicleActors[i];
+							newGoldenBuggy = true;
 							modifySpeed(i, 3);
 							break;
 						}
@@ -1168,7 +1168,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				}
 					
 
-				cout << "A collission with the goldenBuggie has been detected \n";
+				cout << "A collission with the goldenBuggy has been detected \n";
 				break;
 			}
 		}

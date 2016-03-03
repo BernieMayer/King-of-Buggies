@@ -109,7 +109,7 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 
 	surfaceRenderID = renderer.generateObjectID();
 	renderer.assignPlane(surfaceRenderID, 30.f, &surfaceVertices, &surfaceNormals, &surfaceIndices);
-	renderer.assignMaterial(surfaceRenderID, &tsMat);
+	renderer.assignMaterial(surfaceRenderID, &matteMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 
 }
@@ -202,25 +202,25 @@ void GameManager::gameLoop()
 			testPos.x = -10.0;
 			testPos.y = 0.5f;
 			testPos.z = -15.0f;
-			Input ai_in = ai.updateAI(1, in.menu, testPos); //Test code?
-			if (ai.atPoint(1, testPos)) {
+			Input ai_in = ai.updateAI(0, in.menu, testPos); //Test code?
+			if (ai.atPoint(0, testPos)) {
 				cout << "At point\n";
 			}
 			inputs[1] = ai_in;
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 
-			if (physics.newGoldenBuggie){
-				physics.newGoldenBuggie = false;
+			if (physics.newGoldenBuggy){
+				physics.newGoldenBuggy = false;
 
 				//Switch the golden buggie
-				PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggie);
-				int chasisRenderId_goldenBuggie = p->getRenderID();
-				renderer.assignColor(chasisRenderId_goldenBuggie, vec3(1.0f, 0.84f, 0.0f));
+				PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggy);
+				unsigned int chasisRenderId_goldenBuggy = p->getRenderID();
+				renderer.assignColor(chasisRenderId_goldenBuggy, vec3(1.0f, 0.84f, 0.0f));
 
 
-				//Switch the player that used to be the golden buggie
-				PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggie);
+				//Switch the player that used to be the golden buggy
+				PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
 				int chasisRenderId_reg = p_2->getRenderID();
 				renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
 
@@ -270,7 +270,7 @@ void GameManager::gameLoop()
 		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
 
 		// Check for player/coin collisions, and coin respawns
-		for (int i = 0; i < state.numberOfPlayers(); i++) {
+		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
 			if (hasCoinCollision){
 				physics.modifySpeed(i, 0.3333f);
@@ -344,9 +344,12 @@ void GameManager::initTestScene()
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(5.f, 5.f, 15.f), traits);
+	state.getPlayer(1)->setAI(true);
 	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createTestLevel();
 	createBall(0.5f);
+
+	state.setGoldenBuggy(0);
 
 	createCoin(vec3(10.f, -0.3f, 10.f));
 	createCoin(vec3(10.f, -0.3f, -10.f));
