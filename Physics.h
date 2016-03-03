@@ -45,12 +45,16 @@ public:
 	void handleInput(Input* input);
 	void handleInput(Input* input, unsigned int id);
 
+	//Should be migrated to Vehicle class
 	void modifySpeed(unsigned int vehicleNum, float modSpeed);
 	void setSpeed(unsigned int vehicleNum, float speed);
 
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution
 	May need to split further at a later point of time
+
+
+	All of these methods should be migrated to the Vehicle.h & Vehicle.cpp future classes
 	*/
 	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle
 	void vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits);		//Modify vehicle traits
@@ -89,11 +93,11 @@ public:
 
 private:
 	Timer clock;
-	vector<PxVehicleDrive4W*> vehicleActors;
+	vector<PxVehicleDrive4W*> vehicleActors;	//Eventually should be a vector of Vehicles
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 
-	PxVehicleDrive4W* goldenBuggy;
+	PxVehicleDrive4W* goldenBuggy;		       //Should be a vehicle
 
 	vector<PxMaterial*> materials;
 
@@ -109,7 +113,7 @@ private:
 
 	PxMaterial* mMaterial = NULL;
 
-	PxVehicleDrive4WRawInputData* inputs[4];
+	PxVehicleDrive4WRawInputData* inputs[4];	//Move to Vehicle.h & Vehicle.cpp
 
 	PxBatchQuery*			gBatchQuery = NULL;
 	PxVehicleDrivableSurfaceToTireFrictionPairs* gFrictionPairs = NULL;
@@ -117,12 +121,12 @@ private:
 	VehicleSceneQueryData*	gVehicleSceneQueryData = NULL;
 
 	//
-	vector<int> vehicleForwards;
+	vector<int> vehicleForwards;	//Vehicle class
 
 
 	void initScene();
 
-	//Initialize vehicle
+	//Initialize vehicle move to vehicle class
 	PxVehicleDrive4W* initVehicle(VehicleTraits traits, PxVec3 initPos);
 	PxRigidDynamic* initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
 		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, const PxVec3 initPos);
@@ -130,11 +134,11 @@ private:
 		PxMaterial** wheelMaterials, PxConvexMesh** wheelConvexMeshes, const PxU32 numWheels,
 		PxMaterial** chassisMaterials, PxConvexMesh** chassisConvexMeshes, const PxU32 numChassisMeshes, PxPhysics& physics, PxVec3 initPos);
 
-	//Wheel positions
+	//Wheel positions move to vehicle class
 	void computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius,
 		const PxU32 numWheels, PxVec3* wheelCentreOffsets);
 
-	//Vehicle and wheel sim data
+	//Vehicle and wheel sim data, move to vehicle class
 	PxVehicleDriveSimData4W initDriveSimData(PxVehicleWheelsSimData* wheelsSimData);
 	PxVehicleWheelsSimData* initWheelSimData(int nbWheels, const PxVec3 chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxF32 wheelMass,
 		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);
