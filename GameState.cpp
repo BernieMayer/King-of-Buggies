@@ -34,6 +34,21 @@ PlayerInfo* GameState::getAI(unsigned int aiNum)
 		return NULL;
 }
 
+void GameState::setGoldenBuggie(unsigned int playerNum)
+{
+	for (unsigned int i = 0; i < numberOfPlayers(); i++)
+	{
+		getPlayer(i)->setGoldenBuggie(false);
+	}
+	getPlayer(playerNum)->setGoldenBuggie(true);
+	goldenBuggy = playerNum;
+}
+
+PlayerInfo* GameState::getGoldenBuggy()
+{
+	return &players[goldenBuggy];
+}
+
 PlayerInfo* GameState::getGoldenBuggie()
 {
 	for (int i = 0; i < players.size(); i++)

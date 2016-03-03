@@ -9,7 +9,9 @@ public:
 	PlayerInfo();
 	PlayerInfo(unsigned int renderID, unsigned int physicsID, unsigned int* wheelRenderIDs);
 	bool isGoldenBuggie();
+	void setGoldenBuggie(bool val);
 	bool isAI();
+	void setAI(bool value);
 
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);

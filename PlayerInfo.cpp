@@ -25,7 +25,9 @@ goldenBuggie(false), timeGolden(0.f)
 }
 
 bool PlayerInfo::isGoldenBuggie(){ return goldenBuggie; }
+void PlayerInfo::setGoldenBuggie(bool val) { goldenBuggie = val; }
 bool PlayerInfo::isAI(){ return ai; }
+void PlayerInfo::setAI(bool value) { ai = value; }
 
 unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 {

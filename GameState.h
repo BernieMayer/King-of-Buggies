@@ -27,20 +27,27 @@ private:
 
 	unsigned int groundPhysicsID;
 	unsigned int groundRenderID;
+
+	unsigned int goldenBuggy;
 	
 	
 
 public:
 	GameState();
 
+
+
 	void addPlayer(const PlayerInfo& pinfo);
 	void addAI(const PlayerInfo& pinfo);
 	void setPlayer(unsigned int playerNum, const PlayerInfo& pinfo);
 	PlayerInfo* getPlayer(unsigned int playerNum);
 	PlayerInfo* getAI(unsigned int aiNum);
+	void setGoldenBuggie(unsigned int playerNum);		//Use instead of accessing entity directly
 	PlayerInfo* getGoldenBuggie();
 	unsigned int numberOfPlayers();
 	unsigned int numberOfAIs();
+
+	PlayerInfo* getGoldenBuggy();
 
 	void addCoin(const Coin& coin);
 	void setCoin(unsigned int coinNum, const Coin& coin);

@@ -3,8 +3,9 @@
 #include "AIManager.h"
 
 
-AIManager::AIManager(GameState* state) :updateCounter(0), state(state)
+AIManager::AIManager(GameState* state) :updateCounter(0), state(state), pointOnPath(0)
 {
+
 }
 
 bool AIManager::loadNavMesh(const char* fileName)
@@ -17,7 +18,25 @@ void  AIManager::initAI(int pNum) {
 }
 
 void  AIManager::initAI() {
-	prevPosition = state->getPlayer(0)->getPos();
+	//prevPosition = state->getPlayer(0)->getPos();
+	playerNums.clear();
+
+	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
+	{
+		if (state->getPlayer(i)->isAI())
+		{
+			playerNums.push_back(i);
+			vector<vec3> path;
+			pathToGoal.push_back(path);
+			pointOnPath.push_back(0);
+			prevPosition.push_back(state->getPlayer(i)->getPos());
+		}
+	}
+}
+
+void AIManager::findNewPath(vec3 target)
+{
+	
 }
 
 
@@ -28,7 +47,7 @@ void  AIManager::initAI() {
 
 */
 
-Input AIManager::testAIChase(){
+Input AIManager::testAIChase(unsigned int aiNum){
 	/*
 	point vec=hispos-prevpos; 	// vec is the 1-frame position difference
 	vec=vec*N; 					// we project N frames into the future
@@ -37,10 +56,10 @@ Input AIManager::testAIChase(){
 	mypos.x = mypos.x + cos(myyaw) * speed;
 	mypos.z = mypos.z + sin(myyaw) * speed;
 	*/
-	vec3 goldenBuggieLoc = state->getPlayer(0)->getPos();
-	prevPosition = goldenBuggieLoc;
-	vec3 myPos = state->getPlayer(1)->getPos();
-	vec3 vec = goldenBuggieLoc - prevPosition;
+	vec3 goldenBuggieLoc = state->getGoldenBuggy()->getPos();
+	prevPosition[aiNum] = goldenBuggieLoc;
+	vec3 myPos = state->getPlayer(playerNums[aiNum])->getPos();
+	vec3 vec = goldenBuggieLoc - prevPosition[aiNum];
 	vec = vec * vec3(30, 30, 30); // we project N frames into the future
 
 	vec3 futurepos = goldenBuggieLoc + vec;
@@ -63,8 +82,8 @@ Input AIManager::testAIChase(){
 	input.turnL = 0;
 	input.turnR = 0;
 
-	Entity* ai = state->getPlayer(1);
-	Entity* goldenBuggie = state->getPlayer(0);
+	Entity* ai = state->getPlayer(playerNums[aiNum]);
+	Entity* goldenBuggie = state->getGoldenBuggy();
 
 	float dot = facing(ai, goldenBuggie);
 	if (dot < 0.9){
@@ -117,7 +136,7 @@ Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 		return driveToPoint(playerNum, pos);
 	}
 	else if (aiType == 1) {
-		return testAIChase();
+		return testAIChase(playerNum);
 	}
 	else {
 		return testAIEvade(playerNum);
@@ -169,7 +188,7 @@ float AIManager::beside(Entity* object, vec3 targetPos) {
 }
 
 Input AIManager::testAIEvade(int playerNum) {	
-	Entity* ai = state->getPlayer(playerNum);
+	Entity* ai = state->getPlayer(playerNums[playerNum]);
 	vec3 aiPos = ai->getPos();
 
 	Entity* player = NULL;
@@ -243,7 +262,7 @@ Input AIManager::testAIEvade(int playerNum) {
 		}
 	}
 
-	prevPosition = aiPos;
+	prevPosition[playerNum] = aiPos;
 
 	return smoother.smooth(input);
 }
@@ -253,7 +272,7 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 
 	
 	
-	Entity* ai = state->getPlayer(playerNum);
+	Entity* ai = state->getPlayer(playerNums[playerNum]);
 	vec3 aiPos = ai->getPos();
 
 	Input input = Input();
@@ -276,7 +295,7 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 		}
 	}
 
-	prevPosition = aiPos;
+	prevPosition[playerNum] = aiPos;
 
 	return smoother.smooth(input);
 }

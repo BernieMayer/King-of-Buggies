@@ -109,7 +109,7 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 
 	surfaceRenderID = renderer.generateObjectID();
 	renderer.assignPlane(surfaceRenderID, 30.f, &surfaceVertices, &surfaceNormals, &surfaceIndices);
-	renderer.assignMaterial(surfaceRenderID, &tsMat);
+	renderer.assignMaterial(surfaceRenderID, &matteMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 
 }
@@ -202,8 +202,8 @@ void GameManager::gameLoop()
 			testPos.x = -10.0;
 			testPos.y = 0.5f;
 			testPos.z = -15.0f;
-			Input ai_in = ai.updateAI(1, in.menu, testPos); //Test code?
-			if (ai.atPoint(1, testPos)) {
+			Input ai_in = ai.updateAI(0, in.menu, testPos); //Test code?
+			if (ai.atPoint(0, testPos)) {
 				cout << "At point\n";
 			}
 			inputs[1] = ai_in;
@@ -339,6 +339,7 @@ void GameManager::initTestScene()
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(5.f, 5.f, 15.f), traits);
+	state.getPlayer(1)->setAI(true);
 	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createTestLevel();
 	createBall(0.5f);
