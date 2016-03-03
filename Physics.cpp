@@ -149,11 +149,30 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
 
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggie
-	if (vehicleActors.size() == 1)
+	if (vehicleActors.size() == 1){
 		goldenBuggie = vehicleActors[0];
-
+		modifySpeed(0, 3);
+	}
 	vehicleForwards.push_back(-1);
 	return vehicleActors.size() - 1;
+}
+void Physics::modifySpeed(unsigned int vehicleNum , double modSpeed)
+{
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
+	engine.mPeakTorque = engine.mPeakTorque + modSpeed * engine.mPeakTorque;
+	veh->mDriveSimData.setEngineData(engine);
+	
+
+}
+
+void Physics::setSpeed(unsigned int vehicleNum, double speed)
+{
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
+	engine.mPeakTorque = speed;
+	veh->mDriveSimData.setEngineData(engine);
+
 }
 
 void Physics::vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits)
@@ -222,6 +241,16 @@ bool Physics::vehicle_getForwardsGear(unsigned int id) {
 	else {
 		return false;
 	}
+}
+
+float Physics::vehicle_getWheelRotationSpeed(unsigned int id) {
+	if (id >= vehicleActors.size())
+	{
+		printf("Error: Vehicle does not exist\n");
+		return 0.0f;
+	}
+
+	return vehicleActors[id]->mWheelsDynData.getWheelRotationSpeed(0);
 }
 
 
@@ -373,6 +402,7 @@ void Physics::updateGameState(GameState* state, float time)
 		player->setFSpeed(vehicle_getFSpeed(player->getPhysicsID()));
 		player->setSSpeed(vehicle_getSSpeed(player->getPhysicsID()));
 		player->setForwardsGear(vehicle_getForwardsGear(player->getPhysicsID()));
+		player->setWheelRotationSpeed(vehicle_getWheelRotationSpeed(player->getPhysicsID()));
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
@@ -461,6 +491,13 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+
+	if (input->drift) {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 1);
+	}
+	else {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 0);
+	}
 
 }
 
@@ -1101,9 +1138,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 						{
 							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
+							setSpeed(indexOfOldGoldenBuggie, initVehicleSpeed);
 							indexOfGoldenBuggie = i;
 							goldenBuggie = vehicleActors[i];
 							newGoldenBuggie = true;
+							modifySpeed(i, 3); 
 							break;
 						}
 					}
@@ -1112,9 +1151,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 						{
 							cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 							indexOfOldGoldenBuggie = indexOfGoldenBuggie;
+							setSpeed(indexOfOldGoldenBuggie, initVehicleSpeed);
 							indexOfGoldenBuggie = i;
 							goldenBuggie = vehicleActors[i];
 							newGoldenBuggie = true;
+							modifySpeed(i, 3);
 							break;
 						}
 

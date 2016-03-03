@@ -25,6 +25,7 @@ private:
 	vector<Powerup> powerups;
 	vector<PowerupBox> boxes;
 
+	unsigned int buggyPlayer;
 	unsigned int groundPhysicsID;
 	unsigned int groundRenderID;
 
@@ -64,7 +65,7 @@ public:
 	PowerupBox* getPowerupBox(unsigned int boxNum);
 	unsigned int numberOfPowerupBoxes();
 
-	void checkCoinCollision(vec3 playerPos);
+	bool checkCoinCollision(vec3 playerPos);
 };
 
 #endif // GAMESTATE_H

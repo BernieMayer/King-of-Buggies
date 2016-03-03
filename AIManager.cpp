@@ -128,7 +128,7 @@ Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 		}
 		else {
 			aiType += 1;
-			cout << "Chase";
+			cout << "Chase\n";
 		}
 	}
 

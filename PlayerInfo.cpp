@@ -3,7 +3,7 @@
 
 #include "PlayerInfo.h"
 
-PlayerInfo::PlayerInfo() :	powerup(0), powerupCounter(0), numCoins(0), 
+PlayerInfo::PlayerInfo() : powerup(0), powerupCounter(0), numCoins(0), score(0),
 							goldenBuggie(false), timeGolden(0.f)
 {
 

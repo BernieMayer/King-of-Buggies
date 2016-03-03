@@ -45,6 +45,9 @@ public:
 	void handleInput(Input* input);
 	void handleInput(Input* input, unsigned int id);
 
+	void modifySpeed(unsigned int vehicleNum, double modSpeed);
+	void setSpeed(unsigned int vehicleNum, double speed);
+
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution
 	May need to split further at a later point of time
@@ -56,6 +59,7 @@ public:
 	float vehicle_getFSpeed(unsigned int id);
 	float vehicle_getSSpeed(unsigned int id);
 	bool vehicle_getForwardsGear(unsigned int id);
+	float vehicle_getWheelRotationSpeed(unsigned int id);
 
 	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
 	unsigned int ground_createGeneric(MeshObject* mesh);
@@ -80,6 +84,7 @@ public:
 	bool newGoldenBuggie = false;
 	int indexOfGoldenBuggie = 0;
 	int indexOfOldGoldenBuggie = 0;
+	double initVehicleSpeed = 500.0f;
 
 
 private:
