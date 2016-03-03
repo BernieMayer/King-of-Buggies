@@ -39,14 +39,14 @@ private:
 	void playSecret(GameState state);
 	void playSecret2(GameState state);
 	void updateMusicPitch(GameState state, Input input);
-	ALfloat* vec3ToALfloat(vec3 vec);
-	ALfloat* vec3ToALfloat(vec3 vector1, vec3 vector2);
+	vector<ALfloat> vec3ToALfloat(vec3 vec);
+	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
 	ALuint engineSources[5];
 	ALuint listener;
 
 	float musicVolume = 1.0;
-	float idleEngineVolume = 0.1;
+	float idleEngineVolume = 0.08;
 	float idleEnginePitch = 1.0;
 
 	bool secretPlaying = false;

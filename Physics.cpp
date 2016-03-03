@@ -243,14 +243,14 @@ bool Physics::vehicle_getForwardsGear(unsigned int id) {
 	}
 }
 
-float Physics::vehicle_getWheelRotationSpeed(unsigned int id) {
+float Physics::vehicle_getEngineSpeed(unsigned int id) {
 	if (id >= vehicleActors.size())
 	{
 		printf("Error: Vehicle does not exist\n");
 		return 0.0f;
 	}
 
-	return vehicleActors[id]->mWheelsDynData.getWheelRotationSpeed(0);
+	return vehicleActors[id]->mDriveDynData.getEngineRotationSpeed();
 }
 
 
@@ -402,7 +402,7 @@ void Physics::updateGameState(GameState* state, float time)
 		player->setFSpeed(vehicle_getFSpeed(player->getPhysicsID()));
 		player->setSSpeed(vehicle_getSSpeed(player->getPhysicsID()));
 		player->setForwardsGear(vehicle_getForwardsGear(player->getPhysicsID()));
-		player->setWheelRotationSpeed(vehicle_getWheelRotationSpeed(player->getPhysicsID()));
+		player->setEngineSpeed(vehicle_getEngineSpeed(player->getPhysicsID()));
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
@@ -464,6 +464,8 @@ void Physics::giveInput(Input input, int playernum) {
 void Physics::handleInput(Input* input, unsigned int id){
 
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
+
+	cout << "Engine speed: " << vehicle->mDriveDynData.getEngineRotationSpeed() << "\n";
 
 	float fSpeed = vehicle->computeForwardSpeed();
 
@@ -598,7 +600,7 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 	// Changing switch time to 0 be good enough for that?
 	//Gears
 	PxVehicleGearsData gears;
-	gears.mSwitchTime = 0.1f;
+	gears.mSwitchTime = 0.0f;
 	driveSimData.setGearsData(gears);
 
 	//Clutch

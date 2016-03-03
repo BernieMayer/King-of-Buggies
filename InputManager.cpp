@@ -187,7 +187,7 @@ InputManager::InputManager(GLFWwindow* w)
 			rumbleCounters[i - 1] = 0;
 			rumbleTargets[i - 1] = 0;
 
-			rumble(i, 0.5f, 5);
+			//rumble(i, 0.5f, 5);
 		}
 
 		smoothers[i - 1] = InputSmoother();
@@ -258,7 +258,8 @@ Input InputManager::getInput(int playerNum)
 		input.isKeyboard = false;
 
 		rumbleCounters[playerNum] += 1;
-		if (rumbleCounters[playerNum] == rumbleTargets[playerNum]) {
+
+		if (rumbleCounters[playerNum] >= rumbleTargets[playerNum]) {
 			gamepads[playerNum].Rumble(0.0f, 0.0f);
 			rumbleCounters[playerNum] = 0;
 		}

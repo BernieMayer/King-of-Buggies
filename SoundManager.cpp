@@ -30,9 +30,9 @@ void SoundManager::initOpenAL(GameState state) {
 void SoundManager::initListener(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos());
-	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity());
-	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp());
+	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
+	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp()).data();
 
 	alListenerfv(AL_POSITION, ListenerPos);
 	alListenerfv(AL_VELOCITY, ListenerVel);
@@ -49,8 +49,8 @@ void SoundManager::startMusic(GameState state) {
 
 	PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
 
 	alSourcei(musicSource, AL_BUFFER, buffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
@@ -73,8 +73,8 @@ void SoundManager::startEngineSounds(GameState state) {
 
 		PlayerInfo* player = state.getPlayer(i);
 
-		ALfloat *SourcePos = vec3ToALfloat(player->getPos());
-		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity());
+		ALfloat *SourcePos = vec3ToALfloat(player->getPos()).data();
+		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity()).data();
 
 		alSourcei(engineSources[i], AL_BUFFER, buffer);
 		alSourcef(engineSources[i], AL_PITCH, 1.0f);
@@ -94,9 +94,9 @@ void SoundManager::startEngineSounds(GameState state) {
 void SoundManager::updateListener(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos());
-	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity());
-	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp());
+	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
+	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp()).data();
 
 	alListenerfv(AL_POSITION, ListenerPos);
 	alListenerfv(AL_VELOCITY, ListenerVel);
@@ -109,8 +109,8 @@ void SoundManager::updateListener(GameState state) {
 void SoundManager::updateMusic(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
 
 	alSourcefv(musicSource, AL_POSITION, SourcePos);
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
@@ -127,17 +127,19 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		bool forwardsGear = player->getForwardsGear();
 
 		float accelInput = 0;
-		accelInput = abs(player->getWheelRotationSpeed());
+		accelInput = abs(player->getEngineSpeed());
 
-		ALfloat *SourcePos = vec3ToALfloat(player->getPos());
-		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity());
+		ALfloat *SourcePos = vec3ToALfloat(player->getPos()).data();
+		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity()).data();
 
-		float pitchMod = map(accelInput, 0, 16, 1, 2);
+		float pitchMod = map(accelInput, 0, 600, 1, 2);
 		if (pitchMod < 1) {
 			pitchMod = 1;
 		}
 		alSourcef(engineSources[i], AL_PITCH, idleEnginePitch * pitchMod);
 		
+
+		accelInput = map(accelInput, 0, 600, 1, 16);
 		alSourcef(engineSources[i], AL_GAIN, idleEngineVolume * accelInput);
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
@@ -148,16 +150,16 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 /*
  * Converts a vec3 to an array of ALfloats
  */
-ALfloat* SoundManager::vec3ToALfloat(vec3 vec) {
-	ALfloat f[] = { vec.x, vec.y, vec.z };
+vector<ALfloat> SoundManager::vec3ToALfloat(vec3 vec) {
+	vector<ALfloat> f = { vec.x, vec.y, vec.z };
 	return f;
 }
 
 /*
- * Converts two vec3s to an aray of ALfloats
+ * Converts two vec3s to an array of ALfloats
  */
-ALfloat* SoundManager::vec3ToALfloat(vec3 vector1, vec3 vector2) {
-	ALfloat f[] = { vector1.x, vector1.y, vector1.z, vector2.x, vector2.y, vector2.z };
+ vector<ALfloat> SoundManager::vec3ToALfloat(vec3 vector1, vec3 vector2) {
+	vector<ALfloat> f = { vector1.x, vector1.y, vector1.z, vector2.x, vector2.y, vector2.z };
 	return f;
 }
 
@@ -250,7 +252,7 @@ void SoundManager::playBumpSound(vec3 pos) {
 
 	loadWavToBuf("Bump.wav", &bumpSource, &buffer);
 
-	ALfloat *SourcePos = vec3ToALfloat(pos);
+	ALfloat *SourcePos = vec3ToALfloat(pos).data();
 
 	alSourcei(bumpSource, AL_BUFFER, buffer);
 	alSourcef(bumpSource, AL_PITCH, 1.0f);
@@ -270,7 +272,7 @@ void SoundManager::playDingSound(vec3 pos) {
 
 	loadWavToBuf("Ding.wav", &dingSource, &buffer);
 
-	ALfloat *SourcePos = vec3ToALfloat(pos);
+	ALfloat *SourcePos = vec3ToALfloat(pos).data();
 
 	alSourcei(dingSource, AL_BUFFER, buffer);
 	alSourcef(dingSource, AL_PITCH, 1.0f);
@@ -289,8 +291,8 @@ void SoundManager::playSecret(GameState state) {
 
 	PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
 
 	alSourcei(musicSource, AL_BUFFER, buffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
@@ -310,8 +312,8 @@ void SoundManager::playSecret2(GameState state) {
 
 	PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos());
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity());
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
 
 	alSourcei(musicSource, AL_BUFFER, buffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
