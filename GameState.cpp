@@ -34,33 +34,24 @@ PlayerInfo* GameState::getAI(unsigned int aiNum)
 		return NULL;
 }
 
-void GameState::setGoldenBuggie(unsigned int playerNum)
+void GameState::setGoldenBuggy(unsigned int playerNum)
 {
 	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
-		getPlayer(i)->setGoldenBuggie(false);
+		getPlayer(i)->setGoldenBuggy(false);
 	}
-	getPlayer(playerNum)->setGoldenBuggie(true);
+	getPlayer(playerNum)->setGoldenBuggy(true);
 	goldenBuggy = playerNum;
 }
 
 PlayerInfo* GameState::getGoldenBuggy()
 {
-	return &players[goldenBuggy];
+	if (goldenBuggy > players.size())
+		return NULL;
+	else
+		return &players[goldenBuggy];
 }
 
-PlayerInfo* GameState::getGoldenBuggie()
-{
-	for (int i = 0; i < players.size(); i++)
-	{
-		PlayerInfo player = players[i];
-		if (player.isGoldenBuggie()){
-			return &player;
-		}
-
-	}
-	return NULL;
-}
 
 unsigned int GameState::numberOfPlayers(){ return players.size(); }
 unsigned int GameState::numberOfAIs() { return ai.size(); }
@@ -127,7 +118,7 @@ unsigned int GameState::numberOfPowerupBoxes(){ return boxes.size(); }
 
 bool GameState::checkCoinCollision(vec3 playerPos) {
 	bool collided = false;
-	for (int i = 0; i < coins.size(); i++) {
+	for (unsigned int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
 		
 		coins[i].setTransform(coins[i].getRotation());

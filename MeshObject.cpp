@@ -53,7 +53,7 @@ vector<physx::PxVec3>* MeshObject::getPhysicsVertexPointer()
 }
 
 void MeshObject::createPhysicsMesh() {
-	for (int i = 0; i < this->vertices.size(); i++) {
+	for (unsigned int i = 0; i < this->vertices.size(); i++) {
 		physx::PxF32 x = this->vertices[i].x;
 		physx::PxF32 y = this->vertices[i].y;
 		physx::PxF32 z = this->vertices[i].z;

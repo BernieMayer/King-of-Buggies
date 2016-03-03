@@ -4,14 +4,14 @@
 #include "PlayerInfo.h"
 
 PlayerInfo::PlayerInfo() : powerup(0), powerupCounter(0), numCoins(0), score(0),
-							goldenBuggie(false), timeGolden(0.f)
+							goldenBuggy(false), timeGolden(0.f)
 {
 
 }
 
 PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs):
 powerup(0), powerupCounter(0), numCoins(0),
-goldenBuggie(false), timeGolden(0.f)
+goldenBuggy(false), timeGolden(0.f)
 {
 	renderID = _renderID;
 	physicsID = _physicsID;
@@ -24,8 +24,8 @@ goldenBuggie(false), timeGolden(0.f)
 
 }
 
-bool PlayerInfo::isGoldenBuggie(){ return goldenBuggie; }
-void PlayerInfo::setGoldenBuggie(bool val) { goldenBuggie = val; }
+bool PlayerInfo::isGoldenBuggy(){ return goldenBuggy; }
+void PlayerInfo::setGoldenBuggy(bool val) { goldenBuggy = val; }
 bool PlayerInfo::isAI(){ return ai; }
 void PlayerInfo::setAI(bool value) { ai = value; }
 

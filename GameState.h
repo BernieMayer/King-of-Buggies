@@ -43,8 +43,7 @@ public:
 	void setPlayer(unsigned int playerNum, const PlayerInfo& pinfo);
 	PlayerInfo* getPlayer(unsigned int playerNum);
 	PlayerInfo* getAI(unsigned int aiNum);
-	void setGoldenBuggie(unsigned int playerNum);		//Use instead of accessing entity directly
-	PlayerInfo* getGoldenBuggie();
+	void setGoldenBuggy(unsigned int playerNum);		//Use instead of accessing entity directly
 	unsigned int numberOfPlayers();
 	unsigned int numberOfAIs();
 

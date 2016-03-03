@@ -8,8 +8,8 @@ class PlayerInfo: public Entity {
 public:
 	PlayerInfo();
 	PlayerInfo(unsigned int renderID, unsigned int physicsID, unsigned int* wheelRenderIDs);
-	bool isGoldenBuggie();
-	void setGoldenBuggie(bool val);
+	bool isGoldenBuggy();
+	void setGoldenBuggy(bool val);
 	bool isAI();
 	void setAI(bool value);
 
@@ -37,7 +37,7 @@ protected:
 	int numCoins;
 	int powerupCounter;
 	int score;
-	bool goldenBuggie;
+	bool goldenBuggy;
 	bool ai;
 	float timeGolden;
 	float fSpeed;

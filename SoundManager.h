@@ -45,9 +45,9 @@ private:
 	ALuint engineSources[5];
 	ALuint listener;
 
-	float musicVolume = 1.0;
-	float idleEngineVolume = 0.1;
-	float idleEnginePitch = 1.0;
+	float musicVolume = 1.0f;
+	float idleEngineVolume = 0.1f;
+	float idleEnginePitch = 1.0f;
 
 	bool secretPlaying = false;
 	bool secret2Unlocked = false;

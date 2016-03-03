@@ -56,22 +56,22 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	mypos.x = mypos.x + cos(myyaw) * speed;
 	mypos.z = mypos.z + sin(myyaw) * speed;
 	*/
-	vec3 goldenBuggieLoc = state->getGoldenBuggy()->getPos();
-	prevPosition[aiNum] = goldenBuggieLoc;
+	vec3 goldenBuggyLoc = state->getGoldenBuggy()->getPos();
+	prevPosition[aiNum] = goldenBuggyLoc;
 	vec3 myPos = state->getPlayer(playerNums[aiNum])->getPos();
-	vec3 vec = goldenBuggieLoc - prevPosition[aiNum];
+	vec3 vec = goldenBuggyLoc - prevPosition[aiNum];
 	vec = vec * vec3(30, 30, 30); // we project N frames into the future
 
-	vec3 futurepos = goldenBuggieLoc + vec;
+	vec3 futurepos = goldenBuggyLoc + vec;
 	double dX_chaseAI = myPos.x;
 	double dY_chaseAI = myPos.y;
 	double dZ_chaseAI = myPos.z;
 
 	double yaw_chaseAI = atan2(dZ_chaseAI, dX_chaseAI);
 
-	double dX_golden = goldenBuggieLoc.x;
-	double dY_golden = goldenBuggieLoc.y;
-	double dZ_golden = goldenBuggieLoc.z;
+	double dX_golden = goldenBuggyLoc.x;
+	double dY_golden = goldenBuggyLoc.y;
+	double dZ_golden = goldenBuggyLoc.z;
 
 	double yaw_golden = atan2(dZ_golden, dX_golden);
 
@@ -83,12 +83,12 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	input.turnR = 0;
 
 	Entity* ai = state->getPlayer(playerNums[aiNum]);
-	Entity* goldenBuggie = state->getGoldenBuggy();
+	Entity* goldenBuggy = state->getGoldenBuggy();
 
-	float dot = facing(ai, goldenBuggie);
+	float dot = facing(ai, goldenBuggy);
 	if (dot < 0.9){
 		if (dot > 0){
-			float result = beside(ai, goldenBuggie);
+			float result = beside(ai, goldenBuggy);
 
 			if (result > 0){
 				input.turnR = -result;
@@ -99,7 +99,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 
 		}
 		else {
-			float result = beside(ai, goldenBuggie);
+			float result = beside(ai, goldenBuggy);
 
 			if (result > 0){
 				input.turnR = -result;
@@ -193,7 +193,7 @@ Input AIManager::testAIEvade(int playerNum) {
 
 	Entity* player = NULL;
 	float shortestLength = 0;
-	for (int i = 0; i < state->numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < state->numberOfPlayers(); i++) {
 		if (i != playerNum) {
 			Entity* indexedPlayer = state->getPlayer(i);
 			vec3 playerPos = indexedPlayer->getPos();

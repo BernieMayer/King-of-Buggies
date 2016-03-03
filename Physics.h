@@ -45,8 +45,8 @@ public:
 	void handleInput(Input* input);
 	void handleInput(Input* input, unsigned int id);
 
-	void modifySpeed(unsigned int vehicleNum, double modSpeed);
-	void setSpeed(unsigned int vehicleNum, double speed);
+	void modifySpeed(unsigned int vehicleNum, float modSpeed);
+	void setSpeed(unsigned int vehicleNum, float speed);
 
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution
@@ -81,10 +81,10 @@ public:
 	virtual void  onWake(PxActor**, PxU32) {}
 	virtual void  onSleep(PxActor**, PxU32){}
 
-	bool newGoldenBuggie = false;
-	int indexOfGoldenBuggie = 0;
-	int indexOfOldGoldenBuggie = 0;
-	double initVehicleSpeed = 500.0f;
+	bool newGoldenBuggy = false;
+	int indexOfGoldenBuggy = 0;
+	int indexOfOldGoldenBuggy = 0;
+	float initVehicleSpeed = 500.f;
 
 
 private:
@@ -93,7 +93,7 @@ private:
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 
-	PxVehicleDrive4W* goldenBuggie;
+	PxVehicleDrive4W* goldenBuggy;
 
 	vector<PxMaterial*> materials;
 
