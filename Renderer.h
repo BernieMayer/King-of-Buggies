@@ -67,6 +67,9 @@ private:
 	};
 
 	GLFWwindow * window;
+	int windowWidth;
+	int windowHeight;
+
 	vector<ObjectInfo> objects;		//Objects to be drawn
 	vector<LightInfo> lights;
 
@@ -149,6 +152,7 @@ public:
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
 
+	void drawUI(float barWidth, float barHeight);
 	//Debugging draw calls
 	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);

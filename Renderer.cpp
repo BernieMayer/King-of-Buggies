@@ -56,6 +56,7 @@ projection(1.f), modelview(1.f)
 	shaderList.initShaders();
 
 	window = _window;
+	glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 	glfwSetWindowSizeCallback(window, resizeFunc);
 
@@ -68,7 +69,7 @@ projection(1.f), modelview(1.f)
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 
 	initializeVAOs();
-
+	
 }
 
 Renderer::~Renderer()
@@ -295,6 +296,28 @@ void Renderer::drawAll()
 	{
 		draw(i);
 	}
+}
+
+void Renderer::drawUI(float barWidth, float barHeight) 
+{
+	glUseProgram(0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, windowWidth, 0, windowHeight);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glBegin(GL_LINES);
+	glColor3f(0.f, 1.f, 0.f);
+	
+	for (float i = 0.f; i < barHeight; i++) {
+		glVertex3f(0.f, i, 0.f);
+		glVertex3f(barWidth, i, 0.f);
+	}	
+
+	glEnd();
 }
 
 void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
@@ -773,6 +796,9 @@ void resizeFunc(GLFWwindow* window, int width, int height)
 	float minDim = min((float)width, (float)height);
 	winRatio[0][0] = minDim / (float)width;
 	winRatio[1][1] = minDim / (float)height;
+
+	//windowWidth = width;
+	//windowHeight = height;
 }
 
 #endif // RENDERER_CPP

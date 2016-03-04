@@ -5,7 +5,7 @@
 
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
-	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
+	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()
 {
 	window = newWindow;
 	mat = Diffuse();
@@ -20,6 +20,11 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 
 	//TODO: Put this indexing somewhere useful;
 	ai.initAI(1);
+
+	// setup interface according to window dimensions
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	_interface.setWindowDim(width, height);
 
 	gameInit();
 }
@@ -342,6 +347,9 @@ void GameManager::gameLoop()
 		//Draw scene
 		renderer.clearDrawBuffers();
 		renderer.drawAll();
+		renderer.drawUI(_interface.getScoreBarWidth(&state), _interface.getScoreBarHeight());
+		
+		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
 		// increase score and check win conditions
 		state.getGoldenBuggy()->incrementScore();
@@ -423,6 +431,8 @@ void GameManager::initTestScene()
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
 	state.getPlayer(1)->setAI(true);
 	createTestLevel();
+
+	
 	createBall(0.5f);
 
 	state.setGoldenBuggy(0);

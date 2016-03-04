@@ -46,6 +46,7 @@
     </ClCompile>
     <ClCompile Include="InputSmoother.cpp" />
     <ClCompile Include="Events.cpp" />
+    <ClCompile Include="InterfaceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

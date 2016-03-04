@@ -73,6 +73,8 @@ public:
 	void createPowerups();
 	void createPowerupBoxes();
 	void createBall(float radius);
+
+	void createUI();
 	
 	void gameLoop();
 	void gameInit();
