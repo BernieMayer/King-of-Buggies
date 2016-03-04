@@ -132,7 +132,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		ALfloat *SourcePos = vec3ToALfloat(player->getPos()).data();
 		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity()).data();
 
-		float pitchMod = map(accelInput, 0, 600, 1, 2);
+		float pitchMod = map(accelInput, 0, 600, 1, 2.0);
 		if (pitchMod < 1) {
 			pitchMod = 1;
 		}
