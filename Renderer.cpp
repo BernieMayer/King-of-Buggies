@@ -56,6 +56,7 @@ projection(1.f), modelview(1.f)
 	shaderList.initShaders();
 
 	window = _window;
+	glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
 	glfwSetWindowSizeCallback(window, resizeFunc);
 
@@ -68,7 +69,7 @@ projection(1.f), modelview(1.f)
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 
 	initializeVAOs();
-
+	
 }
 
 Renderer::~Renderer()
@@ -295,6 +296,36 @@ void Renderer::drawAll()
 	{
 		draw(i);
 	}
+}
+
+void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
+{
+	glUseProgram(0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, windowWidth, 0, windowHeight);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+	glBegin(GL_LINES);
+	
+	// each vector in segments stores the scorebar information for an individual player
+	for (unsigned int i = 0; i < segments.size(); i++) {
+		vec3 color = colors[i];
+		glColor3f(color.x, color.y, color.z);
+
+		for (unsigned int j = 1; j < segments[i].size(); j += 2)
+		{
+			vec3 a = segments[i][j - 1];
+			vec3 b = segments[i][j];
+			glVertex3f(a.x, a.y, a.z);
+			glVertex3f(b.x, b.y, b.z);
+		}
+	}
+
+	glEnd();
 }
 
 void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
@@ -773,6 +804,9 @@ void resizeFunc(GLFWwindow* window, int width, int height)
 	float minDim = min((float)width, (float)height);
 	winRatio[0][0] = minDim / (float)width;
 	winRatio[1][1] = minDim / (float)height;
+
+	//windowWidth = width;
+	//windowHeight = height;
 }
 
 #endif // RENDERER_CPP

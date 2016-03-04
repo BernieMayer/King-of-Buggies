@@ -51,6 +51,7 @@
     <ClCompile Include="CollisionEvent.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="InterfaceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

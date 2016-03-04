@@ -5,7 +5,7 @@
 
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
-	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
+	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()
 {
 	window = newWindow;
 	mat = Diffuse();
@@ -20,6 +20,11 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 
 	//TODO: Put this indexing somewhere useful;
 	ai.initAI(1);
+
+	// setup interface according to window dimensions
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	_interface.setWindowDim(width, height);
 
 	gameInit();
 }
@@ -45,6 +50,8 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	unsigned int chassisRenderID = renderer.generateObjectID();
 	unsigned int physicsID = physics.vehicle_create(traits, position);
 
+	vec3 colour = vehicleColours[state.numberOfPlayers()];
+
 	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
@@ -52,7 +59,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	if (state.numberOfPlayers() == 0)
 		renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
 	else
-		renderer.assignColor(chassisRenderID, vec3(1.0, 0.0f, 0.0f));
+		renderer.assignColor(chassisRenderID, colour);
 	//renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
@@ -69,7 +76,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
 	}
 
-	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs));
+	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour));
 	
 
 }
@@ -81,11 +88,13 @@ void GameManager::createAI(vec3 position)
 	unsigned int chassisRenderID = renderer.generateObjectID();
 	unsigned int physicsID = physics.vehicle_create(traits, position);
 
+	vec3 colour = vehicleColours[state.numberOfPlayers()];
+
 	MeshObject* playerMesh = meshInfo.getMeshPointer(CUBE);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
 	renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
-	renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
+	renderer.assignColor(chassisRenderID, colour);
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
 	unsigned int wheelIDs[4];
@@ -100,7 +109,7 @@ void GameManager::createAI(vec3 position)
 		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
 	}
 
-	state.addAI(PlayerInfo(chassisRenderID, physicsID, wheelIDs));
+	state.addAI(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour));
 }
 
 void GameManager::createGroundPlane(vec3 normal, float offset)
@@ -269,7 +278,9 @@ void GameManager::gameLoop()
 			//Switch the player that used to be the golden buggy
 			PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
 			int chasisRenderId_reg = p_2->getRenderID();
-			renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
+			// Switch buggy back to original colour
+			vec3 origColour = p_2->getColour();
+			renderer.assignColor(chasisRenderId_reg, origColour);
 
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
@@ -333,6 +344,9 @@ void GameManager::gameLoop()
 		//Draw scene
 		renderer.clearDrawBuffers();
 		renderer.drawAll();
+		renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
+		
+		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
 		// increase score and check win conditions
 		state.getGoldenBuggy()->incrementScore();
@@ -403,6 +417,12 @@ void GameManager::gameInit()
 
 void GameManager::initTestScene()
 {
+	vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car
+	vehicleColours.push_back(vec3(0.f, 1.f, 0.f)); // green car
+	vehicleColours.push_back(vec3(0.f, 0.f, 1.f)); // blue
+	vehicleColours.push_back(vec3(1.f, 1.f, 0.f)); // yellow
+	vehicleColours.push_back(vec3(0.f, 0.f, 0.f)); // black
+
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
 	traits.print();
 
@@ -415,6 +435,8 @@ void GameManager::initTestScene()
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
 	state.getPlayer(1)->setAI(true);
 	createTestLevel();
+
+	
 	createBall(0.5f);
 
 	state.setGoldenBuggy(0);

@@ -246,7 +246,7 @@ Input InputManager::getInput(int playerNum)
 		}
 
 		// Using XINPUT_GAMEPAD_RIGHT_SHOULDER activates when start is pressed for some reason...
-		input.drift = gamepads[playerNum].GetButtonPressed(9);
+		input.drift = gamepads[playerNum].GetButtonPressed(2);
 		// Using XINPUT_GAMEPAD_B never activates for some reason...
 		input.powerup = gamepads[playerNum].GetButtonPressed(1);
 		
