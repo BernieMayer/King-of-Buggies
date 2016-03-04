@@ -199,16 +199,7 @@ void GameManager::gameLoop()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		/*
-		Input in = input.getInput(1);		//Get input
-		inputs[0] = in;
 		
-
-		if (in.cheat_coin)
-			std::cout << "Cheated in a coin \n";
-			*/
-		
-
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
@@ -369,6 +360,7 @@ void GameManager::gameLoop()
 		carPos.push_back(p1);
 		//carPos.push_back(p2);
 		carPos.push_back(ai.getCurrentTarget(1));
+		printf("(%f %f %f) - (%f %f %f)\n", carPos[1].x, carPos[1].y, carPos[1].z, carPos[0].x, carPos[0].y, carPos[0].z);
 
 		//Debugging
 		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);

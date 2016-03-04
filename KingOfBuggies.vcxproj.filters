@@ -45,7 +45,12 @@
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="InputSmoother.cpp" />
-    <ClCompile Include="Events.cpp" />
+    <ClCompile Include="Events.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="CollisionEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -101,7 +106,12 @@
     <ClInclude Include="Keybindings.h" />
     <ClInclude Include="NavMesh.h" />
     <ClInclude Include="InputSmoother.h" />
-    <ClInclude Include="Events.h" />
+    <ClInclude Include="Events.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="CollisionEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">
@@ -109,6 +119,9 @@
     </Filter>
     <Filter Include="Entities">
       <UniqueIdentifier>{680fcdc6-9465-4923-9220-90fe15c23bb1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{33045440-8875-4c35-8b8c-3be8c525f36b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
