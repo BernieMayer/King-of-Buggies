@@ -298,7 +298,7 @@ void Renderer::drawAll()
 	}
 }
 
-void Renderer::drawUI(float barWidth, float barHeight) 
+void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
 {
 	glUseProgram(0);
 
@@ -310,12 +310,20 @@ void Renderer::drawUI(float barWidth, float barHeight)
 	glLoadIdentity();
 
 	glBegin(GL_LINES);
-	glColor3f(0.f, 1.f, 0.f);
 	
-	for (float i = 0.f; i < barHeight; i++) {
-		glVertex3f(0.f, i, 0.f);
-		glVertex3f(barWidth, i, 0.f);
-	}	
+	// each vector in segments stores the scorebar information for an individual player
+	for (unsigned int i = 0; i < segments.size(); i++) {
+		vec3 color = colors[i];
+		glColor3f(color.x, color.y, color.z);
+
+		for (unsigned int j = 1; j < segments[i].size(); j += 2)
+		{
+			vec3 a = segments[i][j - 1];
+			vec3 b = segments[i][j];
+			glVertex3f(a.x, a.y, a.z);
+			glVertex3f(b.x, b.y, b.z);
+		}
+	}
 
 	glEnd();
 }

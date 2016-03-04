@@ -152,7 +152,7 @@ public:
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
 
-	void drawUI(float barWidth, float barHeight);
+	void drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors);
 	//Debugging draw calls
 	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);

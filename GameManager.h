@@ -43,6 +43,8 @@ private:
 	unsigned int winner;
 	bool gameOver;
 
+	vector<vec3> vehicleColours;
+
 	//void updateTransform(const Entity& )
 
 	unsigned int surfaceRenderID;		//TEMPORARY - Replace as soon as possible
@@ -73,17 +75,12 @@ public:
 	void createPowerups();
 	void createPowerupBoxes();
 	void createBall(float radius);
-
-	void createUI();
 	
 	void gameLoop();
 	void gameInit();
 	void initTestScene();
 	void quitGame(unsigned int winnerID);
 
-	
-
-	void physicsAndRenderTest();
 
 };
 
