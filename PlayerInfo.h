@@ -13,6 +13,9 @@ public:
 	bool isAI();
 	void setAI(bool value);
 
+	int getScore();
+	void incrementScore();
+
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);
 	void setWheelTransform(unsigned int wheelNum, const mat4& transform);

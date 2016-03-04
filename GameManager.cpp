@@ -279,6 +279,8 @@ void GameManager::gameLoop()
 			PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
 			int chasisRenderId_reg = p_2->getRenderID();
 			renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
+
+			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
 		//Physics sim 
@@ -341,6 +343,19 @@ void GameManager::gameLoop()
 		renderer.clearDrawBuffers();
 		renderer.drawAll();
 
+		// increase score and check win conditions
+		state.getGoldenBuggy()->incrementScore();
+		int theScore = state.getGoldenBuggy()->getScore();
+		if ((theScore % 100) == 0) {
+			std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
+		}
+		if (theScore >= 700 && gameOver == false) {
+			winner = state.getGoldenBuggyID();
+			printf("Player %i is the winner!\n", winner);
+			gameOver = true;
+			//break;
+		}
+
 		//Get path
 		path.clear();
 		//ai.nav.getPathLines(&path, state.getPlayer(0)->getPos(), state.getPlayer(1)->getPos());
@@ -381,6 +396,7 @@ void GameManager::gameLoop()
 			timeProgressed = 0.f;
 		}
 	}
+	quitGame(winner);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -388,10 +404,8 @@ void GameManager::gameLoop()
 
 void GameManager::gameInit()
 {
+	gameOver = false;
 	initTestScene();
-
-
-
 
 }
 
@@ -408,7 +422,6 @@ void GameManager::initTestScene()
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
 	state.getPlayer(1)->setAI(true);
-	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createTestLevel();
 	createBall(0.5f);
 
@@ -429,7 +442,7 @@ void GameManager::initTestScene()
 	
 }
 
-void quitGame()
+void GameManager::quitGame(unsigned int winnerID)
 {
 
 }

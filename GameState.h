@@ -27,7 +27,6 @@ private:
 	vector<PowerupBox> boxes;
 	vector<Event> events;
 
-	unsigned int buggyPlayer;
 	unsigned int groundPhysicsID;
 	unsigned int groundRenderID;
 
@@ -53,6 +52,7 @@ public:
 	unsigned int numberOfPlayers();
 	unsigned int numberOfAIs();
 	PlayerInfo* getGoldenBuggy();
+	unsigned int getGoldenBuggyID();
 
 	//Coin management
 	void addCoin(const Coin& coin);

@@ -52,6 +52,7 @@ PlayerInfo* GameState::getGoldenBuggy()
 		return &players[goldenBuggy];
 }
 
+unsigned int GameState::getGoldenBuggyID() { return goldenBuggy; }
 
 unsigned int GameState::numberOfPlayers(){ return players.size(); }
 unsigned int GameState::numberOfAIs() { return ai.size(); }

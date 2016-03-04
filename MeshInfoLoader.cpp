@@ -1,9 +1,6 @@
 // File originally partially created by Troy Alderson for use in CPSC453 assignments. Reused with permission from Ben Stephenson
 
 #include "MeshInfoLoader.h"
-#include <fstream>
-#include <string>
-#include <iostream>
 
 #pragma warning(disable:4996)
 
@@ -41,8 +38,6 @@ void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, 
 
 bool MeshInfoLoader::loadModel(char *filename)
 {
-	printf("Opening file\n");
-
 	FILE* f = fopen(filename, "r");
 	if (f == NULL)
 	{
@@ -111,8 +106,6 @@ bool MeshInfoLoader::loadModel(char *filename)
 	}
 
 	sharedIndices(_faces, _nfaces, _normals, vertices, normals, indices);
-
-	printf("Closing file\n");
 
 	return true;
 }

@@ -40,6 +40,9 @@ private:
 
 	GLFWwindow* window;
 
+	unsigned int winner;
+	bool gameOver;
+
 	//void updateTransform(const Entity& )
 
 	unsigned int surfaceRenderID;		//TEMPORARY - Replace as soon as possible
@@ -74,7 +77,7 @@ public:
 	void gameLoop();
 	void gameInit();
 	void initTestScene();
-	void quitGame(); // should this take arguments? 
+	void quitGame(unsigned int winnerID);
 
 	
 

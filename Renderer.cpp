@@ -77,25 +77,6 @@ Renderer::~Renderer()
 	glDeleteBuffers(VBO::COUNT, vbo);
 }
 
-void Renderer::renderLoop()
-{
-	while (!glfwWindowShouldClose(window))
-	{
-		//Clear color buffer  
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		drawAll();
-
-		//Swap buffers  
-		glfwSwapBuffers(window);
-		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
-		glfwPollEvents();
-	}
-
-	glfwDestroyWindow(window);
-	glfwTerminate();
-}
-
 
 /**
 * Object assignment functions

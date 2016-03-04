@@ -10,7 +10,7 @@ PlayerInfo::PlayerInfo() : powerup(0), powerupCounter(0), numCoins(0), score(0),
 }
 
 PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs):
-powerup(0), powerupCounter(0), numCoins(0),
+powerup(0), powerupCounter(0), numCoins(0), score(0),
 goldenBuggy(false), timeGolden(0.f)
 {
 	renderID = _renderID;
@@ -28,6 +28,9 @@ bool PlayerInfo::isGoldenBuggy(){ return goldenBuggy; }
 void PlayerInfo::setGoldenBuggy(bool val) { goldenBuggy = val; }
 bool PlayerInfo::isAI(){ return ai; }
 void PlayerInfo::setAI(bool value) { ai = value; }
+
+int PlayerInfo::getScore() { return score; }
+void PlayerInfo::incrementScore() {	score++; }
 
 unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 {
