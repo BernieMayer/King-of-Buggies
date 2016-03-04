@@ -347,7 +347,7 @@ void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& o
 void Renderer::drawPoints(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
 {
 	glUseProgram(0);
-	glPointSize(5.f);
+	glPointSize(10.f);
 
 	mat4 modelTransform = modelview*camera->getMatrix()*objectTransform;
 	mat4 projTransform = winRatio*projection;

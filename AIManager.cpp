@@ -14,29 +14,89 @@ bool AIManager::loadNavMesh(const char* fileName)
 }
 
 void  AIManager::initAI(int pNum) {
-	playerNums.push_back(pNum);
+	
 }
 
 void  AIManager::initAI() {
 	//prevPosition = state->getPlayer(0)->getPos();
-	playerNums.clear();
 
 	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
 	{
-		if (state->getPlayer(i)->isAI())
-		{
-			playerNums.push_back(i);
-			vector<vec3> path;
-			pathToGoal.push_back(path);
-			pointOnPath.push_back(0);
-			prevPosition.push_back(state->getPlayer(i)->getPos());
-		}
+		vector<vec3> path;
+		pathToGoal.push_back(path);
+		pointOnPath.push_back(0);
+		prevPosition.push_back(state->getPlayer(i)->getPos());
+		smoother.push_back(InputSmoother());
 	}
 }
 
-void AIManager::findNewPath(vec3 target)
+bool AIManager::findNewPath(unsigned int playerNum, unsigned int targetNum)
 {
+	return findNewPath(playerNum, state->getPlayer(targetNum)->getPos());
+}
+
+bool AIManager::findNewPath(unsigned int playerNum, vec3 target)
+{
+	pathToGoal[playerNum].clear();
+	pointOnPath[playerNum] = 0;
+	return nav.getPathPoints(&pathToGoal[playerNum], state->getPlayer(playerNum)->getPos(), target);
+}
+
+vec3 AIManager::getRandomTarget()
+{
+	return nav[nav.getRandomNode()].getCenter();
+}
+
+vec3 AIManager::getCurrentTarget(unsigned int playerNum)
+{
+	return pathToGoal[playerNum][pointOnPath[playerNum]];
+}
+
+
+unsigned int AIManager::updatePathProgress(unsigned int playerNum)
+{
+	while ((pointOnPath[playerNum] < pathToGoal[playerNum].size()) &&
+		(atPoint(playerNum, pathToGoal[playerNum][pointOnPath[playerNum]])))
+	{
+		pointOnPath[playerNum]++;
+	}
 	
+	if (pointOnPath[playerNum] >= pathToGoal[playerNum].size())
+		return AI_COMPLETED_PATH;
+	else
+		return AI_IN_PATH;
+}
+
+Input AIManager::followRandomPath(unsigned int playerNum)
+{
+	if (updatePathProgress(playerNum) == AI_COMPLETED_PATH)
+	{
+		testTarget = getRandomTarget();
+
+		vec3 pos = state->getPlayer(playerNum)->getPos();
+		printf("Find new path %f %f %f to %f %f %f\n", pos.x, pos.y, pos.z, testTarget.x, testTarget.y, testTarget.z);
+
+		findNewPath(playerNum, testTarget);
+	}
+
+	if (pathToGoal[playerNum].size() > 0)
+		return driveToPoint(playerNum, pathToGoal[playerNum][pointOnPath[playerNum]]);
+}
+
+void AIManager::getPathAsLines(unsigned int playerNum, vector<vec3>* lines)
+{
+	for (unsigned int i = 1; i < pathToGoal[playerNum].size(); i++)
+	{
+		lines->push_back(pathToGoal[playerNum][i - 1]);
+		lines->push_back(pathToGoal[playerNum][i]);
+	}
+}
+
+
+
+Input AIManager::getInput(unsigned int playerNum)
+{
+	return followRandomPath(playerNum);		//Test function
 }
 
 
@@ -58,7 +118,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	*/
 	vec3 goldenBuggyLoc = state->getGoldenBuggy()->getPos();
 	prevPosition[aiNum] = goldenBuggyLoc;
-	vec3 myPos = state->getPlayer(playerNums[aiNum])->getPos();
+	vec3 myPos = state->getPlayer(aiNum)->getPos();
 	vec3 vec = goldenBuggyLoc - prevPosition[aiNum];
 	vec = vec * vec3(30, 30, 30); // we project N frames into the future
 
@@ -82,7 +142,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	input.turnL = 0;
 	input.turnR = 0;
 
-	Entity* ai = state->getPlayer(playerNums[aiNum]);
+	Entity* ai = state->getPlayer(aiNum);
 	Entity* goldenBuggy = state->getGoldenBuggy();
 
 	float dot = facing(ai, goldenBuggy);
@@ -111,7 +171,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 		}
 	}
 
-	return smoother.smooth(input);
+	return smoother[aiNum].smooth(input);
 	
 	
 }
@@ -188,7 +248,7 @@ float AIManager::beside(Entity* object, vec3 targetPos) {
 }
 
 Input AIManager::testAIEvade(int playerNum) {	
-	Entity* ai = state->getPlayer(playerNums[playerNum]);
+	Entity* ai = state->getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();
 
 	Entity* player = NULL;
@@ -264,7 +324,7 @@ Input AIManager::testAIEvade(int playerNum) {
 
 	prevPosition[playerNum] = aiPos;
 
-	return smoother.smooth(input);
+	return smoother[playerNum].smooth(input);
 }
 
 Input AIManager::driveToPoint(int playerNum, vec3 pos) {
@@ -272,7 +332,7 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 
 	
 	
-	Entity* ai = state->getPlayer(playerNums[playerNum]);
+	Entity* ai = state->getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();
 
 	Input input = Input();
@@ -297,14 +357,14 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 
 	prevPosition[playerNum] = aiPos;
 
-	return smoother.smooth(input);
+	return smoother[playerNum].smooth(input);
 }
 
 bool AIManager::atPoint(int playerNum, vec3 pos) {
 	PlayerInfo* ai = state->getPlayer(playerNum);
 
-	float distance = length(ai->getPos() - pos);
-	if (distance < 3) {
+	float distance = length(ai->getPos() - vec3(pos.x, ai->getPos().y, pos.z));
+	if (distance < 5.f) {
 		return true;
 	}
 	else {

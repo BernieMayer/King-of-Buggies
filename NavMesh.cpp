@@ -458,7 +458,7 @@ bool NavMesh::getPathPoints(vector<vec3>* path, vec3 position, vec3 target)
 
 	if (getPath_AStar(&indices, position, target))
 	{
-		for (unsigned int i = 0; i < indices.size(); i++)
+		for (unsigned int i = 1; i < indices.size(); i++)
 		{
 			vec3 a = point_a[indices[i - 1]][indices[i]];
 			vec3 b = point_b[indices[i - 1]][indices[i]];
@@ -466,6 +466,8 @@ bool NavMesh::getPathPoints(vector<vec3>* path, vec3 position, vec3 target)
 
 			path->push_back(midpoint);
 		}
+
+		path->push_back(target);
 
 		return true;
 	}

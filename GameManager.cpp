@@ -172,9 +172,9 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -6.f;
 
 	NavMesh nav;
-	nav.loadNavMesh("HiResNavigationMesh.obj");
-	nav.calculateImplicitEdges();
-	nav.navMeshToLines(&polygons, &edges);
+	ai.nav.loadNavMesh("HiResNavigationMesh.obj");
+	ai.nav.calculateImplicitEdges();
+	ai.nav.navMeshToLines(&polygons, &edges);
 
 	vector<vec3> path;
 	
@@ -187,21 +187,50 @@ void GameManager::gameLoop()
 
 	physics.startSim(frameTime);
 
+	// 5 because of 4 players and the inital golden buggy which is not
+	// a player
+	Input inputs[5];
+
+	//Test code (Gives AI initial random path
+	ai.testTarget = ai.getRandomTarget();
+	
+	if (!ai.findNewPath(1, ai.testTarget))
+		cout << endl;
+
 	while (!glfwWindowShouldClose(window))
 	{
-		// 5 because of 4 players and the inital golden buggy which is not
-		// a player
-		Input inputs[5];
+		/*
 		Input in = input.getInput(1);		//Get input
 		inputs[0] = in;
+		
 
 		if (in.cheat_coin)
 			std::cout << "Cheated in a coin \n";
+			*/
+		
 
-		physics.handleInput(&in, state.getPlayer(0)->getPhysicsID());
+		//Get inputs from players/ai
+		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
+		{
+			if (state.getPlayer(i)->isAI())
+			{
+				frameCount++;
+				if (frameCount > 30)
+				{
+					ai.findNewPath(i, ai.testTarget);
+					frameCount = 0;
+				}
+
+				inputs[i] = ai.getInput(i);
+			}
+			else
+				inputs[i] = input.getInput(i + 1);
+
+			physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
+		}
 
 	
-		if (state.numberOfPlayers() > 1){
+		/*if (state.numberOfPlayers() > 1){
 
 			//Change this to AI code
 
@@ -217,6 +246,8 @@ void GameManager::gameLoop()
 
 			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
 
+
+			//Not AI code. AIManager shouldn't change the golden buggy
 			if (physics.newGoldenBuggy){
 				physics.newGoldenBuggy = false;
 
@@ -232,6 +263,22 @@ void GameManager::gameLoop()
 				renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
 				
 			}
+		}*/
+
+		//Not AI code. AIManager shouldn't change the golden buggy
+		if (physics.newGoldenBuggy){
+			physics.newGoldenBuggy = false;
+
+			//Switch the golden buggie
+			PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggy);
+			unsigned int chasisRenderId_goldenBuggy = p->getRenderID();
+			renderer.assignColor(chasisRenderId_goldenBuggy, vec3(1.0f, 0.84f, 0.0f));
+
+
+			//Switch the player that used to be the golden buggy
+			PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
+			int chasisRenderId_reg = p_2->getRenderID();
+			renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
 		}
 
 		//Physics sim 
@@ -241,18 +288,17 @@ void GameManager::gameLoop()
 
 		float scale = 0.1f;
 
-		if (!in.drift)//in.powerup)
-			cam.rotateView(in.camH*scale, in.camV*scale);
-		if (in.drift)
-			cam.zoom(in.camV*0.95f + 1.f);
+		//Update to accomodate more players and multiple cameras
+		if (!inputs[0].drift)//in.powerup)
+			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
+		if (inputs[0].drift)
+			cam.zoom(inputs[0].camV*0.95f + 1.f);
 
 		
 
 		//Update game state and renderer
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
-
-
 		sound.updateSounds(state, inputs);
 
 		//Test code...
@@ -297,14 +343,17 @@ void GameManager::gameLoop()
 
 		//Get path
 		path.clear();
-		nav.getPathLines(&path, state.getPlayer(0)->getPos(), state.getPlayer(1)->getPos());
+		//ai.nav.getPathLines(&path, state.getPlayer(0)->getPos(), state.getPlayer(1)->getPos());
+
+		ai.getPathAsLines(1, &path);
 		vector<vec3> carPos;
 		vec3 p1 = state.getPlayer(0)->getPos();
 		vec3 p2 = state.getPlayer(1)->getPos();
 		p1.y = polygons[0].y;
 		p2.y = p1.y;
 		carPos.push_back(p1);
-		carPos.push_back(p2);
+		//carPos.push_back(p2);
+		carPos.push_back(ai.getCurrentTarget(1));
 
 		//Debugging
 		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
@@ -327,7 +376,7 @@ void GameManager::gameLoop()
 		frameCount++;
 		if (timeProgressed > 1.f)
 		{
-			printf("FPS = %d\n", frameCount);
+			//printf("FPS = %d\n", frameCount);
 			frameCount = 0;
 			timeProgressed = 0.f;
 		}
@@ -357,7 +406,7 @@ void GameManager::initTestScene()
 	temp.print();
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
-	createPlayer(vec3(5.f, 5.f, 15.f), traits);
+	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
 	state.getPlayer(1)->setAI(true);
 	//createGroundPlane(vec3(0.f, 1.f, 0.f), 0.f);
 	createTestLevel();

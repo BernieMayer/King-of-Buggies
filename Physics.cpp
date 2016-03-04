@@ -148,6 +148,7 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
 
+	//This shouldn't be in physics at all
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggy
 	if (vehicleActors.size() == 1){
 		goldenBuggy = vehicleActors[0];
