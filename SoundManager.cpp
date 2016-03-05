@@ -404,8 +404,10 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		case VEHICLE_COLLISION_EVENT:
 			VehicleCollisionEvent* vehE = dynamic_cast<VehicleCollisionEvent*>(e);
 
-			vec3 force = normalize(vehE->force);
-			float volume = max(abs(force.x), max(abs(force.y), abs(force.z)));
+			vec3 force = vehE->force;
+			float volume = length(force);
+			volume = map(volume, 0, 300000, 0, 2);
+			cout << "Volume: " << volume << "\n";
 			playBumpSound(vehE->location, volume);
 
 			break;
