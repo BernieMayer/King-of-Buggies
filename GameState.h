@@ -25,7 +25,7 @@ private:
 	vector<Coin> coins;
 	vector<Powerup> powerups;
 	vector<PowerupBox> boxes;
-	vector<Event> events;
+	vector<Event*> events;
 
 	unsigned int groundPhysicsID;
 	unsigned int groundRenderID;
@@ -38,8 +38,8 @@ public:
 	GameState();
 
 	//Event management
-	void pushEvent(Event newEvent);
-	Event getEvent(unsigned int eventNum);
+	void pushEvent(Event* newEvent);		//Pointer must be allocated on heap (using new)
+	Event* getEvent(unsigned int eventNum);
 	void clearEvents();
 
 	//Player management

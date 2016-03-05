@@ -6,7 +6,12 @@
 
 const unsigned int NO_VALUE = UINT_MAX;
 
-
+//List all subclass collision types here
+enum
+{
+	COLLISION_EVENT,
+	VEHICLE_COLLISION_EVENT,
+};
 
 
 

@@ -157,15 +157,22 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 // Events
 //////////////
 
-void GameState::pushEvent(Event newEvent) { events.push_back(newEvent); }
+void GameState::pushEvent(Event* newEvent) 
+{ 
+	events.push_back(newEvent); 
+}
 
-Event GameState::getEvent(unsigned int eventNum)
+Event* GameState::getEvent(unsigned int eventNum)
 {
 	return events[eventNum];
 }
 
 void GameState::clearEvents()
 {
+	for (unsigned int i = 0; i < events.size(); i++)
+	{
+		delete events[i];
+	}
 	events.clear();
 }
 

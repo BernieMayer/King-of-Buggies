@@ -52,6 +52,9 @@
       <Filter>Events</Filter>
     </ClCompile>
     <ClCompile Include="InterfaceManager.cpp" />
+    <ClCompile Include="VehicleCollisionEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -111,6 +114,9 @@
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="CollisionEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="VehicleCollisionEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
   </ItemGroup>

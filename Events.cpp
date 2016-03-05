@@ -3,7 +3,10 @@
 
 #include "Events.h"
 
+Event::Event()
+{
 
+}
 
 unsigned int Event::getType()
 {

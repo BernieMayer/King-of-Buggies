@@ -100,6 +100,7 @@
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameStateLoader.h" />
+    <ClInclude Include="VehicleCollisionEvent.h" />
     <ClInclude Include="InputSmoother.h" />
     <ClInclude Include="Keybindings.h" />
     <ClInclude Include="Input.h" />
@@ -156,6 +157,7 @@
     <ClCompile Include="specular.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
+    <ClCompile Include="VehicleCollisionEvent.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="VehicleTraits.cpp" />
   </ItemGroup>
