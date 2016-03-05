@@ -10,6 +10,7 @@
 #include "GameStateLoader.h"
 #include "LevelInfo.h"
 #include "Events.h"
+#include "VehicleCollisionEvent.h"
 
 const unsigned int NUM_PLAYERS = 4;
 const unsigned int NUM_COINS = 10;
@@ -40,6 +41,7 @@ public:
 	//Event management
 	void pushEvent(Event* newEvent);		//Pointer must be allocated on heap (using new)
 	Event* getEvent(unsigned int eventNum);
+	int getNbEvents() { return events.size(); }
 	void clearEvents();
 
 	//Player management

@@ -203,8 +203,9 @@ void GameManager::gameLoop()
 	//Test code (Gives AI initial random path
 	ai.testTarget = ai.getRandomTarget();
 	
-	if (!ai.findNewPath(1, ai.testTarget))
-		cout << endl;
+	if (!ai.findNewPath(1, ai.testTarget)) {
+		//cout << endl;
+	}
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -374,7 +375,9 @@ void GameManager::gameLoop()
 		carPos.push_back(p1);
 		//carPos.push_back(p2);
 		carPos.push_back(ai.getCurrentTarget(1));
-		printf("(%f %f %f) - (%f %f %f)\n", carPos[1].x, carPos[1].y, carPos[1].z, carPos[0].x, carPos[0].y, carPos[0].z);
+		//printf("(%f %f %f) - (%f %f %f)\n", carPos[1].x, carPos[1].y, carPos[1].z, carPos[0].x, carPos[0].y, carPos[0].z);
+
+		state.clearEvents();
 
 		//Debugging
 		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);

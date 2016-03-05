@@ -246,7 +246,7 @@ void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer)
 /*
  * Loads and plays a bump sound once at the given position
  */
-void SoundManager::playBumpSound(vec3 pos) {
+void SoundManager::playBumpSound(vec3 pos, float volume) {
 	ALuint bumpSource;
 	ALuint buffer;
 
@@ -256,7 +256,7 @@ void SoundManager::playBumpSound(vec3 pos) {
 
 	alSourcei(bumpSource, AL_BUFFER, buffer);
 	alSourcef(bumpSource, AL_PITCH, 1.0f);
-	alSourcef(bumpSource, AL_GAIN, 1.0f);
+	alSourcef(bumpSource, AL_GAIN, volume);
 	alSourcefv(bumpSource, AL_POSITION, SourcePos);
 	alSourcei(bumpSource, AL_LOOPING, AL_FALSE);
 
@@ -349,7 +349,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateMusic(state);
 	updateEngineSounds(state, inputs);
 	if (inputs[0].powerup) {
-		playBumpSound(state.getPlayer(0)->getPos());
+		playBumpSound(state.getPlayer(0)->getPos(), 1.0);
 	}
 	else if (inputs[0].menu) {
 		playDingSound(state.getPlayer(0)->getPos());
@@ -396,6 +396,21 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		startMusic(state);
 	}
 
+	for (int i = 0; i < state.getNbEvents(); i++) {
+		Event* e = state.getEvent(i);
+
+		switch (e->getType())
+		{
+		case VEHICLE_COLLISION_EVENT:
+			VehicleCollisionEvent* vehE = dynamic_cast<VehicleCollisionEvent*>(e);
+
+			vec3 force = normalize(vehE->force);
+			float volume = max(abs(force.x), max(abs(force.y), abs(force.z)));
+			playBumpSound(vehE->location, volume);
+
+			break;
+		}
+	}
 	// Feel free to remove this. It has no purpose, just sounds funny
 	//updateMusicPitch(state, inputs[0]);
 }

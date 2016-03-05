@@ -468,8 +468,6 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	PxVehicleDrive4W* vehicle = vehicleActors[id];
 
-	//cout << "Engine speed: " << vehicle->mDriveDynData.getEngineRotationSpeed() << "\n";
-
 	float fSpeed = vehicle->computeForwardSpeed();
 
 	// May need to change speed checks to be something like between 0.1 and -0.1
@@ -1146,9 +1144,9 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 					index2 = i;
 				}
 			}
-
-			PxContactPairPoint* contactPoint = NULL;
+			
 			int numContacts = cp.contactCount;
+			PxContactPairPoint contactPoint[1];
 			if (numContacts > 0) {
 				cp.extractContacts(contactPoint, 1);
 				float posX = contactPoint->position.x;
@@ -1157,22 +1155,6 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				vec3 pos = vec3(posX, posY, posZ);
 				vec3 normal = vec3(contactPoint->normal.x, contactPoint->normal.y, contactPoint->normal.z);
 				vec3 force = vec3(contactPoint->impulse.x / lastFrameTime, contactPoint->impulse.y / lastFrameTime, contactPoint->impulse.z / lastFrameTime);
-
-				if (isVehicle1 && isVehicle2) {
-					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
-				}
-				else {
-					// TODO add collision against wall
-				}
-			}
-			// If no contacts, give approx pos and 0 for normal and force
-			else {
-				float posX = (actor1->getGlobalPose().p.x + actor2->getGlobalPose().p.x) / 2;
-				float posY = (actor1->getGlobalPose().p.y + actor2->getGlobalPose().p.y) / 2;
-				float posZ = (actor1->getGlobalPose().p.z + actor2->getGlobalPose().p.z) / 2;
-				vec3 pos = vec3(posX, posY, posZ);
-				vec3 normal = vec3(0, 0, 0);
-				vec3 force = vec3(0, 0, 0);
 
 				if (isVehicle1 && isVehicle2) {
 					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
