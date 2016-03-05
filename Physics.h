@@ -11,6 +11,8 @@
 #include "Timer.h"
 #include "Input.h"
 #include "VehicleTraits.h"
+#include "CollisionEvent.h"
+#include "VehicleCollisionEvent.h"
 
 //Hello World (Test commit)
 
@@ -122,6 +124,9 @@ private:
 
 	//
 	vector<int> vehicleForwards;	//Vehicle class
+
+	GameState* lastState;
+	float lastFrameTime = 1;
 
 
 	void initScene();

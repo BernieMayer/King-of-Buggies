@@ -411,6 +411,8 @@ void Physics::updateGameState(GameState* state, float time)
 		Powerup* powerup = state->getPowerup(i);
 		powerup->setTransform(dynamic_getGlobalPose(powerup->getPhysicsID()), time);
 	}
+
+	lastState = state;
 }
 
 /**
@@ -1077,6 +1079,7 @@ void Physics::startSim(float frameTime) {
 
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); 
 
+	lastFrameTime = frameTime;
 	gScene->simulate(frameTime);
 }
 
@@ -1122,8 +1125,47 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 	{
 		const PxContactPair& cp = pairs[i];
 
+
 		if (cp.events & PxPairFlag::eNOTIFY_TOUCH_FOUND)
 		{
+			PxRigidActor* actor1 = pairHeader.actors[0];
+			int index1 = 0;
+			PxRigidActor* actor2 = pairHeader.actors[1];
+			int index2 = 0;
+
+			bool isVehicle1 = false;
+			bool isVehicle2 = false;
+
+			for (int i = 0; i < vehicleActors.size(); i++) {
+				if (actor1 == vehicleActors[i]->getRigidDynamicActor()) {
+					isVehicle1 = true;
+					index1 = i;
+				}
+				if (actor2 == vehicleActors[i]->getRigidDynamicActor()) {
+					isVehicle2 = true;
+					index2 = i;
+				}
+			}
+
+			PxContactPairPoint* contactPoint = NULL;
+			int numContacts = cp.contactCount;
+			if (numContacts > 0) {
+				cp.extractContacts(contactPoint, 1);
+				float posX = contactPoint->position.x;
+				float posY = contactPoint->position.y;
+				float posZ = contactPoint->position.z;
+				vec3 pos = vec3(posX, posY, posZ);
+				vec3 normal = vec3(contactPoint->normal.x, contactPoint->normal.y, contactPoint->normal.z);
+				vec3 force = vec3(contactPoint->impulse.x / lastFrameTime, contactPoint->impulse.y / lastFrameTime, contactPoint->impulse.z / lastFrameTime);
+
+				if (isVehicle1 && isVehicle2) {
+					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
+				}
+				else {
+					// TODO add collision against wall
+				}
+			}
+
 			if ((pairHeader.actors[0] == goldenBuggy->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggy->getRigidDynamicActor()))
 			{
 				int pairIndexOfGoldenBuggy;
@@ -1167,7 +1209,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				}
 					
 
-				cout << "A collission with the goldenBuggy has been detected \n";
+				cout << "A collision with the goldenBuggy has been detected \n";
 				break;
 			}
 		}
