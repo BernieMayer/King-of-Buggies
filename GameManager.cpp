@@ -358,6 +358,12 @@ void GameManager::gameLoop()
 		if (theScore >= 700 && gameOver == false) {
 			winner = state.getGoldenBuggyID();
 			printf("Player %i is the winner!\n", winner);
+			if (winner == 0) {
+				sound.playWinSound(state.getPlayer(0)->getPos());
+			}
+			else {
+				sound.playLossSound(state.getPlayer(0)->getPos());
+			}
 			gameOver = true;
 			//break;
 		}

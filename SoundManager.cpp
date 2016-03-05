@@ -341,6 +341,40 @@ void SoundManager::updateMusicPitch(GameState state, Input input) {
 	alSourcef(musicSource, AL_PITCH, 1 * accelInput);
 }
 
+void SoundManager::playWinSound(vec3 pos) {
+	ALuint winSource;
+	ALuint buffer;
+
+	loadWavToBuf("Yay.wav", &winSource, &buffer);
+
+	ALfloat *SourcePos = vec3ToALfloat(pos).data();
+
+	alSourcei(winSource, AL_BUFFER, buffer);
+	alSourcef(winSource, AL_PITCH, 1.0f);
+	alSourcef(winSource, AL_GAIN, 1.0);
+	alSourcefv(winSource, AL_POSITION, SourcePos);
+	alSourcei(winSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(winSource);
+}
+
+void SoundManager::playLossSound(vec3 pos) {
+	ALuint lossSource;
+	ALuint buffer;
+
+	loadWavToBuf("Trombone.wav", &lossSource, &buffer);
+
+	ALfloat *SourcePos = vec3ToALfloat(pos).data();
+
+	alSourcei(lossSource, AL_BUFFER, buffer);
+	alSourcef(lossSource, AL_PITCH, 1.0f);
+	alSourcef(lossSource, AL_GAIN, 1.0);
+	alSourcefv(lossSource, AL_POSITION, SourcePos);
+	alSourcei(lossSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(lossSource);
+}
+
 /*
  * Updates all sounds
  */

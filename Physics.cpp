@@ -413,6 +413,15 @@ void Physics::updateGameState(GameState* state, float time)
 	}
 
 	lastState = state;
+	
+	if (goldenBuggyLock) {
+		goldenBuggyCounter++;
+		// 2 second lock
+		if (goldenBuggyCounter >= 120) {
+			goldenBuggyLock = false;
+			goldenBuggyCounter = 0;
+		}
+	}
 }
 
 /**
@@ -1174,36 +1183,39 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 
 				for (unsigned int i = 0; i < vehicleActors.size(); i++)
 				{
-					if (pairIndexOfGoldenBuggy == 0){
-						if (pairHeader.actors[1] == vehicleActors[i]->getRigidDynamicActor()) 
-						{
-							//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
-							indexOfOldGoldenBuggy = indexOfGoldenBuggy;
-							setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
-							indexOfGoldenBuggy = i;
-							goldenBuggy = vehicleActors[i];
-							newGoldenBuggy = true;
-							modifySpeed(i, 3); 
-							break;
+					if (!goldenBuggyLock) {
+						if (pairIndexOfGoldenBuggy == 0){
+							if (pairHeader.actors[1] == vehicleActors[i]->getRigidDynamicActor())
+							{
+								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
+								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
+								setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
+								indexOfGoldenBuggy = i;
+								goldenBuggy = vehicleActors[i];
+								newGoldenBuggy = true;
+								modifySpeed(i, 3);
+								goldenBuggyLock = true;
+								goldenBuggyCounter = 0;
+								break;
+							}
+						}
+						else {
+							if (pairHeader.actors[0] == vehicleActors[i]->getRigidDynamicActor())
+							{
+								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
+								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
+								setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
+								indexOfGoldenBuggy = i;
+								goldenBuggy = vehicleActors[i];
+								newGoldenBuggy = true;
+								modifySpeed(i, 3);
+								goldenBuggyLock = true;
+								goldenBuggyCounter = 0;
+								break;
+							}
+
 						}
 					}
-					else {
-						if (pairHeader.actors[0] == vehicleActors[i]->getRigidDynamicActor())
-						{
-							//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
-							indexOfOldGoldenBuggy = indexOfGoldenBuggy;
-							setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
-							indexOfGoldenBuggy = i;
-							goldenBuggy = vehicleActors[i];
-							newGoldenBuggy = true;
-							modifySpeed(i, 3);
-							break;
-						}
-
-					}
-						
-						
-
 				}
 					
 

@@ -91,6 +91,8 @@ public:
 	int indexOfGoldenBuggy = 0;
 	int indexOfOldGoldenBuggy = 0;
 	float initVehicleSpeed = 500.f;
+	bool goldenBuggyLock = false;
+	int goldenBuggyCounter = 0;
 
 
 private:

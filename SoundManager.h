@@ -24,6 +24,8 @@ public:
 	void updateSounds(GameState state, Input inputs[]);
 	void playBumpSound(vec3 pos, float volume);
 	void playDingSound(vec3 pos);
+	void playWinSound(vec3 pos);
+	void playLossSound(vec3 pos);
 	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
