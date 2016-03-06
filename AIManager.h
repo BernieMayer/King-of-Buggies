@@ -74,7 +74,7 @@ private:
 	float frameCounter = 0;
 	GameState lastState;
 	vector<bool> reversing;
-	float carSpeed = 0.3f;
+	float carSpeed = 1.0f;
 	// Default drive to position
 	vec3 lastDriveToPos = vec3(-13, 0.5, -15);
 	vector<InputSmoother> smoother;		// = InputSmoother();
