@@ -203,7 +203,7 @@ void GameManager::gameLoop()
 	//Test code (Gives AI initial random path
 	ai.testTarget = ai.getRandomTarget();
 	
-	if (!ai.findNewPath(1, ai.testTarget)) {
+	if (!ai.findNewPath(1, state.getGoldenBuggy()->getPos())) {
 		//cout << endl;
 	}
 
@@ -218,7 +218,8 @@ void GameManager::gameLoop()
 				frameCount++;
 				if (frameCount > 30)
 				{
-					ai.findNewPath(i, ai.testTarget);
+					//ai.findNewPath(i, ai.testTarget);
+					ai.findNewPath(i, state.getGoldenBuggy()->getPos());
 					frameCount = 0;
 				}
 

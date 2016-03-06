@@ -323,7 +323,7 @@ float NavMesh::edgeCost(unsigned int i, unsigned int j)
 float NavMesh::trajectoryCost(vec3 trajectory, vec3 newTrajectory)
 {
 	float weight = 1.f - (dot(newTrajectory, trajectory) + 1.f)*0.5;
-	return weight*10.f;
+	return weight*20.f;
 }
 
 float NavMesh::heuristic(unsigned int current, unsigned int finish)

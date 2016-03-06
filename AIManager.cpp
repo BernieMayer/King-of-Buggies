@@ -91,6 +91,17 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 		return Input();
 }
 
+Input AIManager::followPathToTarget(unsigned int playerNum, vec3 target)
+{
+	if (collisionRecovery)
+		return recover(playerNum);
+
+	else if (pathToGoal[playerNum].size() > 0)
+		return driveToPoint(playerNum, pathToGoal[playerNum][pointOnPath[playerNum]]);
+	else
+		return Input();
+}
+
 void AIManager::getPathAsLines(unsigned int playerNum, vector<vec3>* lines)
 {
 	for (unsigned int i = 1; i < pathToGoal[playerNum].size(); i++)

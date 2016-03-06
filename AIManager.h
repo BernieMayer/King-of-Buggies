@@ -30,6 +30,7 @@ public:
 
 	//Test functions
 	Input followRandomPath(unsigned int playerNum);
+	Input followPathToTarget(unsigned int playerNum, vec3 target);
 	vec3 getRandomTarget();
 
 	Input getInput(unsigned int playerNum);		//Main interface into ai
