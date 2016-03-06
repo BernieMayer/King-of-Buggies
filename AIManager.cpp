@@ -207,33 +207,58 @@ Input AIManager::recover(int playerNum) {
 	float dot = facing(state->getPlayer(playerNum), infoAtCollision.getPos());
 	float side = beside(state->getPlayer(playerNum), infoAtCollision.getPos());
 
-	if (dot == 0) {
-		dot = 1;
+	if (side > 1) {
+		side = 1.0f;
+	}
+	else if (side < -1) {
+		side = -1;
+	}
+	else if (side != side) {
+		side = 1;
 	}
 
 	if (reversing[playerNum]) {
 		if (side > 0) {
-			input.turnL = abs(dot);
+			if (side < 0.3)
+			{
+				side = 0.3f;
+			}
+			input.turnL = side;
 		}
 		else {
-			input.turnR = abs(dot);
+			if (side > -0.3)
+			{
+				side = -0.3f;
+			}
+			input.turnR = -side;
 		}
 	}
 	else {
-		if (side < 0) {
-			input.turnL = abs(dot);
+		if (side > 0) {
+			if (side < 0.3)
+			{
+				side = 0.3f;
+			}
+			input.turnR = side;
 		}
 		else {
-			input.turnR = abs(dot);
+			if (side > -0.3)
+			{
+				side = -0.3f;
+			}
+			input.turnL = -side;
 		}
 	}
+
+	cout << "Forward: " << input.forward << " Backward: " << input.backward << " Left: " << input.turnL << " Right: " << input.turnR << "\n";
+
 	return input;
 }
 
 void AIManager::updateRecovery(unsigned int playerNum)
 {
 	// Keeps a sort of cyclical vector
-	if (pastInfo[playerNum].size() < 20) {
+	if (pastInfo[playerNum].size() < recoveryThreshold) {
 		pastInfo[playerNum].erase(pastInfo[playerNum].begin());
 	}
 	pastInfo[playerNum].push_back((*state->getPlayer(playerNum)));

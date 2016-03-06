@@ -48,10 +48,11 @@ public:
 	void updateRecovery(unsigned int playerNum);
 
 	PlayerInfo infoAtCollision;
+	int recoveryThreshold = 60;
 	bool collisionRecovery = false;
 	int collisionRecoveryCounter = 0;
-	// 3 seconds to recover
-	int collisionRecoveryCounterMax = 3 * 60;
+	// 2 seconds to recover
+	int collisionRecoveryCounterMax = 1 * 60;
 
 	//Test code - Not for use in final product
 	vec3 testTarget;
