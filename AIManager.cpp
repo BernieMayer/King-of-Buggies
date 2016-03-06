@@ -26,7 +26,11 @@ void  AIManager::initAI() {
 		pathToGoal.push_back(path);
 		pointOnPath.push_back(0);
 		prevPosition.push_back(state->getPlayer(i)->getPos());
+		reversing.push_back(false);
 		smoother.push_back(InputSmoother());
+		vector<PlayerInfo> temp;
+		temp.push_back(*state->getPlayer(i));
+		pastInfo.push_back(temp);
 	}
 }
 
@@ -176,6 +180,45 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	
 }
 
+Input AIManager::recover(int playerNum) {
+	// If recovery just started
+	if (collisionRecoveryCounter == 0) {
+		// Reverse direction
+		reversing[playerNum] = !reversing[playerNum];
+	}
+
+	Input input = Input();
+	input.forward = carSpeed;
+	input.backward = 0;
+	input.turnL = 0;
+	input.turnR = 0;
+
+	float dot = facing(state->getPlayer(playerNum), infoAtCollision.getPos());
+	float side = beside(state->getPlayer(playerNum), infoAtCollision.getPos());
+
+	if (dot == 0) {
+		dot = 1;
+	}
+
+	if (reversing[playerNum]) {
+		if (side > 0) {
+			input.turnL = abs(dot);
+		}
+		else {
+			input.turnR = abs(dot);
+		}
+	}
+	else {
+		if (side < 0) {
+			input.turnL = abs(dot);
+		}
+		else {
+			input.turnR = abs(dot);
+		}
+	}
+	return input;
+}
+
 Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 	if (switchType) {
 		if (aiType == 2) {
@@ -190,6 +233,33 @@ Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 			aiType += 1;
 			cout << "Chase\n";
 		}
+	}
+
+	// Keeps a sort of cyclical vector
+	if (pastInfo[playerNum].size() < 20) {
+		pastInfo[playerNum].erase(pastInfo[playerNum].begin());
+	}
+	pastInfo[playerNum].push_back((*state->getPlayer(playerNum)));
+
+	bool allSlow = true;
+	for (int i = 0; i < pastInfo[playerNum].size(); i++) {
+		if (pastInfo[playerNum][i].getFSpeed() > 1.0f || pastInfo[playerNum][i].getFSpeed() < 1.0f) {
+			allSlow = false;
+		}
+	}
+
+	if (collisionRecovery) {
+		collisionRecoveryCounter++;
+		if (collisionRecoveryCounter > collisionRecoveryCounterMax) {
+			collisionRecovery = false;
+			collisionRecoveryCounter = 0;
+		}
+	}
+
+	if (allSlow) {
+		collisionRecovery = true;
+		infoAtCollision = *state->getPlayer(playerNum);
+		return recover(playerNum);
 	}
 
 	if (aiType == 0) {
@@ -286,14 +356,14 @@ Input AIManager::testAIEvade(int playerNum) {
 		input.forward = 0.0f;
 		input.backward = carSpeed;
 		// if still moving forwards
-		if (!reversing && speed > 0) {
+		if (!reversing[playerNum] && speed > 0) {
 			// Do not turn as direction of turning will be changing soon
 			input.turnL = 0;
 			input.turnR = 0;
 		}
 		// If moving backwards
-		else if ((!reversing && speed <= 0) || reversing) {
-			reversing = true;
+		else if ((!reversing[playerNum] && speed <= 0) || reversing[playerNum]) {
+			reversing[playerNum] = true;
 				// Turn
 			if (side > 0) {
 				input.turnL = dot;
@@ -305,13 +375,13 @@ Input AIManager::testAIEvade(int playerNum) {
 	}
 	else if (dot > -0.9) {
 		// If still moving backwards, do not turn as turning direction will be changing soon
-		if (reversing && speed < 0) {
+		if (reversing[playerNum] && speed < 0) {
 			input.turnL = 0;
 			input.turnR = 0;
 		}
 		// If moving forwards
-		else if ((reversing && speed >= 0) || !reversing) {
-			reversing = false;
+		else if ((reversing[playerNum] && speed >= 0) || !reversing[playerNum]) {
+			reversing[playerNum] = false;
 				// Turn
 			if (side > 0) {
 				input.turnR = side;

@@ -39,10 +39,17 @@ public:
 	Input updateAI(int playerNum, bool switchType, vec3 pos);
 	Input testAIChase(unsigned int aiNum);
 	Input testAIEvade(int playerNum);
+	Input recover(int playerNum);
 	void initAI(int pNum);
 	void initAI();
 	Input driveToPoint(int playerNum, vec3 pos);
 	bool atPoint(int playerNum, vec3 pos);
+	vector<vector<PlayerInfo>> pastInfo;
+	PlayerInfo infoAtCollision;
+	bool collisionRecovery = false;
+	int collisionRecoveryCounter = 0;
+	// 3 seconds to recover
+	int collisionRecoveryCounterMax = 3 * 60;
 
 	//Test code - Not for use in final product
 	vec3 testTarget;
@@ -62,7 +69,7 @@ private:
 	bool lastTurnL = false;
 	float frameCounter = 0;
 	GameState lastState;
-	bool reversing = false;
+	vector<bool> reversing;
 	float carSpeed = 0.3f;
 	// Default drive to position
 	vec3 lastDriveToPos = vec3(-13, 0.5, -15);
