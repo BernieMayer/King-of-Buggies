@@ -45,6 +45,8 @@ public:
 	Input driveToPoint(int playerNum, vec3 pos);
 	bool atPoint(int playerNum, vec3 pos);
 	vector<vector<PlayerInfo>> pastInfo;
+	void updateRecovery(unsigned int playerNum);
+
 	PlayerInfo infoAtCollision;
 	bool collisionRecovery = false;
 	int collisionRecoveryCounter = 0;

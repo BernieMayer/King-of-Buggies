@@ -82,6 +82,8 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 
 		findNewPath(playerNum, testTarget);
 	}
+	if (collisionRecovery)
+		return recover(playerNum);
 
 	if (pathToGoal[playerNum].size() > 0)
 		return driveToPoint(playerNum, pathToGoal[playerNum][pointOnPath[playerNum]]);
@@ -100,6 +102,8 @@ void AIManager::getPathAsLines(unsigned int playerNum, vector<vec3>* lines)
 
 Input AIManager::getInput(unsigned int playerNum)
 {
+	updateRecovery(playerNum);
+
 	return followRandomPath(playerNum);		//Test function
 }
 
@@ -226,6 +230,37 @@ Input AIManager::recover(int playerNum) {
 	return input;
 }
 
+void AIManager::updateRecovery(unsigned int playerNum)
+{
+	// Keeps a sort of cyclical vector
+	if (pastInfo[playerNum].size() < 20) {
+		pastInfo[playerNum].erase(pastInfo[playerNum].begin());
+	}
+	pastInfo[playerNum].push_back((*state->getPlayer(playerNum)));
+
+	bool allSlow = true;
+	for (int i = 0; i < pastInfo[playerNum].size(); i++) {
+		if (pastInfo[playerNum][i].getFSpeed() > 1.0f || pastInfo[playerNum][i].getFSpeed() < -1.0f) {
+			allSlow = false;
+		}
+	}
+
+	if (collisionRecovery) {
+		collisionRecoveryCounter++;
+		if (collisionRecoveryCounter > collisionRecoveryCounterMax) {
+			cout << "Leaving recovery" << endl;
+			collisionRecovery = false;
+			collisionRecoveryCounter = 0;
+		}
+	}
+
+	if (allSlow) {
+		cout << "entering recovery" << endl;
+		collisionRecovery = true;
+		infoAtCollision = *state->getPlayer(playerNum);
+	}
+}
+
 Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 	if (switchType) {
 		if (aiType == 2) {
@@ -242,6 +277,9 @@ Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 		}
 	}
 
+	updateRecovery(playerNum);
+
+	/*
 	// Keeps a sort of cyclical vector
 	if (pastInfo[playerNum].size() < 20) {
 		pastInfo[playerNum].erase(pastInfo[playerNum].begin());
@@ -267,7 +305,10 @@ Input AIManager::updateAI(int playerNum, bool switchType, vec3 pos) {
 		collisionRecovery = true;
 		infoAtCollision = *state->getPlayer(playerNum);
 		return recover(playerNum);
-	}
+	}*/
+
+	if (collisionRecovery)
+		return recover(playerNum);
 
 	if (aiType == 0) {
 		return driveToPoint(playerNum, pos);
