@@ -188,8 +188,15 @@ Input AIManager::recover(int playerNum) {
 	}
 
 	Input input = Input();
-	input.forward = carSpeed;
-	input.backward = 0;
+	if (reversing[playerNum]) {
+		input.forward = 0;
+		input.backward = carSpeed;
+	}
+	else {
+		input.forward = carSpeed;
+		input.backward = 0;
+	}
+
 	input.turnL = 0;
 	input.turnR = 0;
 
