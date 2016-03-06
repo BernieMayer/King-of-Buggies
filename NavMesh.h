@@ -107,13 +107,15 @@ public:
 	void navMeshToLines(vector<vec3>* polygons, vector<vec3>* edges);
 
 	float edgeCost(unsigned int i, unsigned int j);
+	float trajectoryCost(vec3 trajectory, vec3 newTrajectory);
 	float heuristic(unsigned int i, unsigned int j);
 
 	unsigned int getPolygon(vec3 position);
-	bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 target);
+	bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
 
 	bool getPathLines(vector<vec3>* path, vec3 position, vec3 target);
-	bool getPathPoints(vector<vec3>* path, vec3 position, vec3 target);		//Use this one for AI
+	bool getPathPoints(vector<vec3>* path, vec3 position, vec3 target, vec3 forwards);		//Use this one for AI
+
 
 	unsigned int getRandomNode();
 

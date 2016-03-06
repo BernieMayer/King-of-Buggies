@@ -43,7 +43,7 @@ bool AIManager::findNewPath(unsigned int playerNum, vec3 target)
 {
 	pathToGoal[playerNum].clear();
 	pointOnPath[playerNum] = 0;
-	return nav.getPathPoints(&pathToGoal[playerNum], state->getPlayer(playerNum)->getPos(), target);
+	return nav.getPathPoints(&pathToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target);
 }
 
 vec3 AIManager::getRandomTarget()
@@ -85,8 +85,10 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 	if (collisionRecovery)
 		return recover(playerNum);
 
-	if (pathToGoal[playerNum].size() > 0)
+	else if (pathToGoal[playerNum].size() > 0)
 		return driveToPoint(playerNum, pathToGoal[playerNum][pointOnPath[playerNum]]);
+	else
+		return Input();
 }
 
 void AIManager::getPathAsLines(unsigned int playerNum, vector<vec3>* lines)

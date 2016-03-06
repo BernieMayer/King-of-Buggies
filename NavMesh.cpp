@@ -320,6 +320,12 @@ float NavMesh::edgeCost(unsigned int i, unsigned int j)
 	return edges[i][j];
 }
 
+float NavMesh::trajectoryCost(vec3 trajectory, vec3 newTrajectory)
+{
+	float weight = 1.f - (dot(newTrajectory, trajectory) + 1.f)*0.5;
+	return weight*10.f;
+}
+
 float NavMesh::heuristic(unsigned int current, unsigned int finish)
 {
 	vec3 diff = nodes[current].getCenter() - nodes[finish].getCenter();
@@ -329,7 +335,7 @@ float NavMesh::heuristic(unsigned int current, unsigned int finish)
 
 
 
-bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 target)
+bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forwards, vec3 target)
 {
 	unsigned int start = getPolygon(position);		//Index of polygon containing starting position
 	unsigned int finish = getPolygon(target);		//Index of polygon containing finishing position
@@ -337,8 +343,11 @@ bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 targ
 	if ((start == NO_VALUE) || (finish == NO_VALUE))
 		return false;
 
-	vector<unsigned int> came_from (nodes.size(), NO_VALUE);	//Stores node with shortest path to this one
+	vector<unsigned int> came_from(nodes.size(), NO_VALUE);	//Stores node with shortest path to this one
 	vector<float> cost(nodes.size(), -1.f);		//Stores cost of node
+	vector<vec3> trajectory(nodes.size(), vec3(0.f));
+	trajectory[start] = forwards;
+
 	//Priority queue storing outer ring of explored nodes
 	priority_queue<IndexWeightPair, vector<IndexWeightPair>, IndexWeightComparison> frontier;
 
@@ -357,7 +366,9 @@ bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 targ
 		vector<Edge>::iterator next = nodes[current.i].getEdgeIterator();
 		for (next; next != nodes[current.i].getEndIterator(); next++)
 		{
-			float newCost = cost[current.i] + edgeCost(current.i, next->index);
+			vec3 newTrajectory = normalize(nodes[next->index].getCenter() - nodes[current.i].getCenter());
+			float newCost = cost[current.i] + edgeCost(current.i, next->index) 
+				+ trajectoryCost(trajectory[current.i], newTrajectory);
 
 			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))
 			{
@@ -366,6 +377,7 @@ bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 targ
 
 				frontier.push(IndexWeightPair(next->index, priority));
 				came_from[next->index] = current.i;
+				trajectory[next->index] = newTrajectory;
 			}
 		}
 
@@ -388,7 +400,7 @@ bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 targ
 	//Reverse path - consider swapping end and beginning to get already reversed path
 	for (unsigned int i = 0; i < temp.size(); i++)
 	{
-		path->push_back(temp[temp.size()-1-i]);
+		path->push_back(temp[temp.size() - 1 - i]);
 	}
 
 	return true;
@@ -429,7 +441,7 @@ bool NavMesh::getPathLines(vector<vec3>* path, vec3 position, vec3 target)
 	vector<unsigned int> indices;
 	path->push_back(vec3(position.x, position.y+6.f, position.z));
 
-	if (getPath_AStar(&indices, position, target))
+	if (getPath_AStar(&indices, position, target, vec3(0.f, 0.f, 1.f)))
 	{
 		for (unsigned int i = 1; i < indices.size(); i++)
 		{
@@ -452,11 +464,12 @@ bool NavMesh::getPathLines(vector<vec3>* path, vec3 position, vec3 target)
 }
 
 //Use this one!
-bool NavMesh::getPathPoints(vector<vec3>* path, vec3 position, vec3 target)
+bool NavMesh::getPathPoints(vector<vec3>* path, vec3 position, vec3 forwards, vec3 target)
 {
 	vector<unsigned int> indices;
 
-	if (getPath_AStar(&indices, position, target))
+	//if (getPath_AStar(&indices, position, target))
+	if (getPath_AStar(&indices, position, forwards, target))
 	{
 		for (unsigned int i = 1; i < indices.size(); i++)
 		{
