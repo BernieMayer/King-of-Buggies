@@ -220,6 +220,16 @@ Input AIManager::recover(int playerNum) {
 	float dot = facing(state->getPlayer(playerNum), infoAtCollision.getPos());
 	float side = beside(state->getPlayer(playerNum), infoAtCollision.getPos());
 
+	if (dot > 1) {
+		dot = 1.0f;
+	}
+	else if (dot < -1) {
+		dot = -1;
+	}
+	else if (dot != dot) {
+		dot = 1;
+	}
+
 	if (side > 1) {
 		side = 1.0f;
 	}
@@ -232,40 +242,24 @@ Input AIManager::recover(int playerNum) {
 
 	if (reversing[playerNum]) {
 		if (side > 0) {
-			if (side < 0.3)
-			{
-				side = 0.3f;
-			}
-			input.turnL = side;
+			input.turnL = dot;
 		}
 		else {
-			if (side > -0.3)
-			{
-				side = -0.3f;
-			}
-			input.turnR = -side;
+			input.turnR = dot;
 		}
 	}
 	else {
 		if (side > 0) {
-			if (side < 0.3)
-			{
-				side = 0.3f;
-			}
-			input.turnR = side;
+			input.turnR = dot;
 		}
 		else {
-			if (side > -0.3)
-			{
-				side = -0.3f;
-			}
-			input.turnL = -side;
+			input.turnL = dot;
 		}
 	}
 
 	cout << "Forward: " << input.forward << " Backward: " << input.backward << " Left: " << input.turnL << " Right: " << input.turnR << "\n";
 
-	return input;
+	return smoother[playerNum].smooth(input);
 }
 
 void AIManager::updateRecovery(unsigned int playerNum)
@@ -278,7 +272,7 @@ void AIManager::updateRecovery(unsigned int playerNum)
 
 	bool allSlow = true;
 	for (int i = 0; i < pastInfo[playerNum].size(); i++) {
-		if (pastInfo[playerNum][i].getFSpeed() > 1.0f || pastInfo[playerNum][i].getFSpeed() < -1.0f) {
+		if (pastInfo[playerNum][i].getFSpeed() > 0.5f || pastInfo[playerNum][i].getFSpeed() < -0.5f) {
 			allSlow = false;
 		}
 	}
