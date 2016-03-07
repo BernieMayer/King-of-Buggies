@@ -53,7 +53,6 @@ private:
 
 	bool secretPlaying = false;
 	bool secret2Unlocked = false;
-	bool driftDown = false;
 };
 
 #endif // SOUNDMANAGER_H

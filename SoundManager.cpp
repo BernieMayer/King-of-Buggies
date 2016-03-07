@@ -382,38 +382,26 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateListener(state);
 	updateMusic(state);
 	updateEngineSounds(state, inputs);
-	if (inputs[0].powerup) {
-		playBumpSound(state.getPlayer(0)->getPos(), 1.0);
-	}
-	else if (inputs[0].menu) {
-		playDingSound(state.getPlayer(0)->getPos());
-	}
-	else if (inputs[0].drift && !secretPlaying && !secret2Unlocked && !driftDown) {
+	if (inputs[0].menu && !secretPlaying && !secret2Unlocked) {
 		secretPlaying = true;
-		driftDown = true;
 		playSecret(state);
 	}
-	else if (inputs[0].drift && secretPlaying && !secret2Unlocked && !driftDown) {
+	else if (inputs[0].menu && secretPlaying && !secret2Unlocked) {
 		secretPlaying = false;
-		driftDown = true;
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
-	else if (inputs[0].drift && !secretPlaying && secret2Unlocked && !driftDown) {
+	else if (inputs[0].menu && !secretPlaying && secret2Unlocked) {
 		secretPlaying = true;
-		driftDown = true;
 		playSecret2(state);
 	}
-	else if (inputs[0].drift && secretPlaying && secret2Unlocked && !driftDown) {
+	else if (inputs[0].menu && secretPlaying && secret2Unlocked) {
 		secretPlaying = false;
 		secret2Unlocked = false;
-		driftDown = true;
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
-	else if (!inputs[0].drift && driftDown) {
-		driftDown = false;
-	}
+\
 
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
