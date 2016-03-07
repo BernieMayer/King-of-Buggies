@@ -257,8 +257,6 @@ Input AIManager::recover(int playerNum) {
 		}
 	}
 
-	cout << "Forward: " << input.forward << " Backward: " << input.backward << " Left: " << input.turnL << " Right: " << input.turnR << "\n";
-
 	return smoother[playerNum].smooth(input);
 }
 

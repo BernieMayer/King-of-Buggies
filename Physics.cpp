@@ -487,9 +487,25 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
 		vehicleForwards[id] = 1;
 	}
+	else if ((input->forward > input->backward) && vehicleForwards[id] == 1) {
+		// If supposed to be moving forwards
+		if (vehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE) {
+			// But in reverse gear
+			// put into first
+			vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		}
+	}
 	else if ((input->forward < input->backward) && (vehicleForwards[id] == 1 || vehicleForwards[id] == -1)) {
 		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
 		vehicleForwards[id] = 0;
+	}
+	else if ((input->forward < input->backward) && vehicleForwards[id] == 0) {
+		// If supposed to be moving backwards
+		if (vehicle->mDriveDynData.getCurrentGear() != PxVehicleGearsData::eREVERSE) {
+			// But not in reverse gear
+			// put into reverse gear
+			vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		}
 	}
 
 	if (vehicleForwards[id] == 1) {
