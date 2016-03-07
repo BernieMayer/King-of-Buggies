@@ -12,7 +12,9 @@ float InterfaceManager::getScoreBarWidth(GameState* state, unsigned int playerID
 {
 	float score = state->getPlayer(playerID)->getScore();
 	
-	float barRatio = score / 700.f;
+	float maxScore = state->getMaxScore();
+
+	float barRatio = score / maxScore;
 	float theWidth = (wWidth * barRatio);
 	
 	return theWidth;

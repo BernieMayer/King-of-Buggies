@@ -32,6 +32,8 @@ private:
 	unsigned int groundRenderID;
 
 	unsigned int goldenBuggy;
+
+	unsigned int maxScore;
 	
 	
 
@@ -55,6 +57,8 @@ public:
 	unsigned int numberOfAIs();
 	PlayerInfo* getGoldenBuggy();
 	unsigned int getGoldenBuggyID();
+
+	unsigned int getMaxScore();
 
 	//Coin management
 	void addCoin(const Coin& coin);

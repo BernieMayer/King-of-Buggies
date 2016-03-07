@@ -5,7 +5,7 @@
 
 GameState::GameState()
 {
-
+	maxScore = 1000;
 }
 
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
@@ -53,6 +53,8 @@ PlayerInfo* GameState::getGoldenBuggy()
 }
 
 unsigned int GameState::getGoldenBuggyID() { return goldenBuggy; }
+
+unsigned int GameState::getMaxScore() { return maxScore; }
 
 unsigned int GameState::numberOfPlayers(){ return players.size(); }
 unsigned int GameState::numberOfAIs() { return ai.size(); }

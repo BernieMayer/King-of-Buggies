@@ -356,7 +356,7 @@ void GameManager::gameLoop()
 		if ((theScore % 100) == 0) {
 			std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
 		}
-		if (theScore >= 700 && gameOver == false) {
+		if (theScore >= state.getMaxScore() && gameOver == false) {
 			winner = state.getGoldenBuggyID();
 			printf("Player %i is the winner!\n", winner);
 			if (winner == 0) {
