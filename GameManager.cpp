@@ -322,6 +322,7 @@ void GameManager::gameLoop()
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
 			if (hasCoinCollision){
 				physics.modifySpeed(i, 0.3333f);
+				sound.playDingSound(state.getPlayer(i)->getPos());
 			}
 		}
 
