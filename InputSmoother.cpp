@@ -85,19 +85,19 @@ Input InputSmoother::smooth(Input in) {
 		powerupLock = false;
 	}
 
-	/*
-	if (out.drift && !driftLock) {
-		driftLock = true;
+	
+	if (out.jump && !jumpLock) {
+		jumpLock = true;
 	}
-	else if (driftLock) {
-		out.drift = false;
-		driftFrameCounter += 1;
+	else if (jumpLock) {
+		out.jump = false;
+		jumpFrameCounter += 1;
 	}
-	if (driftFrameCounter == driftCounterMax) {
-		driftFrameCounter = 0;
-		driftLock = false;
+	if (jumpFrameCounter == jumpCounterMax) {
+		jumpFrameCounter = 0;
+		jumpLock = false;
 	}
-	*/
+	
 
 	return out;
 }

@@ -126,6 +126,7 @@ private:
 
 	//
 	vector<int> vehicleForwards;	//Vehicle class
+	vector<bool> vehicleInAir;
 
 	GameState* lastState;
 	float lastFrameTime = 1;

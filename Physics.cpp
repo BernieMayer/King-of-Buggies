@@ -155,6 +155,7 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 		modifySpeed(0, 3);
 	}
 	vehicleForwards.push_back(-1);
+	vehicleInAir.push_back(true);
 	return vehicleActors.size() - 1;
 }
 void Physics::modifySpeed(unsigned int vehicleNum , float modSpeed)
@@ -525,6 +526,12 @@ void Physics::handleInput(Input* input, unsigned int id){
 	}
 	else {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 0);
+	}
+
+
+	if (input->jump && !vehicleInAir[id]) {
+		cout << "Jump!\n";
+		vehicle->getRigidDynamicActor()->addForce(PxVec3(0.0, 500000.0, 0.0));
 	}
 
 }
@@ -1101,6 +1108,10 @@ void Physics::startSim(float frameTime) {
 		vehicleQueryResults.push_back({ &wheelQueryResults[i*PX_MAX_NB_WHEELS], vehicles[i]->mWheelsSimData.getNbWheels() });
 
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); 
+
+	for (int i = 0; i < vehicleActors.size(); i++) {
+		vehicleInAir[i] = vehicleQueryResults[0].wheelQueryResults->isInAir;
+	}
 
 	lastFrameTime = frameTime;
 	gScene->simulate(frameTime);

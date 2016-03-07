@@ -21,6 +21,7 @@ float kCamV;
 bool kPowerup;
 bool kDrift;
 bool kMenu;
+bool kJump;
 
 //Only to easily cheat in coins
 bool kCheat_coin;
@@ -134,6 +135,12 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	else if (key == GLFW_KEY_C && action == GLFW_RELEASE){
 		kCheat_coin = false;
 	}
+	else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
+		kJump = true;
+	}
+	else if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
+		kJump = false;
+	}
 }
 
 /**
@@ -158,6 +165,7 @@ InputManager::InputManager(GLFWwindow* w)
 	kDrift = false;
 	kPowerup = false;
 	kMenu = false;
+	kJump = false;
 
 	int widthP = 0;
 	int heightP = 0;
@@ -253,6 +261,9 @@ Input InputManager::getInput(int playerNum)
 		// Same problem as with B button...
 		input.menu = gamepads[playerNum].GetButtonPressed(12);
 
+		// Press A to jump
+		input.jump = gamepads[playerNum].GetButtonPressed(0);
+
 		gamepads[playerNum].RefreshState();
 
 		input.isKeyboard = false;
@@ -278,6 +289,7 @@ Input InputManager::getInput(int playerNum)
 		input.drift = kDrift;
 		input.powerup = kPowerup;
 		input.menu = kMenu;
+		input.jump = kJump;
 		input.isKeyboard = true;
 
 		//only to easily activate coins

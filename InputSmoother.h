@@ -28,9 +28,9 @@ private:
 	int powerupFrameCounter = 0;
 	int powerupCounterMax = 5;
 
-	bool driftLock = false;
-	int driftFrameCounter = 0;
-	int driftCounterMax = 5;
+	bool jumpLock = false;
+	int jumpFrameCounter = 0;
+	int jumpCounterMax = 5;
 };
 
 #endif // INPUTSMOOTHER_H
