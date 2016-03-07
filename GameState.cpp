@@ -5,7 +5,7 @@
 
 GameState::GameState()
 {
-	maxScore = 1000;
+	maxScore = 2000;
 }
 
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
