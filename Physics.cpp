@@ -518,8 +518,18 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
 	}
 
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
-	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+	if (!vehicleInAir[id]) {
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
+		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+	}
+	else {
+		if (lastState != NULL) {
+			//cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
+			vec3 right = lastState->getPlayer(id)->getForward();
+			right = 5000 * (input->turnL - input->turnR) * right;
+			vehicle->getRigidDynamicActor()->addTorque(PxVec3(right.x, right.y, right.z));
+		}
+	}
 
 	if (input->drift) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 1);
