@@ -352,9 +352,7 @@ void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& o
 	{
 		vec3 a = segments[i-1];
 		vec3 b = segments[i];
-		//glNormal3f(0.f, 0.f, 1.f);
 		glVertex3f(a.x, a.y, a.z);
-		//glNormal3f(0.f, 0.f, 1.f);
 		glVertex3f(b.x, b.y, b.z);
 	}
 	glEnd();

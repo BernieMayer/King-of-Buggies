@@ -75,7 +75,26 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 {
 	if (updatePathProgress(playerNum) == AI_COMPLETED_PATH)
 	{
-		testTarget = getRandomTarget();
+
+		bool invalidPoint = true;
+
+		while (invalidPoint)
+		{
+			invalidPoint = false;
+
+			testTarget = getRandomTarget();
+
+			for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
+			{
+				vec3 playerLoc = state->getPlayer(i)->getPos();;
+
+				if (length(testTarget - playerLoc) < 5.f)
+				{
+					invalidPoint = true;
+					break;
+				}
+			}
+		}
 
 		vec3 pos = state->getPlayer(playerNum)->getPos();
 		printf("Find new path %f %f %f to %f %f %f\n", pos.x, pos.y, pos.z, testTarget.x, testTarget.y, testTarget.z);

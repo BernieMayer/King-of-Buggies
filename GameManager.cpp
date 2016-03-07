@@ -219,7 +219,8 @@ void GameManager::gameLoop()
 				if (frameCount > 30)
 				{
 					//ai.findNewPath(i, ai.testTarget);
-					ai.findNewPath(i, state.getGoldenBuggy()->getPos());
+					if (state.getGoldenBuggy() != state.getPlayer(i))
+						ai.findNewPath(i, state.getGoldenBuggy()->getPos());
 					frameCount = 0;
 				}
 
@@ -368,7 +369,6 @@ void GameManager::gameLoop()
 
 		//Get path
 		path.clear();
-		//ai.nav.getPathLines(&path, state.getPlayer(0)->getPos(), state.getPlayer(1)->getPos());
 
 		ai.getPathAsLines(1, &path);
 		vector<vec3> carPos;
@@ -383,11 +383,15 @@ void GameManager::gameLoop()
 
 		state.clearEvents();
 
+
 		//Debugging
-		renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
-		renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
-		renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
-		renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
+		if (displayDebugging)
+		{
+			renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
+			renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+			renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
+		}
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
