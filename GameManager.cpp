@@ -316,9 +316,6 @@ void GameManager::gameLoop()
 
 		vec3 diff = posAI - posPlayer;
 
-		//Update sphere -- TEMPORARY
-		renderer.assignTransform(sphereRenderID, physics.dynamic_getGlobalPose(spherePhysicsID));
-
 
 		// Check for player/coin collisions, and coin respawns
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
@@ -447,7 +444,7 @@ void GameManager::initTestScene()
 	createTestLevel();
 
 	
-	createBall(0.5f);
+	//createBall(0.5f);
 
 	state.setGoldenBuggy(0);
 

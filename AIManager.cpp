@@ -278,14 +278,12 @@ void AIManager::updateRecovery(unsigned int playerNum)
 	if (collisionRecovery) {
 		collisionRecoveryCounter++;
 		if (collisionRecoveryCounter > collisionRecoveryCounterMax) {
-			cout << "Leaving recovery" << endl;
 			collisionRecovery = false;
 			collisionRecoveryCounter = 0;
 		}
 	}
 
 	if (allSlow) {
-		cout << "entering recovery" << endl;
 		collisionRecovery = true;
 		infoAtCollision = *state->getPlayer(playerNum);
 	}
@@ -512,7 +510,7 @@ bool AIManager::atPoint(int playerNum, vec3 pos) {
 	PlayerInfo* ai = state->getPlayer(playerNum);
 
 	float distance = length(ai->getPos() - vec3(pos.x, ai->getPos().y, pos.z));
-	if (distance < 5.f) {
+	if (distance < 6.f) {
 		return true;
 	}
 	else {
