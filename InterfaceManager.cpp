@@ -33,21 +33,23 @@ void InterfaceManager::setWindowDim(int width, int height)
 
 vector<vector<vec3>> InterfaceManager::generateScoreBars(GameState* state) 
 {
-	vector<vector<vec3>> scorebarLines;
+	vector<vector<vec3>> scorebarQuads;
 
 	int numPlayers = state->numberOfPlayers();
 	int barOffset = 0;
 	
 	for (int i = 0; i < numPlayers; i++) {
 		float barWidth = getScoreBarWidth(state, i);
-		vector<vec3> lineSegments;
+		vector<vec3> quadCoords;
 
-		for (float j = 0; j < barHeight; j++) {
-			lineSegments.push_back(vec3(0.f, (j + barOffset), 0.f));
-			lineSegments.push_back(vec3(barWidth, (j + barOffset), 0.f));
-		}
-		scorebarLines.push_back(lineSegments);
+		// Store the four corners of the scorebar
+		quadCoords.push_back(vec3(0.f, barOffset, 0.f));
+		quadCoords.push_back(vec3(barWidth, barOffset, 0.f));
+		quadCoords.push_back(vec3(barWidth, (barOffset + 10), 0.f));
+		quadCoords.push_back(vec3(0.f, (barOffset + 10), 0.f));
+		
+		scorebarQuads.push_back(quadCoords);
 		barOffset += 10;
 	}
-	return scorebarLines;
+	return scorebarQuads;
 }

@@ -309,19 +309,25 @@ void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	glBegin(GL_LINES);
+	glBegin(GL_QUADS);
 	
 	// each vector in segments stores the scorebar information for an individual player
 	for (unsigned int i = 0; i < segments.size(); i++) {
 		vec3 color = colors[i];
 		glColor3f(color.x, color.y, color.z);
 
-		for (unsigned int j = 1; j < segments[i].size(); j += 2)
+		for (unsigned int j = 3; j < segments[i].size(); j += 4)
 		{
-			vec3 a = segments[i][j - 1];
-			vec3 b = segments[i][j];
+			vec3 a = segments[i][j - 3];
+			vec3 b = segments[i][j - 2];
+			vec3 c = segments[i][j - 1];
+			vec3 d = segments[i][j];
+			
 			glVertex3f(a.x, a.y, a.z);
 			glVertex3f(b.x, b.y, b.z);
+			glVertex3f(c.x, c.y, c.z);
+			glVertex3f(d.x, d.y, d.z);
+
 		}
 	}
 
