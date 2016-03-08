@@ -3,7 +3,7 @@
 
 #include "NavMesh.h"
 
-const unsigned int NO_VALUE = UINT_MAX;
+//const unsigned int NO_VALUE = UINT_MAX;
 
 string navMeshDirectory = "./navigation/";
 
@@ -332,6 +332,29 @@ float NavMesh::heuristic(unsigned int current, unsigned int finish)
 	return abs(diff.x) + abs(diff.y) + abs(diff.z);
 }
 
+float NavMesh::proximityCost(unsigned int node)
+{
+	const float maxRange = 20.f;
+
+	vec3 nodePos = nodes[node].getCenter();
+	float sumOfDists = 0.f;
+
+	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
+	{
+		if (state->getPlayer(i) != state->getGoldenBuggy())
+		{
+			vec3 diff = nodePos - state->getPlayer(i)->getPos();
+			sumOfDists += dot(nodePos, nodePos);
+		}
+	}
+
+	sumOfDists /= (float)(state->numberOfPlayers() - 1);
+
+	float weight = std::max((maxRange - sumOfDists)/maxRange, 0.f);
+
+	return weight*10.f;
+}
+
 
 
 
@@ -467,7 +490,7 @@ bool NavMesh::updatePath_AStar(vector<unsigned int>* path, vec3 position, vec3 f
 			float newCost = cost[current.i] + initWeight[next->index] 
 							+ edgeCost(current.i, next->index)
 							+ trajectoryCost(trajectory[current.i], newTrajectory);
-			newCost = std::max(newCost, 0.01f);
+			newCost = std::max(newCost, cost[current.i] + 1.f);
 
 			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))
 			{
@@ -484,6 +507,100 @@ bool NavMesh::updatePath_AStar(vector<unsigned int>* path, vec3 position, vec3 f
 
 	unsigned int index = finish;
 	vector<unsigned int> temp;
+
+	//Trace path from finish to start
+	while (index != NO_VALUE)
+	{
+		temp.push_back(index);
+		index = came_from[index];
+	}
+
+	//Make sure path reaches beginning
+	if (temp.at(temp.size() - 1) != start)
+		return false;
+
+	//Reverse path - consider swapping end and beginning to get already reversed path
+	for (unsigned int i = 0; i < temp.size(); i++)
+	{
+		path->push_back(temp[temp.size() - 1 - i]);
+	}
+
+	return true;
+}
+
+
+
+bool NavMesh::getPath_Avoidance(vector<unsigned int>* path, vec3 position, vec3 forwards)
+{
+
+	unsigned int start = getPolygon(position);		//Index of polygon containing starting position
+
+	if ((start == NO_VALUE))
+		return false;
+
+	vector<unsigned int> came_from(nodes.size(), NO_VALUE);	//Stores node with shortest path to this one
+	vector<float> cost(nodes.size(), -1.f);		//Stores cost of node
+	vector<vec3> trajectory(nodes.size(), vec3(0.f));
+	trajectory[start] = forwards;
+
+	vector<float> initWeight(nodes.size(), 0.f);
+
+
+	//Set points in last path as lower weights
+	for (unsigned int i = 0; i < path->size(); i++)
+	{
+		initWeight[path->at(i)] = prevPathWeight(i, path->size());
+	}
+
+	path->clear();
+
+	//Priority queue storing outer ring of explored nodes
+	priority_queue<IndexWeightPair, vector<IndexWeightPair>, IndexWeightComparison> frontier;
+
+	cost[start] = 0;
+	frontier.push(IndexWeightPair(start, 0.f));
+
+	unsigned int finish;
+
+	while (!frontier.empty())
+	{
+		IndexWeightPair current = frontier.top();
+		frontier.pop();
+
+		//Iterate through adjacent nodes to current
+		vector<Edge>::iterator next = nodes[current.i].getEdgeIterator();
+		for (next; next != nodes[current.i].getEndIterator(); next++)
+		{
+			vec3 newTrajectory = normalize(nodes[next->index].getCenter() - nodes[current.i].getCenter());
+			float newCost = cost[current.i] + initWeight[next->index]
+				+ edgeCost(current.i, next->index)
+				+ trajectoryCost(trajectory[current.i], newTrajectory)
+				+ proximityCost(next->index);
+			newCost = std::max(newCost, cost[current.i] + 1.f);
+
+			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))
+			{
+				cost[next->index] = newCost;
+				float priority = newCost;
+
+				frontier.push(IndexWeightPair(next->index, priority));
+				came_from[next->index] = current.i;
+				trajectory[next->index] = newTrajectory;
+
+				if (length(nodes[next->index].getCenter() - nodes[start].getCenter()) > 10.f)
+				{
+					finish = next->index;
+					goto foundTarget;
+				}
+			}
+		}
+
+	}
+
+foundTarget:
+	vector<unsigned int> temp;
+
+	unsigned int index = finish;
 
 	//Trace path from finish to start
 	while (index != NO_VALUE)
@@ -563,14 +680,15 @@ bool NavMesh::getPathLines(vector<vec3>* path, vec3 position, vec3 target)
 }
 
 //Use this one!
-bool NavMesh::getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 forwards, vec3 target, bool updateOld)
+bool NavMesh::getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 forwards, vec3 target, bool chasing)
 {
 	vector<unsigned int> indices;
 	//nodes->clear();
 
 	//if (getPath_AStar(&indices, position, target))
-	bool pathFound = (updateOld) ? updatePath_AStar(nodes, position, forwards, target) :
-									getPath_AStar(nodes, position, forwards, target);
+	bool pathFound = (chasing) ? updatePath_AStar(nodes, position, forwards, target) :
+		getPath_AStar(nodes, position, forwards, target);
+		//getPath_Avoidance(nodes, position, forwards);
 
 	if (pathFound)
 	{

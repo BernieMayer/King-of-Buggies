@@ -220,7 +220,7 @@ void GameManager::gameLoop()
 				{
 					//ai.findNewPath(i, ai.testTarget);
 					if (state.getGoldenBuggy() != state.getPlayer(i))
-						ai.findNewPath(i, state.getGoldenBuggy()->getPos(), true);
+						ai.findNewPath(i, state.getGoldenBuggy()->getPos(), false);
 					frameCount = 0;
 				}
 
@@ -232,41 +232,6 @@ void GameManager::gameLoop()
 			physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
-	
-		/*if (state.numberOfPlayers() > 1){
-
-			//Change this to AI code
-
-			vec3 testPos;
-			testPos.x = -10.0;
-			testPos.y = 0.5f;
-			testPos.z = -15.0f;
-			Input ai_in = ai.updateAI(0, in.menu, testPos); //Test code?
-			if (ai.atPoint(0, testPos)) {
-				cout << "At point\n";
-			}
-			inputs[1] = ai_in;
-
-			physics.handleInput(&ai_in, state.getPlayer(1)->getPhysicsID());
-
-
-			//Not AI code. AIManager shouldn't change the golden buggy
-			if (physics.newGoldenBuggy){
-				physics.newGoldenBuggy = false;
-
-				//Switch the golden buggie
-				PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggy);
-				unsigned int chasisRenderId_goldenBuggy = p->getRenderID();
-				renderer.assignColor(chasisRenderId_goldenBuggy, vec3(1.0f, 0.84f, 0.0f));
-
-
-				//Switch the player that used to be the golden buggy
-				PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
-				int chasisRenderId_reg = p_2->getRenderID();
-				renderer.assignColor(chasisRenderId_reg, vec3(1.0f, 0.0f, 0.0f));
-				
-			}
-		}*/
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
@@ -300,6 +265,9 @@ void GameManager::gameLoop()
 			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
 		if (inputs[0].drift)
 			cam.zoom(inputs[0].camV*0.95f + 1.f);
+
+		if (inputs[0].menu)
+			displayDebugging = !displayDebugging;
 
 		
 

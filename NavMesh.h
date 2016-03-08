@@ -114,6 +114,7 @@ public:
 	float edgeCost(unsigned int i, unsigned int j);
 	float trajectoryCost(vec3 trajectory, vec3 newTrajectory);
 	float heuristic(unsigned int i, unsigned int j);
+	float proximityCost(unsigned int node);
 
 	unsigned int getPolygon(vec3 position);
 

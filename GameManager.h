@@ -42,7 +42,7 @@ private:
 
 	unsigned int winner;
 	bool gameOver;
-	bool displayDebugging = true;
+	bool displayDebugging = false;
 
 	vector<vec3> vehicleColours;
 
