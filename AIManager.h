@@ -22,8 +22,8 @@ public:
 
 	//Navigation mesh functions
 	bool loadNavMesh(const char* fileName);
-	bool findNewPath(unsigned int playerNum, unsigned int targetNum);
-	bool findNewPath(unsigned int playerNum, vec3 target);
+	bool findNewPath(unsigned int playerNum, unsigned int targetNum, bool updateOld);
+	bool findNewPath(unsigned int playerNum, vec3 target, bool updateOld);
 	unsigned int updatePathProgress(unsigned int playerNum);
 	void getPathAsLines(unsigned int playerNum, vector<vec3>* lines);
 	vec3 getCurrentTarget(unsigned int playerNum);
@@ -64,6 +64,7 @@ public:
 
 private:
 	vector<vector<vec3>> pathToGoal;
+	vector<vector<unsigned int> > nodesToGoal;
 	vector<unsigned int> pointOnPath;
 	vector<vec3> prevPosition;
 

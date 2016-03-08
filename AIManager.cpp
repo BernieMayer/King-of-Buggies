@@ -5,7 +5,7 @@
 
 AIManager::AIManager(GameState* state) :updateCounter(0), state(state), pointOnPath(0)
 {
-
+	nav.state = state;
 }
 
 bool AIManager::loadNavMesh(const char* fileName)
@@ -23,7 +23,9 @@ void  AIManager::initAI() {
 	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
 	{
 		vector<vec3> path;
+		vector<unsigned int> nodes;
 		pathToGoal.push_back(path);
+		nodesToGoal.push_back(nodes);
 		pointOnPath.push_back(0);
 		prevPosition.push_back(state->getPlayer(i)->getPos());
 		reversing.push_back(false);
@@ -34,16 +36,17 @@ void  AIManager::initAI() {
 	}
 }
 
-bool AIManager::findNewPath(unsigned int playerNum, unsigned int targetNum)
+bool AIManager::findNewPath(unsigned int playerNum, unsigned int targetNum, bool updateOld)
 {
-	return findNewPath(playerNum, state->getPlayer(targetNum)->getPos());
+	return findNewPath(playerNum, state->getPlayer(targetNum)->getPos(), updateOld);
 }
 
-bool AIManager::findNewPath(unsigned int playerNum, vec3 target)
+bool AIManager::findNewPath(unsigned int playerNum, vec3 target, bool updateOld)
 {
 	pathToGoal[playerNum].clear();
 	pointOnPath[playerNum] = 0;
-	return nav.getPathPoints(&pathToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target);
+
+	return nav.getPathPoints(&pathToGoal[playerNum], &nodesToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target, updateOld);
 }
 
 vec3 AIManager::getRandomTarget()
@@ -99,7 +102,7 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 		vec3 pos = state->getPlayer(playerNum)->getPos();
 		printf("Find new path %f %f %f to %f %f %f\n", pos.x, pos.y, pos.z, testTarget.x, testTarget.y, testTarget.z);
 
-		findNewPath(playerNum, testTarget);
+		findNewPath(playerNum, testTarget, false);
 	}
 	if (collisionRecovery)
 		return recover(playerNum);

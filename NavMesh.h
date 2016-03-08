@@ -10,6 +10,8 @@
 #include <queue>
 #include <random>
 
+#include "GameState.h"
+
 using namespace std;
 using namespace glm;
 
@@ -74,6 +76,8 @@ public:
 
 	void clear();
 
+	
+
 };
 
 
@@ -88,6 +92,7 @@ private:
 public:
 	NavMesh();
 	EdgeMatrix edges;
+	GameState* state;
 
 	Node operator[] (unsigned int index) const { return nodes[index]; }
 	Node& operator[] (unsigned int index) { return nodes[index]; }
@@ -111,10 +116,15 @@ public:
 	float heuristic(unsigned int i, unsigned int j);
 
 	unsigned int getPolygon(vec3 position);
+
+	//Combine these two into one
 	bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
+	bool updatePath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
+
+	bool getPath_Avoidance(vector<unsigned int>* path, vec3 position, vec3 forward);
 
 	bool getPathLines(vector<vec3>* path, vec3 position, vec3 target);
-	bool getPathPoints(vector<vec3>* path, vec3 position, vec3 target, vec3 forwards);		//Use this one for AI
+	bool getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 target, vec3 forwards, bool updateOld);		//Use this one for AI
 
 
 	unsigned int getRandomNode();
