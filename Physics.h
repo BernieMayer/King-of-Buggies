@@ -13,6 +13,7 @@
 #include "VehicleTraits.h"
 #include "CollisionEvent.h"
 #include "VehicleCollisionEvent.h"
+#include "VehicleWallCollisionEvent.h"
 
 //Hello World (Test commit)
 

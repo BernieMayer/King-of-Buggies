@@ -126,6 +126,7 @@
     <ClInclude Include="torranceSparrow.h" />
     <ClInclude Include="VehicleSceneQueryData.h" />
     <ClInclude Include="VehicleTraits.h" />
+    <ClInclude Include="VehicleWallCollisionEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AIManager.cpp" />
@@ -160,6 +161,7 @@
     <ClCompile Include="VehicleCollisionEvent.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="VehicleTraits.cpp" />
+    <ClCompile Include="VehicleWallCollisionEvent.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -518,18 +518,14 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_BRAKE, input->forward);
 	}
 
-	if (!vehicleInAir[id]) {
-		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
-		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
+	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
+	if (lastState != NULL) {
+		vec3 forwardVec = lastState->getPlayer(id)->getForward();
+		forwardVec = 3000 * (input->turnL - input->turnR) * forwardVec;
+		vehicle->getRigidDynamicActor()->addTorque(PxVec3(forwardVec.x, forwardVec.y, forwardVec.z));
 	}
-	else {
-		if (lastState != NULL) {
-			//cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
-			vec3 right = lastState->getPlayer(id)->getForward();
-			right = 5000 * (input->turnL - input->turnR) * right;
-			vehicle->getRigidDynamicActor()->addTorque(PxVec3(right.x, right.y, right.z));
-		}
-	}
+	
 
 	if (input->drift) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_HANDBRAKE, 1);
@@ -1206,7 +1202,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
 				}
 				else {
-					// TODO add collision against wall
+					lastState->pushEvent(new VehicleWallCollisionEvent(index1, pos, normal, force));
 				}
 			}
 

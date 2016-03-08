@@ -421,9 +421,8 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	for (int i = 0; i < state.getNbEvents(); i++) {
 		Event* e = state.getEvent(i);
 
-		switch (e->getType())
+		if (e->getType() == VEHICLE_COLLISION_EVENT)
 		{
-		case VEHICLE_COLLISION_EVENT:
 			VehicleCollisionEvent* vehE = dynamic_cast<VehicleCollisionEvent*>(e);
 
 			vec3 force = vehE->force;
@@ -431,8 +430,15 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			volume = map(volume, 0, 300000, 0, 2);
 			cout << "Volume: " << volume << "\n";
 			playBumpSound(vehE->location, volume);
+		}
+		else if (e->getType() == VEHICLE_WALL_COLLISION_EVENT) {
+			VehicleWallCollisionEvent* vehE = dynamic_cast<VehicleWallCollisionEvent*>(e);
 
-			break;
+			vec3 force = vehE->force;
+			float volume = length(force);
+			volume = map(volume, 0, 300000, 0, 2);
+			cout << "Volume: " << volume << "\n";
+			playBumpSound(vehE->location, volume);
 		}
 	}
 	// Feel free to remove this. It has no purpose, just sounds funny

@@ -55,6 +55,7 @@
     <ClCompile Include="VehicleCollisionEvent.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="VehicleWallCollisionEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -119,6 +120,7 @@
     <ClInclude Include="VehicleCollisionEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
+    <ClInclude Include="VehicleWallCollisionEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">
