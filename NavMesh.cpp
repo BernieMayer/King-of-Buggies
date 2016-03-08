@@ -357,7 +357,7 @@ float NavMesh::proximityCost(unsigned int node)
 
 
 
-
+/*
 bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forwards, vec3 target)
 {
 	path->clear();
@@ -429,7 +429,7 @@ bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forw
 	}
 
 	return true;
-}
+}*/
 
 
 float prevPathWeight(unsigned int i, unsigned int num)
@@ -443,7 +443,7 @@ float prevPathWeight(unsigned int i, unsigned int num)
 }
 
 
-bool NavMesh::updatePath_AStar(vector<unsigned int>* path, vec3 position, vec3 forwards, vec3 target)
+bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forwards, vec3 target)
 {
 
 	unsigned int start = getPolygon(position);		//Index of polygon containing starting position
@@ -685,9 +685,11 @@ bool NavMesh::getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec
 	vector<unsigned int> indices;
 	//nodes->clear();
 
+	bool pathFound = getPath_AStar(nodes, position, forwards, target);
+
 	//if (getPath_AStar(&indices, position, target))
-	bool pathFound = (chasing) ? updatePath_AStar(nodes, position, forwards, target) :
-		getPath_AStar(nodes, position, forwards, target);
+	//bool pathFound = (chasing) ? updatePath_AStar(nodes, position, forwards, target) :
+		//getPath_AStar(nodes, position, forwards, target);
 		//getPath_Avoidance(nodes, position, forwards);
 
 	if (pathFound)

@@ -119,8 +119,8 @@ public:
 	unsigned int getPolygon(vec3 position);
 
 	//Combine these two into one
+	//bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
 	bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
-	bool updatePath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
 
 	bool getPath_Avoidance(vector<unsigned int>* path, vec3 position, vec3 forward);
 
