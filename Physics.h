@@ -172,11 +172,15 @@ private:
 
 	void setupObstacleCollisionHandling(PxRigidActor* actor);
 
+	void buggyExplosion(int gBuggyIndex);
+	PxVec3 getPxVec3(vec3 vec) { return PxVec3(vec.x, vec.y, vec.z); }
+
 };
 
 
 
 mat4 getMat4(const physx::PxTransform& transform);
 vec4 getVec4(const physx::PxVec4& vec);
+
 
 #endif // PHYSICS_H

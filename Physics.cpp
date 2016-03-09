@@ -1158,6 +1158,21 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* Physics::createFrictionPairs(const 
 	return surfaceTirePairs;
 }
 
+
+
+void Physics::buggyExplosion(int gBuggyIndex) {
+	for (int i = 0; i < vehicleActors.size(); i++) {
+		if (i != gBuggyIndex) {
+			vec3 vec = lastState->getPlayer(i)->getPos() - lastState->getPlayer(gBuggyIndex)->getPos();
+			float distance = length(vec);
+
+			float force = 8000000;
+			vec = (force * (1 / (distance * distance))) * vec;
+			vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
+		}
+	}
+}
+
 void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 {
 	//std::cout  << "Callback has been called \n";
@@ -1229,6 +1244,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
 								goldenBuggyCounter = 0;
+								buggyExplosion(i);
 								break;
 							}
 						}
@@ -1244,6 +1260,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
 								goldenBuggyCounter = 0;
+								buggyExplosion(i);
 								break;
 							}
 
