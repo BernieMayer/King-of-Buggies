@@ -207,9 +207,14 @@ void GameManager::gameLoop()
 		//cout << endl;
 	}
 
+	vector<vec3> frontier;
+	vector<vec3> paths;
+
+	bool paused = false;
+
 	while (!glfwWindowShouldClose(window))
 	{
-		
+
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
@@ -218,9 +223,7 @@ void GameManager::gameLoop()
 				frameCount++;
 				if (frameCount > 30)
 				{
-					//ai.findNewPath(i, ai.testTarget);
-					if (state.getGoldenBuggy() != state.getPlayer(i))
-						ai.findNewPath(i, state.getGoldenBuggy()->getPos(), false);
+					ai.findNewPath(i, state.getGoldenBuggy()->getPos(), !state.getPlayer(i)->isGoldenBuggy());
 					frameCount = 0;
 				}
 
@@ -232,6 +235,10 @@ void GameManager::gameLoop()
 			physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
+		if (inputs[0].powerup > 0)
+		{
+			paused = !paused;
+		}
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
@@ -253,10 +260,13 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		//Physics sim 
-		physics.getSim();
+		if (!paused)
+		{
+			//Physics sim 
+			physics.getSim();
 
-		physics.startSim(frameTime);
+			physics.startSim(frameTime);
+		}
 
 		float scale = 0.1f;
 
@@ -360,6 +370,11 @@ void GameManager::gameLoop()
 			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
 			renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
 			renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
+		}
+
+		if (paused)
+		{
+
 		}
 
 		//Swap buffers  

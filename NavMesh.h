@@ -126,6 +126,7 @@ public:
 
 	bool getPathLines(vector<vec3>* path, vec3 position, vec3 target);
 	bool getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 target, vec3 forwards, bool updateOld);		//Use this one for AI
+	bool debugAvoidance(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 forwards, unsigned int numIterations);
 
 
 	unsigned int getRandomNode();

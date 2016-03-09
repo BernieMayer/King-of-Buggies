@@ -352,7 +352,7 @@ float NavMesh::proximityCost(unsigned int node)
 
 	float weight = std::max((maxRange - sumOfDists)/maxRange, 0.f);
 
-	return weight*10.f;
+	return weight*100.f;
 }
 
 
@@ -445,6 +445,8 @@ float prevPathWeight(unsigned int i, unsigned int num)
 
 bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forwards, vec3 target)
 {
+
+	cout << "AStar pathfinding" << endl;
 
 	unsigned int start = getPolygon(position);		//Index of polygon containing starting position
 	unsigned int finish = getPolygon(target);		//Index of polygon containing finishing position
@@ -587,7 +589,7 @@ bool NavMesh::getPath_Avoidance(vector<unsigned int>* path, vec3 position, vec3 
 				came_from[next->index] = current.i;
 				trajectory[next->index] = newTrajectory;
 
-				if (length(nodes[next->index].getCenter() - nodes[start].getCenter()) > 10.f)
+				if (length(nodes[next->index].getCenter() - nodes[start].getCenter()) > 30.f)
 				{
 					finish = next->index;
 					goto foundTarget;
@@ -685,12 +687,8 @@ bool NavMesh::getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec
 	vector<unsigned int> indices;
 	//nodes->clear();
 
-	bool pathFound = getPath_AStar(nodes, position, forwards, target);
-
-	//if (getPath_AStar(&indices, position, target))
-	//bool pathFound = (chasing) ? updatePath_AStar(nodes, position, forwards, target) :
-		//getPath_AStar(nodes, position, forwards, target);
-		//getPath_Avoidance(nodes, position, forwards);
+	bool pathFound = (chasing) ? getPath_AStar(nodes, position, forwards, target) :
+								getPath_Avoidance(nodes, position, forwards);
 
 	if (pathFound)
 	{
@@ -709,6 +707,19 @@ bool NavMesh::getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec
 	}
 	else
 		return false;
+}
+
+
+bool NavMesh::debugAvoidance(vector<vec3>* path, vector<unsigned int>* nodePaths, vec3 position, vec3 forwards, unsigned int numIterations)
+{
+	bool pathFound = getPath_Avoidance(nodePaths, position, forwards);
+
+	for (unsigned int i = 0; i < nodePaths->size(); i++)
+	{
+		path->push_back(nodes[nodePaths->at(i)].getCenter());
+	}
+
+	return pathFound;
 }
 
 
