@@ -1245,6 +1245,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								goldenBuggyLock = true;
 								goldenBuggyCounter = 0;
 								buggyExplosion(i);
+								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 								break;
 							}
 						}
@@ -1261,6 +1262,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								goldenBuggyLock = true;
 								goldenBuggyCounter = 0;
 								buggyExplosion(i);
+								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 								break;
 							}
 

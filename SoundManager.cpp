@@ -294,20 +294,7 @@ void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer)
  * Loads and plays a bump sound once at the given position
  */
 void SoundManager::playBumpSound(vec3 pos, float volume) {
-	ALuint bumpSource;
-	ALuint buffer;
-
-	loadWavToBuf("Bump.wav", &bumpSource, &buffer);
-
-	ALfloat *SourcePos = vec3ToALfloat(pos).data();
-
-	alSourcei(bumpSource, AL_BUFFER, buffer);
-	alSourcef(bumpSource, AL_PITCH, 1.0f);
-	alSourcef(bumpSource, AL_GAIN, volume);
-	alSourcefv(bumpSource, AL_POSITION, SourcePos);
-	alSourcei(bumpSource, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(bumpSource);
+	playSound("Bump.wav", pos, volume);
 }
 
 /*
@@ -389,37 +376,28 @@ void SoundManager::updateMusicPitch(GameState state, Input input) {
 }
 
 void SoundManager::playWinSound(vec3 pos) {
-	ALuint winSource;
-	ALuint buffer;
-
-	loadWavToBuf("Yay.wav", &winSource, &buffer);
-
-	ALfloat *SourcePos = vec3ToALfloat(pos).data();
-
-	alSourcei(winSource, AL_BUFFER, buffer);
-	alSourcef(winSource, AL_PITCH, 1.0f);
-	alSourcef(winSource, AL_GAIN, 1.0);
-	alSourcefv(winSource, AL_POSITION, SourcePos);
-	alSourcei(winSource, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(winSource);
+	playSound("Yay.wav", pos, 1.0f);
 }
 
 void SoundManager::playLossSound(vec3 pos) {
-	ALuint lossSource;
+	playSound("Trombone.wav", pos, 1.0f);
+}
+
+void SoundManager::playSound(string fileName, vec3 pos, float volume) {
+	ALuint source;
 	ALuint buffer;
 
-	loadWavToBuf("Trombone.wav", &lossSource, &buffer);
+	loadWavToBuf(fileName, &source, &buffer);
 
 	ALfloat *SourcePos = vec3ToALfloat(pos).data();
 
-	alSourcei(lossSource, AL_BUFFER, buffer);
-	alSourcef(lossSource, AL_PITCH, 1.0f);
-	alSourcef(lossSource, AL_GAIN, 1.0);
-	alSourcefv(lossSource, AL_POSITION, SourcePos);
-	alSourcei(lossSource, AL_LOOPING, AL_FALSE);
+	alSourcei(source, AL_BUFFER, buffer);
+	alSourcef(source, AL_PITCH, 1.0f);
+	alSourcef(source, AL_GAIN, volume);
+	alSourcefv(source, AL_POSITION, SourcePos);
+	alSourcei(source, AL_LOOPING, AL_FALSE);
 
-	alSourcePlay(lossSource);
+	alSourcePlay(source);
 }
 
 /*
@@ -488,6 +466,10 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			volume = map(volume, 0, 300000, 0, 2);
 			cout << "Volume: " << volume << "\n";
 			playBumpSound(vehE->location, volume);
+		}
+		else if (e->getType() == GOLDEN_BUGGY_SWITCH_EVENT) {
+			GoldenBuggySwitchEvent* gbE = dynamic_cast<GoldenBuggySwitchEvent*>(e);
+			playSound("Boom.wav", gbE->gbPos, 1.0f);
 		}
 	}
 	// Feel free to remove this. It has no purpose, just sounds funny

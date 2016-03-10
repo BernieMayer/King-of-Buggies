@@ -39,6 +39,7 @@ private:
 	void updateEngineSounds(GameState state, Input inputs[]);
 	void updateHonks(GameState state, Input inputs[]);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
+	void playSound(string fileName, vec3 pos, float volume);
 	void playSecret(GameState state);
 	void playSecret2(GameState state);
 	void updateMusicPitch(GameState state, Input input);

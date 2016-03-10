@@ -1,3 +1,6 @@
+#ifndef VEHICLEWALLCOLLISIONEVENT_CPP
+#define VEHICLEWALLCOLLISIONEVENT_CPP
+
 #include "VehicleWallCollisionEvent.h"
 
 
@@ -10,4 +13,6 @@ unsigned int VehicleWallCollisionEvent::getType()
 {
 	return VEHICLE_WALL_COLLISION_EVENT;
 }
+
+#endif
 

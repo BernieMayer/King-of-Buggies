@@ -12,6 +12,7 @@
 #include "Events.h"
 #include "VehicleCollisionEvent.h"
 #include "VehicleWallCollisionEvent.h"
+#include "GoldenBuggySwitchEvent.h"
 
 const unsigned int NUM_PLAYERS = 4;
 const unsigned int NUM_COINS = 10;
