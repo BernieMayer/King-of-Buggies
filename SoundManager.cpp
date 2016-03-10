@@ -9,6 +9,10 @@ SoundManager::SoundManager() {
 
 SoundManager::SoundManager(GameState state) {
 	initOpenAL(state);
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		honking.push_back(false);
+		honkSources.push_back(0);
+	}
 }
 
 void SoundManager::initOpenAL(GameState state) {
@@ -144,6 +148,49 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
+	}
+}
+
+void SoundManager::updateHonks(GameState state, Input inputs[]) {
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		if (inputs[i].horn) {
+			if (honking[i] = false) {
+
+				ALuint buffer;
+
+				loadWavToBuf("Idle.wav", &honkSources[i], &buffer);
+
+				PlayerInfo* player = state.getPlayer(i);
+
+				ALfloat *SourcePos = vec3ToALfloat(player->getPos()).data();
+				ALfloat *SourceVel = vec3ToALfloat(player->getVelocity()).data();
+
+				alSourcei(honkSources[i], AL_BUFFER, buffer);
+				alSourcef(honkSources[i], AL_PITCH, 1.0);
+				alSourcef(honkSources[i], AL_GAIN, 1.0);
+				alSourcefv(honkSources[i], AL_POSITION, SourcePos);
+				alSourcefv(honkSources[i], AL_VELOCITY, SourceVel);
+				alSourcei(honkSources[i], AL_LOOPING, AL_TRUE);
+
+				alSourcePlay(honkSources[i]);
+				honking[i] = true;
+			}
+			else {
+				PlayerInfo* p1 = state.getPlayer(i);
+
+				ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+				ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+				alSourcefv(honkSources[i], AL_POSITION, SourcePos);
+				alSourcefv(honkSources[i], AL_VELOCITY, SourceVel);
+			}
+		}
+		else {
+			if (honking[i]) {
+				alSourceStop(honkSources[i]);
+				honking[i] = false;
+			}
+		}
 	}
 }
 
@@ -401,7 +448,10 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
-\
+	else if (inputs[0].horn) {
+		updateHonks(state, inputs);
+		cout << "HONK!\n";
+	}
 
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);

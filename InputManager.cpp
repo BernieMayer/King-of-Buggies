@@ -22,6 +22,7 @@ bool kPowerup;
 bool kDrift;
 bool kMenu;
 bool kJump;
+bool kHorn;
 
 //Only to easily cheat in coins
 bool kCheat_coin;
@@ -141,6 +142,12 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	else if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
 		kJump = false;
 	}
+	else if (hornKeyboard(key) && action == GLFW_PRESS) {
+		kHorn = true;
+	}
+	else if (hornKeyboard(key) && action == GLFW_RELEASE) {
+		kHorn = false;
+	}
 }
 
 /**
@@ -166,6 +173,7 @@ InputManager::InputManager(GLFWwindow* w)
 	kPowerup = false;
 	kMenu = false;
 	kJump = false;
+	kHorn = false;
 
 	int widthP = 0;
 	int heightP = 0;
@@ -264,6 +272,9 @@ Input InputManager::getInput(int playerNum)
 		// Press A to jump
 		input.jump = gamepads[playerNum].GetButtonPressed(0);
 
+		// Press Y to honk
+		input.horn = gamepads[playerNum].GetButtonPressed(3);
+
 		gamepads[playerNum].RefreshState();
 
 		input.isKeyboard = false;
@@ -290,6 +301,8 @@ Input InputManager::getInput(int playerNum)
 		input.powerup = kPowerup;
 		input.menu = kMenu;
 		input.jump = kJump;
+		input.horn = kHorn;
+		
 		input.isKeyboard = true;
 
 		//only to easily activate coins
@@ -318,6 +331,8 @@ Input InputManager::getInput(int playerNum)
 		input.drift = false;
 		input.powerup = false;
 		input.menu = false;
+		input.jump = false;
+		input.horn = false;
 		input.isKeyboard = false;
 	}
 

@@ -51,6 +51,9 @@ private:
 	float idleEngineVolume = 0.08;
 	float idleEnginePitch = 1.0;
 
+	vector<bool> honking;
+	vector<ALuint> honkSources;
+
 	bool secretPlaying = false;
 	bool secret2Unlocked = false;
 };

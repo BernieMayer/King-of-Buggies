@@ -14,8 +14,9 @@ struct Input
 	bool powerup;
 	bool menu;
 	bool jump;
-	bool cheat_coin;
+	bool horn;
 
+	bool cheat_coin;
 	bool isKeyboard;
 };
 
