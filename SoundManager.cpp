@@ -154,11 +154,11 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 void SoundManager::updateHonks(GameState state, Input inputs[]) {
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		if (inputs[i].horn) {
-			if (honking[i] = false) {
+			if (!honking[i]) {
 
 				ALuint buffer;
 
-				loadWavToBuf("Idle.wav", &honkSources[i], &buffer);
+				loadWavToBuf("Honk.wav", &honkSources[i], &buffer);
 
 				PlayerInfo* player = state.getPlayer(i);
 
@@ -187,7 +187,7 @@ void SoundManager::updateHonks(GameState state, Input inputs[]) {
 		}
 		else {
 			if (honking[i]) {
-				alSourceStop(honkSources[i]);
+				alSourcePause(honkSources[i]);
 				honking[i] = false;
 			}
 		}
@@ -448,10 +448,9 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		alSourcePause(musicSource);
 		startMusic(state);
 	}
-	else if (inputs[0].horn) {
-		updateHonks(state, inputs);
-		cout << "HONK!\n";
-	}
+
+	updateHonks(state, inputs);
+
 
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);

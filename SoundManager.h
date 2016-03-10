@@ -37,6 +37,7 @@ private:
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);
+	void updateHonks(GameState state, Input inputs[]);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSecret(GameState state);
 	void playSecret2(GameState state);
