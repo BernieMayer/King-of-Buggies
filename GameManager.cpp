@@ -210,6 +210,8 @@ void GameManager::gameLoop()
 	vector<vec3> frontier;
 	vector<vec3> paths;
 
+	Camera freeCam;
+
 	bool paused = false;
 
 	while (!glfwWindowShouldClose(window))
@@ -238,6 +240,15 @@ void GameManager::gameLoop()
 		if (inputs[0].powerup > 0)
 		{
 			paused = !paused;
+
+			if (paused)
+			{
+				freeCam = cam;
+				freeCam.setCameraMode(FREEROAM_CAMERA);
+				renderer.loadCamera(&freeCam);
+			}
+			else
+				renderer.loadCamera(&cam);
 		}
 
 		//Not AI code. AIManager shouldn't change the golden buggy
@@ -260,21 +271,27 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
+		float scale = 0.1f;
+
 		if (!paused)
 		{
 			//Physics sim 
 			physics.getSim();
 
 			physics.startSim(frameTime);
+
+			//Update to accomodate more players and multiple cameras
+			if (!inputs[0].drift)//in.powerup)
+				cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
+			if (inputs[0].drift)
+				cam.zoom(inputs[0].camV*0.95f + 1.f);
 		}
-
-		float scale = 0.1f;
-
-		//Update to accomodate more players and multiple cameras
-		if (!inputs[0].drift)//in.powerup)
-			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
-		if (inputs[0].drift)
-			cam.zoom(inputs[0].camV*0.95f + 1.f);
+		//Free camera movement
+		if (paused)
+		{
+			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
+			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
+		}
 
 		if (inputs[0].menu)
 			displayDebugging = !displayDebugging;
