@@ -19,6 +19,8 @@
 using namespace std;
 using namespace glm;
 
+
+
 #define M_PI  3.14159265358979323846f
 
 struct SHADOW_BEHAVIOUR{
@@ -67,8 +69,8 @@ private:
 	};
 
 	GLFWwindow * window;
-	int windowWidth;
-	int windowHeight;
+	
+
 
 	vector<ObjectInfo> objects;		//Objects to be drawn
 	vector<LightInfo> lights;
@@ -151,6 +153,7 @@ public:
 	void draw(unsigned int object);
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
+	void drawRadar(vector<vec2> radarVecs);
 
 	void drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors);
 	//Debugging draw calls

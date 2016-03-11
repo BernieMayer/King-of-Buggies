@@ -3,6 +3,9 @@
 
 #include "Renderer.h"
 
+int windowWidth;
+int windowHeight;
+
 mat4 winRatio (1.f);		//Only to be modified by resizeFunc
 
 void glErrorCheck(const char* location)
@@ -296,6 +299,37 @@ void Renderer::drawAll()
 	{
 		draw(i);
 	}
+}
+
+void Renderer::drawRadar(vector<vec2> radarVecs)
+{
+	glViewport(windowWidth * 0.75, windowHeight * 0.75, windowWidth * 0.25, windowHeight * 0.25);
+	
+	glUseProgram(0);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, windowWidth, 0, windowHeight);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glBegin(GL_TRIANGLES);
+	glColor3f(1, 0, 0);
+	
+
+	for (int i = 0; i < radarVecs.size(); i++){
+		vec3 vec = vec3((windowWidth / 2) + radarVecs[i].x * (windowWidth / 10), (windowHeight / 2) + radarVecs[i].y * (windowHeight / 10), 0);
+		glVertex3f(vec.x, vec.y, vec.z);
+		//REMOVE IN PRODUCTION
+		if (i >= 2 && i < 5){
+			glColor3f(0, 0, 1);
+		}
+	}
+	
+
+	glEnd();
+	
+	glViewport(0,0, windowWidth, windowHeight);
 }
 
 void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
@@ -809,8 +843,8 @@ void resizeFunc(GLFWwindow* window, int width, int height)
 	winRatio[0][0] = minDim / (float)width;
 	winRatio[1][1] = minDim / (float)height;
 
-	//windowWidth = width;
-	//windowHeight = height;
+	windowWidth = width;
+	windowHeight = height;
 }
 
 #endif // RENDERER_CPP

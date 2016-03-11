@@ -314,6 +314,7 @@ void GameManager::gameLoop()
 		renderer.clearDrawBuffers();
 		renderer.drawAll();
 		renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
+		renderer.drawRadar(state.setupRadar(0));
 		
 		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
