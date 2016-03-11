@@ -278,12 +278,17 @@ void Renderer::draw(unsigned int id)
 
 	object.mat->useShader();
 
-	if (camera != NULL)
-		object.mat->loadUniforms(winRatio*projection*modelview*camera->getMatrix()*object.transform*object.scaling, object.transform*object.scaling, 
-						camera->getPos(), light.pos, object.color);	
+	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
+	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
+	mat4 projectionMatrix = winRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+						viewPos, light.pos, object.color);
 	else
-		object.mat->loadUniforms(winRatio*projection*modelview*object.transform*object.scaling, object.transform*object.scaling,
-						vec3(0.f, 0.f, 0.f), light.pos, object.color);
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+						viewPos, light.pos, objects[id].texID, 0);
 
 
 	loadBuffers(object);
@@ -401,13 +406,13 @@ bool Renderer::loadBuffers(const ObjectInfo& object)
 {
 	bool success = false;
 
-	if ((object.mat->usingVertices()) && (object.mat->usingNormals()) && (object.mat->usingUvs()))
+	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL))
 		success = loadVertNormalUVBuffer(object);
-	else if ((object.mat->usingVertices()) && (object.mat->usingNormals()))
+	else if ((object.mesh != NULL) && (object.normals != NULL))
 		success = loadVertNormalBuffer(object);
-	else if ((object.mat->usingVertices()) && (object.mat->usingUvs()))
+	else if ((object.mesh != NULL) && (object.uvs != NULL))
 		success = loadVertUVBuffer(object);
-	else if (object.mat->usingVertices())
+	else if (object.mesh != NULL)
 		success = loadVertBuffer(object);
 	else
 	{
