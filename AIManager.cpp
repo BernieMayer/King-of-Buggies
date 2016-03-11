@@ -523,10 +523,10 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	if (dot < 0.95f) {
 		// Turn
 		if (side < 0) {
-			input.turnR = 1;
+			input.turnR = -side;
 		}
 		else {
-			input.turnL = 1;
+			input.turnL = side;
 		}
 	}
 

@@ -432,7 +432,8 @@ void GameManager::initTestScene()
 	vehicleColours.push_back(vec3(0.f, 1.f, 0.f)); // green car
 	vehicleColours.push_back(vec3(0.f, 0.f, 1.f)); // blue
 	vehicleColours.push_back(vec3(1.f, 1.f, 0.f)); // yellow
-	vehicleColours.push_back(vec3(0.f, 0.f, 0.f)); // black
+	// Black car sucks. it's purple now
+	vehicleColours.push_back(vec3(1.f, 0.f, 1.f)); // purple
 
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
 	traits.print();
