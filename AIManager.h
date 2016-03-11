@@ -28,9 +28,12 @@ public:
 	void getPathAsLines(unsigned int playerNum, vector<vec3>* lines);
 	vec3 getCurrentTarget(unsigned int playerNum);
 
+	//Debugging
+	bool debugAIPath(vector<vec3>* pathFinding, unsigned int playerNum, unsigned int numIterations);
+
 	//Test functions
 	Input followRandomPath(unsigned int playerNum);
-	Input followPathToTarget(unsigned int playerNum, vec3 target);
+	Input followPath(unsigned int playerNum);
 	vec3 getRandomTarget();
 
 	Input getInput(unsigned int playerNum);		//Main interface into ai

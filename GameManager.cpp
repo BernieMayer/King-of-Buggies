@@ -214,13 +214,15 @@ void GameManager::gameLoop()
 
 	bool paused = false;
 
+	unsigned int debugPathIterations = 0;
+
 	while (!glfwWindowShouldClose(window))
 	{
 
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
-			if (state.getPlayer(i)->isAI())
+			if ((state.getPlayer(i)->isAI()) && !paused)
 			{
 				frameCount++;
 				if (frameCount > 30)
@@ -234,7 +236,8 @@ void GameManager::gameLoop()
 			else
 				inputs[i] = input.getInput(i + 1);
 
-			physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
+			if(!paused)
+				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
 		if (inputs[0].powerup > 0)
@@ -246,6 +249,7 @@ void GameManager::gameLoop()
 				freeCam = cam;
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
+				debugPathIterations = 0;
 			}
 			else
 				renderer.loadCamera(&cam);
@@ -289,6 +293,11 @@ void GameManager::gameLoop()
 		//Free camera movement
 		if (paused)
 		{
+			//Debugging avoidance
+			ai.debugAIPath(&paths, 1, debugPathIterations);
+			if (inputs[0].jump > 0)
+				debugPathIterations++;
+
 			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
 			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
 		}
@@ -341,6 +350,21 @@ void GameManager::gameLoop()
 		renderer.clearDrawBuffers();
 		renderer.drawAll();
 		renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
+
+		//Debugging
+		if (displayDebugging)
+		{
+			ai.getPathAsLines(1, &path);
+
+			renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
+			//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+		}
+
+		if (paused)
+		{
+			renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
+		}
 		
 		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
@@ -366,33 +390,8 @@ void GameManager::gameLoop()
 		//Get path
 		path.clear();
 
-		ai.getPathAsLines(1, &path);
-		vector<vec3> carPos;
-		vec3 p1 = state.getPlayer(0)->getPos();
-		vec3 p2 = state.getPlayer(1)->getPos();
-		p1.y = polygons[0].y;
-		p2.y = p1.y;
-		carPos.push_back(p1);
-		//carPos.push_back(p2);
-		carPos.push_back(ai.getCurrentTarget(1));
-		//printf("(%f %f %f) - (%f %f %f)\n", carPos[1].x, carPos[1].y, carPos[1].z, carPos[0].x, carPos[0].y, carPos[0].z);
-
 		state.clearEvents();
 
-
-		//Debugging
-		if (displayDebugging)
-		{
-			renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
-			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
-			renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
-			renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
-		}
-
-		if (paused)
-		{
-
-		}
 
 		//Swap buffers  
 		glfwSwapBuffers(window);

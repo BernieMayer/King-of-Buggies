@@ -49,6 +49,12 @@ bool AIManager::findNewPath(unsigned int playerNum, vec3 target, bool updateOld)
 	return nav.getPathPoints(&pathToGoal[playerNum], &nodesToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target, updateOld);
 }
 
+bool AIManager::debugAIPath(vector<vec3>* pathFinding, unsigned int playerNum, unsigned int numIterations)
+{
+	pathFinding->clear();
+	return nav.debugAvoidance(pathFinding, &nodesToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), numIterations);
+}
+
 vec3 AIManager::getRandomTarget()
 {
 	return nav[nav.getRandomNode()].getCenter();
@@ -113,7 +119,7 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 		return Input();
 }
 
-Input AIManager::followPathToTarget(unsigned int playerNum, vec3 target)
+Input AIManager::followPath(unsigned int playerNum)
 {
 	if (collisionRecovery)
 		return recover(playerNum);
@@ -139,7 +145,8 @@ Input AIManager::getInput(unsigned int playerNum)
 {
 	updateRecovery(playerNum);
 
-	return followRandomPath(playerNum);		//Test function
+	return followPath(playerNum);
+	//return followRandomPath(playerNum);		//Test function
 }
 
 
