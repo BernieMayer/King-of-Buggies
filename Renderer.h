@@ -137,6 +137,7 @@ public:
 	void assignSphere(unsigned int object, float radius, unsigned int divisions,
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
+					vector<vec2>* uvs,
 					vector<unsigned int>* indices);
 
 	//Lights

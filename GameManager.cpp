@@ -3,6 +3,10 @@
 
 #include "GameManager.h"
 
+unsigned char testTexture[12] = {	255, 255, 255,
+									255, 0, 0,
+									0, 255, 0,
+									0, 0, 255 };
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
 	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()
@@ -60,6 +64,8 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 		renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
 	else
 		renderer.assignColor(chassisRenderID, colour);
+
+
 	//renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
@@ -139,9 +145,10 @@ void GameManager::createBall(float radius)
 	spherePhysicsID = physics.dynamic_createSphere(radius, vec3(0.f, 10.f, 0.f));
 
 	sphereRenderID = renderer.generateObjectID();
-	renderer.assignSphere(sphereRenderID, radius, 200, &ballVertices, &ballNormals, &ballIndices);
+	renderer.assignSphere(sphereRenderID, radius, 200, &ballVertices, &ballNormals, &ballUVs, &ballIndices);
 	renderer.assignMaterial(sphereRenderID, &tsMat);
-	renderer.assignColor(sphereRenderID, vec3(0.f, 0.f, 1.f));
+	renderer.assignTexture(sphereRenderID, testTexture, 2, 2);
+	//renderer.assignColor(sphereRenderID, vec3(0.f, 0.f, 1.f));
 
 	
 }
@@ -449,7 +456,7 @@ void GameManager::initTestScene()
 	createTestLevel();
 
 	
-	//createBall(0.5f);
+	createBall(0.5f);
 
 	state.setGoldenBuggy(0);
 

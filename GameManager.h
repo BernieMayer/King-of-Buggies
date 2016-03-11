@@ -61,6 +61,7 @@ private:
 	vector<vec3> ballVertices;			//TEMPORARY
 	vector<vec3> ballNormals;			//TEMPORARY
 	vector<unsigned int> ballIndices;	//TEMPORARY
+	vector<vec2> ballUVs;
 
 	void addCoin(int playerId);
 

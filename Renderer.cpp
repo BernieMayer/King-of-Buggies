@@ -93,28 +93,30 @@ void Renderer::assignMeshObject(unsigned int id, MeshObject* mesh)
 {
 	if ((id >= objects.size()) || (objects[id].deleted))
 		return;
+
 	assignMesh(id, mesh->getVertexPointer());
 	assignNormals(id, mesh->getNormalPointer());
+	assignUVs(id, mesh->getUvPointer());
 	assignIndices(id, mesh->getIndexPointer());
 }
 
 void Renderer::assignMesh(unsigned int id, vector<vec3>* mesh)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (mesh == NULL))
 		return;
 	objects[id].mesh = mesh;
 }
 
 void Renderer::assignNormals(unsigned int id, vector<vec3>* normals)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (normals == NULL))
 		return;
 	objects[id].normals = normals;
 }
 
 void Renderer::assignUVs(unsigned int id, vector<vec2>* uvs)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (uvs == NULL))
 		return;
 	objects[id].uvs = uvs;
 }
@@ -128,13 +130,15 @@ void Renderer::assignColor(unsigned int id, vec3 color)
 
 void Renderer::assignIndices(unsigned int id, vector<unsigned int>* indices)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (indices == NULL))
 		return;
 	objects[id].indices = indices;
 }
 
 void Renderer::assignTexture(unsigned int id, unsigned char* pixels, unsigned int width, unsigned int height)
 {
+	if ((width == 0) || (height == 0) || (pixels == NULL))
+		return;
 
 	glGenTextures(1, &objects[id].texID);
 
@@ -148,7 +152,7 @@ void Renderer::assignTexture(unsigned int id, unsigned char* pixels, unsigned in
 
 void Renderer::assignMaterial(unsigned int id, Material* mat)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (mat == NULL))
 		return;
 	objects[id].mat = mat;
 }
@@ -735,12 +739,14 @@ void Renderer::assignPlane(unsigned int id, float width,
 void Renderer::assignSphere(unsigned int id, float radius, unsigned int divisions,
 	vector<vec3>* mesh,
 	vector<vec3>* normals,
+	vector<vec2>* uvs,
 	vector<unsigned int>* indices)
 {
 
 	mesh->clear();
 	normals->clear();
 	indices->clear();
+	uvs->clear();
 
 	unsigned int yDivisions = divisions;
 	unsigned int xDivisions = 2*divisions;
@@ -764,6 +770,7 @@ void Renderer::assignSphere(unsigned int id, float radius, unsigned int division
 			float y = sin(v);
 			mesh->push_back(vec3(x, y, z)*radius);
 			normals->push_back(normalize(vec3(x, y, z)));
+			uvs->push_back(vec2(u / (2.f*M_PI), v / (2.f*M_PI)));
 
 			v += vInc;
 		}
@@ -785,6 +792,7 @@ void Renderer::assignSphere(unsigned int id, float radius, unsigned int division
 
 	assignMesh(id, mesh);
 	assignNormals(id, normals);
+	assignUVs(id, uvs);
 	assignIndices(id, indices);
 	assignColor(id, vec3(1.f, 0.f, 0.f));
 
