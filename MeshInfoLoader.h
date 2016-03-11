@@ -36,6 +36,9 @@ public:
 	vector<vec3> vertices, normals;
 	vector<vec2> uvs;
 	vector<unsigned int> indices;
+
+	unsigned char LoadTexture(const char * filename);
+
 protected:
 
 private:

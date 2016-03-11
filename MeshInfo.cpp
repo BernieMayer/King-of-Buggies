@@ -4,7 +4,11 @@ MeshInfo::MeshInfo() {
 	meshLoader = MeshInfoLoader();
 
 	meshLoader.loadModel("models\\brick.obj");
+	unsigned char texInfo = meshLoader.LoadTexture("textures\\bricktexture.bmp");
 	MeshObject brickObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	
+	brickObject.setupTextureInfo(texInfo, 1024, 1024);
+
 	meshes.push_back(brickObject);
 
 	meshLoader.clearData();
@@ -27,15 +31,27 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
-	meshLoader.loadModel("models\\level.obj");
+	meshLoader.loadModel("models\\donutlevel.obj");
 	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(levelObject);
+
+	meshLoader.clearData();
+
+	meshLoader.loadModel("models\\oldlevel.obj");
+	MeshObject oldObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	meshes.push_back(oldObject);
 
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\buggy.obj");
 	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(buggyObject);
+
+	meshLoader.clearData();
+
+	meshLoader.loadModel("models\\unitbuggy.obj");
+	MeshObject unitBuggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	meshes.push_back(unitBuggyObject);
 
 	meshLoader.clearData();
 }

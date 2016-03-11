@@ -181,7 +181,7 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -6.f;
 
 	NavMesh nav;
-	ai.nav.loadNavMesh("HiResNavigationMesh.obj");
+	ai.nav.loadNavMesh("donutLevelNavMesh.obj");
 	ai.nav.calculateImplicitEdges();
 	ai.nav.navMeshToLines(&polygons, &edges);
 
