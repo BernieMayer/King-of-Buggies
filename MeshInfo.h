@@ -7,7 +7,7 @@
 #include "PxPhysicsAPI.h"
 
 // Loads the indices of meshes contained in MeshInfo
-enum { BRICK = 0, CUBE, WHEEL, COIN, LEVEL, BUGGY, COUNT };
+enum { BRICK = 0, CUBE, WHEEL, COIN, LEVEL, OLDLEVEL, BUGGY, UNITBUGGY, COUNT };
 
 class MeshInfo {
 public:

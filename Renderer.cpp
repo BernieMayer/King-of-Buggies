@@ -33,19 +33,19 @@ void glErrorCheck(const char* location)
 }
 
 
-Renderer::ObjectInfo::ObjectInfo()
-{ 
-	mesh = NULL;
-	normals = NULL;
-	uvs = NULL;
-	indices = NULL;
-	mat = NULL;
-	shadowBehaviour = SHADOW_BEHAVIOUR::NONE;
-	color = vec3(1.f, 1.f, 1.f);
-	deleted = false;
-
-	transform = mat4(1.f);
-	scaling = mat4(1.f);
+Renderer::ObjectInfo::ObjectInfo(): 
+	mesh(NULL),
+	normals(NULL),
+	uvs(NULL),
+	indices(NULL),
+	mat(NULL),
+	shadowBehaviour(SHADOW_BEHAVIOUR::NONE),
+	color(1.f, 1.f, 1.f),
+	deleted(false),
+	texID(NO_VALUE),
+	transform(1.f),
+	scaling(1.f)
+{
 }
 
 Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
@@ -96,28 +96,30 @@ void Renderer::assignMeshObject(unsigned int id, MeshObject* mesh)
 {
 	if ((id >= objects.size()) || (objects[id].deleted))
 		return;
+
 	assignMesh(id, mesh->getVertexPointer());
 	assignNormals(id, mesh->getNormalPointer());
+	assignUVs(id, mesh->getUvPointer());
 	assignIndices(id, mesh->getIndexPointer());
 }
 
 void Renderer::assignMesh(unsigned int id, vector<vec3>* mesh)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (mesh == NULL))
 		return;
 	objects[id].mesh = mesh;
 }
 
 void Renderer::assignNormals(unsigned int id, vector<vec3>* normals)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (normals == NULL))
 		return;
 	objects[id].normals = normals;
 }
 
 void Renderer::assignUVs(unsigned int id, vector<vec2>* uvs)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (uvs == NULL))
 		return;
 	objects[id].uvs = uvs;
 }
@@ -131,14 +133,29 @@ void Renderer::assignColor(unsigned int id, vec3 color)
 
 void Renderer::assignIndices(unsigned int id, vector<unsigned int>* indices)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (indices == NULL))
 		return;
 	objects[id].indices = indices;
 }
 
+void Renderer::assignTexture(unsigned int id, unsigned char* pixels, unsigned int width, unsigned int height)
+{
+	if ((width == 0) || (height == 0) || (pixels == NULL))
+		return;
+
+	glGenTextures(1, &objects[id].texID);
+
+	glBindTexture(GL_TEXTURE_2D, objects[id].texID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_2D, 0);		//Unbind texture
+}
+
 void Renderer::assignMaterial(unsigned int id, Material* mat)
 {
-	if ((id >= objects.size()) || (objects[id].deleted))
+	if ((id >= objects.size()) || (objects[id].deleted) || (mat == NULL))
 		return;
 	objects[id].mat = mat;
 }
@@ -268,12 +285,17 @@ void Renderer::draw(unsigned int id)
 
 	object.mat->useShader();
 
-	if (camera != NULL)
-		object.mat->loadUniforms(winRatio*projection*modelview*camera->getMatrix()*object.transform*object.scaling, object.transform*object.scaling, 
-						camera->getPos(), light.pos, object.color);	
+	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
+	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
+	mat4 projectionMatrix = winRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+						viewPos, light.pos, object.color);
 	else
-		object.mat->loadUniforms(winRatio*projection*modelview*object.transform*object.scaling, object.transform*object.scaling,
-						vec3(0.f, 0.f, 0.f), light.pos, object.color);
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+						viewPos, light.pos, objects[id].texID, 0);
 
 
 	loadBuffers(object);
@@ -422,13 +444,13 @@ bool Renderer::loadBuffers(const ObjectInfo& object)
 {
 	bool success = false;
 
-	if ((object.mat->usingVertices()) && (object.mat->usingNormals()) && (object.mat->usingUvs()))
+	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL))
 		success = loadVertNormalUVBuffer(object);
-	else if ((object.mat->usingVertices()) && (object.mat->usingNormals()))
+	else if ((object.mesh != NULL) && (object.normals != NULL))
 		success = loadVertNormalBuffer(object);
-	else if ((object.mat->usingVertices()) && (object.mat->usingUvs()))
+	else if ((object.mesh != NULL) && (object.uvs != NULL))
 		success = loadVertUVBuffer(object);
-	else if (object.mat->usingVertices())
+	else if (object.mesh != NULL)
 		success = loadVertBuffer(object);
 	else
 	{
@@ -751,12 +773,14 @@ void Renderer::assignPlane(unsigned int id, float width,
 void Renderer::assignSphere(unsigned int id, float radius, unsigned int divisions,
 	vector<vec3>* mesh,
 	vector<vec3>* normals,
+	vector<vec2>* uvs,
 	vector<unsigned int>* indices)
 {
 
 	mesh->clear();
 	normals->clear();
 	indices->clear();
+	uvs->clear();
 
 	unsigned int yDivisions = divisions;
 	unsigned int xDivisions = 2*divisions;
@@ -780,6 +804,7 @@ void Renderer::assignSphere(unsigned int id, float radius, unsigned int division
 			float y = sin(v);
 			mesh->push_back(vec3(x, y, z)*radius);
 			normals->push_back(normalize(vec3(x, y, z)));
+			uvs->push_back(vec2(u / (2.f*M_PI), v / (2.f*M_PI)));
 
 			v += vInc;
 		}
@@ -801,6 +826,7 @@ void Renderer::assignSphere(unsigned int id, float radius, unsigned int division
 
 	assignMesh(id, mesh);
 	assignNormals(id, normals);
+	assignUVs(id, uvs);
 	assignIndices(id, indices);
 	assignColor(id, vec3(1.f, 0.f, 0.f));
 

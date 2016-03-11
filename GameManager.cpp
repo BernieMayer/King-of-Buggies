@@ -3,6 +3,10 @@
 
 #include "GameManager.h"
 
+unsigned char testTexture[12] = {	255, 255, 255,
+									255, 0, 0,
+									0, 255, 0,
+									0, 0, 255 };
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
 	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()
@@ -60,6 +64,8 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 		renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
 	else
 		renderer.assignColor(chassisRenderID, colour);
+
+
 	//renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
@@ -139,9 +145,10 @@ void GameManager::createBall(float radius)
 	spherePhysicsID = physics.dynamic_createSphere(radius, vec3(0.f, 10.f, 0.f));
 
 	sphereRenderID = renderer.generateObjectID();
-	renderer.assignSphere(sphereRenderID, radius, 200, &ballVertices, &ballNormals, &ballIndices);
+	renderer.assignSphere(sphereRenderID, radius, 200, &ballVertices, &ballNormals, &ballUVs, &ballIndices);
 	renderer.assignMaterial(sphereRenderID, &tsMat);
-	renderer.assignColor(sphereRenderID, vec3(0.f, 0.f, 1.f));
+	renderer.assignTexture(sphereRenderID, testTexture, 2, 2);
+	//renderer.assignColor(sphereRenderID, vec3(0.f, 0.f, 1.f));
 
 	
 }
@@ -181,7 +188,7 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -6.f;
 
 	NavMesh nav;
-	ai.nav.loadNavMesh("HiResNavigationMesh.obj");
+	ai.nav.loadNavMesh("donutLevelNavMesh.obj");
 	ai.nav.calculateImplicitEdges();
 	ai.nav.navMeshToLines(&polygons, &edges);
 
@@ -207,20 +214,27 @@ void GameManager::gameLoop()
 		//cout << endl;
 	}
 
+	vector<vec3> frontier;
+	vector<vec3> paths;
+
+	Camera freeCam;
+
+	bool paused = false;
+
+	unsigned int debugPathIterations = 0;
+
 	while (!glfwWindowShouldClose(window))
 	{
-		
+
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
-			if (state.getPlayer(i)->isAI())
+			if ((state.getPlayer(i)->isAI()) && !paused)
 			{
 				frameCount++;
 				if (frameCount > 30)
 				{
-					//ai.findNewPath(i, ai.testTarget);
-					if (state.getGoldenBuggy() != state.getPlayer(i))
-						ai.findNewPath(i, state.getGoldenBuggy()->getPos(), false);
+					ai.findNewPath(i, state.getGoldenBuggy()->getPos(), !state.getPlayer(i)->isGoldenBuggy());
 					frameCount = 0;
 				}
 
@@ -229,9 +243,24 @@ void GameManager::gameLoop()
 			else
 				inputs[i] = input.getInput(i + 1);
 
-			physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
+			if(!paused)
+				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
+		if (inputs[0].powerup)
+		{
+			paused = !paused;
+
+			if (paused)
+			{
+				freeCam = cam;
+				freeCam.setCameraMode(FREEROAM_CAMERA);
+				renderer.loadCamera(&freeCam);
+				debugPathIterations = 0;
+			}
+			else
+				renderer.loadCamera(&cam);
+		}
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
@@ -253,18 +282,32 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		//Physics sim 
-		physics.getSim();
-
-		physics.startSim(frameTime);
-
 		float scale = 0.1f;
 
-		//Update to accomodate more players and multiple cameras
-		if (!inputs[0].drift)//in.powerup)
-			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
-		if (inputs[0].drift)
-			cam.zoom(inputs[0].camV*0.95f + 1.f);
+		if (!paused)
+		{
+			//Physics sim 
+			physics.getSim();
+
+			physics.startSim(frameTime);
+
+			//Update to accomodate more players and multiple cameras
+			if (!inputs[0].drift)//in.powerup)
+				cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
+			if (inputs[0].drift)
+				cam.zoom(inputs[0].camV*0.95f + 1.f);
+		}
+		//Free camera movement
+		if (paused)
+		{
+			//Debugging avoidance
+			ai.debugAIPath(&paths, 1, debugPathIterations);
+			if (inputs[0].jump)
+				debugPathIterations++;
+
+			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
+			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
+		}
 
 		if (inputs[0].menu)
 			displayDebugging = !displayDebugging;
@@ -315,6 +358,22 @@ void GameManager::gameLoop()
 		renderer.drawAll();
 		renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 		renderer.drawRadar(state.setupRadar(0));
+
+		//Debugging
+		if (displayDebugging)
+		{
+			ai.getPathAsLines(1, &path);
+
+			renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
+			//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+		}
+
+		if (paused)
+		{
+			renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
+		}
+>>>>>>> 1e0f72a8f61dbffe432ead2ec40f321e7a0ee20b
 		
 		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
@@ -340,28 +399,8 @@ void GameManager::gameLoop()
 		//Get path
 		path.clear();
 
-		ai.getPathAsLines(1, &path);
-		vector<vec3> carPos;
-		vec3 p1 = state.getPlayer(0)->getPos();
-		vec3 p2 = state.getPlayer(1)->getPos();
-		p1.y = polygons[0].y;
-		p2.y = p1.y;
-		carPos.push_back(p1);
-		//carPos.push_back(p2);
-		carPos.push_back(ai.getCurrentTarget(1));
-		//printf("(%f %f %f) - (%f %f %f)\n", carPos[1].x, carPos[1].y, carPos[1].z, carPos[0].x, carPos[0].y, carPos[0].z);
-
 		state.clearEvents();
 
-
-		//Debugging
-		if (displayDebugging)
-		{
-			renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
-			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
-			renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
-			renderer.drawPoints(carPos, vec3(1.f, 0.f, 0.f), lineTransform);
-		}
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
@@ -402,7 +441,8 @@ void GameManager::initTestScene()
 	vehicleColours.push_back(vec3(0.f, 1.f, 0.f)); // green car
 	vehicleColours.push_back(vec3(0.f, 0.f, 1.f)); // blue
 	vehicleColours.push_back(vec3(1.f, 1.f, 0.f)); // yellow
-	vehicleColours.push_back(vec3(0.f, 0.f, 0.f)); // black
+	// Black car sucks. it's purple now
+	vehicleColours.push_back(vec3(1.f, 0.f, 1.f)); // purple
 
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
 	traits.print();
@@ -418,7 +458,7 @@ void GameManager::initTestScene()
 	createTestLevel();
 
 	
-	//createBall(0.5f);
+	createBall(0.5f);
 
 	state.setGoldenBuggy(0);
 

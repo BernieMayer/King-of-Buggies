@@ -100,6 +100,7 @@
     <ClInclude Include="Gamepad.h" />
     <ClInclude Include="GameState.h" />
     <ClInclude Include="GameStateLoader.h" />
+    <ClInclude Include="GoldenBuggySwitchEvent.h" />
     <ClInclude Include="VehicleCollisionEvent.h" />
     <ClInclude Include="InputSmoother.h" />
     <ClInclude Include="Keybindings.h" />
@@ -139,6 +140,7 @@
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="Gamepad.cpp" />
     <ClCompile Include="GameState.cpp" />
+    <ClCompile Include="GoldenBuggySwitchEvent.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="InputSmoother.cpp" />
     <ClCompile Include="InterfaceManager.cpp" />

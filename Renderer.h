@@ -48,6 +48,7 @@ private:
 		vector<vec3>* normals;
 		vector<vec2>* uvs;
 		vector<unsigned int>* indices;
+		GLuint texID;
 		Material* mat;
 		vec3 color;
 		int shadowBehaviour;
@@ -121,6 +122,7 @@ public:
 	void assignUVs(unsigned int object, vector<vec2>* uvs);
 	void assignIndices(unsigned int object, vector<unsigned int>* indices);		//If no indices are assigned, will traverse mesh in order
 	void assignColor(unsigned int object, vec3 color);
+	void assignTexture(unsigned int object, unsigned char* pixels, unsigned int width, unsigned int height);
 	void setShadowBehaviour(int object, int behaviour);
 	void assignMaterial(unsigned int object, Material* mat);
 	void assignTransform(unsigned int object, const mat4& transform);
@@ -137,6 +139,7 @@ public:
 	void assignSphere(unsigned int object, float radius, unsigned int divisions,
 					vector<vec3>* mesh,
 					vector<vec3>* normals,
+					vector<vec2>* uvs,
 					vector<unsigned int>* indices);
 
 	//Lights

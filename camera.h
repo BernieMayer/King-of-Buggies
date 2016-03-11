@@ -45,6 +45,8 @@ public:
 
 	vec3 getViewCenter();
 
+	void setCameraMode(int type);
+
 	void changeDir(vec3 _dir);
 
 	float trackingSpeedFunc(float angleDiff);

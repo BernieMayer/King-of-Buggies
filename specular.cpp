@@ -30,6 +30,16 @@ void Specular::loadUniforms(const mat4& transform, const mat4& objectTransform,
 	glUniform1f(uniformLocation, shininess);
 }
 
+void Specular::loadUniforms(const mat4& transform, const mat4& objectTransform,
+	vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit)
+{
+	Material::loadUniforms(transform, objectTransform, viewer, light, texID, texUnit);
+	
+	GLuint uniformLocation = glGetUniformLocation(programID, "shininess");
+	glUniform1f(uniformLocation, shininess);
+
+}
+
 void Specular::setShininess(float _shininess) { shininess = _shininess; }
 
 

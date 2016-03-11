@@ -24,6 +24,10 @@ inline bool rightKeyboard(unsigned int key) {
 		|| (key == GLFW_KEY_D);
 }
 
+inline bool hornKeyboard(unsigned int key) {
+	return (key == GLFW_KEY_E);
+}
+
 
 
 

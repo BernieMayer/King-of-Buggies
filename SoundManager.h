@@ -37,7 +37,9 @@ private:
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);
+	void updateHonks(GameState state, Input inputs[]);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
+	void playSound(string fileName, vec3 pos, float volume);
 	void playSecret(GameState state);
 	void playSecret2(GameState state);
 	void updateMusicPitch(GameState state, Input input);
@@ -50,6 +52,9 @@ private:
 	float musicVolume = 1.0;
 	float idleEngineVolume = 0.08;
 	float idleEnginePitch = 1.0;
+
+	vector<bool> honking;
+	vector<ALuint> honkSources;
 
 	bool secretPlaying = false;
 	bool secret2Unlocked = false;

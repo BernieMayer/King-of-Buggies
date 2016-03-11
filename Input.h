@@ -7,6 +7,8 @@ struct Input
 	float backward;
 	float turnL;
 	float turnR;
+	float tiltForward;
+	float tiltBackward;
 	float camV;
 	float camH;
 
@@ -14,8 +16,9 @@ struct Input
 	bool powerup;
 	bool menu;
 	bool jump;
-	bool cheat_coin;
+	bool horn;
 
+	bool cheat_coin;
 	bool isKeyboard;
 };
 

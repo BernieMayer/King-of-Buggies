@@ -55,7 +55,12 @@
     <ClCompile Include="VehicleCollisionEvent.cpp">
       <Filter>Events</Filter>
     </ClCompile>
-    <ClCompile Include="VehicleWallCollisionEvent.cpp" />
+    <ClCompile Include="VehicleWallCollisionEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="GoldenBuggySwitchEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -120,7 +125,12 @@
     <ClInclude Include="VehicleCollisionEvent.h">
       <Filter>Events</Filter>
     </ClInclude>
-    <ClInclude Include="VehicleWallCollisionEvent.h" />
+    <ClInclude Include="VehicleWallCollisionEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="GoldenBuggySwitchEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

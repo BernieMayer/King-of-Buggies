@@ -523,7 +523,11 @@ void Physics::handleInput(Input* input, unsigned int id){
 	if (lastState != NULL) {
 		vec3 forwardVec = lastState->getPlayer(id)->getForward();
 		forwardVec = 3000 * (input->turnL - input->turnR) * forwardVec;
-		vehicle->getRigidDynamicActor()->addTorque(PxVec3(forwardVec.x, forwardVec.y, forwardVec.z));
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
+
+		vec3 sideVec = cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
+		sideVec = 3000 * (input->tiltBackward - input->tiltForward) * sideVec;
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(sideVec));
 	}
 	
 
@@ -537,7 +541,9 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (input->jump && !vehicleInAir[id]) {
 		cout << "Jump!\n";
-		vehicle->getRigidDynamicActor()->addForce(PxVec3(0.0, 500000.0, 0.0));
+		vec3 upVec = lastState->getPlayer(id)->getUp();
+		upVec = 500000.f * upVec;
+		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
 }
@@ -1158,6 +1164,21 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* Physics::createFrictionPairs(const 
 	return surfaceTirePairs;
 }
 
+
+
+void Physics::buggyExplosion(int gBuggyIndex) {
+	for (int i = 0; i < vehicleActors.size(); i++) {
+		if (i != gBuggyIndex) {
+			vec3 vec = lastState->getPlayer(i)->getPos() - lastState->getPlayer(gBuggyIndex)->getPos();
+			float distance = length(vec);
+
+			float force = 8000000;
+			vec = (force * (1 / (distance * distance))) * vec;
+			vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
+		}
+	}
+}
+
 void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
 {
 	//std::cout  << "Callback has been called \n";
@@ -1229,6 +1250,8 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
 								goldenBuggyCounter = 0;
+								buggyExplosion(i);
+								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 								break;
 							}
 						}
@@ -1244,6 +1267,8 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
 								goldenBuggyCounter = 0;
+								buggyExplosion(i);
+								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 								break;
 							}
 

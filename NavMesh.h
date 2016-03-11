@@ -123,9 +123,11 @@ public:
 	bool getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forward, vec3 target);
 
 	bool getPath_Avoidance(vector<unsigned int>* path, vec3 position, vec3 forward);
+	bool debugPath_Avoidance(vector<unsigned int>* path, vector<vec3>* pathFinding, vec3 position, vec3 forward, unsigned int numIterations);
 
 	bool getPathLines(vector<vec3>* path, vec3 position, vec3 target);
 	bool getPathPoints(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 target, vec3 forwards, bool updateOld);		//Use this one for AI
+	bool debugAvoidance(vector<vec3>* path, vector<unsigned int>* nodes, vec3 position, vec3 forwards, unsigned int numIterations);
 
 
 	unsigned int getRandomNode();

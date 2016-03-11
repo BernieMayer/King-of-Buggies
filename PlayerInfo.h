@@ -21,7 +21,7 @@ public:
 	void setWheelTransform(unsigned int wheelNum, const mat4& transform);
 	void setTransform(const mat4& transform, float time);
 	
-	void setColour(vec3 colour);
+	void setColour(vec3 colour) { vehicleColour = colour; }
 	vec3 getColour();
 
 	void setFSpeed(float speed) { fSpeed = speed; };

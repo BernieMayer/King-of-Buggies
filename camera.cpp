@@ -235,6 +235,11 @@ vec3 Camera::getDir(){ return dir; }
 
 vec3 Camera::getUp(){ return up; }
 
+void Camera::setCameraMode(int type)
+{
+	cameraMode = type;
+}
+
 vec3 Camera::getViewCenter(){ return viewCenter; }
 
 
