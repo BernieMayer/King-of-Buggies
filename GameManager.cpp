@@ -373,7 +373,6 @@ void GameManager::gameLoop()
 		{
 			renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 		}
->>>>>>> 1e0f72a8f61dbffe432ead2ec40f321e7a0ee20b
 		
 		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
