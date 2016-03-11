@@ -523,7 +523,11 @@ void Physics::handleInput(Input* input, unsigned int id){
 	if (lastState != NULL) {
 		vec3 forwardVec = lastState->getPlayer(id)->getForward();
 		forwardVec = 3000 * (input->turnL - input->turnR) * forwardVec;
-		vehicle->getRigidDynamicActor()->addTorque(PxVec3(forwardVec.x, forwardVec.y, forwardVec.z));
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
+
+		vec3 sideVec = cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
+		sideVec = 3000 * (input->tiltBackward - input->tiltForward) * sideVec;
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(sideVec));
 	}
 	
 
@@ -537,7 +541,9 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (input->jump && !vehicleInAir[id]) {
 		cout << "Jump!\n";
-		vehicle->getRigidDynamicActor()->addForce(PxVec3(0.0, 500000.0, 0.0));
+		vec3 upVec = lastState->getPlayer(id)->getUp();
+		upVec = 500000.f * upVec;
+		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
 }

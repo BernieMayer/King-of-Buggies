@@ -12,6 +12,8 @@ float kForward;
 float kBackward;
 float kTurnL;
 float kTurnR;
+float kTiltForward;
+float kTiltBackward;
 float lastMouseX;
 float currentMouseX;
 float kCamH;
@@ -167,6 +169,7 @@ InputManager::InputManager(GLFWwindow* w)
 	glfwSetCursorPosCallback(window, mousePosition);
 	kForward = kBackward = 0;
 	kTurnL = kTurnR = 0;
+	kTiltForward = kTiltBackward = 0;
 	kCamH = 0;
 	kCamV = 0;
 	kDrift = false;
@@ -241,6 +244,8 @@ Input InputManager::getInput(int playerNum)
 		if (gamepads[playerNum].LStick_InDeadzone()) {
 			input.turnL = 0;
 			input.turnR = 0;
+			input.tiltForward = 0;
+			input.tiltBackward = 0;
 		} else {
 			float turn = gamepads[playerNum].LeftStick_X();
 			if (turn <= 0) {
@@ -250,6 +255,16 @@ Input InputManager::getInput(int playerNum)
 			else {
 				input.turnL = 0;
 				input.turnR = -turn;
+			}
+
+			float tilt = gamepads[playerNum].LeftStick_Y();
+			if (tilt <= 0) {
+				input.tiltBackward = -tilt;
+				input.tiltForward = 0;
+			}
+			else {
+				input.tiltForward = tilt;
+				input.tiltBackward = 0;
 			}
 		}
 

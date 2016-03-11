@@ -7,6 +7,8 @@ struct Input
 	float backward;
 	float turnL;
 	float turnR;
+	float tiltForward;
+	float tiltBackward;
 	float camV;
 	float camH;
 
