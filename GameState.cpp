@@ -95,19 +95,14 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 			
 			if (isWithinPolygon(otherPlayerPos, radarPoly)){
-				printf("Other player is in radar \n");
+				
 				double dist = length((otherPlayerPos - player3Dpos));
 				
 				vec3 otherPlayerCenter = normalize(otherPlayerPos - player3Dpos);
 
 				vec3 otherPlayer3DUp =   getPlayer(i)->getForward();
 				vec3 otherPlayer3DRight =cross(getPlayer(i)->getForward(), getPlayer(i)->getUp());
-				/*
-				vec2 otherPlayerLeft = vec2(origin.x - dist *otherPlayer3DposRight.x, origin.x - dist * otherPlayer3DposRight.z);
-				vec2 otherPlayerRight = vec2(origin.x + dist * otherPlayer3DposRight.x, origin.x + dist * otherPlayer3DposRight.z);
-				vec2 otherPlayerUp = vec2(origin.x + dist *otherPlayer3DposUp.x, origin.z + dist *otherPlayer3DposUp.z);
-				*/
-
+				
 				vec2 otherPlayerLeft = vec2(otherPlayerCenter.x - otherPlayer3DRight.x, otherPlayerCenter.z - otherPlayer3DRight.z);
 				vec2 otherPlayerRight = vec2(otherPlayerCenter.x + otherPlayer3DRight.x, otherPlayerCenter.z + otherPlayer3DRight.z);
 				vec2 otherPlayerUp = vec2(otherPlayerCenter.x + otherPlayer3DUp.x, otherPlayerCenter.z + otherPlayer3DUp.z);
