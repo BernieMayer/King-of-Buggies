@@ -523,7 +523,11 @@ void Physics::handleInput(Input* input, unsigned int id){
 	if (lastState != NULL) {
 		vec3 forwardVec = lastState->getPlayer(id)->getForward();
 		forwardVec = 3000 * (input->turnL - input->turnR) * forwardVec;
-		vehicle->getRigidDynamicActor()->addTorque(PxVec3(forwardVec.x, forwardVec.y, forwardVec.z));
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
+
+		vec3 sideVec = cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
+		sideVec = 3000 * (input->tiltBackward - input->tiltForward) * sideVec;
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(sideVec));
 	}
 	
 
