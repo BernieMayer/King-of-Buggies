@@ -541,7 +541,9 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (input->jump && !vehicleInAir[id]) {
 		cout << "Jump!\n";
-		vehicle->getRigidDynamicActor()->addForce(PxVec3(0.0, 500000.0, 0.0));
+		vec3 upVec = lastState->getPlayer(id)->getUp();
+		upVec = 500000.f * upVec;
+		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
 }
