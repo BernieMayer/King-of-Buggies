@@ -30,19 +30,19 @@ void glErrorCheck(const char* location)
 }
 
 
-Renderer::ObjectInfo::ObjectInfo()
-{ 
-	mesh = NULL;
-	normals = NULL;
-	uvs = NULL;
-	indices = NULL;
-	mat = NULL;
-	shadowBehaviour = SHADOW_BEHAVIOUR::NONE;
-	color = vec3(1.f, 1.f, 1.f);
-	deleted = false;
-
-	transform = mat4(1.f);
-	scaling = mat4(1.f);
+Renderer::ObjectInfo::ObjectInfo(): 
+	mesh(NULL),
+	normals(NULL),
+	uvs(NULL),
+	indices(NULL),
+	mat(NULL),
+	shadowBehaviour(SHADOW_BEHAVIOUR::NONE),
+	color(1.f, 1.f, 1.f),
+	deleted(false),
+	texID(NO_VALUE),
+	transform(1.f),
+	scaling(1.f)
+{
 }
 
 Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
@@ -131,6 +131,19 @@ void Renderer::assignIndices(unsigned int id, vector<unsigned int>* indices)
 	if ((id >= objects.size()) || (objects[id].deleted))
 		return;
 	objects[id].indices = indices;
+}
+
+void Renderer::assignTexture(unsigned int id, unsigned char* pixels, unsigned int width, unsigned int height)
+{
+
+	glGenTextures(1, &objects[id].texID);
+
+	glBindTexture(GL_TEXTURE_2D, objects[id].texID);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glBindTexture(GL_TEXTURE_2D, 0);		//Unbind texture
 }
 
 void Renderer::assignMaterial(unsigned int id, Material* mat)

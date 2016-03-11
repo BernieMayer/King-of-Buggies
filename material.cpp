@@ -32,8 +32,12 @@ void glErrorCheckMaterial(const char* location)
 void ShaderList::initShaders()
 {
 	shaderIDs[ShaderList::DIFFUSE] = GetShader("diffuse");
+	shaderIDs[ShaderList::DIFFUSE_TEX] = GetShader("diffuseTex");
 	shaderIDs[ShaderList::SPECULAR] = GetShader("specular");
+	shaderIDs[ShaderList::SPECULAR_TEX] = GetShader("specularTex");
 	shaderIDs[ShaderList::TORRANCE_SPARROW] = GetShader("torranceSparrow");
+	shaderIDs[ShaderList::TORRANCE_SPARROW_TEX] = GetShader("torranceSparrowTex");
+
 }
 
 
@@ -62,17 +66,36 @@ void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 
 	uniformLocation = glGetUniformLocation(programID, "light");
 	glUniform3f(uniformLocation, light.x, light.y, light.z);
-
+	
 	uniformLocation = glGetUniformLocation(programID, "color");
 	glUniform3f(uniformLocation, color.x, color.y, color.z);
 
 	glErrorCheckMaterial("Uniforms");
-
-	/*printf("viewer = (%f, %f, %f)\nLight = (%f, %f, %f)\nColor = (%f, %f, %f)\n\n",
-		viewer.x, viewer.y, viewer.z,
-		light.x, light.y, light.z,
-		color.x, color.y, color.z);*/
 	
+}
+
+void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
+	vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit)
+{
+	GLuint uniformLocation = glGetUniformLocation(programID, "transform");
+	glUniformMatrix4fv(uniformLocation, 1, false, &transform[0][0]);
+
+	uniformLocation = glGetUniformLocation(programID, "objectTransform");
+	glUniformMatrix4fv(uniformLocation, 1, false, &objectTransform[0][0]);
+
+	uniformLocation = glGetUniformLocation(programID, "viewPos");
+	glUniform3f(uniformLocation, viewer.x, viewer.y, viewer.z);
+
+	uniformLocation = glGetUniformLocation(programID, "light");
+	glUniform3f(uniformLocation, light.x, light.y, light.z);
+
+	uniformLocation = glGetUniformLocation(programID, "colorTexture");
+	glActiveTexture(GL_TEXTURE0+texUnit);
+	glBindTexture(GL_TEXTURE_2D, texID);
+	glUniform1i(uniformLocation, 0);
+
+	glErrorCheckMaterial("Uniforms");
+
 }
 
 

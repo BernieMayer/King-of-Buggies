@@ -14,6 +14,9 @@ public:
 	void loadUniforms(const mat4& transform, const mat4& objectTransform,
 		vec3 viewPos, vec3 light, vec3 color);
 
+	void loadUniforms(const mat4& transform, const mat4& objectTransform,
+		vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit);
+
 	void setShininess(float _shininess);
 };
 

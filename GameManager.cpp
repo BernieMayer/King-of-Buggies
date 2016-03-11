@@ -240,7 +240,7 @@ void GameManager::gameLoop()
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
-		if (inputs[0].powerup > 0)
+		if (inputs[0].powerup)
 		{
 			paused = !paused;
 
@@ -295,7 +295,7 @@ void GameManager::gameLoop()
 		{
 			//Debugging avoidance
 			ai.debugAIPath(&paths, 1, debugPathIterations);
-			if (inputs[0].jump > 0)
+			if (inputs[0].jump)
 				debugPathIterations++;
 
 			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
