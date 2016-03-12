@@ -174,6 +174,25 @@ Coin* GameState::getCoin(unsigned int coinNum)
 
 unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
+void GameState::addBoostPad(const BoostPad& boostPad) { boostPads.push_back(boostPad); }
+
+unsigned int GameState::numberOfBoostPads(){ return boostPads.size(); }
+
+bool GameState::checkBoostPadCollision(vec3 playerPos)
+{
+	bool collided = false;
+	for (unsigned int i = 0; i < boostPads.size(); i++) {
+		vector<vec3> points = boostPads[i].getPoints();
+
+		if (isWithinPolygon(playerPos, points))
+		{
+			printf("Collision with boostpad detected \n");
+			return true;
+		}
+	}
+	return collided;
+}
+
 void GameState::addPowerup(const Powerup& powerup) { powerups.push_back(powerup); }
 
 void GameState::setPowerup(unsigned int powerupNum, const Powerup& powerup)

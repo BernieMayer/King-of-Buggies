@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "PlayerInfo.h"
+#include "BoostPad.h"
 #include "Coin.h"
 #include "Powerup.h"
 #include "PowerupBox.h"
@@ -26,6 +27,7 @@ private:
 	vector<PlayerInfo> ai;
 	vector<PlayerInfo> players;
 	vector<Coin> coins;
+	vector<BoostPad> boostPads;
 	vector<Powerup> powerups;
 	vector<PowerupBox> boxes;
 	vector<Event*> events;
@@ -71,6 +73,15 @@ public:
 	void setCoin(unsigned int coinNum, const Coin& coin);
 	Coin* getCoin(unsigned int coinNum);
 	unsigned int numberOfCoins();
+
+
+	//BoostPad management
+	void addBoostPad(const BoostPad& boostPad);
+	//TODO setBoostPad
+	//TODO getBoostPad
+	unsigned int numberOfBoostPads();
+	bool checkBoostPadCollision(vec3 playerPos);
+
 
 	//Powerup management
 	void addPowerup(const Powerup& powerup);

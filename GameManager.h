@@ -74,6 +74,7 @@ public:
 	void createGroundPlane(vec3 normal, float offset);
 	void createTestLevel();
 	void createCoin(vec3 position);
+	void createBoostPad(vec3 position);
 	void createPowerups();
 	void createPowerupBoxes();
 	void createBall(float radius);

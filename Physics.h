@@ -51,6 +51,7 @@ public:
 	//Should be migrated to Vehicle class
 	void modifySpeed(unsigned int vehicleNum, float modSpeed);
 	void setSpeed(unsigned int vehicleNum, float speed);
+	void applySpeedBoost(unsigned int vechicleNum);
 
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution

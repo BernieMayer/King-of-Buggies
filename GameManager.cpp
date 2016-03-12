@@ -179,6 +179,17 @@ void GameManager::createCoin(vec3 position)
 	state.addCoin(newCoin);
 }
 
+void GameManager::createBoostPad(vec3 position)
+{
+	BoostPad newBoostPad;
+	newBoostPad.setDefault(position);
+	//Set up the mesh here...
+
+	//renderer stuff here
+
+	state.addBoostPad(newBoostPad);
+
+}
 void GameManager::gameLoop()
 {
 	vector<vec3> polygons;
@@ -247,6 +258,7 @@ void GameManager::gameLoop()
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
+		//I'm leaving a comment here so that once we add powerups we change the pause key
 		if (inputs[0].powerup)
 		{
 			paused = !paused;
@@ -332,9 +344,15 @@ void GameManager::gameLoop()
 		// Check for player/coin collisions, and coin respawns
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+			bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
 			if (hasCoinCollision){
+				//TODO change to all
 				physics.modifySpeed(i, 0.3333f);
 				sound.playDingSound(state.getPlayer(i)->getPos());
+			}
+
+			if (hasBoostPadCollision){
+				physics.applySpeedBoost(i);
 			}
 		}
 
@@ -463,6 +481,10 @@ void GameManager::initTestScene()
 
 	createCoin(vec3(10.f, -0.3f, 10.f));
 	createCoin(vec3(10.f, -0.3f, -10.f));
+
+	createBoostPad(vec3(10.f, -0.3f, 10.f));
+	createBoostPad(vec3(10.f, -0.3f, 10.f));
+	
 
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();

@@ -15,11 +15,12 @@ public:
 	int getCountdown();
 
 	mat4 getRotation();
-
+	
 private:
 	bool collided;
 	int countdown;
 	float angle;
+	
 };
 
 #endif //COIN_H
