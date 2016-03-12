@@ -1,6 +1,8 @@
 // File originally partially created by Troy Alderson for use in CPSC453 assignments. Reused with permission from Ben Stephenson
 
 #include "MeshInfoLoader.h"
+#include <windows.h>
+#include <fstream>
 
 #pragma warning(disable:4996)
 
@@ -205,7 +207,7 @@ float MeshInfoLoader::getBottom(){
 
 	for (unsigned int i = 0; i<vertices.size(); i++)
 	{
-		bottom = std::min(bottom, vertices[i].z);
+		bottom = min(bottom, vertices[i].z);
 	}
 
 	return bottom;
@@ -220,62 +222,67 @@ float MeshInfoLoader::getBoundingRadius()
 	{
 		vec3 point = vertices[i];
 		float distance = length(center - point);
-		boundingRadius = std::max(boundingRadius, distance);
+		boundingRadius = max(boundingRadius, distance);
 	}
 
 	return boundingRadius;
 }
 
-unsigned char MeshInfoLoader::LoadTexture(const char * filename)
+/* This function is taken from a tutorial on cplusplus.com: http://www.cplusplus.com/articles/GwvU7k9E/
+	Code reused with permission from Ben Stephenson. */
+vector<unsigned char> MeshInfoLoader::LoadTexture(const char * filename)
 {
-	GLuint texture;
+	unsigned char* datBuff[2] = { nullptr, nullptr }; // Header buffers
 
-	int width, height;
+	unsigned char* pixels = nullptr; // Pixels
 
-	unsigned char* data;
+	BITMAPFILEHEADER* bmpHeader = nullptr; // Header
+	BITMAPINFOHEADER* bmpInfo = nullptr; // Info 
 
-	FILE * file;
-
-	file = fopen(filename, "rb");
-
-	if (file == NULL) return 0;
-
-	// all of our textures have these dimensions
-	width = 1024;
-	height = 1024;
-	data = (unsigned char *)malloc(width * height * 3);
-	//int size = fseek(file,);
-	fread(data, width * height * 3, 1, file);
-	fclose(file);
-
-	for (int i = 0; i < width * height; ++i)
+	// The file... We open it with it's constructor
+	std::ifstream file(filename, std::ios::binary);
+	if (!file)
 	{
-		int index = i * 3;
-		unsigned char B, R;
-		B = data[index];
-		R = data[index + 2];
-
-		data[index] = R;
-		data[index + 2] = B;
-
-	}
-	printf("BMP read successfully");
-
-	return *data;
-
-	/*
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-
-
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, 3, width, height, GL_RGB, GL_UNSIGNED_BYTE, data);
-	free(data);
+		printf("Failure to open bitmap file.\n");
 	
-	return texture;*/
-}
+	}
 
+	// Allocate byte memory that will hold the two headers
+	datBuff[0] = new unsigned char[sizeof(BITMAPFILEHEADER)];
+	datBuff[1] = new unsigned char[sizeof(BITMAPINFOHEADER)];
+
+	file.read((char*)datBuff[0], sizeof(BITMAPFILEHEADER));
+	file.read((char*)datBuff[1], sizeof(BITMAPINFOHEADER));
+
+	// Construct the values from the buffers
+	bmpHeader = (BITMAPFILEHEADER*)datBuff[0];
+	bmpInfo = (BITMAPINFOHEADER*)datBuff[1];
+
+	// First allocate pixel memory
+	pixels = new unsigned char[bmpInfo->biSizeImage];
+
+	// Go to where image data starts, then read in image data
+	file.seekg(bmpHeader->bfOffBits);
+	file.read((char*)pixels, bmpInfo->biSizeImage);
+
+	// We're almost done. We have our image loaded, however it's not in the right format.
+	// .bmp files store image data in the BGR format, and we have to convert it to RGB.
+	// Since we have the value in bytes, this shouldn't be to hard to accomplish
+	unsigned char tmpRGB = 0; // Swap buffer
+	for (unsigned long i = 0; i < bmpInfo->biSizeImage; i += 3)
+	{
+		tmpRGB = pixels[i];
+		pixels[i] = pixels[i + 2];
+		pixels[i + 2] = tmpRGB;
+	}
+
+	vector<unsigned char> imageVector;
+
+	for (unsigned int j = 0; j < bmpInfo->biSizeImage; j += 3) {
+		imageVector.push_back(pixels[j]);
+		imageVector.push_back(pixels[j + 1]);
+		imageVector.push_back(pixels[j + 2]);
+	}
+	return imageVector;
+}
+/* End of code from outside source */

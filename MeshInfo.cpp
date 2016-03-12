@@ -4,7 +4,7 @@ MeshInfo::MeshInfo() {
 	meshLoader = MeshInfoLoader();
 
 	meshLoader.loadModel("models\\brick.obj");
-	unsigned char texInfo = meshLoader.LoadTexture("textures\\bricktexture.bmp");
+	vector<unsigned char> texInfo = meshLoader.LoadTexture("textures\\bricktexture.bmp");
 	MeshObject brickObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	
 	brickObject.setupTextureInfo(texInfo, 1024, 1024);
