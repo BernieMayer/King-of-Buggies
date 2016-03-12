@@ -5,19 +5,13 @@
 
 TorranceSparrow::TorranceSparrow() : shininess(3)
 {
-	verticesUsed = true;
-	normalsUsed = true;
-	uvsUsed = false;
-
+	shaderIndex = ShaderList::TORRANCE_SPARROW;
 	programID = shaderList.shaderIDs[ShaderList::TORRANCE_SPARROW];
 }
 
 TorranceSparrow::TorranceSparrow(float _shininess) : shininess(_shininess)
 {
-	verticesUsed = true;
-	normalsUsed = true;
-	uvsUsed = false;
-
+	shaderIndex = ShaderList::TORRANCE_SPARROW;
 	programID = shaderList.shaderIDs[ShaderList::TORRANCE_SPARROW];
 }
 

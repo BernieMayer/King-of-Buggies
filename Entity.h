@@ -21,6 +21,7 @@ public:
 	vec3 getPos();
 	vec3 getForward();
 	vec3 getUp();
+	vec3 getRight();
 	virtual vec3 getVelocity();
 
 	void setPos(const vec3& _pos);

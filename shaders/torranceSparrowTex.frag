@@ -32,6 +32,7 @@ float torranceSparrowLighting()
 void main(){
     
 	vec3 color = texture(colorTexture, texCoord).rgb;
+	//vec3 color = vec3(texCoord.x, texCoord.y, 0.f);
     fragColor = torranceSparrowLighting()*color;
 }
 

@@ -29,10 +29,7 @@ void glErrorCheckMat(const char* location)
 
 Diffuse::Diffuse()
 {
-	verticesUsed = true;
-	normalsUsed = true;
-	uvsUsed = false;
-
+	shaderIndex = ShaderList::DIFFUSE;
 	programID = shaderList.shaderIDs[ShaderList::DIFFUSE];
 	//programID = GetShader("diffuse");
 }

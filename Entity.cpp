@@ -25,6 +25,10 @@ vec3 Entity::getUp(){
 	return vec3(transform*vec4(0.f, 1.f, 0.f, 0.f));
 }
 
+vec3 Entity::getRight(){
+	return vec3(transform*vec4(1.f, 0.f, 0.f, 0.f));
+}
+
 void Entity::setPos(const vec3& _pos)
 {
 	transform[3][0] = _pos.x;

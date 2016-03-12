@@ -46,11 +46,14 @@ Material::Material()
 	
 }
 
-bool Material::usingVertices(){ return verticesUsed; }
-bool Material::usingNormals(){ return normalsUsed; }
-bool Material::usingUvs(){ return uvsUsed; }
-
-void Material::useShader(){ glUseProgram(programID); }
+void Material::useShader(){
+	programID = shaderList.shaderIDs[shaderIndex];
+	glUseProgram(programID); 
+}
+void Material::useTextureShader(){ 
+	programID = shaderList.shaderIDs[shaderIndex + ShaderList::OFFSET::TEXTURE];
+	glUseProgram(programID); 
+}
 
 void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 							vec3 viewer, vec3 light, vec3 color)

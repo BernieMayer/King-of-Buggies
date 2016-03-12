@@ -18,6 +18,8 @@ class ShaderList
 public:
 
 	enum {DIFFUSE=0, DIFFUSE_TEX, SPECULAR, SPECULAR_TEX, TORRANCE_SPARROW, TORRANCE_SPARROW_TEX, COUNT};
+
+	enum OFFSET {TEXTURE=1};
 	
 	GLuint shaderIDs[COUNT];
 	void initShaders();		//Must call after glewInit but before using materials
@@ -32,10 +34,8 @@ class Material
 {
 protected:
 	GLuint programID;
+	unsigned int shaderIndex = 0;
 
-	bool verticesUsed;
-	bool normalsUsed;
-	bool uvsUsed;
 public:
 
 	Material();
@@ -45,10 +45,7 @@ public:
 	virtual void loadUniforms(const mat4& transform, const mat4& objectTransform,
 		vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit);
 	void useShader();
-
-	bool usingVertices();
-	bool usingNormals();
-	bool usingUvs();
+	void useTextureShader();
 };
 
 

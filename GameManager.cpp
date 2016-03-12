@@ -3,10 +3,10 @@
 
 #include "GameManager.h"
 
-unsigned char testTexture[12] = {	255, 255, 255,
-									255, 0, 0,
+unsigned char testTexture[12] = {	0, 0, 255,
 									0, 255, 0,
-									0, 0, 255 };
+									255, 0, 0,
+									255, 255, 255};
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
 	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()

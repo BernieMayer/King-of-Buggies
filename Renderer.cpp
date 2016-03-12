@@ -283,7 +283,11 @@ void Renderer::draw(unsigned int id)
 	else
 		light = lights[0];		//Else, use first light in array
 
-	object.mat->useShader();
+	//Make into ObjectInfo function?
+	if (objects[id].texID == NO_VALUE)
+		object.mat->useShader();
+	else
+		object.mat->useTextureShader();
 
 	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
 	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
@@ -557,7 +561,6 @@ bool Renderer::loadVertNormalUVBuffer(const ObjectInfo& object)
 		debug_message("loadVertNormalUVBuffer: UV pointer invalid\n");
 		return false;
 	}
-		
 
 	glBindVertexArray(vao[VAO::VERT_NORMALS_UVS]);
 
@@ -804,7 +807,7 @@ void Renderer::assignSphere(unsigned int id, float radius, unsigned int division
 			float y = sin(v);
 			mesh->push_back(vec3(x, y, z)*radius);
 			normals->push_back(normalize(vec3(x, y, z)));
-			uvs->push_back(vec2(u / (2.f*M_PI), v / (2.f*M_PI)));
+			uvs->push_back(vec2(u / (2.f*M_PI), (v+M_PI*0.5) / (M_PI)));
 
 			v += vInc;
 		}
