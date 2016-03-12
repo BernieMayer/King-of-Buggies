@@ -1149,7 +1149,11 @@ void Physics::startSim(float frameTime) {
 	PxVehicleUpdates(frameTime, grav, *gFrictionPairs, vehicles.size(), &vehicles[0], &vehicleQueryResults[0]); 
 
 	for (int i = 0; i < vehicleActors.size(); i++) {
-		vehicleInAir[i] = vehicleQueryResults[0].wheelQueryResults->isInAir;
+		bool inAir = true;
+		for (int j = 0; j < vehicleQueryResults[i].nbWheelQueryResults; j++) {
+			inAir = inAir && vehicleQueryResults[i].wheelQueryResults[j].isInAir;
+		}
+		vehicleInAir[i] = inAir;
 	}
 
 	lastFrameTime = frameTime;
