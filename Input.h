@@ -9,6 +9,10 @@ struct Input
 	float turnR;
 	float tiltForward;
 	float tiltBackward;
+	float rollL;
+	float rollR;
+	float spinL;
+	float spinR;
 	float camV;
 	float camH;
 

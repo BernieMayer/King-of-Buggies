@@ -29,7 +29,6 @@ void  AIManager::initAI() {
 		pointOnPath.push_back(0);
 		prevPosition.push_back(state->getPlayer(i)->getPos());
 		reversing.push_back(false);
-		smoother.push_back(InputSmoother());
 		vector<PlayerInfo> temp;
 		temp.push_back(*state->getPlayer(i));
 		pastInfo.push_back(temp);
@@ -191,6 +190,12 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	input.backward = 0;
 	input.turnL = 0;
 	input.turnR = 0;
+	input.tiltBackward = 0;
+	input.tiltForward = 0;
+	input.spinL = 0;
+	input.spinR = 0;
+	input.rollL = 0;
+	input.rollR = 0;
 
 	Entity* ai = state->getPlayer(aiNum);
 	Entity* goldenBuggy = state->getGoldenBuggy();
@@ -221,7 +226,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 		}
 	}
 
-	return smoother[aiNum].smooth(input);
+	return input;
 	
 	
 }
@@ -245,6 +250,12 @@ Input AIManager::recover(int playerNum) {
 
 	input.turnL = 0;
 	input.turnR = 0;
+	input.tiltBackward = 0;
+	input.tiltForward = 0;
+	input.spinL = 0;
+	input.spinR = 0;
+	input.rollL = 0;
+	input.rollR = 0;
 
 	float dot = facing(state->getPlayer(playerNum), infoAtCollision.getPos());
 	float side = beside(state->getPlayer(playerNum), infoAtCollision.getPos());
@@ -286,7 +297,7 @@ Input AIManager::recover(int playerNum) {
 		}
 	}
 
-	return smoother[playerNum].smooth(input);
+	return input;
 }
 
 void AIManager::updateRecovery(unsigned int playerNum)
@@ -447,6 +458,12 @@ Input AIManager::testAIEvade(int playerNum) {
 	input.backward = 0;
 	input.turnL = 0;
 	input.turnR = 0;
+	input.tiltBackward = 0;
+	input.tiltForward = 0;
+	input.spinL = 0;
+	input.spinR = 0;
+	input.rollL = 0;
+	input.rollR = 0;
 
 	float dot = facing(ai, player);
 	float side = beside(ai, player);
@@ -499,7 +516,7 @@ Input AIManager::testAIEvade(int playerNum) {
 
 	prevPosition[playerNum] = aiPos;
 
-	return smoother[playerNum].smooth(input);
+	return input;
 }
 
 Input AIManager::driveToPoint(int playerNum, vec3 pos) {
@@ -515,6 +532,12 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	input.backward = 0;
 	input.turnL = 0;
 	input.turnR = 0;
+	input.tiltBackward = 0;
+	input.tiltForward = 0;
+	input.spinL = 0;
+	input.spinR = 0;
+	input.rollL = 0;
+	input.rollR = 0;
 
 	float dot = facing(ai, pos);
 	float side = beside(ai, pos);
@@ -532,7 +555,7 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 
 	prevPosition[playerNum] = aiPos;
 
-	return smoother[playerNum].smooth(input);
+	return input;
 }
 
 bool AIManager::atPoint(int playerNum, vec3 pos) {

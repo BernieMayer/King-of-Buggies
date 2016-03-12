@@ -20,10 +20,15 @@ public:
 	int getNumPlayers();
 	void rumble(int playerNum, float strength, int timeFrames);
 private:
+	const int driftButton = 2;
+	const int powerupButton = 1;
+	const int menuButton = 12;
+	const int jumpButton = 0;
+	const int honkButton = 3;
+
 	GLFWwindow* window;
 	Gamepad gamepads[4];
 	int numPlayers;
-	InputSmoother smoothers[4];
 	int rumbleCounters[4];
 	int rumbleTargets[4];
 	

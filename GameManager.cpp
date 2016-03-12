@@ -83,6 +83,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour));
+	smoothers.push_back(InputSmoother());
 	
 
 }
@@ -251,8 +252,11 @@ void GameManager::gameLoop()
 
 				inputs[i] = ai.getInput(i);
 			}
-			else
+			else {
 				inputs[i] = input.getInput(i + 1);
+			}
+
+			inputs[i] = smoothers[i].smooth(inputs[i], state.getPlayer(i)->getInAir());
 
 			if(!paused)
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());

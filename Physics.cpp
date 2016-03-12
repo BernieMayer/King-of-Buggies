@@ -423,6 +423,7 @@ void Physics::updateGameState(GameState* state, float time)
 		player->setSSpeed(vehicle_getSSpeed(player->getPhysicsID()));
 		player->setForwardsGear(vehicle_getForwardsGear(player->getPhysicsID()));
 		player->setEngineSpeed(vehicle_getEngineSpeed(player->getPhysicsID()));
+		player->setInAir(vehicleInAir[i]);
 	}
 
 	for (unsigned int i = 0; i < state->numberOfPowerups(); i++)
@@ -539,10 +540,18 @@ void Physics::handleInput(Input* input, unsigned int id){
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
 	if (lastState != NULL) {
+		
+		// Spinning
+		vec3 upVec = lastState->getPlayer(id)->getUp();
+		upVec = 5000 * (input->spinR - input->spinL) * upVec;
+		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(upVec));
+
+		// Rolling
 		vec3 forwardVec = lastState->getPlayer(id)->getForward();
-		forwardVec = 3000 * (input->turnL - input->turnR) * forwardVec;
+		forwardVec = 3000 * (input->rollL - input->rollR) * forwardVec;
 		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
 
+		// Tilting
 		vec3 sideVec = cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
 		sideVec = 3000 * (input->tiltBackward - input->tiltForward) * sideVec;
 		vehicle->getRigidDynamicActor()->addTorque(getPxVec3(sideVec));

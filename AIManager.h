@@ -81,7 +81,6 @@ private:
 	float carSpeed = 1.0f;
 	// Default drive to position
 	vec3 lastDriveToPos = vec3(-13, 0.5, -15);
-	vector<InputSmoother> smoother;		// = InputSmoother();
 	float aiType = 0;
 
 	float facing(Entity* object, Entity* target);

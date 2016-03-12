@@ -12,7 +12,7 @@ InputSmoother::~InputSmoother()
 {
 }
 
-Input InputSmoother::smooth(Input in) {
+Input InputSmoother::smooth(Input in, bool inAir) {
 	Input out = in;
 
 	// If forward is increasing too much, increase by max instead
@@ -58,6 +58,64 @@ Input InputSmoother::smooth(Input in) {
 	}
 	// Otherwise, do not change
 	lastTurnR = out.turnR;
+
+	if (inAir) {
+		if (out.tiltForward > lastTiltForward && out.tiltForward - lastTiltForward > inAirControlStep) {
+			out.tiltForward = lastTiltForward + inAirControlStep;
+		}
+		else if (out.tiltForward < lastTiltForward && lastTiltForward - out.tiltForward > inAirControlStep) {
+			out.tiltForward = lastTiltForward - inAirControlStep;
+		}
+		lastTiltForward = out.tiltForward;
+
+		if (out.tiltBackward > lastTiltBackward && out.tiltBackward - lastTiltBackward > inAirControlStep) {
+			out.tiltBackward = lastTiltBackward + inAirControlStep;
+		}
+		else if (out.tiltBackward < lastTiltBackward && lastTiltBackward - out.tiltBackward > inAirControlStep) {
+			out.tiltBackward = lastTiltBackward - inAirControlStep;
+		}
+		lastTiltBackward = out.tiltBackward;
+
+		if (out.rollL > lastRollL && out.rollL - lastRollL > inAirControlStep) {
+			out.rollL = lastRollL + inAirControlStep;
+		}
+		else if (out.rollL < lastRollL && lastRollL - out.rollL > inAirControlStep) {
+			out.rollL = lastRollL - inAirControlStep;
+		}
+		lastRollL = out.rollL;
+
+		if (out.rollR > lastRollR && out.rollR - lastRollR > inAirControlStep) {
+			out.rollR = lastRollR + inAirControlStep;
+		}
+		else if (out.rollR < lastRollR && lastRollR - out.rollR > inAirControlStep) {
+			out.rollR = lastRollR - inAirControlStep;
+		}
+		lastRollR = out.rollR;
+
+		if (out.spinL > lastSpinL && out.spinL - lastSpinL > inAirControlStep) {
+			out.spinL = lastSpinL + inAirControlStep;
+		}
+		else if (out.spinL < lastSpinL && lastSpinL - out.spinL > inAirControlStep) {
+			out.spinL = lastSpinL - inAirControlStep;
+		}
+		lastSpinL = out.spinL;
+
+		if (out.spinR > lastSpinR && out.spinR - lastSpinR > inAirControlStep) {
+			out.spinR = lastSpinR + inAirControlStep;
+		}
+		else if (out.spinR < lastSpinR && lastSpinR - out.spinR > inAirControlStep) {
+			out.spinR = lastSpinR - inAirControlStep;
+		}
+		lastSpinR = out.spinR;
+	}
+	else {
+		lastTiltForward = 0;
+		lastTiltBackward = 0;
+		lastRollL = 0;
+		lastRollR = 0;
+		lastSpinL = 0;
+		lastSpinR = 0;
+	}
 
 	// Menu can only be "pressed" once every 20 frames to prevent
 	// effects triggering on button pressed happening too often

@@ -33,6 +33,7 @@ private:
 	Physics physics;
 	Renderer renderer;
 	SoundManager sound;
+	vector<InputSmoother> smoothers;
 
 	Timer clock;
 

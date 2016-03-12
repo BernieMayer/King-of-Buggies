@@ -12,8 +12,6 @@ float kForward;
 float kBackward;
 float kTurnL;
 float kTurnR;
-float kTiltForward;
-float kTiltBackward;
 float lastMouseX;
 float currentMouseX;
 float kCamH;
@@ -169,7 +167,6 @@ InputManager::InputManager(GLFWwindow* w)
 	glfwSetCursorPosCallback(window, mousePosition);
 	kForward = kBackward = 0;
 	kTurnL = kTurnR = 0;
-	kTiltForward = kTiltBackward = 0;
 	kCamH = 0;
 	kCamV = 0;
 	kDrift = false;
@@ -208,8 +205,6 @@ InputManager::InputManager(GLFWwindow* w)
 
 			//rumble(i, 0.5f, 5);
 		}
-
-		smoothers[i - 1] = InputSmoother();
 	}
 }
 
@@ -246,15 +241,31 @@ Input InputManager::getInput(int playerNum)
 			input.turnR = 0;
 			input.tiltForward = 0;
 			input.tiltBackward = 0;
+			input.rollL = 0;
+			input.rollR = 0;
+			input.spinL = 0;
+			input.spinR = 0;
 		} else {
 			float turn = gamepads[playerNum].LeftStick_X();
 			if (turn <= 0) {
 				input.turnL = turn;
 				input.turnR = 0;
+				if (gamepads[playerNum].GetButtonPressed(driftButton)) {
+					input.rollL = turn;
+				}
+				else {
+					input.spinL = turn;
+				}
 			}
 			else {
 				input.turnL = 0;
 				input.turnR = -turn;
+				if (gamepads[playerNum].GetButtonPressed(driftButton)) {
+					input.rollR = -turn;
+				}
+				else {
+					input.spinR = -turn;
+				}
 			}
 
 			float tilt = gamepads[playerNum].LeftStick_Y();
@@ -276,19 +287,11 @@ Input InputManager::getInput(int playerNum)
 			input.camV = gamepads[playerNum].RightStick_Y();
 		}
 
-		// Using XINPUT_GAMEPAD_RIGHT_SHOULDER activates when start is pressed for some reason...
-		input.drift = gamepads[playerNum].GetButtonPressed(2);
-		// Using XINPUT_GAMEPAD_B never activates for some reason...
-		input.powerup = gamepads[playerNum].GetButtonPressed(1);
-		
-		// Same problem as with B button...
-		input.menu = gamepads[playerNum].GetButtonPressed(12);
-
-		// Press A to jump
-		input.jump = gamepads[playerNum].GetButtonPressed(0);
-
-		// Press Y to honk
-		input.horn = gamepads[playerNum].GetButtonPressed(3);
+		input.drift = gamepads[playerNum].GetButtonPressed(driftButton);
+		input.powerup = gamepads[playerNum].GetButtonPressed(powerupButton);
+		input.menu = gamepads[playerNum].GetButtonPressed(menuButton);
+		input.jump = gamepads[playerNum].GetButtonPressed(jumpButton);
+		input.horn = gamepads[playerNum].GetButtonPressed(honkButton);
 
 		gamepads[playerNum].RefreshState();
 
@@ -310,6 +313,8 @@ Input InputManager::getInput(int playerNum)
 		input.backward = kBackward;
 		input.turnL = kTurnL;
 		input.turnR = kTurnR;
+		input.tiltForward = kForward;
+		input.tiltBackward = kBackward;
 		input.camH = kCamH;
 		input.camV = kCamV;
 		input.drift = kDrift;
@@ -317,6 +322,19 @@ Input InputManager::getInput(int playerNum)
 		input.menu = kMenu;
 		input.jump = kJump;
 		input.horn = kHorn;
+
+		if (kDrift) {
+			input.rollL = kTurnL;
+			input.rollR = kTurnR;
+			input.spinL = 0;
+			input.spinR = 0;
+		}
+		else {
+			input.rollL = 0;
+			input.rollR = 0;
+			input.spinL = kTurnL;
+			input.spinR = kTurnR;
+		}
 		
 		input.isKeyboard = true;
 
@@ -352,7 +370,7 @@ Input InputManager::getInput(int playerNum)
 	}
 
 
-	return smoothers[smootherNum].smooth(input);
+	return input;
 }
 
 /**

@@ -33,6 +33,8 @@ public:
 	void setForwardsGear(bool b) { forwardsGear = b; }
 	float getEngineSpeed() { return engineSpeed; }
 	void setEngineSpeed(float speed) { engineSpeed = speed; }
+	bool getInAir() { return inAir; }
+	void setInAir(bool air) { inAir = air; }
 
 protected:
 	unsigned int wheelRenderIDs[4];
@@ -50,6 +52,7 @@ protected:
 	float sSpeed;
 	bool forwardsGear;
 	float engineSpeed;
+	bool inAir;
 
 	vec3 vehicleColour;
 };
