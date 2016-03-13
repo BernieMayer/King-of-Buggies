@@ -18,8 +18,9 @@ struct FilterGroup
 	enum Enum
 	{
 		eVEHICLE = (1 << 0),
-		eSPHERE  = (1 << 1),
-		eGROUND  = (1 << 2)
+		eWHEEL = (1 << 1),
+		eSPHERE  = (1 << 2),
+		eGROUND  = (1 << 3)
 	};
 };
 
@@ -1108,8 +1109,11 @@ PxRigidDynamic* Physics::createVehicleActor(const PxVehicleChassisData& chassisD
 	//Wheel and chassis query filter data.
 	//Optional: cars don't drive on other cars.
 	PxFilterData wheelQryFilterData;
+	wheelQryFilterData.word0 = FilterGroup::eWHEEL;
 	setupNonDrivableSurface(wheelQryFilterData);
 	PxFilterData chassisQryFilterData;
+	chassisQryFilterData.word0 = FilterGroup::eVEHICLE;
+
 	setupNonDrivableSurface(chassisQryFilterData);
 
 	//Add all the wheel shapes to the actor.
