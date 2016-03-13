@@ -44,9 +44,12 @@ void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, 
 	//Returned values
 	vector<vec3> &vertices, vector<vec3> &normals, vector<vec2>& uvs, vector<unsigned int> &faces)
 {
+	faces.clear();
+	uvs.clear();
+	normals.clear();
+
 	normals.resize(vertices.size(), vec3(0.0, 0.0, 0.0));
 
-	faces.clear();
 	vector<unsigned int> tempFaces;
 	vector<unsigned int> tempTFaces;
 
@@ -89,17 +92,39 @@ void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, 
 			uvs[vi] = _uvs[ti];
 			faces.push_back(vi);
 		}
-		else if (uvs[vi] != uvs[ti])
+		else if (uvs[vi] != _uvs[ti])
 		{
 			vertices.push_back(vertices[vi]);
 			normals.push_back(normals[vi]);
-			uvs.push_back(uvs[ti]);
+			uvs.push_back(_uvs[ti]);
 
-			faces.push_back(vi);
+			faces.push_back(vertices.size() -1);
 		}
 		else
 			faces.push_back(vi);
 	}
+
+	//Check validity of mesh
+	bool valid = true;
+
+	for (unsigned int i = 0; i < faces.size(); i++)
+	{
+		int unifiedIndex = faces[i];
+		int vIndex = _faces[i];
+		int nIndex = _nFaces[i];
+		int tIndex = _tFaces[i];
+
+
+		if (vertices[unifiedIndex] != vertices[vIndex])
+			valid = false;
+		if (normals[unifiedIndex] != _normals[nIndex])
+			valid = false;
+		if (uvs[unifiedIndex] != _uvs[tIndex])
+			valid = false;	
+	}
+
+	if (valid == false)
+		printf("Mesh continuity violated\n");
 }
 
 bool MeshInfoLoader::loadModel(char *filename)
@@ -113,7 +138,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 
 	//vector<GLv3f> vertices;
 	vector<vec3> _normals;
-	//vector<vec2> _uvs;
+	vector<vec2> _uvs;
 	vector<unsigned int> _faces;
 	vector<unsigned int> _uvfaces;
 	vector<unsigned int> _nfaces;
@@ -145,7 +170,9 @@ bool MeshInfoLoader::loadModel(char *filename)
 			vec2 uv;
 
 			fscanf(f, "%f %f\n", &uv.x, &uv.y);
-			uvs.push_back(uv);
+			//uv.y = -(uv.y - 0.5) + 0.5;		//Flip y coordinate
+			//uv.x = -(uv.x - 0.5) + 0.5;		//Flip x coordinate
+			_uvs.push_back(uv);
 		}
 		else if (strcmp(text, "f") == 0)
 		{
@@ -172,7 +199,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 		}
 	}
 
-	sharedIndices(_faces, _nfaces, _normals, vertices, normals, indices);
+	sharedIndices(_faces, _nfaces, _uvfaces, _normals, _uvs, vertices, normals, uvs, indices);
 
 	return true;
 }
@@ -180,6 +207,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 void MeshInfoLoader::clearData() {
 	vertices.clear();
 	normals.clear();
+	uvs.clear();
 	indices.clear();
 }
 
