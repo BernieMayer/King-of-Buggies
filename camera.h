@@ -10,6 +10,7 @@ const float minZoom = 0.05f;
 const float maxZoom = 5.f;
 
 const float maxY = 0.8f;		//Determines maximum y value of camera direction (To prevent bugs associated with looking straight up)
+const float minY = -0.5f;
 
 const int FREEROAM_CAMERA = 0;
 const int MODELVIEWER_CAMERA = 1;

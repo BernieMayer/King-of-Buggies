@@ -130,7 +130,7 @@ void Camera::rotateView(float x, float y)
 		float pos_length = length(pos-viewCenter);
 		vec3 _dir = normalize(pos-viewCenter);
 
-		if (abs(_dir.y) > maxY)
+		/*if (abs(_dir.y) > maxY)
 		{
 			if (_dir.y < 0)
 				_dir.y = -maxY;
@@ -143,6 +143,29 @@ void Camera::rotateView(float x, float y)
 			_dir = normalize(_dir);
 
 			pos = viewCenter+_dir*pos_length;
+		}*/
+
+		if ((_dir.y > maxY) || (_dir.y < minY))
+		{
+
+			float s = 1.f;
+
+			if (_dir.y > maxY)
+			{
+				_dir.y = maxY;
+				s = sqrt((1 - maxY*maxY) / (_dir.x*_dir.x + _dir.z*_dir.z));
+			}
+			else if (_dir.y < minY)
+			{
+				_dir.y = minY;
+				s = sqrt((1 - minY*minY) / (_dir.x*_dir.x + _dir.z*_dir.z));
+			}
+
+			dir.x *= s;
+			_dir.z *= s;
+			_dir = normalize(_dir);
+
+			pos = viewCenter + _dir*pos_length;
 		}
 
 		changeDir(normalize(viewCenter-pos));
