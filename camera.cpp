@@ -44,20 +44,23 @@ Camera::Camera():
 	right(vec3 (1.f, 0.f, 0.f)),
 	pos(vec3 (0.f, 0.f, 0.f)),
 	viewCenter(vec3(0.f, 0.f, 0.f)),
-	cameraMode(FREEROAM_CAMERA) {}
+	cameraMode(FREEROAM_CAMERA),
+	distance(5.f){}
 
 Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos):
 	up(_up),
 	pos(_pos),
-	cameraMode(FREEROAM_CAMERA)
+	cameraMode(FREEROAM_CAMERA),
+	distance(5.f)
 {
 	changeDir(_dir);
 }
 
-Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos, int _cameraMode):
+Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos, int _cameraMode) :
 	up(_up),
 	pos(_pos),
-	cameraMode(_cameraMode)
+	cameraMode(_cameraMode),
+	distance(5.f)
 {
 	changeDir(_dir);
 }
@@ -211,6 +214,12 @@ void Camera::moveCenter(vec3 change)
 	pos = pos + movement;
 }
 
+void Camera::resetCameraDistance()
+{
+	vec3 adjustedPos = viewCenter + normalize(pos - viewCenter)*distance;
+	setPos(adjustedPos);
+}
+
 void Camera::zoom(float scale)
 {
 	if(cameraMode == FREEROAM_CAMERA)
@@ -227,6 +236,7 @@ void Camera::zoom(float scale)
 	}
 
 	pos = viewCenter + toCenter*scale;
+	distance = length(viewCenter - pos);
 }
 
 vec3 Camera::getPos(){ return pos; }
@@ -251,6 +261,13 @@ void Camera::changeViewCenter(vec3 _viewCenter)
 
 	printf("viewCenter - (%f, %f, %f)\n", viewCenter.x, viewCenter.y, viewCenter.z);
 	changeDir(viewCenter - pos);
+}
+
+void Camera::setPos(vec3 _pos)
+{
+	pos = _pos;
+	if (MODELVIEWER_CAMERA)
+		changeDir(viewCenter - pos);
 }
 
 void Camera::changeCenterAndPos(vec3 movement)

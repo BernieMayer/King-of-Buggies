@@ -47,6 +47,23 @@ mat4 scaleMatrix(vec3 scale)
 
 vec3 PxToVec3(PxVec3 vec) { return vec3(vec.x, vec.y, vec.z); }
 
+void GameManager::cameraEnvironmentCollision(Camera* cam)
+{
+	cam->resetCameraDistance();
+
+	vec3 origin = cam->getViewCenter();
+	vec3 dir = cam->getPos() - origin;
+	float maxDist = length(dir);
+	dir = normalize(dir);
+
+	float distance = physics.getEnvironmentRaycastResult(origin, dir, maxDist);
+	if (distance > 0)
+	{
+		vec3 newPos = origin + dir*distance;
+		cam->setPos(newPos);
+	}
+}
+
 void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 {
 	//Make argument to function later
@@ -312,6 +329,8 @@ void GameManager::gameLoop()
 				cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
 			if (inputs[0].drift)
 				cam.zoom(inputs[0].camV*0.95f + 1.f);
+
+			cameraEnvironmentCollision(&cam);
 		}
 		//Free camera movement
 		if (paused)

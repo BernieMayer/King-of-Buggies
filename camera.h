@@ -27,6 +27,7 @@ class Camera
 	vec3 right;
 	vec3 pos;
 	vec3 viewCenter;
+	float distance;
 
 	int cameraMode;
 
@@ -55,6 +56,8 @@ public:
 
 	void changePos(vec3 _pos);
 
+	void setPos(vec3 _pos);
+
 	void changeViewCenter(vec3 _viewCenter);
 
 	void changeCenterAndPos(vec3 movement);
@@ -76,6 +79,8 @@ public:
 	void rotateViewAround(float x, float y);
 
 	void zoom(float scale);
+
+	void resetCameraDistance();
 
 };
 

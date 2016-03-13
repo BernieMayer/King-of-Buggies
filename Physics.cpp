@@ -94,6 +94,11 @@ vec4 getVec4(const PxVec4& vec)
 	return vec4(vec.x, vec.y, vec.z, vec.w);
 }
 
+PxVec3 getPxVec3(const vec3& vec)
+{
+	return PxVec3(vec.x, vec.y, vec.z);
+}
+
 mat4 getMat4(const PxTransform& transform)
 {
 	PxMat44 physxMatrix = PxMat44(transform);
@@ -294,6 +299,22 @@ unsigned int Physics::ground_createPlane(vec3 normal, float offset)
 	return groundActors.size() - 1;
 }
 
+float Physics::getEnvironmentRaycastResult(vec3 origin, vec3 direction, float maxDist)
+{
+
+	PxRaycastBuffer hit;
+	const PxHitFlags outputFlags = PxHitFlag::eDISTANCE;
+	PxQueryFilterData filterData = PxQueryFilterData();
+	filterData.data.word0 = FilterGroup::eGROUND;
+
+	if (gScene->raycast(getPxVec3(origin), getPxVec3(direction), maxDist, hit, outputFlags, filterData))
+	{
+		return hit.block.distance;
+	}
+	else
+		return -1.f;
+}
+
 PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* physics, MeshObject* levelMesh)
 {
 	//Add a plane to the scene.
@@ -325,6 +346,7 @@ PxRigidStatic* Physics::createDrivableLevel(PxMaterial* material, PxPhysics* phy
 
 	//Set the query filter data of the ground plane so that the vehicle raycasts can hit the ground.
 	PxFilterData qryFilterData;
+	qryFilterData.word0 = FilterGroup::eGROUND;
 	setupDrivableSurface(qryFilterData);
 	shapes[0]->setQueryFilterData(qryFilterData);
 

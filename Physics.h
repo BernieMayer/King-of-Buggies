@@ -82,6 +82,8 @@ public:
 
 	void updateGameState(GameState* state, float time);
 
+	float getEnvironmentRaycastResult(vec3 origin, vec3 direction, float maxDist);		//Shoots ray into seen and returns distance of closest hit
+
 	// Implements PxSimulationEventCallback
 	virtual void  onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
 	virtual void  onTrigger(PxTriggerPair* pairs, PxU32 count){}

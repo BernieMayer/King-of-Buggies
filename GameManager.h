@@ -79,6 +79,8 @@ public:
 	void createPowerups();
 	void createPowerupBoxes();
 	void createBall(float radius);
+
+	void cameraEnvironmentCollision(Camera* cam);
 	
 	void gameLoop();
 	void gameInit();
