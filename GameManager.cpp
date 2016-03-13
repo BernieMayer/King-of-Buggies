@@ -325,10 +325,7 @@ void GameManager::gameLoop()
 			physics.startSim(frameTime);
 
 			//Update to accomodate more players and multiple cameras
-			if (!inputs[0].drift)//in.powerup)
-				cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
-			if (inputs[0].drift)
-				cam.zoom(inputs[0].camV*0.95f + 1.f);
+			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
 
 			cameraEnvironmentCollision(&cam);
 		}
@@ -391,8 +388,8 @@ void GameManager::gameLoop()
 
 		//Track camera around front of vehicle
 		vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
-
-		cam.trackDirAroundY(vec3(carDir), 1.f / 60.f);
+		if ((inputs[0].camH == 0.f) && (inputs[0].camV == 0.f))
+			cam.trackDirAroundY(vec3(carDir), 1.f / 60.f);
 
 		//Draw scene
 		renderer.clearDrawBuffers();
