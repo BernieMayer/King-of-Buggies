@@ -373,8 +373,14 @@ void GameManager::gameLoop()
 			}
 
 			if (hasBoostPadCollision){
-				physics.applySpeedBoost(i);
+				physics.applySpeedPadBoost(i);
 			}
+		}
+
+		//Allow for nitro/powerup activation her
+		if (inputs[0].cheat_coin){
+			printf("cheated in a speed boost \n");
+			physics.applyNitroBoost(0);
 		}
 
 		//Update camera position

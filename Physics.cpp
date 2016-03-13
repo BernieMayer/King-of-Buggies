@@ -183,22 +183,29 @@ void Physics::setSpeed(unsigned int vehicleNum, float speed)
 
 }
 
-void Physics::applySpeedBoost(unsigned int vehicleNum)
+void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 {
 	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 downVec = -lastState->getPlayer(vehicleNum)->getUp();
-	downVec = 10000.f * downVec;
+	downVec = 100000.f * downVec;
 	vehBody->addForce(getPxVec3(downVec));
 
+	
 	vec3 forwardVec = lastState->getPlayer(vehicleNum)->getForward();
-	forwardVec = 250000.f * forwardVec;
+	forwardVec = 156200.f * forwardVec * vec3(1, 0, 1);
 	vehBody->addForce(getPxVec3(forwardVec));
+}
 
+void Physics::applyNitroBoost(unsigned int vehicleNum)
+{
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
-
-
+	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
+	forceVec = 39050.f * forceVec * vec3(1, 0, 1);
+	vehBody->addForce(getPxVec3(forceVec));
 }
 
 void Physics::vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits)
