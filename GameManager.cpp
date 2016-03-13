@@ -78,7 +78,8 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	renderer.assignMaterial(chassisRenderID, &tsMat);
 	//renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
 	if (state.numberOfPlayers() == 0)
-		renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
+		//renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
+		renderer.assignTexture(chassisRenderID, playerMesh->getTextureID());
 	else
 		renderer.assignColor(chassisRenderID, colour);
 
@@ -165,7 +166,7 @@ void GameManager::createBall(float radius)
 	sphereRenderID = renderer.generateObjectID();
 	renderer.assignSphere(sphereRenderID, radius, 200, &ballVertices, &ballNormals, &ballUVs, &ballIndices);
 	renderer.assignMaterial(sphereRenderID, &tsMat);
-	renderer.assignTexture(sphereRenderID, testTexture, 2, 2);
+	renderer.assignTexture(sphereRenderID, 1);
 	//renderer.assignColor(sphereRenderID, vec3(0.f, 0.f, 1.f));
 
 	

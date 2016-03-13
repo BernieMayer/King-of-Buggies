@@ -3,6 +3,7 @@
 #include "MeshInfoLoader.h"
 #include <windows.h>
 #include <fstream>
+#include <soil\SOIL.h>
 
 #pragma warning(disable:4996)
 
@@ -49,6 +50,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 
 	//vector<GLv3f> vertices;
 	vector<vec3> _normals;
+	//vector<vec2> _uvs;
 	vector<unsigned int> _faces;
 	vector<unsigned int> _uvfaces;
 	vector<unsigned int> _nfaces;
@@ -118,77 +120,6 @@ void MeshInfoLoader::clearData() {
 	indices.clear();
 }
 
-/*int ObjFile::numVertices () {
-return vertices.size() / 4;
-}
-
-GLv3f ObjFile::getVertex (int i) {
-return GLv3f (vertices[3*i], vertices[3*i+1], vertices[3*i+2]);
-}
-
-GLv3f ObjFile::getNormal (int i) {
-return GLv3f (normals[3*i], normals[3*i+1], normals[3*i+2]);
-}
-
-void ObjFile::setVertex (int i, GLv3f v) {
-vertices[3*i] = v.x;
-vertices[3*i+1] = v.y;
-vertices[3*i+2] = v.z;
-}
-
-void ObjFile::setNormal (int i, GLv3f v) {
-normals[3*i] = v.x;
-normals[3*i+1] = v.y;
-normals[3*i+2] = v.z;
-}
-
-void ObjFile::calculateNormals () {
-
-printf("Calc normals\n");
-
-for (int i = 0; i < vertices.size(); i += 3) {
-normals.push_back (0.0f);
-normals.push_back (0.0f);
-normals.push_back (0.0f);
-}
-
-for (int i = 0; i < indices.size(); i += 3) {
-int i1 = indices[i];
-int i2 = indices[i+1];
-int i3 = indices[i+2];
-
-GLv3f p1 = getVertex (i1);
-GLv3f p2 = getVertex (i2);
-GLv3f p3 = getVertex (i3);
-
-GLv3f fNormal = cross (p2 - p1, p3 - p1);
-
-float l = length (fNormal);
-if (fNormal.x != 0.0f && fNormal.y != 0.0f && fNormal.z != 0.0f) {
-fNormal = normalize (fNormal);
-setNormal (i1, getNormal(i1) + fNormal);
-setNormal (i2, getNormal(i2) + fNormal);
-setNormal (i3, getNormal(i3) + fNormal);
-}
-}
-
-for (int i = 0; i < normals.size(); i += 3) {
-setNormal (i/3, normalize(getNormal(i/3)));
-}
-
-printf("Calc normals->\n");
-}
-
-
-void ObjFile::flipFaces(){
-for(int i=0; i<indices.size(); i+=3)
-{
-GLuint temp = indices[i];
-indices[i] = indices[i+2];
-indices[i+2] = temp;
-}
-}*/
-
 vec3 MeshInfoLoader::getCenter(){
 	vec3 center;
 
@@ -228,61 +159,14 @@ float MeshInfoLoader::getBoundingRadius()
 	return boundingRadius;
 }
 
-/* This function is taken from a tutorial on cplusplus.com: http://www.cplusplus.com/articles/GwvU7k9E/
-	Code reused with permission from Ben Stephenson. */
-vector<unsigned char> MeshInfoLoader::LoadTexture(const char * filename)
-{
-	unsigned char* datBuff[2] = { nullptr, nullptr }; // Header buffers
-
-	unsigned char* pixels = nullptr; // Pixels
-
-	BITMAPFILEHEADER* bmpHeader = nullptr; // Header
-	BITMAPINFOHEADER* bmpInfo = nullptr; // Info 
-
-	// The file... We open it with it's constructor
-	std::ifstream file(filename, std::ios::binary);
-	if (!file)
-	{
-		printf("Failure to open bitmap file.\n");
+unsigned int MeshInfoLoader::LoadTexture(const char * filename) {
+	unsigned int textureID = SOIL_load_OGL_texture
+		(
+		filename,
+		SOIL_LOAD_AUTO,
+		SOIL_CREATE_NEW_ID, 
+		SOIL_FLAG_INVERT_Y | SOIL_FLAG_NTSC_SAFE_RGB
+		);
 	
-	}
-
-	// Allocate byte memory that will hold the two headers
-	datBuff[0] = new unsigned char[sizeof(BITMAPFILEHEADER)];
-	datBuff[1] = new unsigned char[sizeof(BITMAPINFOHEADER)];
-
-	file.read((char*)datBuff[0], sizeof(BITMAPFILEHEADER));
-	file.read((char*)datBuff[1], sizeof(BITMAPINFOHEADER));
-
-	// Construct the values from the buffers
-	bmpHeader = (BITMAPFILEHEADER*)datBuff[0];
-	bmpInfo = (BITMAPINFOHEADER*)datBuff[1];
-
-	// First allocate pixel memory
-	pixels = new unsigned char[bmpInfo->biSizeImage];
-
-	// Go to where image data starts, then read in image data
-	file.seekg(bmpHeader->bfOffBits);
-	file.read((char*)pixels, bmpInfo->biSizeImage);
-
-	// We're almost done. We have our image loaded, however it's not in the right format.
-	// .bmp files store image data in the BGR format, and we have to convert it to RGB.
-	// Since we have the value in bytes, this shouldn't be to hard to accomplish
-	unsigned char tmpRGB = 0; // Swap buffer
-	for (unsigned long i = 0; i < bmpInfo->biSizeImage; i += 3)
-	{
-		tmpRGB = pixels[i];
-		pixels[i] = pixels[i + 2];
-		pixels[i + 2] = tmpRGB;
-	}
-
-	vector<unsigned char> imageVector;
-
-	for (unsigned int j = 0; j < bmpInfo->biSizeImage; j += 3) {
-		imageVector.push_back(pixels[j]);
-		imageVector.push_back(pixels[j + 1]);
-		imageVector.push_back(pixels[j + 2]);
-	}
-	return imageVector;
+	return textureID;
 }
-/* End of code from outside source */

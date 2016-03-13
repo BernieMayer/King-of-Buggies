@@ -14,16 +14,14 @@ MeshObject::MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vect
 	createPhysicsMesh();
 }
 
-MeshObject::MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vector<vec2> initUvs, vector<unsigned int> initIndices, vector<unsigned char> texData) {
+MeshObject::MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vector<vec2> initUvs, vector<unsigned int> initIndices, unsigned int texID) {
 	vertices = initVertices;
 	normals = initNormals;
 	uvs = initUvs;
 	indices = initIndices;
 	createPhysicsMesh();
 
-	textureData = texData;
-	textureWidth = 1024;
-	textureHeight = 1024;
+	textureID = texID;
 }
 
 vector<vec3> MeshObject::getVertices() {
@@ -74,17 +72,9 @@ void MeshObject::createPhysicsMesh() {
 	}
 }
 
-void MeshObject::setupTextureInfo(vector<unsigned char> data, unsigned int width, unsigned int height) {
-	textureData = data;
-	textureWidth = width;
-	textureHeight = height;
-}
-
 vector<physx::PxVec3> MeshObject::getPhysicsVertices()
 {
 	return physicsVertices;
 }
 
-vector<unsigned char>* MeshObject::getTextureData() { return &textureData; }
-unsigned int MeshObject::getTextureWidth() { return textureWidth; }
-unsigned int MeshObject::getTextureHeight() { return textureHeight; }
+unsigned int MeshObject::getTextureID() { return textureID; }

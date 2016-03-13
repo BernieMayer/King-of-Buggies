@@ -4,11 +4,9 @@ MeshInfo::MeshInfo() {
 	meshLoader = MeshInfoLoader();
 
 	meshLoader.loadModel("models\\brick.obj");
-	vector<unsigned char> texInfo = meshLoader.LoadTexture("textures\\bricktexture.bmp");
+	//unsigned int texID = meshLoader.LoadTexture("textures\\bricktexture.bmp");
 	MeshObject brickObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	
-	brickObject.setupTextureInfo(texInfo, 1024, 1024);
-
 	meshes.push_back(brickObject);
 
 	meshLoader.clearData();
@@ -44,7 +42,8 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\buggy.obj");
-	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	unsigned int buggyTexID = meshLoader.LoadTexture("textures\\buggytexture.png");
+	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, buggyTexID);
 	meshes.push_back(buggyObject);
 
 	meshLoader.clearData();

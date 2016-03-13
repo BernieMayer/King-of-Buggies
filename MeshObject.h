@@ -12,7 +12,7 @@ using namespace glm;
 class MeshObject {
 public:
 	MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vector<vec2> initUvs, vector<unsigned int> initIndices);
-	MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vector<vec2> initUvs, vector<unsigned int> initIndices, vector<unsigned char> texData);
+	MeshObject(vector<vec3> initVertices, vector<vec3> initNormals, vector<vec2> initUvs, vector<unsigned int> initIndices, unsigned int texID);
 	vector<vec3> getVertices();
 	vector<vec3> getNormals();
 	vector<vec2> getUvs();
@@ -28,12 +28,10 @@ public:
 	vector<physx::PxVec3>* getPhysicsVertexPointer();
 	vector<physx::PxVec3>* getPhysicsIndexPointer();
 
-	vector<unsigned char>* getTextureData();
-	unsigned int getTextureWidth();
-	unsigned int getTextureHeight();
+	unsigned int getTextureID();
 
 	void createPhysicsMesh();
-	void setupTextureInfo(vector<unsigned char> data, unsigned int width, unsigned int height);
+	void setupTextureInfo(unsigned char data, unsigned int width, unsigned int height);
 
 private:
 	vector<vec3> vertices, normals;
@@ -41,9 +39,7 @@ private:
 	vector<unsigned int> indices;
 	vector<physx::PxVec3> physicsVertices, physicsIndices;
 
-	vector<unsigned char> textureData;
-	unsigned int textureWidth;
-	unsigned int textureHeight;
+	unsigned int textureID;
 };
 
 #endif // MESHOBJECT_H

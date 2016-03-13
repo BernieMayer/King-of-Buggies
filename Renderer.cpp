@@ -138,19 +138,9 @@ void Renderer::assignIndices(unsigned int id, vector<unsigned int>* indices)
 	objects[id].indices = indices;
 }
 
-void Renderer::assignTexture(unsigned int id, unsigned char* pixels, unsigned int width, unsigned int height)
+void Renderer::assignTexture(unsigned int objectID, unsigned int textureID)
 {
-	if ((width == 0) || (height == 0) || (pixels == NULL))
-		return;
-
-	glGenTextures(1, &objects[id].texID);
-
-	glBindTexture(GL_TEXTURE_2D, objects[id].texID);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_BGR, GL_UNSIGNED_BYTE, pixels);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glBindTexture(GL_TEXTURE_2D, 0);		//Unbind texture
+	objects[objectID].texID = textureID;
 }
 
 void Renderer::assignMaterial(unsigned int id, Material* mat)

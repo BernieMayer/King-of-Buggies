@@ -37,7 +37,7 @@ public:
 	vector<vec2> uvs;
 	vector<unsigned int> indices;
 
-	vector<unsigned char> LoadTexture(const char * filename);
+	unsigned int LoadTexture(const char * filename);
 
 protected:
 
