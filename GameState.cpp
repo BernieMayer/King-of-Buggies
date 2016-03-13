@@ -195,7 +195,7 @@ bool GameState::checkBoostPadCollision(vec3 playerPos)
 	return collided;
 }
 
-void GameState::addMine(const Mine& mine){ mines.push_back(mine); };
+void GameState::addMine(const Mine& mine){ mines.push_back(mine); }
 
 unsigned int GameState::numberOfMines(){ return mines.size(); }
 
