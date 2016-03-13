@@ -324,6 +324,7 @@ void GameManager::gameLoop()
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 		sound.updateSounds(state, inputs);
+		state.clearEvents();
 
 		//Test code...
 		PlayerInfo* player = state.getPlayer(0);
@@ -461,7 +462,7 @@ void GameManager::gameLoop()
 		//Get path
 		path.clear();
 
-		state.clearEvents();
+
 
 
 		//Swap buffers  
