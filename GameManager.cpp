@@ -316,34 +316,7 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		float scale = 0.1f;
-
-		if (!paused)
-		{
-			//Physics sim 
-			physics.getSim();
-
-			physics.startSim(frameTime);
-
-			//Update to accomodate more players and multiple cameras
-			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
-
-			cameraEnvironmentCollision(&cam);
-		}
-		//Free camera movement
-		if (paused)
-		{
-			//Debugging avoidance
-			ai.debugAIPath(&paths, 1, debugPathIterations);
-			if (inputs[0].jump)
-				debugPathIterations++;
-
-			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
-			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
-		}
-
-		if (inputs[0].menu)
-			displayDebugging = !displayDebugging;
+		
 
 		
 
@@ -409,11 +382,39 @@ void GameManager::gameLoop()
 		if (cPos != cam.getViewCenter())
 			cam.changeCenterAndPos(cPos - cam.getViewCenter());
 
+		float scale = 0.1f;
 
-		//Track camera around front of vehicle
-		vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
-		if ((inputs[0].camH == 0.f) && (inputs[0].camV == 0.f))
-			cam.trackDirAroundY(vec3(carDir), 1.f / 60.f);
+		if (!paused)
+		{
+			//Physics sim 
+			physics.getSim();
+
+			physics.startSim(frameTime);
+
+			//Update to accomodate more players and multiple cameras
+			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
+
+			cameraEnvironmentCollision(&cam);
+
+			//Track camera around front of vehicle
+			vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
+			if ((inputs[0].camH == 0.f) && (inputs[0].camV == 0.f))
+				cam.trackDirAroundY(vec3(carDir), 1.f / 60.f);
+		}
+		//Free camera movement
+		if (paused)
+		{
+			//Debugging avoidance
+			ai.debugAIPath(&paths, 1, debugPathIterations);
+			if (inputs[0].jump)
+				debugPathIterations++;
+
+			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
+			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
+		}
+
+		if (inputs[0].menu)
+			displayDebugging = !displayDebugging;
 
 		//Draw scene
 		renderer.clearDrawBuffers();

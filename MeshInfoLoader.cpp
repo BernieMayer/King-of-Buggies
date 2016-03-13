@@ -39,6 +39,69 @@ void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, 
 	}
 }
 
+//Vertices not modified
+void sharedIndices(vector<unsigned int> &_faces, vector<unsigned int> &_nFaces, vector<unsigned int>& _tFaces, vector<vec3>& _normals, vector<vec2>& _uvs, 
+	//Returned values
+	vector<vec3> &vertices, vector<vec3> &normals, vector<vec2>& uvs, vector<unsigned int> &faces)
+{
+	normals.resize(vertices.size(), vec3(0.0, 0.0, 0.0));
+
+	faces.clear();
+	vector<unsigned int> tempFaces;
+	vector<unsigned int> tempTFaces;
+
+	for (unsigned int i = 0; i<_faces.size(); i++)
+	{
+		int vi = _faces[i];
+		int ni = _nFaces[i];
+		int ti = _tFaces[i];
+
+		if (normals[vi] == vec3())
+		{
+			normals[vi] = _normals[ni];
+			tempFaces.push_back(vi);
+			tempTFaces.push_back(ti);
+		}
+		else if (normals[vi] != _normals[ni])
+		{
+			vertices.push_back(vertices[vi]);
+			normals.push_back(_normals[ni]);
+			
+			tempFaces.push_back(vertices.size() - 1);
+			tempTFaces.push_back(ti);
+		}
+		else
+		{
+			tempFaces.push_back(vi);
+			tempTFaces.push_back(ti);
+		}
+	}
+
+	uvs.resize(vertices.size(), vec2(-1.f, -1.f));
+
+	for (unsigned int i = 0; i < tempFaces.size(); i++)
+	{
+		int vi = tempFaces[i];
+		int ti = tempTFaces[i];
+
+		if (uvs[vi] == vec2(-1.f, -1.f))
+		{
+			uvs[vi] = _uvs[ti];
+			faces.push_back(vi);
+		}
+		else if (uvs[vi] != uvs[ti])
+		{
+			vertices.push_back(vertices[vi]);
+			normals.push_back(normals[vi]);
+			uvs.push_back(uvs[ti]);
+
+			faces.push_back(vi);
+		}
+		else
+			faces.push_back(vi);
+	}
+}
+
 bool MeshInfoLoader::loadModel(char *filename)
 {
 	FILE* f = fopen(filename, "r");
