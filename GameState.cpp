@@ -174,6 +174,8 @@ Coin* GameState::getCoin(unsigned int coinNum)
 
 unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
+
+
 void GameState::addBoostPad(const BoostPad& boostPad) { boostPads.push_back(boostPad); }
 
 unsigned int GameState::numberOfBoostPads(){ return boostPads.size(); }
@@ -192,6 +194,33 @@ bool GameState::checkBoostPadCollision(vec3 playerPos)
 	}
 	return collided;
 }
+
+void GameState::addMine(const Mine& mine){ mines.push_back(mine); };
+
+unsigned int GameState::numberOfMines(){ return mines.size(); }
+
+bool GameState::checkMineCollision(vec3 playerPos)
+{
+	bool collided = false;
+
+	for (int i = 0; i < mines.size(); i++)
+	{
+		Mine mine = mines[i];
+		vec3 minePos = mine.getPos();
+
+		vec3 diff = playerPos - minePos;
+
+
+		//Check if the player is within the radius of the mine
+		if (abs(length(diff)) <= mine.getRadius())
+		{
+			mines.erase(mines.begin() + i);
+			return true;
+		}
+	}
+	return collided;
+}
+
 
 void GameState::addPowerup(const Powerup& powerup) { powerups.push_back(powerup); }
 

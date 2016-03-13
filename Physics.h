@@ -53,6 +53,7 @@ public:
 	void setSpeed(unsigned int vehicleNum, float speed);
 	void applySpeedPadBoost(unsigned int vechicleNum);
 	void applyNitroBoost(unsigned int vehicleNum);
+	void applyMineExplosion(unsigned int vehicleNum);
 
 	/*
 	Split between vehicle, ground, and dynamic for the same of collision resolution

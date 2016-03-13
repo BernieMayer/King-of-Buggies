@@ -4,8 +4,9 @@
 #include <vector>
 
 #include "PlayerInfo.h"
-#include "BoostPad.h"
 #include "Coin.h"
+#include "Mine.h"
+#include "BoostPad.h"
 #include "Powerup.h"
 #include "PowerupBox.h"
 #include "GameStateLoader.h"
@@ -27,6 +28,7 @@ private:
 	vector<PlayerInfo> ai;
 	vector<PlayerInfo> players;
 	vector<Coin> coins;
+	vector<Mine> mines;
 	vector<BoostPad> boostPads;
 	vector<Powerup> powerups;
 	vector<PowerupBox> boxes;
@@ -81,6 +83,15 @@ public:
 	//TODO getBoostPad
 	unsigned int numberOfBoostPads();
 	bool checkBoostPadCollision(vec3 playerPos);
+	
+
+	//Mine management
+	void addMine(const Mine& mine);
+	//TODO setMine
+	//TODO getMine
+	unsigned int numberOfMines();
+	bool checkMineCollision(vec3 playerPos);
+	
 
 
 	//Powerup management

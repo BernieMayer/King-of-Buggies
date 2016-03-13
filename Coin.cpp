@@ -1,3 +1,6 @@
+#ifndef COIN_CPP
+#define COIN_CPP
+
 #include "Coin.h"
 
 void Coin::setCollided(bool hasCollision) {
@@ -32,3 +35,5 @@ mat4 Coin::getRotation() {
 	mat4 oldTransform = this->getTransform();
 	return (oldTransform * rotation);
 }
+
+#endif //COIN_CPP

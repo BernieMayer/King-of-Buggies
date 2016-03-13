@@ -1,3 +1,4 @@
+
 #include "BoostPad.h"
 
 void BoostPad::setPoints(std::vector<vec3> newPoints){
@@ -29,3 +30,4 @@ void BoostPad::setDefault(vec3 newCenter)
 
 BoostPad::BoostPad(){
 }
+

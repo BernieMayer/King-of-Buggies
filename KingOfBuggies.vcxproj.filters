@@ -64,6 +64,9 @@
     <ClCompile Include="BoostPad.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="Mine.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -135,6 +138,9 @@
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="BoostPad.h">
+      <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="Mine.h">
       <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>

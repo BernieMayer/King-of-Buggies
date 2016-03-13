@@ -208,6 +208,21 @@ void Physics::applyNitroBoost(unsigned int vehicleNum)
 	vehBody->addForce(getPxVec3(forceVec));
 }
 
+void Physics::applyMineExplosion(unsigned int vehicleNum)
+{
+	PxVehicleDrive4W* vehicle = vehicleActors[vehicleNum];
+	if (!vehicleInAir[vehicleNum]){
+		vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
+		forceVec = 39050.f * forceVec * vec3(-1, 0, -1);
+		vehicle->getRigidDynamicActor()->addForce(getPxVec3(forceVec));
+
+		vec3 upVec = lastState->getPlayer(vehicleNum)->getUp();
+		upVec = 400000.f * upVec * vec3(0,1,0);
+		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
+	}
+
+}
+
 void Physics::vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits)
 { 
 	//To be implemented 

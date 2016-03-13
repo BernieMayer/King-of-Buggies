@@ -362,10 +362,11 @@ void GameManager::gameLoop()
 		vec3 diff = posAI - posPlayer;
 
 
-		// Check for player/coin collisions, and coin respawns
+		// Check for player/coin collisions, and coin respawns also check for other collisions
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
 			bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
+			bool hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
 			if (hasCoinCollision){
 				//TODO change to all
 				physics.modifySpeed(i, 0.3333f);
@@ -375,12 +376,28 @@ void GameManager::gameLoop()
 			if (hasBoostPadCollision){
 				physics.applySpeedPadBoost(i);
 			}
+
+			if (hasMineCollision){
+				printf("Mine Explosion! \n");
+				physics.applyMineExplosion(i);
+			}
 		}
 
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
-			printf("cheated in a speed boost \n");
-			physics.applyNitroBoost(0);
+			//inputs[0].cheat_coin = false;
+			
+			if (state.numberOfMines() < 20){
+				//input[0].cheat_coin = false;
+				printf("cheated in placing a Mine \n");
+				Mine newMine = Mine(3.0, (state.getPlayer(0)->getPos() - vec3(5, 0, 0)));
+				state.addMine(newMine);
+
+				//TEST
+				physics.applyMineExplosion(0);
+			}
+		
+
 		}
 
 		//Update camera position
