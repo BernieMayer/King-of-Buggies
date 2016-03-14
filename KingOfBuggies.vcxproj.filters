@@ -67,6 +67,9 @@
     <ClCompile Include="Mine.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="unshaded.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -142,6 +145,9 @@
     </ClInclude>
     <ClInclude Include="Mine.h">
       <Filter>Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="unshaded.h">
+      <Filter>Materials</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

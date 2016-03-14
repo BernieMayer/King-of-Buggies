@@ -37,13 +37,13 @@ public:
 	vector<vec2> uvs;
 	vector<unsigned int> indices;
 
-	unsigned int LoadTexture(const char * filename);
-
 protected:
 
 private:
 
 	vec3 max, min;
 };
+
+unsigned int LoadTexture(const char * filename);
 
 #endif // MESHINFOLOADER_H

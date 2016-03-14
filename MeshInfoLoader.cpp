@@ -250,7 +250,7 @@ float MeshInfoLoader::getBoundingRadius()
 	return boundingRadius;
 }
 
-unsigned int MeshInfoLoader::LoadTexture(const char * filename) {
+unsigned int LoadTexture(const char * filename) {
 	unsigned int textureID = SOIL_load_OGL_texture
 		(
 		filename,

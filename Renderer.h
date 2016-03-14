@@ -14,6 +14,7 @@
 #include "Specular.h"
 #include "diffuse.h"
 #include "torranceSparrow.h"
+#include "unshaded.h"
 #include "GameState.h"
 
 using namespace std;
@@ -141,6 +142,12 @@ public:
 					vector<vec3>* normals,
 					vector<vec2>* uvs,
 					vector<unsigned int>* indices);
+
+	void assignSkyDome(unsigned int object, float radius, unsigned int divisions,
+					vector<vec3>* mesh,
+					vector<vec2>* uvs,
+					vector<unsigned int>* indices,
+					unsigned int textureID);
 
 	//Lights
 	unsigned int generateLightObject();

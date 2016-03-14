@@ -16,6 +16,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	shinyMat = Specular(20.f);
 	tsMat = TorranceSparrow(10.f);
 	matteMat = TorranceSparrow(0.5f);
+	skyMaterial = Unshaded();
 
 	renderer.loadPerspectiveTransform(0.1f, 100.f, 80.f);		//Near, far, fov
 	renderer.loadCamera(&cam);
@@ -519,6 +520,12 @@ void GameManager::initTestScene()
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
 	state.getPlayer(1)->setAI(true);
 	createTestLevel();
+	
+	//Create skybox
+	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
+	skyboxID = renderer.generateObjectID();
+	renderer.assignSkyDome(skyboxID, 40.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
+	renderer.assignMaterial(skyboxID, &skyMaterial);
 
 	
 	createBall(0.5f);

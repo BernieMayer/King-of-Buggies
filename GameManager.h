@@ -62,7 +62,15 @@ private:
 	vector<vec3> ballVertices;			//TEMPORARY
 	vector<vec3> ballNormals;			//TEMPORARY
 	vector<unsigned int> ballIndices;	//TEMPORARY
-	vector<vec2> ballUVs;
+	vector<vec2> ballUVs;				//TEMPORARY
+
+	//Skybox - Temporary
+	vector<vec3> skyboxVerts;
+	vector<vec2> skyboxUVs;
+	vector<unsigned int> skyboxIndices;
+	unsigned int skyboxTextureID;
+	unsigned int skyboxID;
+	Unshaded skyMaterial;
 
 	void addCoin(int playerId);
 

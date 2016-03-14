@@ -93,6 +93,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="CollisionEvent.h" />
+    <ClInclude Include="unshaded.h" />
     <ClInclude Include="diffuse.h" />
     <ClInclude Include="DrivingController.h" />
     <ClInclude Include="Entity.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="specular.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
+    <ClCompile Include="unshaded.cpp" />
     <ClCompile Include="VehicleCollisionEvent.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="VehicleTraits.cpp" />

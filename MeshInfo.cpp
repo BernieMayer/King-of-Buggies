@@ -42,7 +42,7 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\buggy.obj");
-	unsigned int buggyTexID = meshLoader.LoadTexture("textures\\buggytexture.png");
+	unsigned int buggyTexID = LoadTexture("textures\\buggytexture.png");
 	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, buggyTexID);
 	meshes.push_back(buggyObject);
 

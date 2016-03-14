@@ -17,7 +17,7 @@ class ShaderList
 {
 public:
 
-	enum {DIFFUSE=0, DIFFUSE_TEX, SPECULAR, SPECULAR_TEX, TORRANCE_SPARROW, TORRANCE_SPARROW_TEX, COUNT};
+	enum {DIFFUSE=0, DIFFUSE_TEX, SPECULAR, SPECULAR_TEX, TORRANCE_SPARROW, TORRANCE_SPARROW_TEX, UNSHADED, UNSHADED_TEX, COUNT};
 
 	enum OFFSET {TEXTURE=1};
 	
@@ -68,5 +68,5 @@ bool checkLinkStatus(GLint programID);
 
 string loadShaderStringFromFile(const string & filePath);
 
-
+void glErrorCheckMaterial(const char* location);
 #endif	//MATERIAL_H
