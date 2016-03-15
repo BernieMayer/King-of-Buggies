@@ -105,7 +105,6 @@ Input AIManager::followRandomPath(unsigned int playerNum)
 		}
 
 		vec3 pos = state->getPlayer(playerNum)->getPos();
-		printf("Find new path %f %f %f to %f %f %f\n", pos.x, pos.y, pos.z, testTarget.x, testTarget.y, testTarget.z);
 
 		findNewPath(playerNum, testTarget, true);
 	}

@@ -2,10 +2,11 @@
 #define COIN_H
 
 #include "Entity.h"
+#include "math.h"
 
 class Coin: public Entity {
 public:
-	Coin() : collided(false), angle(.20f) {};
+	Coin() : collided(false){};
 
 	void setCollided(bool hasCollision);
 	bool isCollided();
@@ -14,12 +15,11 @@ public:
 	void decrementCountdown();
 	int getCountdown();
 
-	mat4 getRotation();
+	mat4 getRotation(float angle);
 	
 private:
 	bool collided;
 	int countdown;
-	float angle;
 	
 };
 

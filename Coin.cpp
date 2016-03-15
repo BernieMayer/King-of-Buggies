@@ -23,7 +23,7 @@ int Coin::getCountdown() {
 	return countdown;
 }
 
-mat4 Coin::getRotation() {
+mat4 Coin::getRotation(float angle) {
 	mat4 rotation = mat4();
 	float cosine = cos(angle);
 	float sine = sin(angle);

@@ -267,7 +267,7 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 	for (unsigned int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
 		
-		coins[i].setTransform(coins[i].getRotation());
+		coins[i].setTransform(coins[i].getRotation((1.f/60.f)*2.f*3.1415926f));
 
 		if (coins[i].isCollided()) {
 			// countdown to coin respawn

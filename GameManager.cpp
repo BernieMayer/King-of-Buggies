@@ -254,6 +254,8 @@ void GameManager::gameLoop()
 
 	unsigned int debugPathIterations = 0;
 
+	timeb loopStart = clock.getCurrentTime();
+
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -401,7 +403,14 @@ void GameManager::gameLoop()
 			//Track camera around front of vehicle
 			vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
 			if ((inputs[0].camH == 0.f) && (inputs[0].camV == 0.f))
-				cam.trackDirAroundY(vec3(carDir), 1.f / 60.f);
+				cam.trackDirAroundY(vec3(carDir), frameTime);
+
+			//Translate skydome
+			mat4 translation;
+			translation[3][0] = state.getPlayer(0)->getPos().x;
+			translation[3][1] = state.getPlayer(0)->getPos().y;
+			translation[3][2] = state.getPlayer(0)->getPos().z;
+			renderer.assignTransform(skyboxID, translation);
 		}
 		//Free camera movement
 		if (paused)
@@ -481,10 +490,12 @@ void GameManager::gameLoop()
 		frameCount++;
 		if (timeProgressed > 1.f)
 		{
-			//printf("FPS = %d\n", frameCount);
+			printf("FPS = %d\n", frameCount);
 			frameCount = 0;
 			timeProgressed = 0.f;
 		}
+
+		clock.start();
 	}
 	quitGame(winner);
 
@@ -524,7 +535,7 @@ void GameManager::initTestScene()
 	//Create skybox
 	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
 	skyboxID = renderer.generateObjectID();
-	renderer.assignSkyDome(skyboxID, 40.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
+	renderer.assignSkyDome(skyboxID, 70.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
 
 	

@@ -21,7 +21,7 @@ float Timer::getElapsedTime()
 	ftime(&current);
 
 	int diff = (int)(1000.0 * (current.time - previous.time)
-		+ (previous.millitm - previous.millitm));
+		+ (current.millitm - previous.millitm));
 
 	previous = current;
 	return ((float)diff)*0.001f;
@@ -41,13 +41,14 @@ float Timer::getTimeSince(timeb previousTime)
 	ftime(&current);
 
 	int diff = (int)(1000.0 * (current.time - previousTime.time)
-		+ (previousTime.millitm - previousTime.millitm));
+		+ (current.millitm - previousTime.millitm));
 
 	return ((float)diff)*0.001f;
 }
 
 void Timer::waitUntil(float targetTime)
 {
+	//printf("Wait for %f. FrameTime = %f\n", targetTime, 1.f/60.f);
 	Sleep(targetTime*1000.f);
 }
 

@@ -450,8 +450,6 @@ float prevPathWeight(unsigned int i, unsigned int num)
 bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forwards, vec3 target)
 {
 
-	cout << "AStar pathfinding" << endl;
-
 	unsigned int start = getPolygon(position);		//Index of polygon containing starting position
 	unsigned int finish = getPolygon(target);		//Index of polygon containing finishing position
 

@@ -4,6 +4,7 @@
 #include <time.h>
 #include <Windows.h>
 #include <sys/timeb.h>
+#include <cstdio>
 
 class Timer {
 private:
