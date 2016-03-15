@@ -18,6 +18,8 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	matteMat = TorranceSparrow(0.5f);
 	skyMaterial = Unshaded();
 
+	timePassedDecoy = 0;
+
 	renderer.loadPerspectiveTransform(0.1f, 100.f, 80.f);		//Near, far, fov
 	renderer.loadCamera(&cam);
 
@@ -101,6 +103,58 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	smoothers.push_back(InputSmoother());
 	
 
+}
+
+void GameManager::createDecoyGoldenBuggie(vec3 position, VehicleTraits traits)
+{
+	unsigned int chassisRenderID = renderer.generateObjectID();
+	unsigned int physicsID = physics.vehicle_create(traits, position);
+
+	vec3 colour = vehicleColours[state.numberOfPlayers()];
+	unsigned int texID = meshInfo.getBuggyTexID(state.numberOfPlayers());
+
+	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
+	renderer.assignMeshObject(chassisRenderID, playerMesh);
+	renderer.assignMaterial(chassisRenderID, &tsMat);
+	
+	renderer.assignTexture(chassisRenderID, meshInfo.getGoldenBuggyTexID());
+	
+
+	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
+	unsigned int wheelIDs[4];
+
+
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		wheelIDs[i] = renderer.generateObjectID();
+		renderer.assignMeshObject(wheelIDs[i], wheelMesh);
+		renderer.assignMaterial(wheelIDs[i], &matteMat);
+		renderer.assignScale(wheelIDs[i],
+			scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
+		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
+	}
+
+
+	//state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
+	state.addDecoy(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID ));
+	smoothers.push_back(InputSmoother());
+
+	
+}
+
+void GameManager::startDecoy(float time)
+{
+	timePassedDecoy += time;
+}
+
+bool GameManager::isDecoyTimerUp()
+{
+	if (timePassedDecoy > 50000)
+	{
+		timePassedDecoy = 0;
+		return true;
+	}
+	return false;
 }
 
 void GameManager::createGroundPlane(vec3 normal, float offset)
@@ -248,6 +302,8 @@ void GameManager::gameLoop()
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
+
+
 		//I'm leaving a comment here so that once we add powerups we change the pause key
 		if (inputs[0].powerup)
 		{
@@ -325,9 +381,20 @@ void GameManager::gameLoop()
 			}
 		}
 
+
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
-			//inputs[0].cheat_coin = false;
+			inputs[0].cheat_coin = false;
+
+			VehicleTraits traits = VehicleTraits(physics.getMaterial());
+			//traits.print();
+
+
+			VehicleTraits temp = VehicleTraits(physics.getMaterial());
+			traits.loadConfiguration("base");
+			//temp.print();
+
+			createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 			
 			if (state.numberOfMines() < 20){
 				//input[0].cheat_coin = false;

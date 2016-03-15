@@ -130,13 +130,11 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 		// Temporary way to close window
 		glfwSetWindowShouldClose(sender, GL_TRUE);
 	}
-	else if (key == GLFW_KEY_C && action == GLFW_PRESS && !kCheat_coin){
-		if (!kCheat_coin){
-			kCheat_coin = true;
-		}
+	else if (key == GLFW_KEY_C && action == GLFW_REPEAT ){
+		//kCheat_coin = true;
 	}
 	else if (key == GLFW_KEY_C && action == GLFW_RELEASE){
-		kCheat_coin = false;
+		kCheat_coin = true;
 	}
 	else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
 		kJump = true;

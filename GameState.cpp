@@ -10,6 +10,30 @@ GameState::GameState()
 
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
 void GameState::addAI(const PlayerInfo& pinfo){ ai.push_back(pinfo); }
+
+void GameState::addDecoy(const PlayerInfo& decoyInfo)
+{
+	numOfDecoys++;
+	if (numOfDecoys >= NUM_DECOYS)
+	{
+		numOfDecoys = NUM_DECOYS;
+	}
+	else {
+		decoys.push_back(decoyInfo);
+	}
+}
+void GameState::removeDecoy()
+{
+	numOfDecoys--;
+	if (numOfDecoys <= 0)
+	{
+		numOfDecoys = 0;
+	}
+	else
+	{
+		decoys.erase(decoys.begin());
+	}
+}
 void GameState::setPlayer(unsigned int playerNum, const PlayerInfo& pinfo)
 {
 	if (playerNum < NUM_PLAYERS)
@@ -220,6 +244,8 @@ bool GameState::checkMineCollision(vec3 playerPos)
 	}
 	return collided;
 }
+
+
 
 
 void GameState::addPowerup(const Powerup& powerup) { powerups.push_back(powerup); }

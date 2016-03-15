@@ -44,6 +44,9 @@ private:
 	unsigned int winner;
 	bool gameOver;
 	bool displayDebugging = false;
+	
+
+	float timePassedDecoy;
 
 	vector<vec3> vehicleColours;
 
@@ -87,6 +90,10 @@ public:
 	void createPowerups();
 	void createPowerupBoxes();
 	void createBall(float radius);
+
+	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);
+	void startDecoy(float time);
+	bool isDecoyTimerUp();
 
 	void cameraEnvironmentCollision(Camera* cam);
 	

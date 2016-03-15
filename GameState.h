@@ -20,6 +20,7 @@ const unsigned int NUM_PLAYERS = 4;
 const unsigned int NUM_COINS = 10;
 const unsigned int NUM_POWERUPS = 5;
 const unsigned int NUM_POWERBOXES = 10;
+const unsigned int NUM_DECOYS = 1;
 
 class GameState {
 private:
@@ -27,6 +28,7 @@ private:
 
 	vector<PlayerInfo> ai;
 	vector<PlayerInfo> players;
+	vector<PlayerInfo> decoys;
 	vector<Coin> coins;
 	vector<Mine> mines;
 	vector<BoostPad> boostPads;
@@ -34,10 +36,12 @@ private:
 	vector<PowerupBox> boxes;
 	vector<Event*> events;
 
+
 	unsigned int groundPhysicsID;
 	unsigned int groundRenderID;
 
 	unsigned int goldenBuggy;
+	unsigned int numOfDecoys;
 
 	unsigned int maxScore;
 	
@@ -52,9 +56,11 @@ public:
 	int getNbEvents() { return events.size(); }
 	void clearEvents();
 
-	//Player management
+	//Player & ai management
 	void addPlayer(const PlayerInfo& pinfo);
 	void addAI(const PlayerInfo& pinfo);
+	void addDecoy(const PlayerInfo& decoyInfo);
+	void removeDecoy();
 	void setPlayer(unsigned int playerNum, const PlayerInfo& pinfo);
 	PlayerInfo* getPlayer(unsigned int playerNum);
 	PlayerInfo* getAI(unsigned int aiNum);
@@ -91,6 +97,8 @@ public:
 	//TODO getMine
 	unsigned int numberOfMines();
 	bool checkMineCollision(vec3 playerPos);
+
+	
 	
 
 
