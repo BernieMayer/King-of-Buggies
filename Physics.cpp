@@ -480,11 +480,9 @@ void Physics::updateGameState(GameState* state, float time)
 	lastState = state;
 	
 	if (goldenBuggyLock) {
-		goldenBuggyCounter++;
 		// 2 second lock
-		if (goldenBuggyCounter >= 120) {
+		if (clock.getTimeSince(gbLockStartTime) >= 2) {
 			goldenBuggyLock = false;
-			goldenBuggyCounter = 0;
 		}
 	}
 }
@@ -1328,7 +1326,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								newGoldenBuggy = true;
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
-								goldenBuggyCounter = 0;
+								gbLockStartTime = clock.getCurrentTime();
 								buggyExplosion(i);
 								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 								break;
@@ -1345,7 +1343,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 								newGoldenBuggy = true;
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
-								goldenBuggyCounter = 0;
+								gbLockStartTime = clock.getCurrentTime();
 								buggyExplosion(i);
 								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 								break;

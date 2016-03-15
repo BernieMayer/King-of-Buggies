@@ -8,6 +8,7 @@
 #include "Gamepad.h"
 #include "Keybindings.h"
 #include "InputSmoother.h"
+#include "Timer.h"
 
 class InputManager
 {
@@ -18,7 +19,7 @@ public:
 	Input getInput(int playerNum);
 	// Returns the number of players
 	int getNumPlayers();
-	void rumble(int playerNum, float strength, int timeFrames);
+	void rumble(int playerNum, float strength, float timeInSec);
 private:
 	const int driftButton = 2;
 	const int powerupButton = 1;
@@ -29,8 +30,9 @@ private:
 	GLFWwindow* window;
 	Gamepad gamepads[4];
 	int numPlayers;
-	int rumbleCounters[4];
-	int rumbleTargets[4];
+	Timer rumbleTimer;
+	timeb rumbleStartTimes[4];
+	float rumbleEndTimes[4];
 	
 };
 

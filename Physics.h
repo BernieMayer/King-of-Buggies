@@ -98,7 +98,7 @@ public:
 	int indexOfOldGoldenBuggy = 0;
 	float initVehicleSpeed = 500.f;
 	bool goldenBuggyLock = false;
-	int goldenBuggyCounter = 0;
+	timeb gbLockStartTime;
 
 
 private:
