@@ -177,6 +177,8 @@ InputManager::InputManager(GLFWwindow* w)
 	kJump = false;
 	kHorn = false;
 
+	rumbleTimer = Timer();
+
 	int widthP = 0;
 	int heightP = 0;
 	glfwGetWindowSize(window, &widthP, &heightP);
@@ -202,10 +204,9 @@ InputManager::InputManager(GLFWwindow* w)
 			if (i != 1) {
 				numPlayers += 1;
 			}
-			rumbleCounters[i - 1] = 0;
-			rumbleTargets[i - 1] = 0;
+			rumbleEndTimes[i - 1] = 0;
 
-			//rumble(i, 0.5f, 5);
+			//rumble(i, 0.5f, 0.5);
 		}
 	}
 }
@@ -299,15 +300,12 @@ Input InputManager::getInput(int playerNum)
 
 		input.isKeyboard = false;
 
-		rumbleCounters[playerNum] += 1;
-
-		if (rumbleCounters[playerNum] >= rumbleTargets[playerNum]) {
-			gamepads[playerNum].Rumble(0.0f, 0.0f);
-			rumbleCounters[playerNum] = 0;
-		}
-		// To prevent overflow
-		else if (rumbleCounters[playerNum] > 300) {
-			rumbleCounters[playerNum] = 0;
+	
+		if (rumbleEndTimes[playerNum] > 0) {
+			if (rumbleTimer.getTimeSince(rumbleStartTimes[playerNum]) >= rumbleEndTimes[playerNum]) {
+				gamepads[playerNum].Rumble(0.0f, 0.0f);
+				rumbleEndTimes[playerNum] = 0;
+			}
 		}
 	} else if (playerNum == 0) {
 		// use Keyboard
@@ -383,14 +381,14 @@ int InputManager::getNumPlayers() {
 }
 
 
-void InputManager::rumble(int playerNum, float strength, int timeFrames) {
+void InputManager::rumble(int playerNum, float strength, float timeInSec) {
 	if (!gamepads[playerNum - 1].Connected()) {
 		return;
 	}
 	gamepads[playerNum - 1].Rumble(strength, 0.0f);
 
-	rumbleCounters[playerNum - 1] = 0;
-	rumbleTargets[playerNum - 1] = timeFrames;
+	rumbleStartTimes[playerNum - 1] = rumbleTimer.getCurrentTime();
+	rumbleEndTimes[playerNum - 1] = timeInSec;
 }
 
 #endif
