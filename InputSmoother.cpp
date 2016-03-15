@@ -18,7 +18,6 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 	Input out = in;
 
 	difference = timer.getTimeSince(movementTime);
-	printf("%f\n", difference);
 
 	if (difference >= movementCounterEnd) {
 		movementTime = timer.getCurrentTime();
