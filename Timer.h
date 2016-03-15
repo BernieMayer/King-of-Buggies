@@ -14,7 +14,10 @@ public:
 
 	void start();
 	float getElapsedTime();		//In seconds
-	void waitUntil(float targetTime);		//Don't use! Hogs CPU
+	void waitUntil(float targetTime);
+	timeb getCurrentTime();
+	float getTimeSince(timeb previousTime);
+
 
 };
 

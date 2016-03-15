@@ -13,6 +13,8 @@ void Timer::start()
 	ftime(&previous);
 }
 
+
+
 float Timer::getElapsedTime()
 {
 	timeb current;
@@ -22,6 +24,25 @@ float Timer::getElapsedTime()
 		+ (previous.millitm - previous.millitm));
 
 	previous = current;
+	return ((float)diff)*0.001f;
+}
+
+timeb Timer::getCurrentTime()
+{
+	timeb current;
+	ftime(&current);
+
+	return current;
+}
+
+float Timer::getTimeSince(timeb previousTime)
+{
+	timeb current;
+	ftime(&current);
+
+	int diff = (int)(1000.0 * (current.time - previousTime.time)
+		+ (previousTime.millitm - previousTime.millitm));
+
 	return ((float)diff)*0.001f;
 }
 
