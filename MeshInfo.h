@@ -19,11 +19,15 @@ public:
 	vector<vec3> getMeshNormals(int objectType);
 	vector<vec2> getMeshUvs(int objectType);
 	vector<unsigned int> getMeshIndices(int objectType);
+	unsigned int getBuggyTexID(int index);
+	unsigned int getGoldenBuggyTexID();
 
 	MeshInfoLoader meshLoader;
 
 private:
 	vector<MeshObject> meshes;
+	vector<unsigned int> buggyTexIDs;
+	unsigned int goldenBuggyTexID;
 };
 
 #endif // MESHINFO_H

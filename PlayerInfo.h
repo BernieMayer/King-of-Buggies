@@ -7,7 +7,7 @@
 class PlayerInfo: public Entity {
 public:
 	PlayerInfo();
-	PlayerInfo(unsigned int renderID, unsigned int physicsID, unsigned int* wheelRenderIDs, vec3 colour);
+	PlayerInfo(unsigned int renderID, unsigned int physicsID, unsigned int* wheelRenderIDs, vec3 colour, unsigned int texID);
 	bool isGoldenBuggy();
 	void setGoldenBuggy(bool val);
 	bool isAI();
@@ -23,6 +23,7 @@ public:
 	
 	void setColour(vec3 colour) { vehicleColour = colour; }
 	vec3 getColour();
+	unsigned int getTextureID();
 
 	void setFSpeed(float speed) { fSpeed = speed; };
 	float getFSpeed() { return fSpeed; };
@@ -55,6 +56,7 @@ protected:
 	bool inAir;
 
 	vec3 vehicleColour;
+	unsigned int textureID;
 };
 
 #endif // PLAYERINFO_H

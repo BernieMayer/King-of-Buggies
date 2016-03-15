@@ -41,9 +41,9 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
+	// Buggy textures are loaded separately, since there are multiple textures for the same mesh
 	meshLoader.loadModel("models\\buggy.obj");
-	unsigned int buggyTexID = LoadTexture("textures\\buggytexture.png");
-	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, buggyTexID);
+	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(buggyObject);
 
 	meshLoader.clearData();
@@ -53,6 +53,15 @@ MeshInfo::MeshInfo() {
 	meshes.push_back(unitBuggyObject);
 
 	meshLoader.clearData();
+
+	// load buggy textures
+	buggyTexIDs.push_back(LoadTexture("textures\\redbuggytexture.png"));
+	buggyTexIDs.push_back(LoadTexture("textures\\greenbuggytexture.png"));
+	buggyTexIDs.push_back(LoadTexture("textures\\bluebuggytexture.png"));
+	buggyTexIDs.push_back(LoadTexture("textures\\yellowbuggytexture.png"));
+	buggyTexIDs.push_back(LoadTexture("textures\\purplebuggytexture.png"));
+
+	goldenBuggyTexID = LoadTexture("textures\\goldenbuggytexture.png");
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
@@ -77,4 +86,12 @@ vector<vec2> MeshInfo::getMeshUvs(int objectType) {
 
 vector<unsigned int> MeshInfo::getMeshIndices(int objectType) {
 	return meshes[objectType].getIndices();
+}
+
+unsigned int MeshInfo::getBuggyTexID(int index) {
+	return buggyTexIDs[index];
+}
+
+unsigned int MeshInfo::getGoldenBuggyTexID() {
+	return goldenBuggyTexID;
 }

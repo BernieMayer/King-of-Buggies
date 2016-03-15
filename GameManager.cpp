@@ -73,19 +73,15 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	unsigned int physicsID = physics.vehicle_create(traits, position);
 
 	vec3 colour = vehicleColours[state.numberOfPlayers()];
+	unsigned int texID = meshInfo.getBuggyTexID(state.numberOfPlayers());
 
 	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
-	//renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
-	if (state.numberOfPlayers() == 0)
-		//renderer.assignColor(chassisRenderID, vec3(1.0f, 0.84f, 0.0f));
-		renderer.assignTexture(chassisRenderID, playerMesh->getTextureID());
-	else
-		renderer.assignColor(chassisRenderID, colour);
-
-
-	//renderer.assignColor(chassisRenderID, vec3(1.f, 0.f, 0.f));
+	if (state.numberOfPlayers() == 0) {
+		renderer.assignTexture(chassisRenderID, meshInfo.getGoldenBuggyTexID());
+	}
+	else { renderer.assignTexture(chassisRenderID, texID); }
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
 	unsigned int wheelIDs[4];
@@ -101,41 +97,10 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
 	}
 
-	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour));
+	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
 	smoothers.push_back(InputSmoother());
 	
 
-}
-
-void GameManager::createAI(vec3 position)
-{
-	VehicleTraits traits = VehicleTraits(physics.getMaterial());	//physics.createMaterial(0.5f, 0.5f, 0.5f));		//Make argument to function later
-
-	unsigned int chassisRenderID = renderer.generateObjectID();
-	unsigned int physicsID = physics.vehicle_create(traits, position);
-
-	vec3 colour = vehicleColours[state.numberOfPlayers()];
-
-	MeshObject* playerMesh = meshInfo.getMeshPointer(CUBE);
-	renderer.assignMeshObject(chassisRenderID, playerMesh);
-	renderer.assignMaterial(chassisRenderID, &tsMat);
-	renderer.assignScale(chassisRenderID, scaleMatrix(PxToVec3(traits.chassisDims)*0.5f));
-	renderer.assignColor(chassisRenderID, colour);
-
-	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
-	unsigned int wheelIDs[4];
-
-	for (unsigned int i = 0; i < 4; i++)
-	{
-		wheelIDs[i] = renderer.generateObjectID();
-		renderer.assignMeshObject(wheelIDs[i], wheelMesh);
-		renderer.assignMaterial(wheelIDs[i], &matteMat);
-		renderer.assignScale(wheelIDs[i],
-			scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
-		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
-	}
-
-	state.addAI(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour));
 }
 
 void GameManager::createGroundPlane(vec3 normal, float offset)
@@ -305,16 +270,16 @@ void GameManager::gameLoop()
 
 			//Switch the golden buggie
 			PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggy);
-			unsigned int chasisRenderId_goldenBuggy = p->getRenderID();
-			renderer.assignColor(chasisRenderId_goldenBuggy, vec3(1.0f, 0.84f, 0.0f));
+			unsigned int chassisRenderId_goldenBuggy = p->getRenderID();
+			renderer.assignTexture(chassisRenderId_goldenBuggy, meshInfo.getGoldenBuggyTexID());
 
 
 			//Switch the player that used to be the golden buggy
 			PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
 			int chasisRenderId_reg = p_2->getRenderID();
 			// Switch buggy back to original colour
-			vec3 origColour = p_2->getColour();
-			renderer.assignColor(chasisRenderId_reg, origColour);
+			unsigned int origTexture = p_2->getTextureID();
+			renderer.assignTexture(chasisRenderId_reg, origTexture);
 
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
@@ -537,9 +502,6 @@ void GameManager::initTestScene()
 	skyboxID = renderer.generateObjectID();
 	renderer.assignSkyDome(skyboxID, 70.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
-
-	
-	createBall(0.5f);
 
 	state.setGoldenBuggy(0);
 

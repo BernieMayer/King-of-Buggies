@@ -9,9 +9,9 @@ PlayerInfo::PlayerInfo() : powerup(0), powerupCounter(0), numCoins(0), score(0),
 
 }
 
-PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs, vec3 colour) :
+PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs, vec3 colour, unsigned int texID) :
 powerup(0), powerupCounter(0), numCoins(0), score(0),
-goldenBuggy(false), timeGolden(0.f), vehicleColour(colour)
+goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID)
 {
 	renderID = _renderID;
 	physicsID = _physicsID;
@@ -62,6 +62,8 @@ void PlayerInfo::setTransform(const mat4& _transform, float time)
 }
 
 vec3 PlayerInfo::getColour() { return vehicleColour; }
+
+unsigned int PlayerInfo::getTextureID() { return textureID; }
 
 vec3 PlayerInfo::getVelocity() { return velocity; }
 
