@@ -381,17 +381,19 @@ void GameManager::gameLoop()
 
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
+			/*
 			inputs[0].cheat_coin = false;
 
+			//
 			VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
 
 
-			VehicleTraits temp = VehicleTraits(physics.getMaterial());
-			traits.loadConfiguration("base");
+			//VehicleTraits temp = VehicleTraits(physics.getMaterial());
+			//traits.loadConfiguration("base");
 			//temp.print();
 
-			createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
+			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 			
 			if (state.numberOfMines() < 20){
 				//input[0].cheat_coin = false;
@@ -403,7 +405,7 @@ void GameManager::gameLoop()
 				physics.applyMineExplosion(0);
 			}
 		
-
+		*/
 		}
 
 		//Update camera position
@@ -578,8 +580,8 @@ void GameManager::initTestScene()
 		createCoin(i);
 	}
 
-	createBoostPad(vec3(10.f, -0.3f, 10.f));
-	createBoostPad(vec3(10.f, -0.3f, 10.f));
+	//createBoostPad(vec3(10.f, -0.3f, 10.f));
+	//createBoostPad(vec3(10.f, -0.3f, 10.f));
 	
 
 	vec3 lightPos(60.f, 60.f, 60.f);
