@@ -1,5 +1,22 @@
 #include "InterfaceManager.h"
 
+ComponentInfo::ComponentInfo() :
+	vertices(NULL),
+	uvs(NULL)
+{
+	for (unsigned int i = 0; i < 3; i++)
+		texIDs[i] = NO_VALUE;
+}
+
+void ComponentInfo::setVertices(vector<vec3>* _vertices) { vertices = _vertices; }
+
+void ComponentInfo::setUVs(vector<vec2>* _uvs) { uvs = _uvs; }
+
+void ComponentInfo::setTexture(unsigned int texID, unsigned int textureType) 
+{ 
+	texIDs[textureType] = texID; 
+}
+
 InterfaceManager::InterfaceManager() {}
 
 InterfaceManager::InterfaceManager(unsigned int windowWidth, unsigned int windowHeight) : wWidth(windowWidth), wHeight(windowHeight) 
@@ -53,3 +70,13 @@ vector<vector<vec3>> InterfaceManager::generateScoreBars(GameState* state)
 	}
 	return scorebarQuads;
 }
+
+unsigned int InterfaceManager::generateComponentID()
+{
+	components.push_back(ComponentInfo());
+	return components.size()-1;
+}
+
+void InterfaceManager::assignVertices(unsigned int id, vector<vec3>* vertices) { components[id].setVertices(vertices); }
+
+void InterfaceManager::assignUVs(unsigned int id, vector<vec2>* uvs) { components[id].setUVs(uvs); }

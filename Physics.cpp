@@ -76,7 +76,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
 {
 	//NORMAL,	WORN
-	{ 1.5f, 0.5f }//TARMAC
+	{ 1.6f, 0.5f }//TARMAC
 };
 
 
@@ -852,6 +852,8 @@ PxVehicleWheelsSimData* wheelsSimData)
 		//Enable steering for the front wheels only.
 		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.25f;
 		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.25f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxSteer = 0.f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxSteer = 0.f;
 	}
 
 	//Set up the tires.
@@ -885,8 +887,8 @@ PxVehicleWheelsSimData* wheelsSimData)
 
 		//Set the camber angles.
 		const PxF32 camberAngleAtRest = 0.0;
-		const PxF32 camberAngleAtMaxDroop = 0.01f;
-		const PxF32 camberAngleAtMaxCompression = -0.01f;
+		const PxF32 camberAngleAtMaxDroop = 0.1f;
+		const PxF32 camberAngleAtMaxCompression = -0.5f;
 		for (PxU32 i = 0; i < numWheels; i += 2)
 		{
 			suspensions[i + 0].mCamberAtRest = camberAngleAtRest;

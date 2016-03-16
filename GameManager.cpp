@@ -369,12 +369,12 @@ void GameManager::gameLoop()
 			}
 
 			if (hasBoostPadCollision){
-				physics.applySpeedPadBoost(i);
+				//physics.applySpeedPadBoost(i);
 			}
 
 			if (hasMineCollision){
 				printf("Mine Explosion! \n");
-				physics.applyMineExplosion(i);
+				//physics.applyMineExplosion(i);
 			}
 		}
 
