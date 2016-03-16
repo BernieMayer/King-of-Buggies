@@ -8,6 +8,18 @@ GameState::GameState()
 	maxScore = 2000;
 }
 
+GameState::GameState(MeshObject* selectedLevel, char *coinsFile)
+{
+	maxScore = 2000;
+	map = LevelInfo(selectedLevel, coinsFile);
+	vector<vec3> coinCoords = map.getCoinLocations();
+	for (unsigned int i = 0; i < coinCoords.size(); i++) {
+		Coin newCoin = Coin();
+		newCoin.setPos(coinCoords[i]);
+		addCoin(newCoin);
+	}
+}
+
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
 void GameState::addAI(const PlayerInfo& pinfo){ ai.push_back(pinfo); }
 
@@ -345,6 +357,17 @@ void GameState::clearEvents()
 		delete events[i];
 	}
 	events.clear();
+}
+
+void GameState::setMap(MeshObject* arena, char *coinLocations) 
+{
+	map = LevelInfo(arena, coinLocations);
+	vector<vec3> coinCoords = map.getCoinLocations();
+	for (unsigned int i = 0; i < coinCoords.size(); i++) {
+		Coin newCoin = Coin();
+		newCoin.setPos(coinCoords[i]);
+		addCoin(newCoin);
+	}
 }
 
 #endif // GAMESTATE_CPP

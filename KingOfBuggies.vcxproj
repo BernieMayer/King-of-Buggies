@@ -148,6 +148,7 @@
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="InputSmoother.cpp" />
     <ClCompile Include="InterfaceManager.cpp" />
+    <ClCompile Include="LevelInfoLoader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MeshInfo.cpp" />
     <ClCompile Include="MeshInfoLoader.cpp" />

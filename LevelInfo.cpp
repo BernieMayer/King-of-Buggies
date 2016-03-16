@@ -13,9 +13,15 @@ LevelInfo::LevelInfo(MeshObject* mesh) : arena(mesh)
 
 }
 
-MeshObject* LevelInfo::getMeshObject()
+LevelInfo::LevelInfo(MeshObject* mesh, char *coinsInfoFile) : arena(mesh)
 {
-	return arena;
+	loader.loadLevelData(coinsInfoFile);
+	coinLocations = loader.getData();
+	loader.clearData();
 }
 
-#endif // LEVELINFO_H
+MeshObject* LevelInfo::getMeshObject() { return arena; }
+
+vector<vec3> LevelInfo::getCoinLocations() { return coinLocations; }
+
+#endif // LEVELINFO_CPP

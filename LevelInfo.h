@@ -10,13 +10,17 @@ using namespace glm;
 
 class LevelInfo {
 private:
+	LevelInfoLoader loader;
 	MeshObject* arena;
-	vec3 powerUpLocations;
+	vector<vec3> coinLocations;
+
 public:
 	LevelInfo();
 	LevelInfo(MeshObject* mesh);
+	LevelInfo(MeshObject* mesh, char *coinsInfoFile);
 
 	MeshObject* getMeshObject();
+	vector<vec3> getCoinLocations();
 
 };
 

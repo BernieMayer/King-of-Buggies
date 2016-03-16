@@ -6,8 +6,6 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <vector>
-#include <algorithm>
-#include <cstring>
 
 using namespace std;
 using namespace glm;

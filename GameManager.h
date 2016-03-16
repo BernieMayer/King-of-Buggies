@@ -75,8 +75,6 @@ private:
 	unsigned int skyboxID;
 	Unshaded skyMaterial;
 
-	void addCoin(int playerId);
-
 public:
 	GameManager(GLFWwindow* newWindow);
 
@@ -84,8 +82,8 @@ public:
 	void createPlayer(vec3 position, VehicleTraits traits);		//Add forward parameter later, maybe also VehicleTraits
 	void createAI(vec3 position);
 	void createGroundPlane(vec3 normal, float offset);
-	void createTestLevel();
-	void createCoin(vec3 position);
+	void createLevel(unsigned int objectID);
+	void createCoin(unsigned int coinIndex);
 	void createBoostPad(vec3 position);
 	void createPowerups();
 	void createPowerupBoxes();

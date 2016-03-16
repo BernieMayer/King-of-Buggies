@@ -167,8 +167,8 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 
 }
-void GameManager::createTestLevel() {
-	MeshObject* levelMesh = meshInfo.getMeshPointer(LEVEL);
+void GameManager::createLevel(unsigned int objectID) {
+	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
 	surfacePhysicsID = physics.ground_createGeneric(levelMesh);
 
 	surfaceRenderID = renderer.generateObjectID();
@@ -191,7 +191,7 @@ void GameManager::createBall(float radius)
 
 	
 }
-
+/*
 void GameManager::addCoin(int playerId)
 {
 	//Add a coin into the player properties here
@@ -199,12 +199,12 @@ void GameManager::addCoin(int playerId)
 	PlayerInfo* p = state.getPlayer(playerId);
 
 	int physID = p->getPhysicsID();
-}
+}*/
 
 // At least for now, coins are not being created as physics objects
-void GameManager::createCoin(vec3 position)
+void GameManager::createCoin(unsigned int coinIndex)
 {
-	Coin newCoin;
+	Coin* newCoin = state.getCoin(coinIndex);
 	MeshObject* coinMesh = meshInfo.getMeshPointer(COIN);
 
 	unsigned int coin = renderer.generateObjectID();
@@ -212,10 +212,7 @@ void GameManager::createCoin(vec3 position)
 	renderer.assignMaterial(coin, &tsMat);
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
-	newCoin.setRenderID(coin);
-	newCoin.setPos(position);
-
-	state.addCoin(newCoin);
+	newCoin->setRenderID(coin);
 }
 
 void GameManager::createBoostPad(vec3 position)
@@ -538,8 +535,13 @@ void GameManager::gameLoop()
 void GameManager::gameInit()
 {
 	gameOver = false;
-	initTestScene();
+	
+	// temporary since we only have one level right now
+	createLevel(DONUTLEVEL);
+	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj");
 
+	initTestScene();
 }
 
 void GameManager::initTestScene()
@@ -562,7 +564,6 @@ void GameManager::initTestScene()
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
 	state.getPlayer(1)->setAI(true);
-	createTestLevel();
 	
 	//Create skybox
 	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
@@ -572,8 +573,10 @@ void GameManager::initTestScene()
 
 	state.setGoldenBuggy(0);
 
-	createCoin(vec3(10.f, -0.3f, 10.f));
-	createCoin(vec3(10.f, -0.3f, -10.f));
+	// Add all coins as render objects
+	for (unsigned int i = 0; i < state.numberOfCoins(); i++) {
+		createCoin(i);
+	}
 
 	createBoostPad(vec3(10.f, -0.3f, 10.f));
 	createBoostPad(vec3(10.f, -0.3f, 10.f));

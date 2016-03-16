@@ -4,7 +4,7 @@ InterfaceManager::InterfaceManager() {}
 
 InterfaceManager::InterfaceManager(unsigned int windowWidth, unsigned int windowHeight) : wWidth(windowWidth), wHeight(windowHeight) 
 {
-	barHeight = wHeight * 0.01;
+	barHeight = wHeight / 100;
 }
 
 //  this is calculated based on the player's score

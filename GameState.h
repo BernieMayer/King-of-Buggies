@@ -17,7 +17,6 @@
 #include "GoldenBuggySwitchEvent.h"
 
 const unsigned int NUM_PLAYERS = 4;
-const unsigned int NUM_COINS = 10;
 const unsigned int NUM_POWERUPS = 5;
 const unsigned int NUM_POWERBOXES = 10;
 const unsigned int NUM_DECOYS = 1;
@@ -49,6 +48,7 @@ private:
 
 public:
 	GameState();
+	GameState(MeshObject* selectedLevel, char *coinLocations);
 
 	//Event management
 	void pushEvent(Event* newEvent);		//Pointer must be allocated on heap (using new)
@@ -82,14 +82,12 @@ public:
 	Coin* getCoin(unsigned int coinNum);
 	unsigned int numberOfCoins();
 
-
 	//BoostPad management
 	void addBoostPad(const BoostPad& boostPad);
 	//TODO setBoostPad
 	//TODO getBoostPad
 	unsigned int numberOfBoostPads();
 	bool checkBoostPadCollision(vec3 playerPos);
-	
 
 	//Mine management
 	void addMine(const Mine& mine);
@@ -97,10 +95,6 @@ public:
 	//TODO getMine
 	unsigned int numberOfMines();
 	bool checkMineCollision(vec3 playerPos);
-
-	
-	
-
 
 	//Powerup management
 	void addPowerup(const Powerup& powerup);
@@ -113,6 +107,9 @@ public:
 	void setPowerupBox(unsigned int boxNum, const PowerupBox& box);
 	PowerupBox* getPowerupBox(unsigned int boxNum);
 	unsigned int numberOfPowerupBoxes();
+
+	// Map management
+	void setMap(MeshObject* arena, char *coinLocations);
 
 	bool checkCoinCollision(vec3 playerPos);
 };
