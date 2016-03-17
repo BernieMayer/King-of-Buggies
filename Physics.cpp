@@ -76,7 +76,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
 {
 	//NORMAL,	WORN
-	{ 1.6f, 0.5f }//TARMAC
+	{ 1.5f, 0.5f }//TARMAC
 };
 
 
@@ -582,7 +582,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
-	if (lastState != NULL) {
+	if (lastState != NULL && vehicleInAir[id]) {
 		
 		// Spinning
 		vec3 upVec = lastState->getPlayer(id)->getUp();
@@ -706,7 +706,7 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 
 	//Engine
 	PxVehicleEngineData engine;
-	engine.mPeakTorque = 500.0f;
+	engine.mPeakTorque = 2000.f;
 	engine.mMaxOmega = 300.0f;//approx 6000 rpm
 	driveSimData.setEngineData(engine);
 
@@ -847,11 +847,13 @@ PxVehicleWheelsSimData* wheelsSimData)
 		}
 
 		//Enable the handbrake for the rear wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque = 4000.0f;
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 4000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque = 2000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 2000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxHandBrakeTorque = 1000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxHandBrakeTorque = 1000.0f;
 		//Enable steering for the front wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.25f;
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.25f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.33f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.33f;
 		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxSteer = 0.f;
 		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxSteer = 0.f;
 	}
@@ -863,6 +865,8 @@ PxVehicleWheelsSimData* wheelsSimData)
 		for (PxU32 i = 0; i < numWheels; i++)
 		{
 			tires[i].mType = TIRE_TYPE_NORMAL;
+			tires[i].mLatStiffX = 1;
+			tires[i].mLatStiffY = 18;
 		}
 	}
 
@@ -878,7 +882,7 @@ PxVehicleWheelsSimData* wheelsSimData)
 		//Set the suspension data.
 		for (PxU32 i = 0; i < numWheels; i++)
 		{
-			suspensions[i].mMaxCompression = 0.3f;
+			suspensions[i].mMaxCompression = 0.5f;
 			suspensions[i].mMaxDroop = 0.1f;
 			suspensions[i].mSpringStrength = 35000.0f;
 			suspensions[i].mSpringDamperRate = 4500.0f;
@@ -886,9 +890,9 @@ PxVehicleWheelsSimData* wheelsSimData)
 		}
 
 		//Set the camber angles.
-		const PxF32 camberAngleAtRest = 0.0;
-		const PxF32 camberAngleAtMaxDroop = 0.1f;
-		const PxF32 camberAngleAtMaxCompression = -0.5f;
+		const PxF32 camberAngleAtRest = -0.01;
+		const PxF32 camberAngleAtMaxDroop = -0.01f;
+		const PxF32 camberAngleAtMaxCompression = -0.1f;
 		for (PxU32 i = 0; i < numWheels; i += 2)
 		{
 			suspensions[i + 0].mCamberAtRest = camberAngleAtRest;

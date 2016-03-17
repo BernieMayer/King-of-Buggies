@@ -32,6 +32,9 @@ void glErrorCheck(const char* location)
 	}
 }
 
+unsigned int Renderer::getHeight() { return windowHeight; }
+unsigned int Renderer::getWidth() { return windowWidth; }
+
 
 Renderer::ObjectInfo::ObjectInfo(): 
 	mesh(NULL),
@@ -520,7 +523,9 @@ bool Renderer::loadVertUVBuffer(const ObjectInfo& object)
 		return false;
 	}
 
-	glBindVertexArray(vao[VAO::VERT_UVS]);
+	return loadVertUVBuffer(object.mesh, object.uvs);
+
+	/*glBindVertexArray(vao[VAO::VERT_UVS]);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VERT]);
 	glBufferData(GL_ARRAY_BUFFER,
@@ -532,6 +537,25 @@ bool Renderer::loadVertUVBuffer(const ObjectInfo& object)
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec2)*object.uvs->size(),
 		&object.uvs->at(0),
+		GL_STATIC_DRAW);
+
+	return true;*/
+}
+
+bool Renderer::loadVertUVBuffer(vector<vec3>* verts, vector<vec2>* uvs)
+{
+	glBindVertexArray(vao[VAO::VERT_UVS]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VERT]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*verts->size(),
+		&verts->at(0),
+		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::UVS]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec2)*uvs->size(),
+		&uvs->at(0),
 		GL_STATIC_DRAW);
 
 	return true;
