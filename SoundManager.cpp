@@ -317,32 +317,27 @@ void SoundManager::playDingSound(vec3 pos) {
 	alSourcePlay(dingSource);
 }
 
-void SoundManager::playSecret(GameState state) {
+void SoundManager::playSecretMusic(GameState state) {
 	alSourcePause(musicSource);
 	ALuint buffer;
+	int songSelection = rand() % 5;
 
-	loadWavToBuf("Secret.wav", &musicSource, &buffer);
-
-	PlayerInfo* p1 = state.getPlayer(0);
-
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
-
-	alSourcei(musicSource, AL_BUFFER, buffer);
-	alSourcef(musicSource, AL_PITCH, 1.0f);
-	alSourcef(musicSource, AL_GAIN, musicVolume);
-	alSourcefv(musicSource, AL_POSITION, SourcePos);
-	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-	alSourcei(musicSource, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(musicSource);
-}
-
-void SoundManager::playSecret2(GameState state) {
-	alSourcePause(musicSource);
-	ALuint buffer;
-
-	loadWavToBuf("Dogstorm.wav", &musicSource, &buffer);
+	if (songSelection == 0) {
+		loadWavToBuf("Secret.wav", &musicSource, &buffer);
+	}
+	else if (songSelection == 1) {
+		loadWavToBuf("Dogstorm.wav", &musicSource, &buffer);
+	}
+	else if (songSelection == 2) {
+		loadWavToBuf("Dogbass.wav", &musicSource, &buffer);
+	}
+	else if (songSelection == 3) {
+		loadWavToBuf("DogLevels.wav", &musicSource, &buffer);
+	}
+	else {
+		loadWavToBuf("DogsongMetal.wav", &musicSource, &buffer);
+	}
+	
 
 	PlayerInfo* p1 = state.getPlayer(0);
 
@@ -407,40 +402,16 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateListener(state);
 	updateMusic(state);
 	updateEngineSounds(state, inputs);
-	if (inputs[0].menu && !secretPlaying && !secret2Unlocked) {
-		secretPlaying = true;
-		playSecret(state);
-	}
-	else if (inputs[0].menu && secretPlaying && !secret2Unlocked) {
-		secretPlaying = false;
-		alSourcePause(musicSource);
-		startMusic(state);
-	}
-	else if (inputs[0].menu && !secretPlaying && secret2Unlocked) {
-		secretPlaying = true;
-		playSecret2(state);
-	}
-	else if (inputs[0].menu && secretPlaying && secret2Unlocked) {
-		secretPlaying = false;
-		secret2Unlocked = false;
-		alSourcePause(musicSource);
-		startMusic(state);
-	}
 
 	updateHonks(state, inputs);
 
+	if (inputs[0].konamiCode) {
+		playSecretMusic(state);
+	}
 
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
-	if (musicState == AL_STOPPED && secretPlaying && !secret2Unlocked) {
-		secretPlaying = false;
-		secret2Unlocked = true;
-		alSourcePause(musicSource);
-		startMusic(state);
-	}
-	else if (musicState == AL_STOPPED && secretPlaying && secret2Unlocked) {
-		secretPlaying = false;
-		secret2Unlocked = false;
+	if (musicState == AL_STOPPED) {
 		alSourcePause(musicSource);
 		startMusic(state);
 	}

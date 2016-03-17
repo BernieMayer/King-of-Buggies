@@ -40,8 +40,7 @@ private:
 	void updateHonks(GameState state, Input inputs[]);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSound(string fileName, vec3 pos, float volume);
-	void playSecret(GameState state);
-	void playSecret2(GameState state);
+	void playSecretMusic(GameState state);
 	void updateMusicPitch(GameState state, Input input);
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
@@ -55,9 +54,6 @@ private:
 
 	vector<bool> honking;
 	vector<ALuint> honkSources;
-
-	bool secretPlaying = false;
-	bool secret2Unlocked = false;
 };
 
 #endif // SOUNDMANAGER_H
