@@ -191,15 +191,6 @@ void GameManager::createBall(float radius)
 
 	
 }
-/*
-void GameManager::addCoin(int playerId)
-{
-	//Add a coin into the player properties here
-
-	PlayerInfo* p = state.getPlayer(playerId);
-
-	int physID = p->getPhysicsID();
-}*/
 
 // At least for now, coins are not being created as physics objects
 void GameManager::createCoin(unsigned int coinIndex)
@@ -213,6 +204,23 @@ void GameManager::createCoin(unsigned int coinIndex)
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
 	newCoin->setRenderID(coin);
+}
+
+void GameManager::createPowerup(unsigned int objectID)
+{
+	unsigned int powerup = renderer.generateObjectID();
+	//state.getPowerup(i)->setRenderID(powerup);
+
+	MeshObject powerupMesh = meshInfo.getMesh(objectID);
+	vector<vec3> powerupVerts = powerupMesh.getVertices();
+	vector<vec3> powerupNormals = powerupMesh.getNormals();
+	vector<unsigned int> powerupIndices = powerupMesh.getIndices();
+
+	renderer.assignMesh(powerup, &powerupVerts);
+	renderer.assignNormals(powerup, &powerupNormals);
+	renderer.assignIndices(powerup, &powerupIndices);
+	renderer.assignMaterial(powerup, &tsMat);
+	//renderer.assignTexture()
 }
 
 void GameManager::createBoostPad(vec3 position)
@@ -381,7 +389,7 @@ void GameManager::gameLoop()
 
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
-			/*
+			
 			inputs[0].cheat_coin = false;
 
 			//
@@ -402,10 +410,10 @@ void GameManager::gameLoop()
 				state.addMine(newMine);
 
 				//TEST
-				physics.applyMineExplosion(0);
+				//physics.applyMineExplosion(0);
 			}
 		
-		*/
+		
 		}
 
 		//Update camera position
@@ -604,27 +612,7 @@ void GameManager::quitGame(unsigned int winnerID)
 
 
 /*
-void GameManager::createPowerups()
-{
-int i = 0;
-while (i < NUM_POWERUPS) {
-unsigned int powerup = renderer.generateObjectID();
-state.getPowerup(i)->setRenderID(powerup);
 
-// leave commented for now, there's no powerup meshes
-//MeshObject coinMesh = meshInfo.getMesh(POWERUP);
-MeshObject powerupMesh = meshInfo.getMesh(SPHERE);
-vector<vec3> powerupVerts = powerupMesh.getVertices();
-vector<vec3> powerupNormals = powerupMesh.getNormals();
-vector<unsigned int> powerupIndices = powerupMesh.getIndices();
-
-renderer.assignMesh(powerup, &powerupVerts);
-renderer.assignNormals(powerup, &powerupNormals);
-renderer.assignIndices(powerup, &powerupIndices);
-renderer.assignMaterial(powerup, &tsMat);
-i++;
-}
-}
 
 void GameManager::createPowerupBoxes()
 {

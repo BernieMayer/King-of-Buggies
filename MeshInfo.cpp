@@ -29,6 +29,12 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
+	meshLoader.loadModel("models\\mine.obj");
+	MeshObject mineObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	meshes.push_back(mineObject);
+
+	meshLoader.clearData();
+
 	meshLoader.loadModel("models\\donutlevel.obj");
 	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(levelObject);
