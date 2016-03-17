@@ -8,7 +8,7 @@
 //#include "PxSimulationEventCallback.h"
 //#include "MeshObject.h"
 //#include "LevelInfo.h"
-//#include "GameState.h"
+#include "GameState.h"
 #include "PxPhysicsAPI.h"
 #include "VehicleSceneQueryData.h"
 //#include "Timer.h"
@@ -30,22 +30,32 @@ enum
 };
 
 
-class Vehicle {
+class Vehicle : public PxVehicleDrive4W  {
 public:
-	static int numOfVehicles = 0;
+    int numOfVehicles = 0;
 
 	PxVehicleDrive4W* vehDrive4W;
 
 	
 
 	int gear;
+	int vehicleNum;
 
 	bool inAir;
+	bool isGoldenBuggy;
+
 
 	int forwards; 
 	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle
+	GameState* lastState;
+	void updateGameState(GameState* state);
+	void modifySpeed(float modSpeed);
+	void setSpeed(float speed);
+	void applyNitroBoost();
 
-	Vehicle(PxPhysics& phys, PxCooking& cook);
+	Vehicle(PxPhysics& phys, PxCooking& cook, VehicleTraits traits, vec3 initPos);
+
+	PxVec3 getPxVec3(const vec3& vec);
 
 private:
 

@@ -152,12 +152,13 @@ Physics::Physics() {
 
 unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
-	vehicleActors.push_back(initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z)));
+	
+	vehicleActors.push_back(Vehicle(* mPhysics, * mCooking, traits, initPos));
 
 	//This shouldn't be in physics at all
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggy
 	if (vehicleActors.size() == 1){
-		goldenBuggy = vehicleActors[0];
+		goldenBuggy = & vehicleActors[0];
 		modifySpeed(0, 3);
 	}
 	vehicleForwards.push_back(-1);
@@ -166,26 +167,32 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 }
 void Physics::modifySpeed(unsigned int vehicleNum , float modSpeed)
 {
-	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+
+	vehicleActors[vehicleNum].modifySpeed(modSpeed);
+	/*
+	REMOVE ONCE VEHICLE IS DONE
+	PxVehicleDrive4W* veh = & vehicleActors[vehicleNum];
 	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
 	engine.mPeakTorque = engine.mPeakTorque + modSpeed * engine.mPeakTorque;
 	veh->mDriveSimData.setEngineData(engine);
-	
+	*/
 
 }
 
 void Physics::setSpeed(unsigned int vehicleNum, float speed)
 {
-	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	vehicleActors[vehicleNum].setSpeed(speed);
+	/*
 	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
 	engine.mPeakTorque = speed;
 	veh->mDriveSimData.setEngineData(engine);
+	*/
 
 }
 
 void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 {
-	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 downVec = -lastState->getPlayer(vehicleNum)->getUp();
@@ -200,7 +207,7 @@ void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 
 void Physics::applyNitroBoost(unsigned int vehicleNum)
 {
-	PxVehicleDrive4W* veh = vehicleActors[vehicleNum];
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
@@ -210,7 +217,7 @@ void Physics::applyNitroBoost(unsigned int vehicleNum)
 
 void Physics::applyMineExplosion(unsigned int vehicleNum)
 {
-	PxVehicleDrive4W* vehicle = vehicleActors[vehicleNum];
+	PxVehicleDrive4W* vehicle = vehicleActors[vehicleNum].vehDrive4W;;
 	if (!vehicleInAir[vehicleNum]){
 		vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
 		forceVec = 39050.f * forceVec * vec3(-1, 0, -1);
@@ -235,7 +242,7 @@ mat4 Physics::vehicle_getGlobalPose(unsigned int id)
 		printf("Error: Vehicle does not exist\n");
 		return mat4(1.f);
 	}
-	return getMat4(vehicleActors[id]->getRigidDynamicActor()->getGlobalPose());
+	return getMat4(vehicleActors[id].getRigidDynamicActor()->getGlobalPose());
 }
 
 mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
@@ -252,7 +259,7 @@ mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
 	}
 
 	PxShape* wheelShape[1];
-	vehicleActors[id]->getRigidDynamicActor()->getShapes(wheelShape, 1, wheelNum);
+	vehicleActors[id].getRigidDynamicActor()->getShapes(wheelShape, 1, wheelNum);
 
 	return vehicle_getGlobalPose(id)*getMat4(wheelShape[0]->getLocalPose());
 }
@@ -263,7 +270,7 @@ float Physics::vehicle_getFSpeed(unsigned int id) {
 		printf("Error: Vehicle does not exist\n");
 		return 0.0f;
 	}
-	return vehicleActors[id]->computeForwardSpeed();
+	return vehicleActors[id].computeForwardSpeed();
 }
 
 float Physics::vehicle_getSSpeed(unsigned int id) {
@@ -273,7 +280,7 @@ float Physics::vehicle_getSSpeed(unsigned int id) {
 		return 0.0f;
 	}
 
-	return vehicleActors[id]->computeSidewaysSpeed();
+	return vehicleActors[id].computeSidewaysSpeed();
 }
 
 bool Physics::vehicle_getForwardsGear(unsigned int id) {
@@ -298,7 +305,7 @@ float Physics::vehicle_getEngineSpeed(unsigned int id) {
 		return 0.0f;
 	}
 
-	return vehicleActors[id]->mDriveDynData.getEngineRotationSpeed();
+	return vehicleActors[id].mDriveDynData.getEngineRotationSpeed();
 }
 
 
@@ -538,7 +545,7 @@ void Physics::giveInput(Input input, int playernum) {
 
 void Physics::handleInput(Input* input, unsigned int id){
 
-	PxVehicleDrive4W* vehicle = vehicleActors[id];
+	PxVehicleDrive4W* vehicle = vehicleActors[id].vehDrive4W;;
 
 	float fSpeed = vehicle->computeForwardSpeed();
 
@@ -1178,7 +1185,7 @@ void Physics::startSim(float frameTime) {
 
 	vector<PxVehicleWheels*> vehicles;
 	for (unsigned int i = 0; i < vehicleActors.size(); i++)
-		vehicles.push_back(vehicleActors[i]);
+		vehicles.push_back(vehicleActors[i].vehDrive4W);
 
 	PxRaycastQueryResult* raycastResults = gVehicleSceneQueryData->getRaycastQueryResultBuffer(0);
 	const PxU32 raycastResultsSize = gVehicleSceneQueryData->getRaycastQueryResultBufferSize();
@@ -1251,7 +1258,7 @@ void Physics::buggyExplosion(int gBuggyIndex) {
 
 			float force = 8000000;
 			vec = (force * (1 / (distance * distance))) * vec;
-			vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
+			vehicleActors[i].getRigidDynamicActor()->addForce(getPxVec3(vec));
 		}
 	}
 }
@@ -1275,11 +1282,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 			bool isVehicle2 = false;
 
 			for (int i = 0; i < vehicleActors.size(); i++) {
-				if (actor1 == vehicleActors[i]->getRigidDynamicActor()) {
+				if (actor1 == vehicleActors[i].getRigidDynamicActor()) {
 					isVehicle1 = true;
 					index1 = i;
 				}
-				if (actor2 == vehicleActors[i]->getRigidDynamicActor()) {
+				if (actor2 == vehicleActors[i].getRigidDynamicActor()) {
 					isVehicle2 = true;
 					index2 = i;
 				}
@@ -1316,13 +1323,13 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				{
 					if (!goldenBuggyLock) {
 						if (pairIndexOfGoldenBuggy == 0){
-							if (pairHeader.actors[1] == vehicleActors[i]->getRigidDynamicActor())
+							if (pairHeader.actors[1] == vehicleActors[i].getRigidDynamicActor())
 							{
 								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
 								setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
 								indexOfGoldenBuggy = i;
-								goldenBuggy = vehicleActors[i];
+								goldenBuggy = &vehicleActors[i];
 								newGoldenBuggy = true;
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;
@@ -1333,13 +1340,13 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 							}
 						}
 						else {
-							if (pairHeader.actors[0] == vehicleActors[i]->getRigidDynamicActor())
+							if (pairHeader.actors[0] == vehicleActors[i].getRigidDynamicActor())
 							{
 								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
 								setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
 								indexOfGoldenBuggy = i;
-								goldenBuggy = vehicleActors[i];
+								goldenBuggy = &vehicleActors[i];
 								newGoldenBuggy = true;
 								modifySpeed(i, 3);
 								goldenBuggyLock = true;

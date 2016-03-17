@@ -17,19 +17,52 @@ struct FilterGroup
 
 
 
-Vehicle::Vehicle(PxPhysics& phys, PxCooking& cook){
-	mMaterial = mPhysics->createMaterial(0.8f, 0.8f, 0.6f);
+Vehicle::Vehicle(PxPhysics& phys, PxCooking& cook, VehicleTraits traits, vec3 initPos){
 	mPhysics =  &phys;
+	mMaterial = mPhysics->createMaterial(0.8f, 0.8f, 0.6f);
 	mCooking = &cook;
 	gear = 0;
+	vehicle_create(traits, initPos);
+}
+
+void updateGameState(GameState* state)
+{
+
+}
+
+void Vehicle::modifySpeed(float modSpeed)
+{
+
+	PxVehicleDrive4W* veh = vehDrive4W;
+	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
+	engine.mPeakTorque = engine.mPeakTorque + modSpeed * engine.mPeakTorque;
+	veh->mDriveSimData.setEngineData(engine);
+}
+
+void Vehicle::setSpeed( float speed)
+{
+
+	PxVehicleEngineData engine = vehDrive4W->mDriveSimData.getEngineData();
+	engine.mPeakTorque = speed;
+	vehDrive4W->mDriveSimData.setEngineData(engine);
+}
+
+void Vehicle::applyNitroBoost()
+{
+	
+	PxRigidDynamic* vehBody = vehDrive4W->getRigidDynamicActor();
+
+	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
+	forceVec = 39050.f * forceVec * vec3(1, 0, 1);
+	vehBody->addForce(getPxVec3(forceVec));
 }
 
 unsigned int Vehicle::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
+	vehicleNum = numOfVehicles;
 	numOfVehicles++;
 	initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z));
 
-	
 	gear = -1;
 	inAir = false;
 	return numOfVehicles - 1;
@@ -422,6 +455,11 @@ PxConvexMesh* Vehicle::createConvexMesh(const PxVec3* verts, const PxU32 numVert
 void Vehicle::setupNonDrivableSurface(PxFilterData& filterData)
 {
 	filterData.word3 = UNDRIVABLE_SURFACE;
+}
+
+PxVec3 Vehicle::getPxVec3(const vec3& vec)
+{
+	return PxVec3(vec.x, vec.y, vec.z);
 }
 
 #endif 

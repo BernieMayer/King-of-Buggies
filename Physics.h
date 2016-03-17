@@ -2,6 +2,7 @@
 #define PHYSICS_H
 
 #include <math.h>
+#include "Vehicle.h"
 #include "PxSimulationEventCallback.h"
 #include "MeshObject.h"
 #include "LevelInfo.h"
@@ -23,6 +24,7 @@ const float gravity = -9.81f;
 using namespace physx;
 
 //Tire types. Part of Vehicle
+/*
 enum
 {
 	TIRE_TYPE_NORMAL = 0,
@@ -30,7 +32,7 @@ enum
 	,
 	MAX_NUM_TIRE_TYPES
 };
-
+*/
 enum
 {
 	SURFACE_TYPE_TARMAC,
@@ -50,7 +52,7 @@ public:
 	void handleInput(Input* input, unsigned int id);
 
 	//Should be migrated to Vehicle class
-	void modifySpeed(unsigned int vehicleNum, float modSpeed);
+	void modifySpeed(unsigned int vehicleNum, float modSpeed);	//revised to Vehicle class BM
 	void setSpeed(unsigned int vehicleNum, float speed);
 	void applySpeedPadBoost(unsigned int vechicleNum);
 	void applyNitroBoost(unsigned int vehicleNum);
@@ -104,11 +106,11 @@ public:
 
 private:
 	Timer clock;
-	vector<PxVehicleDrive4W*> vehicleActors;	//Eventually should be a vector of Vehicles
+	vector<Vehicle> vehicleActors;	//Eventually should be a vector of Vehicles
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 
-	PxVehicleDrive4W* goldenBuggy;		       //Should be a vehicle
+	Vehicle* goldenBuggy;		       //Should be a vehicle
 
 	vector<PxMaterial*> materials;
 
