@@ -320,7 +320,12 @@ void SoundManager::playDingSound(vec3 pos) {
 void SoundManager::playSecretMusic(GameState state) {
 	alSourcePause(musicSource);
 	ALuint buffer;
-	int songSelection = rand() % 5;
+	int songSelection; 
+	
+	do {
+		songSelection = rand() % 5;
+	} while (songSelection == lastSecretPlayed);
+	lastSecretPlayed = songSelection;
 
 	if (songSelection == 0) {
 		loadWavToBuf("Secret.wav", &musicSource, &buffer);
@@ -350,6 +355,26 @@ void SoundManager::playSecretMusic(GameState state) {
 	alSourcefv(musicSource, AL_POSITION, SourcePos);
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
 	alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(musicSource);
+}
+
+void SoundManager::playPauseSong(GameState state) {
+	alSourcePause(musicSource);
+	ALuint buffer;
+	loadWavToBuf("PauseSong.wav", &musicSource, &buffer);
+
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+	alSourcei(musicSource, AL_BUFFER, buffer);
+	alSourcef(musicSource, AL_PITCH, 1.0f);
+	alSourcef(musicSource, AL_GAIN, musicVolume);
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+	alSourcei(musicSource, AL_LOOPING, AL_TRUE);
 
 	alSourcePlay(musicSource);
 }
@@ -407,13 +432,35 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 
 	if (inputs[0].konamiCode) {
 		playSecretMusic(state);
+		secretPlaying = true;
+	}
+
+	// Change to menu later
+	if (inputs[0].powerup && !paused && !secretPlaying) {
+		paused = true;
+		if (!secretPlaying) {
+			playPauseSong(state);
+		}
+	}
+	else if (inputs[0].powerup && paused) {
+		paused = false;
+		if (!secretPlaying) {
+			alSourcePause(musicSource);
+			startMusic(state);
+		}
 	}
 
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
 	if (musicState == AL_STOPPED) {
 		alSourcePause(musicSource);
-		startMusic(state);
+		secretPlaying = false;
+		if (paused) {
+			playPauseSong(state);
+		}
+		else {
+			startMusic(state);
+		}
 	}
 
 	for (int i = 0; i < state.getNbEvents(); i++) {

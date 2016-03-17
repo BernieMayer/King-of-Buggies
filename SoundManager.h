@@ -41,6 +41,7 @@ private:
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSound(string fileName, vec3 pos, float volume);
 	void playSecretMusic(GameState state);
+	void playPauseSong(GameState state);
 	void updateMusicPitch(GameState state, Input input);
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
@@ -54,6 +55,10 @@ private:
 
 	vector<bool> honking;
 	vector<ALuint> honkSources;
+
+	bool paused = false;
+	bool secretPlaying = false;
+	int lastSecretPlayed = -1;
 };
 
 #endif // SOUNDMANAGER_H
