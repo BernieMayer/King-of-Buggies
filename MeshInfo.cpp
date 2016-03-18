@@ -36,7 +36,8 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\donutlevel.obj");
-	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	unsigned int texID = LoadTexture("textures\\donutleveltexture.png");
+	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(levelObject);
 
 	meshLoader.clearData();

@@ -176,6 +176,7 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &tsMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
+	renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
 
 }
 
