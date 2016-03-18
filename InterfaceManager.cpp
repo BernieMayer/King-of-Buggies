@@ -22,25 +22,26 @@ mat4 ComponentInfo::getMatrix(const mat4& winRatio)
 	scale[1][1] = height;
 
 	vec2 anchor(xOffset / winRatio[0][0], yOffset / winRatio[1][1]);
+	//vec2 anchor(xOffset, yOffset);
 
 	vec2 corner;
 
 	switch (anchorPoint)
 	{
 	case ANCHOR::TOP_LEFT:
-		corner = vec2(-width, height);
+		corner = vec2(-width, height)*0.5f;
 		break;
 	case ANCHOR::TOP_RIGHT:
-		corner = vec2(width, height);
+		corner = vec2(width, height)*0.5f;
 		break;
 	case ANCHOR::BOTTOM_LEFT:
-		corner = vec2(-width, -height);
+		corner = vec2(-width, -height)*0.5f;
 		break;
 	case ANCHOR::BOTTOM_RIGHT:
-		corner = vec2(width, -height);
+		corner = vec2(width, -height)*0.5f;
 		break;
 	case ANCHOR::CENTER:
-		corner = vec2(0.f, 0.f);
+		corner = vec2(0.f, 0.f)*0.5f;
 		break;
 	}
 
@@ -49,14 +50,13 @@ mat4 ComponentInfo::getMatrix(const mat4& winRatio)
 	transMat[3][0] = translation.x;
 	transMat[3][1] = translation.y;
 
-
 	return winRatio*transMat*scale;
 }
 
 
 InterfaceManager::InterfaceManager() :winRatio(1.f), uiMat(Unshaded()) 
 {
-
+	initSquare();
 }
 
 InterfaceManager::InterfaceManager(unsigned int windowWidth, unsigned int windowHeight) : wWidth(windowWidth), wHeight(windowHeight), winRatio(1.f), uiMat(Unshaded())
@@ -80,10 +80,10 @@ void InterfaceManager::initSquare()
 {
 	float halfWidth = 0.5f;
 
-	vec3 p00 (-halfWidth, -halfWidth, 1.f);
-	vec3 p10(halfWidth, -halfWidth, 1.f);
-	vec3 p01(-halfWidth, halfWidth, 1.f);
-	vec3 p11(halfWidth, halfWidth, 1.f);
+	vec3 p00 (-halfWidth, -halfWidth, 0.99f);
+	vec3 p10(halfWidth, -halfWidth, 0.99f);
+	vec3 p01(-halfWidth, halfWidth, 0.99f);
+	vec3 p11(halfWidth, halfWidth, 0.99f);
 
 	vec2 uv00(0.f, 0.f);
 	vec2 uv10(1.f, 0.f);
@@ -186,6 +186,11 @@ unsigned int InterfaceManager::generateComponentID()
 void InterfaceManager::assignVertices(unsigned int id, vector<vec3>* vertices) { components[id].vertices = vertices; }
 
 void InterfaceManager::assignUVs(unsigned int id, vector<vec2>* uvs) { components[id].uvs = uvs; }
+
+void InterfaceManager::assignTexture(unsigned int id, unsigned int texID, unsigned int textureType)
+{
+	components[id].texIDs[textureType] = texID;
+}
 
 void InterfaceManager::assignIndices(unsigned int id, vector<unsigned int>* indices) { components[id].indices = indices; }
 

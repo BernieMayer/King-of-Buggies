@@ -9,7 +9,7 @@ unsigned char testTexture[12] = {	0, 0, 255,
 									255, 255, 255};
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
-	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()
+	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
 {
 	window = newWindow;
 	mat = Diffuse();
@@ -31,7 +31,8 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	// setup interface according to window dimensions
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	_interface.setWindowDim(width, height);
+	_interface = InterfaceManager(width, height);
+//	_interface.setWindowDim(width, height);
 
 	gameInit();
 }
@@ -486,6 +487,8 @@ void GameManager::gameLoop()
 		{
 			renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 		}
+
+		_interface.drawAll(&renderer);
 		
 		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
@@ -510,10 +513,6 @@ void GameManager::gameLoop()
 
 		//Get path
 		path.clear();
-
-
-		//
-
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
@@ -599,6 +598,13 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 	sound = SoundManager(state);
+
+	//Add dummy objects to interface
+	unsigned int centerBox = _interface.generateComponentID();
+	_interface.assignSquare(centerBox);
+	_interface.assignTexture(centerBox, skyboxTextureID, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(centerBox, -1.f, 1.f, 1.f, 1.f, ANCHOR::TOP_LEFT);
+
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 
