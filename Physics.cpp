@@ -620,8 +620,9 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (input->jump) {
 		// Create bomb above actor
-		createBomb(vehicle->getRigidDynamicActor()->getGlobalPose().p + PxVec3(0, 5, 0));
-		lastState->pushEvent(new BombCreationEvent(getVec3(vehicle->getRigidDynamicActor()->getGlobalPose().p + PxVec3(0, 5, 0))));
+		vec3 location = 5.0f * lastState->getPlayer(id)->getForward() + lastState->getPlayer(id)->getPos();
+		createBomb(getPxVec3(location), id);
+		lastState->pushEvent(new BombCreationEvent(location));
 	}
 
 
@@ -1269,6 +1270,15 @@ void Physics::buggyExplosion(int gBuggyIndex) {
 			vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
 		}
 	}
+
+	for (int i = 0; i < bombActors.size(); i++) {
+		PxVec3 vec = bombActors[i]->getGlobalPose().p - vehicleActors[gBuggyIndex]->getRigidDynamicActor()->getGlobalPose().p;
+		float distance = length(getVec3(vec));
+
+		float force = 8000000;
+		vec = (force * (1 / (distance * distance))) * vec;
+		bombActors[i]->addForce(vec);
+	}
 }
 
 void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs)
@@ -1332,9 +1342,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				}
 				else if (isBomb1 && isVehicle2) {
 					lastState->pushEvent(new VehicleBombCollisionEvent(index2, index1, pos));
+					bombExplosion(index1);
 				}
 				else if (isBomb2 && isVehicle1) {
 					lastState->pushEvent(new VehicleBombCollisionEvent(index1, index2, pos));
+					bombExplosion(index2);
 				}
 				else {
 					lastState->pushEvent(new VehicleWallCollisionEvent(index1, pos, normal, force));
@@ -1398,9 +1410,10 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 	}
 }
 
-void Physics::createBomb(PxVec3 location) {
+void Physics::createBomb(PxVec3 location, int playerID) {
 	// Add dynamic thrown ball to scene
 	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(location.x, location.y, location.z)));
+	aSphereActor->setMass(500);
 	float radius = 0.5f;
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
 
@@ -1416,7 +1429,11 @@ void Physics::createBomb(PxVec3 location) {
 	// 1.0f = density
 	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
 
-	aSphereActor->setLinearVelocity(PxVec3(0.0f, 3.0f, 0.0f));
+	// Set velocity to be same direction of player, but faster 
+	vec3 velocity = lastState->getPlayer(playerID)->getForward();
+	float speedMod = lastState->getPlayer(playerID)->getFSpeed() * 2;
+	velocity = speedMod * velocity;
+	aSphereActor->setLinearVelocity(getPxVec3(velocity));
 
 	gScene->addActor(*aSphereActor);
 
@@ -1426,5 +1443,36 @@ void Physics::createBomb(PxVec3 location) {
 	lastState->addPowerup(b);
 }
 
+
+void Physics::bombExplosion(int bombID) {
+	for (int i = 0; i < vehicleActors.size(); i++) {
+		vec3 vec = lastState->getPlayer(i)->getPos() - getVec3(bombActors[bombID]->getGlobalPose().p);
+		float distance = length(vec);
+
+		float force = 3000000;
+		vec = (force * (1 / (distance * distance))) * vec;
+		vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
+	}
+
+	for (int i = 0; i < bombActors.size(); i++) {
+		if (i != bombID) {
+			PxVec3 vec = bombActors[i]->getGlobalPose().p - bombActors[bombID]->getGlobalPose().p;
+			float distance = length(getVec3(vec));
+
+			float force = 3000000;
+			vec = (force * (1 / (distance * distance))) * vec;
+			bombActors[i]->addForce(vec);
+		}
+	}
+
+	gScene->removeActor(*bombActors[bombID]);
+
+	for (int i = 0; i < dynamicActors.size(); i++) {
+		if (dynamicActors[i] == bombActors[bombID]) {
+			dynamicActors.erase(dynamicActors.begin() + i);
+		}
+	}
+	bombActors.erase(bombActors.begin() + bombID);
+}
 
 #endif 

@@ -373,6 +373,9 @@ void GameManager::gameLoop()
 					renderer.assignTexture(b->getRenderID(), meshInfo.getMeshPointer(CUBE)->getTextureID());
 				}
 			}
+			else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
+				// Remove bomb
+			}
 		}
 		state.clearEvents();
 
