@@ -89,6 +89,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
+    <ClInclude Include="Bomb.h" />
+    <ClInclude Include="BombCreationEvent.h" />
     <ClInclude Include="BoostPad.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Coin.h" />
@@ -104,6 +106,7 @@
     <ClInclude Include="GameStateLoader.h" />
     <ClInclude Include="GoldenBuggySwitchEvent.h" />
     <ClInclude Include="Mine.h" />
+    <ClInclude Include="VehicleBombCollisionEvent.h" />
     <ClInclude Include="VehicleCollisionEvent.h" />
     <ClInclude Include="InputSmoother.h" />
     <ClInclude Include="Keybindings.h" />
@@ -134,6 +137,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AIManager.cpp" />
+    <ClCompile Include="Bomb.cpp" />
+    <ClCompile Include="BombCreationEvent.cpp" />
     <ClCompile Include="BoostPad.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="Coin.cpp" />
@@ -167,6 +172,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
     <ClCompile Include="unshaded.cpp" />
+    <ClCompile Include="VehicleBombCollisionEvent.cpp" />
     <ClCompile Include="VehicleCollisionEvent.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="VehicleTraits.cpp" />

@@ -14,8 +14,11 @@
 #include "CollisionEvent.h"
 #include "VehicleCollisionEvent.h"
 #include "VehicleWallCollisionEvent.h"
+#include "VehicleBombCollisionEvent.h"
+#include "BombCreationEvent.h"
+#include "Bomb.h"
 
-//Hello World (Test commit)
+
 
 const float gravity = -9.81f;
 
@@ -106,6 +109,7 @@ private:
 	vector<PxVehicleDrive4W*> vehicleActors;	//Eventually should be a vector of Vehicles
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
+	vector<PxRigidDynamic*> bombActors;
 
 	PxVehicleDrive4W* goldenBuggy;		       //Should be a vehicle
 
@@ -179,7 +183,9 @@ private:
 
 	void buggyExplosion(int gBuggyIndex);
 	PxVec3 getPxVec3(vec3 vec) { return PxVec3(vec.x, vec.y, vec.z); }
+	vec3 getVec3(PxVec3 vec) { return vec3(vec.x, vec.y, vec.z); }
 
+	void createBomb(PxVec3 location);
 };
 
 

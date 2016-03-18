@@ -355,6 +355,21 @@ void GameManager::gameLoop()
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 		sound.updateSounds(state, inputs);
+
+		for (int i = 0; i < state.getNbEvents(); i++) {
+			Event* e = state.getEvent(i);
+
+			if (e->getType() == BOMB_CREATION_EVENT)
+			{
+				BombCreationEvent* vehE = dynamic_cast<BombCreationEvent*>(e);
+				if (state.numberOfPowerups() > 0) {
+					// Get last bomb
+					Bomb* b = dynamic_cast<Bomb*>(state.getPowerup(state.numberOfPowerups() - 1));
+					b->setRenderID(renderer.generateObjectID());
+				}
+				createBall(0.5f);
+			}
+		}
 		state.clearEvents();
 
 		//Test code...

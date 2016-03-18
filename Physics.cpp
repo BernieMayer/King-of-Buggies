@@ -610,11 +610,20 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 
 	if (input->jump && !vehicleInAir[id]) {
-		cout << "Jump!\n";
+		
 		vec3 upVec = lastState->getPlayer(id)->getUp();
 		upVec = 500000.f * upVec;
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
+
+	// Change to powerup eventually
+	/*
+	if (input->jump) {
+		// Create bomb above actor
+		createBomb(vehicle->getRigidDynamicActor()->getGlobalPose().p + PxVec3(0, 5, 0));
+		lastState->pushEvent(new BombCreationEvent(getVec3(vehicle->getRigidDynamicActor()->getGlobalPose().p + PxVec3(0, 5, 0))));
+	}
+	*/
 
 }
 
@@ -1290,6 +1299,22 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 					index2 = i;
 				}
 			}
+
+			bool isBomb1 = false;
+			bool isBomb2 = false;
+			
+			if (!isVehicle1 || !isVehicle2) {
+				for (int i = 0; i < bombActors.size(); i++) {
+					if (actor1 == bombActors[i]) {
+						isBomb1 = true;
+						index1 = i;
+					}
+					if (actor2 == bombActors[i]) {
+						isBomb2 = true;
+						index2 = i;
+					}
+				}
+			}
 			
 			int numContacts = cp.contactCount;
 			PxContactPairPoint contactPoint[1];
@@ -1304,6 +1329,12 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 
 				if (isVehicle1 && isVehicle2) {
 					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
+				}
+				else if (isBomb1 && isVehicle2) {
+					lastState->pushEvent(new VehicleBombCollisionEvent(index2, index1, pos));
+				}
+				else if (isBomb2 && isVehicle1) {
+					lastState->pushEvent(new VehicleBombCollisionEvent(index1, index2, pos));
 				}
 				else {
 					lastState->pushEvent(new VehicleWallCollisionEvent(index1, pos, normal, force));
@@ -1365,6 +1396,33 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 			}
 		}
 	}
+}
+
+void Physics::createBomb(PxVec3 location) {
+	// Add dynamic thrown ball to scene
+	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(location.x, location.y, location.z)));
+	float radius = 0.5f;
+	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
+
+	PxShape* shapes[1];
+	aSphereActor->getShapes(shapes, 1);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_BOMB;
+	simFilterData.word1 = COLLISION_FLAG_BOMB_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	// 1.0f = density
+	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
+
+	aSphereActor->setLinearVelocity(PxVec3(0.0f, 3.0f, 0.0f));
+
+	gScene->addActor(*aSphereActor);
+
+	bombActors.push_back(aSphereActor);
+	dynamicActors.push_back(aSphereActor);
+	lastState->addPowerup(Bomb(bombActors.size() - 1, 60, getVec3(location)));
 }
 
 

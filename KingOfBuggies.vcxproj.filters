@@ -71,6 +71,15 @@
       <Filter>Materials</Filter>
     </ClCompile>
     <ClCompile Include="LevelInfoLoader.cpp" />
+    <ClCompile Include="BombCreationEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="VehicleBombCollisionEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="Bomb.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -149,6 +158,15 @@
     </ClInclude>
     <ClInclude Include="unshaded.h">
       <Filter>Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="BombCreationEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="VehicleBombCollisionEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Bomb.h">
+      <Filter>Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
