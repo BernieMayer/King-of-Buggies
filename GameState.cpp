@@ -118,7 +118,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vectors.push_back( playerRight);
 
 	int radarSize = 50;
-	for (int i = 0; i < numberOfPlayers(); i++)
+	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
 		if (i != playerId)
 		{
@@ -239,7 +239,7 @@ bool GameState::checkMineCollision(vec3 playerPos)
 {
 	bool collided = false;
 
-	for (int i = 0; i < mines.size(); i++)
+	for (unsigned int i = 0; i < mines.size(); i++)
 	{
 		Mine mine = mines[i];
 		vec3 minePos = mine.getPos();
@@ -251,7 +251,7 @@ bool GameState::checkMineCollision(vec3 playerPos)
 		if (abs(length(diff)) <= mine.getRadius())
 		{
 			mines.erase(mines.begin() + i);
-			return true;
+			collided = true;
 		}
 	}
 	return collided;

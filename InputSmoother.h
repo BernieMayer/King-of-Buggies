@@ -55,6 +55,10 @@ private:
 	timeb jumpTime;
 	float jumpCounterMax = 5.0f / 60.0f;
 
+	bool cheatLock = false;
+	timeb cheatTime;
+	float cheatCounterMax = 5.0f / 60.0f;
+
 	bool konamiLock = false;
 	timeb konamiTime;
 	// 5 seconds before another code can be entered
