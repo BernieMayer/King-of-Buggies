@@ -364,10 +364,14 @@ void GameManager::gameLoop()
 				BombCreationEvent* vehE = dynamic_cast<BombCreationEvent*>(e);
 				if (state.numberOfPowerups() > 0) {
 					// Get last bomb
-					Bomb* b = dynamic_cast<Bomb*>(state.getPowerup(state.numberOfPowerups() - 1));
+					Bomb* b = (Bomb*)(state.getPowerup(state.numberOfPowerups() - 1));
 					b->setRenderID(renderer.generateObjectID());
+
+					renderer.assignMeshObject(b->getRenderID(), meshInfo.getMeshPointer(CUBE));
+					renderer.assignMaterial(b->getRenderID(), &tsMat);
+					renderer.assignColor(b->getRenderID(), vec3(0.5f, 0.5f, 0.5f));
+					renderer.assignTexture(b->getRenderID(), meshInfo.getMeshPointer(CUBE)->getTextureID());
 				}
-				createBall(0.5f);
 			}
 		}
 		state.clearEvents();

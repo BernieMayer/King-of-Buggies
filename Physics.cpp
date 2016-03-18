@@ -617,13 +617,13 @@ void Physics::handleInput(Input* input, unsigned int id){
 	}
 
 	// Change to powerup eventually
-	/*
+
 	if (input->jump) {
 		// Create bomb above actor
 		createBomb(vehicle->getRigidDynamicActor()->getGlobalPose().p + PxVec3(0, 5, 0));
 		lastState->pushEvent(new BombCreationEvent(getVec3(vehicle->getRigidDynamicActor()->getGlobalPose().p + PxVec3(0, 5, 0))));
 	}
-	*/
+
 
 }
 
@@ -1422,7 +1422,8 @@ void Physics::createBomb(PxVec3 location) {
 
 	bombActors.push_back(aSphereActor);
 	dynamicActors.push_back(aSphereActor);
-	lastState->addPowerup(Bomb(bombActors.size() - 1, 60, getVec3(location)));
+	Bomb b = Bomb(bombActors.size() - 1, -1, getVec3(location));
+	lastState->addPowerup(b);
 }
 
 
