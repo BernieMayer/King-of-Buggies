@@ -24,7 +24,7 @@ public:
 	enum {UP_TEXTURE=0, OVER_TEXTURE, DOWN_TEXTURE};
 };
 
-//Determines which corner UI elements are anchohred from
+//Determines which corner UI elements are anchored from
 enum ANCHOR {TOP_LEFT, BOTTOM_LEFT, TOP_RIGHT, BOTTOM_RIGHT, CENTER};
 
 enum STATE {UP=0, OVER, DOWN};
