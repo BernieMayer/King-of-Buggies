@@ -1,11 +1,9 @@
-
 #include "Mine.h"
 
 
-Mine::Mine(double newRadius, vec3 newPos)
+Mine::Mine(double newRadius)
 {
 	radius = newRadius;
-	pos = newPos;
 }
 
 
@@ -15,9 +13,6 @@ void Mine::setRadius(double newRadius)
 }
 
 double Mine::getRadius(){ return radius; }
-
-void Mine::setPos(vec3 newPos){ pos = newPos; }
-vec3 Mine::getPos(){ return pos; }
 
 
 

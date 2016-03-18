@@ -188,6 +188,18 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		jumpLock = false;
 	}
 	
+	if (out.cheat_coin && !cheatLock) {
+		cheatLock = true;
+		cheatTime = timer.getCurrentTime();
+	}
+	else if (cheatLock && timer.getTimeSince(cheatTime) < cheatCounterMax) {
+		out.cheat_coin = false;
+	}
+	else if (cheatLock && timer.getTimeSince(cheatTime) >= cheatCounterMax) {
+		out.cheat_coin = false;
+		cheatLock = false;
+	}
+
 
 	return out;
 }

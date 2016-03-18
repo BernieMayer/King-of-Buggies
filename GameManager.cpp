@@ -211,17 +211,17 @@ void GameManager::createPowerup(unsigned int objectID)
 {
 	unsigned int powerup = renderer.generateObjectID();
 	//state.getPowerup(i)->setRenderID(powerup);
+	MeshObject* powerupMesh = meshInfo.getMeshPointer(MINE);
 
-	MeshObject powerupMesh = meshInfo.getMesh(objectID);
-	vector<vec3> powerupVerts = powerupMesh.getVertices();
-	vector<vec3> powerupNormals = powerupMesh.getNormals();
-	vector<unsigned int> powerupIndices = powerupMesh.getIndices();
-
-	renderer.assignMesh(powerup, &powerupVerts);
-	renderer.assignNormals(powerup, &powerupNormals);
-	renderer.assignIndices(powerup, &powerupIndices);
+	renderer.assignMeshObject(powerup, powerupMesh);
 	renderer.assignMaterial(powerup, &tsMat);
+	renderer.assignColor(powerup, vec3(1.f, 0.f, 0.f));
 	//renderer.assignTexture()
+	Mine newMine = Mine(3.0);
+	
+	newMine.setPos(vec3(0.f, (state.getPlayer(0)->getPos().x + 1), 0.f));
+	newMine.setRenderID(powerup);
+	state.addMine(newMine);
 }
 
 void GameManager::createBoostPad(vec3 position)
@@ -391,10 +391,10 @@ void GameManager::gameLoop()
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
 			
-			inputs[0].cheat_coin = false;
+			//inputs[0].cheat_coin = false;
 
 			//
-			VehicleTraits traits = VehicleTraits(physics.getMaterial());
+			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
 
 
@@ -407,8 +407,7 @@ void GameManager::gameLoop()
 			if (state.numberOfMines() < 20){
 				//input[0].cheat_coin = false;
 				printf("cheated in placing a Mine \n");
-				Mine newMine = Mine(3.0, (state.getPlayer(0)->getPos() - vec3(5, 0, 0)));
-				state.addMine(newMine);
+				createPowerup(MINE);
 
 				//TEST
 				//physics.applyMineExplosion(0);

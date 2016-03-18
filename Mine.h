@@ -6,17 +6,13 @@
 class Mine: public Powerup {
 
 public:
-	void setRadius(double newRaduis);
+	void setRadius(double newRadius);
 	double getRadius();
 
-	void setPos(vec3 newPos);
-	vec3 getPos();
-
-	Mine(double newRadius, vec3 newPos);
+	Mine(double newRadius);
 	
 private:
 	double radius;
-	vec3 pos;
 
 };
 
