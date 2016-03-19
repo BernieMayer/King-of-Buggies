@@ -616,16 +616,6 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
-	// Change to powerup eventually
-
-	if (input->jump) {
-		// Create bomb above actor
-		vec3 location = 5.0f * lastState->getPlayer(id)->getForward() + lastState->getPlayer(id)->getPos();
-		createBomb(getPxVec3(location), id);
-		lastState->pushEvent(new BombCreationEvent(location));
-	}
-
-
 }
 
 void Physics::initScene()
@@ -1410,10 +1400,10 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 	}
 }
 
-void Physics::createBomb(PxVec3 location, int playerID) {
+int Physics::createBomb(vec3 location, int playerID) {
 	// Add dynamic thrown ball to scene
-	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(PxVec3(location.x, location.y, location.z)));
-	aSphereActor->setMass(500);
+	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(getPxVec3(location)));
+	aSphereActor->setMass(1200);
 	float radius = 0.5f;
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
 
@@ -1439,8 +1429,8 @@ void Physics::createBomb(PxVec3 location, int playerID) {
 
 	bombActors.push_back(aSphereActor);
 	dynamicActors.push_back(aSphereActor);
-	Bomb b = Bomb(bombActors.size() - 1, -1, getVec3(location));
-	lastState->addPowerup(b);
+
+	return bombActors.size() - 1;
 }
 
 
@@ -1473,6 +1463,13 @@ void Physics::bombExplosion(int bombID) {
 		}
 	}
 	bombActors.erase(bombActors.begin() + bombID);
+
+	for (int i = 0; i < lastState->numberOfPowerups(); i++) {
+		// Subtract 1 from physics id if spot in bombs list was modified
+		if (i > bombID) {
+			lastState->getPowerup(i)->setPhysicsID(lastState->getPowerup(i)->getPhysicsID() - 1);
+		}
+	}
 }
 
 #endif 

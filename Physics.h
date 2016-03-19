@@ -103,6 +103,8 @@ public:
 	bool goldenBuggyLock = false;
 	timeb gbLockStartTime;
 
+	int createBomb(vec3 location, int playerID);
+
 
 private:
 	Timer clock;
@@ -185,7 +187,6 @@ private:
 	PxVec3 getPxVec3(vec3 vec) { return PxVec3(vec.x, vec.y, vec.z); }
 	vec3 getVec3(PxVec3 vec) { return vec3(vec.x, vec.y, vec.z); }
 
-	void createBomb(PxVec3 location, int playerID);
 	void bombExplosion(int bombID);
 };
 

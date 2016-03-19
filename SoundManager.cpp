@@ -436,13 +436,13 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	}
 
 	// Change to menu later
-	if (inputs[0].powerup && !paused && !secretPlaying) {
+	if (inputs[0].menu && !paused && !secretPlaying) {
 		paused = true;
 		if (!secretPlaying) {
 			playPauseSong(state);
 		}
 	}
-	else if (inputs[0].powerup && paused) {
+	else if (inputs[0].menu && paused) {
 		paused = false;
 		if (!secretPlaying) {
 			alSourcePause(musicSource);

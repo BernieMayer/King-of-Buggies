@@ -357,6 +357,7 @@ bool InputSmoother::checkKonamiCode() {
 			}
 			counter--;
 		}
+		return false;
 	}
 	else {
 		// Otherwise, stop checking

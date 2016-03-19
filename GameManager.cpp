@@ -318,7 +318,7 @@ void GameManager::gameLoop()
 
 
 		//I'm leaving a comment here so that once we add powerups we change the pause key
-		if (inputs[0].powerup)
+		if (inputs[0].menu)
 		{
 			paused = !paused;
 
@@ -354,8 +354,28 @@ void GameManager::gameLoop()
 		}
 
 		
+		for (int i = 0; i < state.numberOfPlayers(); i++) {
+			if (inputs[i].powerup) {
+				vec3 location = 5.0f * state.getPlayer(i)->getForward() + state.getPlayer(i)->getPos();
+				Bomb b = Bomb(physics.createBomb(location, i), renderer.generateObjectID(), location);
+				state.addPowerup(b);
 
-		
+				/*
+				vector<vec3> mesh;
+				vector<vec3> normals;
+				vector<vec2> uvs;
+				vector<unsigned int> indices;
+				renderer.assignSphere(b->getRenderID(), 0.5f, 5, &mesh, &normals, &uvs, &indices);
+				*/
+
+
+				renderer.assignMeshObject(b.getRenderID(), meshInfo.getMeshPointer(CUBE));
+				renderer.assignMaterial(b.getRenderID(), &tsMat);
+				renderer.assignColor(b.getRenderID(), vec3(0.5f, 0.5f, 0.5f));
+				renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(CUBE)->getTextureID());
+				state.pushEvent(new BombCreationEvent(location));
+			}
+		}
 
 		//Update game state and renderer
 		physics.updateGameState(&state, frameTime);
@@ -365,21 +385,7 @@ void GameManager::gameLoop()
 		for (int i = 0; i < state.getNbEvents(); i++) {
 			Event* e = state.getEvent(i);
 
-			if (e->getType() == BOMB_CREATION_EVENT)
-			{
-				BombCreationEvent* vehE = dynamic_cast<BombCreationEvent*>(e);
-				if (state.numberOfPowerups() > 0) {
-					// Get last bomb
-					Bomb* b = (Bomb*)(state.getPowerup(state.numberOfPowerups() - 1));
-					b->setRenderID(renderer.generateObjectID());
-
-					renderer.assignMeshObject(b->getRenderID(), meshInfo.getMeshPointer(CUBE));
-					renderer.assignMaterial(b->getRenderID(), &tsMat);
-					renderer.assignColor(b->getRenderID(), vec3(0.5f, 0.5f, 0.5f));
-					renderer.assignTexture(b->getRenderID(), meshInfo.getMeshPointer(CUBE)->getTextureID());
-				}
-			}
-			else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
+			if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
 				// Remove bomb
 			}
 		}
