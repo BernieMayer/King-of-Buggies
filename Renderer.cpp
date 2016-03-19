@@ -252,6 +252,11 @@ void Renderer::updateObjectTransforms(GameState* state)
 		assignTransform(coin->getRenderID(), coin->getTransform());
 	}
 
+	for (unsigned int i = 0; i < state->numberOfMines(); i++)
+	{
+		Mine* mine = state->getMine(i);
+		assignTransform(mine->getRenderID(), mine->getTransform());
+	}
 }
 
 
@@ -909,6 +914,10 @@ void Renderer::assignSkyDome(unsigned int id, float radius, unsigned int divisio
 
 }
 
+void Renderer::deleteDrawableObject(int objectID)
+{
+	objects[objectID].deleted = true;
+}
 
 
 /**

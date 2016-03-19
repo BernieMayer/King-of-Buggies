@@ -211,7 +211,6 @@ void GameManager::createCoin(unsigned int coinIndex)
 void GameManager::createPowerup(unsigned int objectID)
 {
 	unsigned int powerup = renderer.generateObjectID();
-	//state.getPowerup(i)->setRenderID(powerup);
 	MeshObject* powerupMesh = meshInfo.getMeshPointer(MINE);
 
 	renderer.assignMeshObject(powerup, powerupMesh);
@@ -220,7 +219,14 @@ void GameManager::createPowerup(unsigned int objectID)
 	//renderer.assignTexture()
 	Mine newMine = Mine(3.0);
 	
-	newMine.setPos(vec3(0.f, (state.getPlayer(0)->getPos().x + 1), 0.f));
+	vec3 playerPos = state.getPlayer(0)->getPos();
+	vec3 playerForward = state.getPlayer(0)->getForward();
+
+	// there is definitely a simpler way of doing this
+	vec3 placementVec = playerPos - (playerForward);
+	placementVec = placementVec - (playerForward);
+	placementVec = placementVec - (playerForward);
+	newMine.setPos(vec3((placementVec.x), (placementVec.y - 1), (placementVec.z)));
 	newMine.setRenderID(powerup);
 	state.addMine(newMine);
 }
@@ -393,7 +399,7 @@ void GameManager::gameLoop()
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
 			bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
-			bool hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
+			int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
 			if (hasCoinCollision){
 				//TODO change to all
 				physics.modifySpeed(i, 0.3333f);
@@ -404,9 +410,11 @@ void GameManager::gameLoop()
 				//physics.applySpeedPadBoost(i);
 			}
 
-			if (hasMineCollision){
+			if (hasMineCollision > -1){
 				printf("Mine Explosion! \n");
-				//physics.applyMineExplosion(i);
+				physics.applyMineExplosion(i);
+				renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
+				state.removeMine(hasMineCollision);
 			}
 		}
 
@@ -414,9 +422,6 @@ void GameManager::gameLoop()
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
 			
-			//inputs[0].cheat_coin = false;
-
-			//
 			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
 
@@ -428,15 +433,9 @@ void GameManager::gameLoop()
 			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 			
 			if (state.numberOfMines() < 20){
-				//input[0].cheat_coin = false;
 				printf("cheated in placing a Mine \n");
 				createPowerup(MINE);
-
-				//TEST
-				//physics.applyMineExplosion(0);
 			}
-		
-		
 		}
 
 		//Update camera position
