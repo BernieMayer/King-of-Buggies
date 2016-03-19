@@ -1422,6 +1422,10 @@ int Physics::createBomb(vec3 location, int playerID) {
 	// Set velocity to be same direction of player, but faster 
 	vec3 velocity = lastState->getPlayer(playerID)->getForward();
 	float speedMod = lastState->getPlayer(playerID)->getFSpeed() * 2;
+	// Ensures forwards throwing when moving backwards or not moving
+	if (speedMod < 30) {
+		speedMod = 30;
+	}
 	velocity = speedMod * velocity;
 	aSphereActor->setLinearVelocity(getPxVec3(velocity));
 
