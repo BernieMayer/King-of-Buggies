@@ -489,6 +489,10 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			GoldenBuggySwitchEvent* gbE = dynamic_cast<GoldenBuggySwitchEvent*>(e);
 			playSound("Boom.wav", gbE->gbPos, 1.0f);
 		}
+		else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
+			VehicleBombCollisionEvent* boomE = dynamic_cast<VehicleBombCollisionEvent*>(e);
+			playSound("LittleBoom.wav", boomE->location, 1.0f);
+		}
 	}
 	// Feel free to remove this. It has no purpose, just sounds funny
 	//updateMusicPitch(state, inputs[0]);
