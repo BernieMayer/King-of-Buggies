@@ -33,6 +33,7 @@ private:
 	void initOpenAL(GameState state);
 	void initListener(GameState state);
 	void startMusic(GameState state);
+	float distanceVolumeAdjuster(float volume, vec3 pos);
 	void startEngineSounds(GameState state);
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
@@ -48,6 +49,9 @@ private:
 	ALuint musicSource;
 	ALuint engineSources[5];
 	ALuint listener;
+	vec3 listenerPos;
+	// Higher and distance will have less of an effect on volume, lower will increase the effect
+	float distanceDivider = 10.0f;
 
 	float musicVolume = 1.0;
 	float idleEngineVolume = 0.08;

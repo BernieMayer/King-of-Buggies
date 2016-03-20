@@ -35,6 +35,7 @@ void SoundManager::initListener(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
 	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos()).data();
+	listenerPos = p1->getPos();
 	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
 	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp()).data();
 
@@ -66,6 +67,16 @@ void SoundManager::startMusic(GameState state) {
 	alSourcePlay(musicSource);
 }
 
+float SoundManager::distanceVolumeAdjuster(float volume, vec3 pos) {
+	float distanceVolumeMod = length(listenerPos - pos) / distanceDivider;
+	if (distanceVolumeMod <= 1) {
+		distanceVolumeMod = 1.0f;
+	}
+	distanceVolumeMod = 1 / distanceVolumeMod;
+
+	return distanceVolumeMod * volume;
+}
+
 /*
  * Initializes engines sounds to play at the location of players
  */
@@ -80,9 +91,11 @@ void SoundManager::startEngineSounds(GameState state) {
 		ALfloat *SourcePos = vec3ToALfloat(player->getPos()).data();
 		ALfloat *SourceVel = vec3ToALfloat(player->getVelocity()).data();
 
+		float volume = distanceVolumeAdjuster(idleEngineVolume, state.getPlayer(i)->getPos());
+
 		alSourcei(engineSources[i], AL_BUFFER, buffer);
 		alSourcef(engineSources[i], AL_PITCH, 1.0f);
-		alSourcef(engineSources[i], AL_GAIN, idleEngineVolume);
+		alSourcef(engineSources[i], AL_GAIN, volume);
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
@@ -99,6 +112,7 @@ void SoundManager::updateListener(GameState state) {
 	PlayerInfo* p1 = state.getPlayer(0);
 
 	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos()).data();
+	listenerPos = p1->getPos();
 	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
 	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp()).data();
 
@@ -144,7 +158,10 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		
 
 		accelInput = map(accelInput, 0, 600, 1, 16);
-		alSourcef(engineSources[i], AL_GAIN, idleEngineVolume * accelInput);
+
+		float volume = distanceVolumeAdjuster(idleEngineVolume * accelInput, state.getPlayer(i)->getPos());
+
+		alSourcef(engineSources[i], AL_GAIN, volume);
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
@@ -165,9 +182,11 @@ void SoundManager::updateHonks(GameState state, Input inputs[]) {
 				ALfloat *SourcePos = vec3ToALfloat(player->getPos()).data();
 				ALfloat *SourceVel = vec3ToALfloat(player->getVelocity()).data();
 
+
+				float volume = distanceVolumeAdjuster(1.0, state.getPlayer(i)->getPos());
 				alSourcei(honkSources[i], AL_BUFFER, buffer);
 				alSourcef(honkSources[i], AL_PITCH, 1.0);
-				alSourcef(honkSources[i], AL_GAIN, 1.0);
+				alSourcef(honkSources[i], AL_GAIN, volume);
 				alSourcefv(honkSources[i], AL_POSITION, SourcePos);
 				alSourcefv(honkSources[i], AL_VELOCITY, SourceVel);
 				alSourcei(honkSources[i], AL_LOOPING, AL_TRUE);
@@ -301,20 +320,7 @@ void SoundManager::playBumpSound(vec3 pos, float volume) {
 * Loads and plays a bump sound once at the given position
 */
 void SoundManager::playDingSound(vec3 pos) {
-	ALuint dingSource;
-	ALuint buffer;
-
-	loadWavToBuf("Ding.wav", &dingSource, &buffer);
-
-	ALfloat *SourcePos = vec3ToALfloat(pos).data();
-
-	alSourcei(dingSource, AL_BUFFER, buffer);
-	alSourcef(dingSource, AL_PITCH, 1.0f);
-	alSourcef(dingSource, AL_GAIN, 1.0f);
-	alSourcefv(dingSource, AL_POSITION, SourcePos);
-	alSourcei(dingSource, AL_LOOPING, AL_FALSE);
-
-	alSourcePlay(dingSource);
+	playSound("Ding.wav", pos, 1.0);
 }
 
 void SoundManager::playSecretMusic(GameState state) {
@@ -407,9 +413,12 @@ void SoundManager::playSound(string fileName, vec3 pos, float volume) {
 	ALuint source;
 	ALuint buffer;
 
+	
+
 	loadWavToBuf(fileName, &source, &buffer);
 
 	ALfloat *SourcePos = vec3ToALfloat(pos).data();
+	volume = distanceVolumeAdjuster(volume, pos);
 
 	alSourcei(source, AL_BUFFER, buffer);
 	alSourcef(source, AL_PITCH, 1.0f);
