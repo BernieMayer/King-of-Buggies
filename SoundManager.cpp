@@ -23,6 +23,9 @@ void SoundManager::initOpenAL(GameState state) {
 	ALCcontext* context = alcCreateContext(device, NULL);
 	alcMakeContextCurrent(context);
 
+	alDistanceModel(AL_LINEAR_DISTANCE);
+	alDopplerFactor(1.0f);
+
 	initListener(state);
 	startMusic(state);
 	startEngineSounds(state);
@@ -69,14 +72,10 @@ void SoundManager::startMusic(GameState state) {
 
 float SoundManager::distanceVolumeAdjuster(float volume, vec3 pos) {
 	float distanceVolumeMod = length(listenerPos - pos) / distanceDivider;
-	if (distanceVolumeMod <= 1) {
-		distanceVolumeMod = 1.0f;
-	}
+	// Ensures that volume the denominator will never be less than 1
+	// thus the volume returned will never be greater than the input volume
+	distanceVolumeMod += 1.0f;
 	distanceVolumeMod = 1 / distanceVolumeMod;
-
-	if (distanceVolumeMod > 1.0f) {
-		distanceVolumeMod = 1.0f;
-	}
 
 	return distanceVolumeMod * volume;
 }
@@ -103,6 +102,8 @@ void SoundManager::startEngineSounds(GameState state) {
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
+
+		//alSourcei(engineSources[i], AL_REFERENCE_DISTANCE, )
 
 		alSourcePlay(engineSources[i]);
 	}
@@ -164,7 +165,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		accelInput = map(accelInput, 0, 600, 1, 16);
 
 		float volume = distanceVolumeAdjuster(idleEngineVolume * accelInput, state.getPlayer(i)->getPos());
-
+		
 		alSourcef(engineSources[i], AL_GAIN, volume);
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
@@ -471,8 +472,6 @@ void SoundManager::playSound(string fileName, vec3 pos, float volume) {
 	ALuint source;
 	ALuint buffer;
 
-	
-
 	loadWavToBuf(fileName, &source, &buffer);
 
 	ALfloat *SourcePos = vec3ToALfloat(pos).data();
@@ -585,8 +584,9 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		}
 		else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
 			VehicleBombCollisionEvent* boomE = dynamic_cast<VehicleBombCollisionEvent*>(e);
-			stopFuse(boomE->ob2);
+			
 			playSound("LittleBoom.wav", boomE->location, 1.0f);
+			stopFuse(boomE->ob2);
 		}
 	}
 	// Feel free to remove this. It has no purpose, just sounds funny
