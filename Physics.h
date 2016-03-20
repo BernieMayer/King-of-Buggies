@@ -110,7 +110,7 @@ private:
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 
-	Vehicle* goldenBuggy;		       //Should be a vehicle
+	Vehicle* goldenBuggy;	       //Should be a vehicle
 
 	vector<PxMaterial*> materials;
 

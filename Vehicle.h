@@ -34,7 +34,7 @@ class Vehicle : public PxVehicleDrive4W  {
 public:
     int numOfVehicles = 0;
 
-	PxVehicleDrive4W* vehDrive4W;
+	PxVehicleDrive4W* vehDrive4W = NULL;
 
 	
 
@@ -53,7 +53,9 @@ public:
 	void setSpeed(float speed);
 	void applyNitroBoost();
 
-	Vehicle(PxPhysics& phys, PxCooking& cook, VehicleTraits traits, vec3 initPos);
+	Vehicle(PxPhysics& phys, PxCooking& cook, PxScene& aScene, VehicleTraits traits, vec3 initPos);
+	Vehicle(PxVehicleDrive4W& veh);
+	Vehicle(){};
 
 	PxVec3 getPxVec3(const vec3& vec);
 
@@ -62,9 +64,10 @@ private:
 	PxMaterial* mMaterial = NULL;
 	PxPhysics* mPhysics = NULL;
 	PxCooking* mCooking = NULL;
+	PxScene* gScene = NULL;
 
 
-	Vehicle* initVehicle(VehicleTraits traits, PxVec3 initPos);
+	PxVehicleDrive4W* initVehicle(VehicleTraits traits, PxVec3 initPos);
 	PxRigidDynamic* initVehicleActor(const PxF32 wheelWidth, const PxF32 wheelRadius, const PxU32 nbWheels, const PxVec3 chassisDims,
 		const PxVec3 chassisMOI, const PxF32 chassisMass, const PxVec3 chassisCMOffset, const PxVec3 initPos);
 

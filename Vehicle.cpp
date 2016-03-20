@@ -17,12 +17,18 @@ struct FilterGroup
 
 
 
-Vehicle::Vehicle(PxPhysics& phys, PxCooking& cook, VehicleTraits traits, vec3 initPos){
+Vehicle::Vehicle(PxPhysics& phys, PxCooking& cook, PxScene& aScene, VehicleTraits traits, vec3 initPos){
 	mPhysics =  &phys;
 	mMaterial = mPhysics->createMaterial(0.8f, 0.8f, 0.6f);
 	mCooking = &cook;
+	gScene = &aScene;
 	gear = 0;
 	vehicle_create(traits, initPos);
+}
+
+Vehicle::Vehicle(PxVehicleDrive4W& veh)
+{
+	vehDrive4W = &veh;
 }
 
 void updateGameState(GameState* state)
@@ -61,14 +67,14 @@ unsigned int Vehicle::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	vehicleNum = numOfVehicles;
 	numOfVehicles++;
-	initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z));
+	vehDrive4W =initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z));
 
 	gear = -1;
 	inAir = false;
 	return numOfVehicles - 1;
 }
 
-Vehicle* Vehicle::initVehicle(VehicleTraits traits, PxVec3 initPos) {
+PxVehicleDrive4W* Vehicle::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 
 	// Create the batched scene queries for the supension raycasts
 	//gVehicleSceneQueryData
@@ -82,12 +88,12 @@ Vehicle* Vehicle::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 		traits.chassisDims, traits.wheelWidth, traits.wheelRadius,
 		traits.wheelMass, traits.wheelMOI, traits.chassisCMOffset,
 		traits.chassisMass);
-	
+
 	//Set up the sim data for the vehicle drive model.
 	PxVehicleDriveSimData4W driveSimData = initDriveSimData(wheelsSimData);
 	
 	//Create a vehicle from the wheels and drive sim data.
-	vehDrive4W = PxVehicleDrive4W::allocate(traits.numWheels);
+	PxVehicleDrive4W* vehDrive4W = PxVehicleDrive4W::allocate(traits.numWheels);
 	vehDrive4W->setup(mPhysics, veh4WActor, *wheelsSimData, driveSimData,
 		traits.numWheels - 4);
 
@@ -95,11 +101,12 @@ Vehicle* Vehicle::initVehicle(VehicleTraits traits, PxVec3 initPos) {
 	//Free the sim data because we don't need that any more.
 	wheelsSimData->free();
 
-	//gScene->addActor(*veh4WActor);
+	gScene->addActor(*veh4WActor);
+
 
 	vehDrive4W->mDriveDynData.setUseAutoGears(true);
-	
-	return this;
+
+	return vehDrive4W;
 }
 
 PxRigidDynamic* Vehicle::createVehicleActor(const PxVehicleChassisData& chassisData,

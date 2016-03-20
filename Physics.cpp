@@ -152,17 +152,22 @@ Physics::Physics() {
 
 unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
-	
-	vehicleActors.push_back(Vehicle(* mPhysics, * mCooking, traits, initPos));
+	PxVehicleDrive4W* veh = initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z));
+	vehicleActors.push_back(Vehicle(* veh));
 
 	//This shouldn't be in physics at all
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggy
 	if (vehicleActors.size() == 1){
-		goldenBuggy = & vehicleActors[0];
+		goldenBuggy = &vehicleActors[0];
 		modifySpeed(0, 3);
 	}
 	vehicleForwards.push_back(-1);
 	vehicleInAir.push_back(true);
+
+	
+
+	
+
 	return vehicleActors.size() - 1;
 }
 void Physics::modifySpeed(unsigned int vehicleNum , float modSpeed)
@@ -242,7 +247,7 @@ mat4 Physics::vehicle_getGlobalPose(unsigned int id)
 		printf("Error: Vehicle does not exist\n");
 		return mat4(1.f);
 	}
-	return getMat4(vehicleActors[id].getRigidDynamicActor()->getGlobalPose());
+	return getMat4(vehicleActors[id].vehDrive4W->getRigidDynamicActor()->getGlobalPose());
 }
 
 mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
@@ -259,7 +264,7 @@ mat4 Physics::vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum)
 	}
 
 	PxShape* wheelShape[1];
-	vehicleActors[id].getRigidDynamicActor()->getShapes(wheelShape, 1, wheelNum);
+	vehicleActors[id].vehDrive4W->getRigidDynamicActor()->getShapes(wheelShape, 1, wheelNum);
 
 	return vehicle_getGlobalPose(id)*getMat4(wheelShape[0]->getLocalPose());
 }
@@ -270,7 +275,7 @@ float Physics::vehicle_getFSpeed(unsigned int id) {
 		printf("Error: Vehicle does not exist\n");
 		return 0.0f;
 	}
-	return vehicleActors[id].computeForwardSpeed();
+	return vehicleActors[id].vehDrive4W->computeForwardSpeed();
 }
 
 float Physics::vehicle_getSSpeed(unsigned int id) {
@@ -280,7 +285,7 @@ float Physics::vehicle_getSSpeed(unsigned int id) {
 		return 0.0f;
 	}
 
-	return vehicleActors[id].computeSidewaysSpeed();
+	return vehicleActors[id].vehDrive4W->computeSidewaysSpeed();
 }
 
 bool Physics::vehicle_getForwardsGear(unsigned int id) {
@@ -305,7 +310,7 @@ float Physics::vehicle_getEngineSpeed(unsigned int id) {
 		return 0.0f;
 	}
 
-	return vehicleActors[id].mDriveDynData.getEngineRotationSpeed();
+	return vehicleActors[id].vehDrive4W->mDriveDynData.getEngineRotationSpeed();
 }
 
 
@@ -1258,7 +1263,7 @@ void Physics::buggyExplosion(int gBuggyIndex) {
 
 			float force = 8000000;
 			vec = (force * (1 / (distance * distance))) * vec;
-			vehicleActors[i].getRigidDynamicActor()->addForce(getPxVec3(vec));
+			vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
 		}
 	}
 }
@@ -1282,11 +1287,11 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 			bool isVehicle2 = false;
 
 			for (int i = 0; i < vehicleActors.size(); i++) {
-				if (actor1 == vehicleActors[i].getRigidDynamicActor()) {
+				if (actor1 == vehicleActors[i].vehDrive4W->getRigidDynamicActor()) {
 					isVehicle1 = true;
 					index1 = i;
 				}
-				if (actor2 == vehicleActors[i].getRigidDynamicActor()) {
+				if (actor2 == vehicleActors[i].vehDrive4W->getRigidDynamicActor()) {
 					isVehicle2 = true;
 					index2 = i;
 				}
@@ -1311,10 +1316,12 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				}
 			}
 
-			if ((pairHeader.actors[0] == goldenBuggy->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggy->getRigidDynamicActor()))
+			Vehicle* goldenBuggieContact =  &vehicleActors[indexOfGoldenBuggy];
+
+			if ((pairHeader.actors[0] == goldenBuggieContact->vehDrive4W->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggieContact->vehDrive4W->getRigidDynamicActor()))
 			{
 				int pairIndexOfGoldenBuggy;
-				if (pairHeader.actors[0] == goldenBuggy->getRigidDynamicActor())
+				if (pairHeader.actors[0] == goldenBuggieContact->vehDrive4W->getRigidDynamicActor())
 					pairIndexOfGoldenBuggy = 0;
 				else
 					pairIndexOfGoldenBuggy = 1;
@@ -1323,7 +1330,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				{
 					if (!goldenBuggyLock) {
 						if (pairIndexOfGoldenBuggy == 0){
-							if (pairHeader.actors[1] == vehicleActors[i].getRigidDynamicActor())
+							if (pairHeader.actors[1] == vehicleActors[i].vehDrive4W->getRigidDynamicActor())
 							{
 								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
@@ -1340,7 +1347,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 							}
 						}
 						else {
-							if (pairHeader.actors[0] == vehicleActors[i].getRigidDynamicActor())
+							if (pairHeader.actors[0] == vehicleActors[i].vehDrive4W->getRigidDynamicActor())
 							{
 								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
 								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
