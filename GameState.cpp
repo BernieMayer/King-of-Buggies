@@ -288,6 +288,12 @@ Powerup* GameState::getPowerup(unsigned int powerupNum)
 		return NULL;
 }
 
+void GameState::removePowerup(unsigned int powerupNum) {
+	if (powerupNum < powerups.size()) {
+		powerups.erase(powerups.begin() + powerupNum);
+	}
+}
+
 unsigned int GameState::numberOfPowerups(){ return powerups.size(); }
 
 void GameState::addPowerupBox(const PowerupBox& box) { boxes.push_back(box); }

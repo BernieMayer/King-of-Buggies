@@ -616,6 +616,10 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
+	if (bombActors.size() > 0) {
+		//cout << "Bomb x: " << bombActors[0]->getGlobalPose().p.x << "\n";
+	}
+
 }
 
 void Physics::initScene()
@@ -1403,7 +1407,8 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 int Physics::createBomb(vec3 location, int playerID) {
 	// Add dynamic thrown ball to scene
 	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(getPxVec3(location)));
-	aSphereActor->setMass(1200);
+	aSphereActor->setMass(800);
+	cout << "Mass: " << aSphereActor->getMass();
 	float radius = 0.5f;
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
 
@@ -1474,6 +1479,8 @@ void Physics::bombExplosion(int bombID) {
 			lastState->getPowerup(i)->setPhysicsID(lastState->getPowerup(i)->getPhysicsID() - 1);
 		}
 	}
+
+	lastState->removePowerup(bombID);
 }
 
 #endif 

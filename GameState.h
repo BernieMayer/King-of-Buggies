@@ -102,6 +102,7 @@ public:
 	void addPowerup(const Powerup& powerup);
 	void setPowerup(unsigned int powerupNum, const Powerup& powerup);
 	Powerup* getPowerup(unsigned int powerupNum);
+	void removePowerup(unsigned int powerupNUum);
 	unsigned int numberOfPowerups();
 
 	//Powerup box management
