@@ -30,13 +30,14 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\mine.obj");
-	MeshObject mineObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	unsigned int texID = LoadTexture("textures\\minetexture.png");
+	MeshObject mineObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(mineObject);
 
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\bomb.obj");
-	unsigned int texID = LoadTexture("textures\\bombtexture.png");
+	texID = LoadTexture("textures\\bombtexture.png");
 	MeshObject bombObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(bombObject);
 

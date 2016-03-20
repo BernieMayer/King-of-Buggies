@@ -215,8 +215,7 @@ void GameManager::createPowerup(unsigned int objectID)
 
 	renderer.assignMeshObject(powerup, powerupMesh);
 	renderer.assignMaterial(powerup, &tsMat);
-	renderer.assignColor(powerup, vec3(1.f, 0.f, 0.f));
-	//renderer.assignTexture()
+	renderer.assignTexture(powerup, powerupMesh->getTextureID());
 	Mine newMine = Mine(3.0);
 	
 	vec3 playerPos = state.getPlayer(0)->getPos();
