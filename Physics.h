@@ -2,6 +2,7 @@
 #define PHYSICS_H
 
 #include <math.h>
+#include "Vehicle.h"
 #include "PxSimulationEventCallback.h"
 #include "MeshObject.h"
 #include "LevelInfo.h"
@@ -16,12 +17,14 @@
 #include "VehicleWallCollisionEvent.h"
 
 //Hello World (Test commit)
+//Hola
 
 const float gravity = -9.81f;
 
 using namespace physx;
 
-//Tire types.
+//Tire types. Part of Vehicle
+/*
 enum
 {
 	TIRE_TYPE_NORMAL = 0,
@@ -29,7 +32,7 @@ enum
 	,
 	MAX_NUM_TIRE_TYPES
 };
-
+*/
 enum
 {
 	SURFACE_TYPE_TARMAC,
@@ -49,7 +52,7 @@ public:
 	void handleInput(Input* input, unsigned int id);
 
 	//Should be migrated to Vehicle class
-	void modifySpeed(unsigned int vehicleNum, float modSpeed);
+	void modifySpeed(unsigned int vehicleNum, float modSpeed);	//revised to Vehicle class BM
 	void setSpeed(unsigned int vehicleNum, float speed);
 	void applySpeedPadBoost(unsigned int vechicleNum);
 	void applyNitroBoost(unsigned int vehicleNum);
@@ -62,8 +65,8 @@ public:
 
 	All of these methods should be migrated to the Vehicle.h & Vehicle.cpp future classes
 	*/
-	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle
-	void vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits);		//Modify vehicle traits
+	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle (Ported to Vehicle Bernie Mayer)
+	void vehicle_setVehicleTraits(unsigned int id, VehicleTraits traits);		//Modify vehicle traits 
 	mat4 vehicle_getGlobalPose(unsigned int id);
 	mat4 vehicle_getGlobalPoseWheel(unsigned int id, unsigned int wheelNum);
 	float vehicle_getFSpeed(unsigned int id);
@@ -103,11 +106,11 @@ public:
 
 private:
 	Timer clock;
-	vector<PxVehicleDrive4W*> vehicleActors;	//Eventually should be a vector of Vehicles
+	vector<Vehicle> vehicleActors;	//Eventually should be a vector of Vehicles
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 
-	PxVehicleDrive4W* goldenBuggy;		       //Should be a vehicle
+	Vehicle* goldenBuggy;	       //Should be a vehicle
 
 	vector<PxMaterial*> materials;
 
@@ -115,13 +118,13 @@ private:
 	PxDefaultErrorCallback gErrorCallback;
 
 	PxFoundation* mFoundation = NULL;
-	PxPhysics* mPhysics = NULL;
-	PxCooking* mCooking = NULL;
+	PxPhysics* mPhysics = NULL;			//Now is a part of Vehicle as well
+	PxCooking* mCooking = NULL;			//Now is a part of Vehicle as well
 
 	PxDefaultCpuDispatcher* mDispatcher = NULL;
 	PxScene* gScene = NULL;
 
-	PxMaterial* mMaterial = NULL;
+	PxMaterial* mMaterial = NULL;		//A version of this has been added to Vehicle (Bernie Mayer)
 
 	PxVehicleDrive4WRawInputData* inputs[4];	//Move to Vehicle.h & Vehicle.cpp
 
@@ -150,18 +153,18 @@ private:
 
 	//Wheel positions move to vehicle class
 	void computeWheelCenterActorOffsets4W(const PxF32 wheelFrontZ, const PxF32 wheelRearZ, const PxVec3& chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius,
-		const PxU32 numWheels, PxVec3* wheelCentreOffsets);
+		const PxU32 numWheels, PxVec3* wheelCentreOffsets);		//Now is a part of the Vehicle class
 
 	//Vehicle and wheel sim data, move to vehicle class
-	PxVehicleDriveSimData4W initDriveSimData(PxVehicleWheelsSimData* wheelsSimData);
+	PxVehicleDriveSimData4W initDriveSimData(PxVehicleWheelsSimData* wheelsSimData);		//Now is a part of the Vehicle class B.M
 	PxVehicleWheelsSimData* initWheelSimData(int nbWheels, const PxVec3 chassisDims, const PxF32 wheelWidth, const PxF32 wheelRadius, const PxF32 wheelMass,
-		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);
+		const PxF32 wheelMOI, const PxVec3 chassisCMOffset, const PxF32 chassisMass);			//Now is a part of the Vehicle class
 	void setupWheelsSimulationData
 		(const PxF32 wheelMass, const PxF32 wheelMOI, const PxF32 wheelRadius, const PxF32 wheelWidth,
 		const PxU32 numWheels, const PxVec3* wheelCenterActorOffsets,
 		const PxVec3& chassisCMOffset, const PxF32 chassisMass,
 		PxVehicleWheelsSimData* wheelsSimData);
-	void setupNonDrivableSurface(PxFilterData& filterData);
+	void setupNonDrivableSurface(PxFilterData& filterData);			//Now is a part of the Vehicle class
 	PxVehicleDrivableSurfaceToTireFrictionPairs* createFrictionPairs(const PxMaterial* defaultMaterial);
 
 	//Initialize ground
@@ -170,9 +173,9 @@ private:
 	PxRigidStatic* createDrivableLevel(PxMaterial* material, PxPhysics* physics, MeshObject* levelMesh);
 
 	//Create meshes
-	PxConvexMesh* createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking);
-	PxConvexMesh* createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking);
-	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);
+	PxConvexMesh* createWheelMesh(const PxF32 width, const PxF32 radius, PxPhysics& physics, PxCooking& cooking);		//Now is a part of the Vehicle class
+	PxConvexMesh* createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking);							//Now is a part of the Vehicle class
+	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);  //Now is a part of the Vehicle class
 	PxTriangleMesh* createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* indices, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking);
 
 	void setupObstacleCollisionHandling(PxRigidActor* actor);

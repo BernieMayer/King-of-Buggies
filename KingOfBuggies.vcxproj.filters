@@ -71,6 +71,7 @@
       <Filter>Materials</Filter>
     </ClCompile>
     <ClCompile Include="LevelInfoLoader.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -150,6 +151,7 @@
     <ClInclude Include="unshaded.h">
       <Filter>Materials</Filter>
     </ClInclude>
+    <ClInclude Include="Vehicle.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

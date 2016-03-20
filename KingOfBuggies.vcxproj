@@ -104,6 +104,7 @@
     <ClInclude Include="GameStateLoader.h" />
     <ClInclude Include="GoldenBuggySwitchEvent.h" />
     <ClInclude Include="Mine.h" />
+    <ClInclude Include="Vehicle.h" />
     <ClInclude Include="VehicleCollisionEvent.h" />
     <ClInclude Include="InputSmoother.h" />
     <ClInclude Include="Keybindings.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="torranceSparrow.cpp" />
     <ClCompile Include="unshaded.cpp" />
+    <ClCompile Include="Vehicle.cpp" />
     <ClCompile Include="VehicleCollisionEvent.cpp" />
     <ClCompile Include="VehicleSceneQueryData.cpp" />
     <ClCompile Include="VehicleTraits.cpp" />
