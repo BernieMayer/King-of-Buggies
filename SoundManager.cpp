@@ -210,12 +210,62 @@ void SoundManager::updateHonks(GameState state, Input inputs[]) {
 		}
 		else {
 			if (honking[i]) {
-				alSourcePause(honkSources[i]);
+				alSourceStop(honkSources[i]);
 				honking[i] = false;
 			}
 		}
 	}
 }
+
+void SoundManager::startFuse(GameState state) {
+	ALuint buffer;
+	fuseSources.push_back(0);
+
+	loadWavToBuf("Fuse.wav", &fuseSources.back(), &buffer);
+
+	// Get most recent powerup
+	Powerup* bomb = state.getPowerup(state.numberOfPowerups() - 1);
+
+	ALfloat *SourcePos = vec3ToALfloat(bomb->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(bomb->getVelocity()).data();
+
+	float volume = distanceVolumeAdjuster(1.0f, bomb->getPos());
+
+	alSourcei(fuseSources.back(), AL_BUFFER, buffer);
+	alSourcef(fuseSources.back(), AL_PITCH, 1.0f);
+	alSourcef(fuseSources.back(), AL_GAIN, volume);
+	alSourcefv(fuseSources.back(), AL_POSITION, SourcePos);
+	alSourcefv(fuseSources.back(), AL_VELOCITY, SourceVel);
+	alSourcei(fuseSources.back(), AL_LOOPING, AL_TRUE);
+
+	alSourcePlay(fuseSources.back());
+}
+
+void SoundManager::updateFuses(GameState state) {
+	for (int i = 0; i < fuseSources.size(); i++) {
+		if (i < state.numberOfPowerups()) {
+			Powerup* bomb = state.getPowerup(i);
+
+			ALfloat *SourcePos = vec3ToALfloat(bomb->getPos()).data();
+			ALfloat *SourceVel = vec3ToALfloat(bomb->getVelocity()).data();
+
+			alSourcef(fuseSources[i], AL_PITCH, 1.0f);
+			float volume = distanceVolumeAdjuster(1.0f, bomb->getPos());
+			alSourcef(fuseSources[i], AL_GAIN, volume);
+			alSourcefv(fuseSources[i], AL_POSITION, SourcePos);
+			alSourcefv(fuseSources[i], AL_VELOCITY, SourceVel);
+			alSourcei(fuseSources[i], AL_LOOPING, AL_TRUE);
+		}
+	}
+}
+
+void SoundManager::stopFuse(int fuseNum) {
+	if (fuseNum < fuseSources.size()) {
+		alSourceStop(fuseSources[fuseNum]);
+		fuseSources.erase(fuseSources.begin() + fuseNum);
+	}
+}
+
 
 /*
  * Converts a vec3 to an array of ALfloats
@@ -328,7 +378,7 @@ void SoundManager::playDingSound(vec3 pos) {
 }
 
 void SoundManager::playSecretMusic(GameState state) {
-	alSourcePause(musicSource);
+	alSourceStop(musicSource);
 	ALuint buffer;
 	int songSelection; 
 	
@@ -370,7 +420,7 @@ void SoundManager::playSecretMusic(GameState state) {
 }
 
 void SoundManager::playPauseSong(GameState state) {
-	alSourcePause(musicSource);
+	alSourceStop(musicSource);
 	ALuint buffer;
 	loadWavToBuf("PauseSong.wav", &musicSource, &buffer);
 
@@ -440,6 +490,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateListener(state);
 	updateMusic(state);
 	updateEngineSounds(state, inputs);
+	updateFuses(state);
 
 	updateHonks(state, inputs);
 
@@ -458,7 +509,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	else if (inputs[0].menu && paused) {
 		paused = false;
 		if (!secretPlaying) {
-			alSourcePause(musicSource);
+			alSourceStop(musicSource);
 			startMusic(state);
 		}
 	}
@@ -466,7 +517,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	ALint musicState;
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
 	if (musicState == AL_STOPPED) {
-		alSourcePause(musicSource);
+		alSourceStop(musicSource);
 		secretPlaying = false;
 		if (paused) {
 			playPauseSong(state);
@@ -502,8 +553,13 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			GoldenBuggySwitchEvent* gbE = dynamic_cast<GoldenBuggySwitchEvent*>(e);
 			playSound("Boom.wav", gbE->gbPos, 1.0f);
 		}
+		else if (e->getType() == BOMB_CREATION_EVENT) {
+			BombCreationEvent* bombE = dynamic_cast<BombCreationEvent*>(e);
+			startFuse(state);
+		}
 		else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
 			VehicleBombCollisionEvent* boomE = dynamic_cast<VehicleBombCollisionEvent*>(e);
+			stopFuse(boomE->ob2);
 			playSound("LittleBoom.wav", boomE->location, 1.0f);
 		}
 	}

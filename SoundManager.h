@@ -39,6 +39,9 @@ private:
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);
 	void updateHonks(GameState state, Input inputs[]);
+	void startFuse(GameState state);
+	void updateFuses(GameState state);
+	void stopFuse(int fuseNum);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSound(string fileName, vec3 pos, float volume);
 	void playSecretMusic(GameState state);
@@ -59,6 +62,8 @@ private:
 
 	vector<bool> honking;
 	vector<ALuint> honkSources;
+
+	vector<ALuint> fuseSources;
 
 	bool paused = false;
 	bool secretPlaying = false;
