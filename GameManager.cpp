@@ -369,10 +369,9 @@ void GameManager::gameLoop()
 				*/
 
 
-				renderer.assignMeshObject(b.getRenderID(), meshInfo.getMeshPointer(CUBE));
+				renderer.assignMeshObject(b.getRenderID(), meshInfo.getMeshPointer(BOMB));
 				renderer.assignMaterial(b.getRenderID(), &tsMat);
-				renderer.assignColor(b.getRenderID(), vec3(0.5f, 0.5f, 0.5f));
-				renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(CUBE)->getTextureID());
+				renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(BOMB)->getTextureID());
 				state.pushEvent(new BombCreationEvent(location));
 			}
 		}
