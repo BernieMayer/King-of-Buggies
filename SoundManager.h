@@ -47,11 +47,14 @@ private:
 	void playSecretMusic(GameState state);
 	void playPauseSong(GameState state);
 	void updateMusicPitch(GameState state, Input input);
+	void cleanOneTimeUseSources();
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
 	ALuint engineSources[5];
 	ALuint listener;
+	vector<ALuint> oneTimeUseBuffers;
+	vector<ALuint> oneTimeUseSources;
 	vec3 listenerPos;
 	// Higher and distance will have less of an effect on volume, lower will increase the effect
 	float distanceDivider = 15.0f;
@@ -63,6 +66,7 @@ private:
 	vector<bool> honking;
 	vector<ALuint> honkSources;
 
+	vector<ALuint> fuseBuffers;
 	vector<ALuint> fuseSources;
 
 	bool paused = false;

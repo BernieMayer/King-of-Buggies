@@ -218,10 +218,10 @@ void SoundManager::updateHonks(GameState state, Input inputs[]) {
 }
 
 void SoundManager::startFuse(GameState state) {
-	ALuint buffer;
+	fuseBuffers.push_back(0);
 	fuseSources.push_back(0);
 
-	loadWavToBuf("Fuse.wav", &fuseSources.back(), &buffer);
+	loadWavToBuf("Fuse.wav", &fuseSources.back(), &fuseBuffers.back());
 
 	// Get most recent powerup
 	Powerup* bomb = state.getPowerup(state.numberOfPowerups() - 1);
@@ -231,7 +231,7 @@ void SoundManager::startFuse(GameState state) {
 
 	float volume = distanceVolumeAdjuster(1.0f, bomb->getPos());
 
-	alSourcei(fuseSources.back(), AL_BUFFER, buffer);
+	alSourcei(fuseSources.back(), AL_BUFFER, fuseBuffers.back());
 	alSourcef(fuseSources.back(), AL_PITCH, 1.0f);
 	alSourcef(fuseSources.back(), AL_GAIN, volume);
 	alSourcefv(fuseSources.back(), AL_POSITION, SourcePos);
@@ -262,7 +262,11 @@ void SoundManager::updateFuses(GameState state) {
 void SoundManager::stopFuse(int fuseNum) {
 	if (fuseNum < fuseSources.size()) {
 		alSourceStop(fuseSources[fuseNum]);
+
+		alDeleteSources(1, &fuseSources[fuseNum]);
 		fuseSources.erase(fuseSources.begin() + fuseNum);
+		alDeleteBuffers(1, &fuseBuffers[fuseNum]);
+		fuseBuffers.erase(fuseBuffers.begin() + fuseNum);
 	}
 }
 
@@ -481,6 +485,26 @@ void SoundManager::playSound(string fileName, vec3 pos, float volume) {
 	alSourcei(source, AL_LOOPING, AL_FALSE);
 
 	alSourcePlay(source);
+	oneTimeUseBuffers.push_back(buffer);
+	oneTimeUseSources.push_back(source);
+}
+
+void SoundManager::cleanOneTimeUseSources() {
+	for (int i = 0; i < oneTimeUseSources.size(); i++) {
+		ALint soundState;
+		alGetSourcei(oneTimeUseSources[i], AL_SOURCE_STATE, &soundState);
+		if (soundState == AL_STOPPED) {
+			alSourceStop(oneTimeUseSources[i]);
+			
+
+			alDeleteSources(1, &oneTimeUseSources[i]);
+			oneTimeUseSources.erase(oneTimeUseSources.begin() + i);
+			alDeleteBuffers(1, &oneTimeUseBuffers[i]);
+			oneTimeUseBuffers.erase(oneTimeUseBuffers.begin() + i);
+			
+			i--;
+		}
+	}
 }
 
 /*
@@ -493,6 +517,8 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateFuses(state);
 
 	updateHonks(state, inputs);
+
+	cleanOneTimeUseSources();
 
 	if (inputs[0].konamiCode) {
 		playSecretMusic(state);
