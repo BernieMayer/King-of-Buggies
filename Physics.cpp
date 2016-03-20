@@ -616,10 +616,6 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
-	if (bombActors.size() > 0) {
-		//cout << "Bomb x: " << bombActors[0]->getGlobalPose().p.x << "\n";
-	}
-
 }
 
 void Physics::initScene()
@@ -1258,8 +1254,9 @@ void Physics::buggyExplosion(int gBuggyIndex) {
 		if (i != gBuggyIndex) {
 			vec3 vec = lastState->getPlayer(i)->getPos() - lastState->getPlayer(gBuggyIndex)->getPos();
 			float distance = length(vec);
+			vec = normalize(vec);
 
-			float force = 8000000;
+			float force = 15000000;
 			vec = (force * (1 / (distance * distance))) * vec;
 			vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
 		}
@@ -1268,8 +1265,9 @@ void Physics::buggyExplosion(int gBuggyIndex) {
 	for (int i = 0; i < bombActors.size(); i++) {
 		PxVec3 vec = bombActors[i]->getGlobalPose().p - vehicleActors[gBuggyIndex]->getRigidDynamicActor()->getGlobalPose().p;
 		float distance = length(getVec3(vec));
+		vec = getPxVec3(normalize(getVec3(vec)));
 
-		float force = 8000000;
+		float force = 20000;
 		vec = (force * (1 / (distance * distance))) * vec;
 		bombActors[i]->addForce(vec);
 	}
@@ -1447,8 +1445,9 @@ void Physics::bombExplosion(int bombID) {
 	for (int i = 0; i < vehicleActors.size(); i++) {
 		vec3 vec = lastState->getPlayer(i)->getPos() - getVec3(bombActors[bombID]->getGlobalPose().p);
 		float distance = length(vec);
+		vec = normalize(vec);
 
-		float force = 3000000;
+		float force = 6000000;
 		vec = (force * (1 / (distance * distance))) * vec;
 		vehicleActors[i]->getRigidDynamicActor()->addForce(getPxVec3(vec));
 	}
@@ -1457,8 +1456,9 @@ void Physics::bombExplosion(int bombID) {
 		if (i != bombID) {
 			PxVec3 vec = bombActors[i]->getGlobalPose().p - bombActors[bombID]->getGlobalPose().p;
 			float distance = length(getVec3(vec));
+			vec = getPxVec3(normalize(getVec3(vec)));
 
-			float force = 3000000;
+			float force = 10000;
 			vec = (force * (1 / (distance * distance))) * vec;
 			bombActors[i]->addForce(vec);
 		}

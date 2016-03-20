@@ -74,6 +74,10 @@ float SoundManager::distanceVolumeAdjuster(float volume, vec3 pos) {
 	}
 	distanceVolumeMod = 1 / distanceVolumeMod;
 
+	if (distanceVolumeMod > 1.0f) {
+		distanceVolumeMod = 1.0f;
+	}
+
 	return distanceVolumeMod * volume;
 }
 
