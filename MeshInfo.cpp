@@ -29,8 +29,23 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
+	meshLoader.loadModel("models\\mine.obj");
+	unsigned int texID = LoadTexture("textures\\minetexture.png");
+	MeshObject mineObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
+	meshes.push_back(mineObject);
+
+	meshLoader.clearData();
+
+	meshLoader.loadModel("models\\bomb.obj");
+	texID = LoadTexture("textures\\bombtexture.png");
+	MeshObject bombObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
+	meshes.push_back(bombObject);
+
+	meshLoader.clearData();
+
 	meshLoader.loadModel("models\\donutlevel.obj");
-	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	texID = LoadTexture("textures\\donutleveltexture.png");
+	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(levelObject);
 
 	meshLoader.clearData();

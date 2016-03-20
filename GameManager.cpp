@@ -9,7 +9,7 @@ unsigned char testTexture[12] = {	0, 0, 255,
 									255, 255, 255};
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
-	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA), _interface()
+	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
 {
 	window = newWindow;
 	mat = Diffuse();
@@ -31,7 +31,8 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	// setup interface according to window dimensions
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	_interface.setWindowDim(width, height);
+	_interface = InterfaceManager(width, height);
+//	_interface.setWindowDim(width, height);
 
 	gameInit();
 }
@@ -176,6 +177,7 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &tsMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
+	renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
 
 }
 
@@ -191,15 +193,6 @@ void GameManager::createBall(float radius)
 
 	
 }
-/*
-void GameManager::addCoin(int playerId)
-{
-	//Add a coin into the player properties here
-
-	PlayerInfo* p = state.getPlayer(playerId);
-
-	int physID = p->getPhysicsID();
-}*/
 
 // At least for now, coins are not being created as physics objects
 void GameManager::createCoin(unsigned int coinIndex)
@@ -213,6 +206,28 @@ void GameManager::createCoin(unsigned int coinIndex)
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
 
 	newCoin->setRenderID(coin);
+}
+
+void GameManager::createPowerup(unsigned int objectID)
+{
+	unsigned int powerup = renderer.generateObjectID();
+	MeshObject* powerupMesh = meshInfo.getMeshPointer(MINE);
+
+	renderer.assignMeshObject(powerup, powerupMesh);
+	renderer.assignMaterial(powerup, &tsMat);
+	renderer.assignTexture(powerup, powerupMesh->getTextureID());
+	Mine newMine = Mine(3.0);
+	
+	vec3 playerPos = state.getPlayer(0)->getPos();
+	vec3 playerForward = state.getPlayer(0)->getForward();
+
+	// there is definitely a simpler way of doing this
+	vec3 placementVec = playerPos - (playerForward);
+	placementVec = placementVec - (playerForward);
+	placementVec = placementVec - (playerForward);
+	newMine.setPos(vec3((placementVec.x), (placementVec.y - 1), (placementVec.z)));
+	newMine.setRenderID(powerup);
+	state.addMine(newMine);
 }
 
 void GameManager::createBoostPad(vec3 position)
@@ -302,7 +317,7 @@ void GameManager::gameLoop()
 
 
 		//I'm leaving a comment here so that once we add powerups we change the pause key
-		if (inputs[0].powerup)
+		if (inputs[0].menu)
 		{
 			paused = !paused;
 
@@ -338,13 +353,40 @@ void GameManager::gameLoop()
 		}
 
 		
+		for (int i = 0; i < state.numberOfPlayers(); i++) {
+			if (inputs[i].powerup) {
+				vec3 location = 5.0f * state.getPlayer(i)->getForward() + state.getPlayer(i)->getPos();
+				Bomb b = Bomb(physics.createBomb(location, i), renderer.generateObjectID(), location);
+				state.addPowerup(b);
 
-		
+				/*
+				vector<vec3> mesh;
+				vector<vec3> normals;
+				vector<vec2> uvs;
+				vector<unsigned int> indices;
+				renderer.assignSphere(b->getRenderID(), 0.5f, 5, &mesh, &normals, &uvs, &indices);
+				*/
+
+
+				renderer.assignMeshObject(b.getRenderID(), meshInfo.getMeshPointer(BOMB));
+				renderer.assignMaterial(b.getRenderID(), &tsMat);
+				renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(BOMB)->getTextureID());
+				state.pushEvent(new BombCreationEvent(location));
+			}
+		}
 
 		//Update game state and renderer
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
 		sound.updateSounds(state, inputs);
+
+		for (int i = 0; i < state.getNbEvents(); i++) {
+			Event* e = state.getEvent(i);
+
+			if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
+				// Remove bomb
+			}
+		}
 		state.clearEvents();
 
 		//Test code...
@@ -361,7 +403,7 @@ void GameManager::gameLoop()
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
 			bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
-			bool hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
+			int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
 			if (hasCoinCollision){
 				//TODO change to all
 				physics.modifySpeed(i, 0.3333f);
@@ -369,23 +411,22 @@ void GameManager::gameLoop()
 			}
 
 			if (hasBoostPadCollision){
-				physics.applySpeedPadBoost(i);
+				//physics.applySpeedPadBoost(i);
 			}
 
-			if (hasMineCollision){
+			if (hasMineCollision > -1){
 				printf("Mine Explosion! \n");
 				physics.applyMineExplosion(i);
+				renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
+				state.removeMine(hasMineCollision);
 			}
 		}
 
 
 		//Allow for nitro/powerup activation her
 		if (inputs[0].cheat_coin){
-			/*
-			inputs[0].cheat_coin = false;
-
-			//
-			VehicleTraits traits = VehicleTraits(physics.getMaterial());
+			
+			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
 
 
@@ -396,16 +437,9 @@ void GameManager::gameLoop()
 			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 			
 			if (state.numberOfMines() < 20){
-				//input[0].cheat_coin = false;
 				printf("cheated in placing a Mine \n");
-				Mine newMine = Mine(3.0, (state.getPlayer(0)->getPos() - vec3(5, 0, 0)));
-				state.addMine(newMine);
-
-				//TEST
-				physics.applyMineExplosion(0);
+				createPowerup(MINE);
 			}
-		
-		*/
 		}
 
 		//Update camera position
@@ -478,6 +512,8 @@ void GameManager::gameLoop()
 		{
 			renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 		}
+
+		_interface.drawAll(&renderer);
 		
 		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
 
@@ -502,9 +538,6 @@ void GameManager::gameLoop()
 
 		//Get path
 		path.clear();
-
-
-
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
@@ -590,6 +623,13 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 	sound = SoundManager(state);
+
+	//Add dummy objects to interface
+	unsigned int centerBox = _interface.generateComponentID();
+	_interface.assignSquare(centerBox);
+	_interface.assignTexture(centerBox, skyboxTextureID, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(centerBox, -1.f, 1.f, 1.f, 1.f, ANCHOR::TOP_LEFT);
+
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 
@@ -604,27 +644,7 @@ void GameManager::quitGame(unsigned int winnerID)
 
 
 /*
-void GameManager::createPowerups()
-{
-int i = 0;
-while (i < NUM_POWERUPS) {
-unsigned int powerup = renderer.generateObjectID();
-state.getPowerup(i)->setRenderID(powerup);
 
-// leave commented for now, there's no powerup meshes
-//MeshObject coinMesh = meshInfo.getMesh(POWERUP);
-MeshObject powerupMesh = meshInfo.getMesh(SPHERE);
-vector<vec3> powerupVerts = powerupMesh.getVertices();
-vector<vec3> powerupNormals = powerupMesh.getNormals();
-vector<unsigned int> powerupIndices = powerupMesh.getIndices();
-
-renderer.assignMesh(powerup, &powerupVerts);
-renderer.assignNormals(powerup, &powerupNormals);
-renderer.assignIndices(powerup, &powerupIndices);
-renderer.assignMaterial(powerup, &tsMat);
-i++;
-}
-}
 
 void GameManager::createPowerupBoxes()
 {

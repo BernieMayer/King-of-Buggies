@@ -8,6 +8,11 @@ Entity::Entity() :	transform(mat4(1.f)), renderID(-1), physicsID(-1)
 
 }
 
+Entity::Entity(const vec3& position) : transform(mat4(1.f)), renderID(-1), physicsID(-1)
+{
+	setPos(position);
+}
+
 void Entity::setTransform(const mat4& _transform) { transform = _transform; }
 mat4 Entity::getTransform() { return transform; }
 

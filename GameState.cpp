@@ -118,7 +118,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vectors.push_back( playerRight);
 
 	int radarSize = 50;
-	for (int i = 0; i < numberOfPlayers(); i++)
+	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
 		if (i != playerId)
 		{
@@ -208,6 +208,14 @@ Coin* GameState::getCoin(unsigned int coinNum)
 		return NULL;
 }
 
+Mine* GameState::getMine(unsigned int mineNum)
+{
+	if (mineNum < mines.size())
+		return &mines[mineNum];
+	else
+		return NULL;
+}
+
 unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
 
@@ -233,13 +241,15 @@ bool GameState::checkBoostPadCollision(vec3 playerPos)
 
 void GameState::addMine(const Mine& mine){ mines.push_back(mine); }
 
+void GameState::removeMine(unsigned int objectID) { mines.erase(mines.begin() + objectID); }
+
 unsigned int GameState::numberOfMines(){ return mines.size(); }
 
-bool GameState::checkMineCollision(vec3 playerPos)
+int GameState::checkMineCollision(vec3 playerPos)
 {
-	bool collided = false;
+	//bool collided = false;
 
-	for (int i = 0; i < mines.size(); i++)
+	for (unsigned int i = 0; i < mines.size(); i++)
 	{
 		Mine mine = mines[i];
 		vec3 minePos = mine.getPos();
@@ -250,11 +260,11 @@ bool GameState::checkMineCollision(vec3 playerPos)
 		//Check if the player is within the radius of the mine
 		if (abs(length(diff)) <= mine.getRadius())
 		{
-			mines.erase(mines.begin() + i);
-			return true;
+			//mines.erase(mines.begin() + i);
+			return i;
 		}
 	}
-	return collided;
+	return -1;
 }
 
 
@@ -276,6 +286,12 @@ Powerup* GameState::getPowerup(unsigned int powerupNum)
 		return &powerups[powerupNum];
 	else
 		return NULL;
+}
+
+void GameState::removePowerup(unsigned int powerupNum) {
+	if (powerupNum < powerups.size()) {
+		powerups.erase(powerups.begin() + powerupNum);
+	}
 }
 
 unsigned int GameState::numberOfPowerups(){ return powerups.size(); }

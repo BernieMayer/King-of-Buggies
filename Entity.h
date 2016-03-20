@@ -13,6 +13,7 @@ protected:
 	unsigned int renderID;
 	unsigned int physicsID;
 	Entity();
+	Entity(const vec3&  position);
 	
 public:
 	void setTransform(const mat4& _tranform);

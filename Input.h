@@ -24,6 +24,8 @@ struct Input
 
 	bool cheat_coin;
 	bool isKeyboard;
+
+	bool konamiCode;
 };
 
 #endif //INPUT_H

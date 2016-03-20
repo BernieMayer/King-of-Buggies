@@ -112,8 +112,8 @@ void Gamepad::Update()
 	}
 }
 
-float xDeadZone = 0.15f;
-float yDeadZone = 0.15f;
+float xDeadZone = 0.17f;
+float yDeadZone = 0.17f;
 
 // Deadzone check for Left Thumbstick
 bool Gamepad::LStick_InDeadzone()

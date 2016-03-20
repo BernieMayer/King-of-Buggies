@@ -15,6 +15,8 @@
 #include "VehicleCollisionEvent.h"
 #include "VehicleWallCollisionEvent.h"
 #include "GoldenBuggySwitchEvent.h"
+#include "VehicleBombCollisionEvent.h"
+#include "BombCreationEvent.h"
 
 const unsigned int NUM_PLAYERS = 4;
 const unsigned int NUM_POWERUPS = 5;
@@ -80,6 +82,7 @@ public:
 	void addCoin(const Coin& coin);
 	void setCoin(unsigned int coinNum, const Coin& coin);
 	Coin* getCoin(unsigned int coinNum);
+	Mine* getMine(unsigned int mineNum);
 	unsigned int numberOfCoins();
 
 	//BoostPad management
@@ -91,15 +94,16 @@ public:
 
 	//Mine management
 	void addMine(const Mine& mine);
+	void removeMine(unsigned int objectID);
 	//TODO setMine
-	//TODO getMine
 	unsigned int numberOfMines();
-	bool checkMineCollision(vec3 playerPos);
+	int checkMineCollision(vec3 playerPos);
 
 	//Powerup management
 	void addPowerup(const Powerup& powerup);
 	void setPowerup(unsigned int powerupNum, const Powerup& powerup);
 	Powerup* getPowerup(unsigned int powerupNum);
+	void removePowerup(unsigned int powerupNUum);
 	unsigned int numberOfPowerups();
 
 	//Powerup box management

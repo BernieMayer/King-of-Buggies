@@ -594,7 +594,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
-	if (lastState != NULL) {
+	if (lastState != NULL && vehicleInAir[id]) {
 		
 		// Spinning
 		vec3 upVec = lastState->getPlayer(id)->getUp();
@@ -622,7 +622,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 
 	if (input->jump && !vehicleInAir[id]) {
-		cout << "Jump!\n";
+		
 		vec3 upVec = lastState->getPlayer(id)->getUp();
 		upVec = 500000.f * upVec;
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
@@ -718,7 +718,7 @@ PxVehicleDriveSimData4W Physics::initDriveSimData(PxVehicleWheelsSimData* wheels
 
 	//Engine
 	PxVehicleEngineData engine;
-	engine.mPeakTorque = 500.0f;
+	engine.mPeakTorque = 2000.f;
 	engine.mMaxOmega = 300.0f;//approx 6000 rpm
 	driveSimData.setEngineData(engine);
 
@@ -859,11 +859,15 @@ PxVehicleWheelsSimData* wheelsSimData)
 		}
 
 		//Enable the handbrake for the rear wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque = 4000.0f;
-		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 4000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxHandBrakeTorque = 2000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxHandBrakeTorque = 2000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxHandBrakeTorque = 1000.0f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxHandBrakeTorque = 1000.0f;
 		//Enable steering for the front wheels only.
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.25f;
-		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.25f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_LEFT].mMaxSteer = PxPi*0.33f;
+		wheels[PxVehicleDrive4WWheelOrder::eFRONT_RIGHT].mMaxSteer = PxPi*0.33f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_LEFT].mMaxSteer = 0.f;
+		wheels[PxVehicleDrive4WWheelOrder::eREAR_RIGHT].mMaxSteer = 0.f;
 	}
 
 	//Set up the tires.
@@ -873,6 +877,8 @@ PxVehicleWheelsSimData* wheelsSimData)
 		for (PxU32 i = 0; i < numWheels; i++)
 		{
 			tires[i].mType = TIRE_TYPE_NORMAL;
+			tires[i].mLatStiffX = 1;
+			tires[i].mLatStiffY = 18;
 		}
 	}
 
@@ -888,7 +894,7 @@ PxVehicleWheelsSimData* wheelsSimData)
 		//Set the suspension data.
 		for (PxU32 i = 0; i < numWheels; i++)
 		{
-			suspensions[i].mMaxCompression = 0.3f;
+			suspensions[i].mMaxCompression = 0.5f;
 			suspensions[i].mMaxDroop = 0.1f;
 			suspensions[i].mSpringStrength = 35000.0f;
 			suspensions[i].mSpringDamperRate = 4500.0f;
@@ -896,9 +902,9 @@ PxVehicleWheelsSimData* wheelsSimData)
 		}
 
 		//Set the camber angles.
-		const PxF32 camberAngleAtRest = 0.0;
-		const PxF32 camberAngleAtMaxDroop = 0.01f;
-		const PxF32 camberAngleAtMaxCompression = -0.01f;
+		const PxF32 camberAngleAtRest = -0.01;
+		const PxF32 camberAngleAtMaxDroop = -0.01f;
+		const PxF32 camberAngleAtMaxCompression = -0.1f;
 		for (PxU32 i = 0; i < numWheels; i += 2)
 		{
 			suspensions[i + 0].mCamberAtRest = camberAngleAtRest;
@@ -1260,11 +1266,23 @@ void Physics::buggyExplosion(int gBuggyIndex) {
 		if (i != gBuggyIndex) {
 			vec3 vec = lastState->getPlayer(i)->getPos() - lastState->getPlayer(gBuggyIndex)->getPos();
 			float distance = length(vec);
+			vec = normalize(vec);
 
-			float force = 8000000;
+			float force = 15000000;
 			vec = (force * (1 / (distance * distance))) * vec;
 			vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
 		}
+	}
+
+	for (int i = 0; i < bombActors.size(); i++) {
+	
+		PxVec3 vec = bombActors[i]->getGlobalPose().p - vehicleActors[gBuggyIndex].vehDrive4W->getRigidDynamicActor()->getGlobalPose().p;
+		float distance = length(getVec3(vec));
+		vec = getPxVec3(normalize(getVec3(vec)));
+
+		float force = 20000;
+		vec = (force * (1 / (distance * distance))) * vec;
+		bombActors[i]->addForce(vec);
 	}
 }
 
@@ -1296,6 +1314,22 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 					index2 = i;
 				}
 			}
+
+			bool isBomb1 = false;
+			bool isBomb2 = false;
+			
+			if (!isVehicle1 || !isVehicle2) {
+				for (int i = 0; i < bombActors.size(); i++) {
+					if (actor1 == bombActors[i]) {
+						isBomb1 = true;
+						index1 = i;
+					}
+					if (actor2 == bombActors[i]) {
+						isBomb2 = true;
+						index2 = i;
+					}
+				}
+			}
 			
 			int numContacts = cp.contactCount;
 			PxContactPairPoint contactPoint[1];
@@ -1310,6 +1344,14 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 
 				if (isVehicle1 && isVehicle2) {
 					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
+				}
+				else if (isBomb1 && isVehicle2) {
+					lastState->pushEvent(new VehicleBombCollisionEvent(index2, index1, pos));
+					bombExplosion(index1);
+				}
+				else if (isBomb2 && isVehicle1) {
+					lastState->pushEvent(new VehicleBombCollisionEvent(index1, index2, pos));
+					bombExplosion(index2);
 				}
 				else {
 					lastState->pushEvent(new VehicleWallCollisionEvent(index1, pos, normal, force));
@@ -1375,5 +1417,85 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 	}
 }
 
+int Physics::createBomb(vec3 location, int playerID) {
+	// Add dynamic thrown ball to scene
+	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(getPxVec3(location)));
+	aSphereActor->setMass(800);
+	cout << "Mass: " << aSphereActor->getMass();
+	float radius = 0.5f;
+	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
+
+	PxShape* shapes[1];
+	aSphereActor->getShapes(shapes, 1);
+
+	//Set the simulation filter data of the ground plane so that it collides with the chassis of a vehicle but not the wheels.
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_BOMB;
+	simFilterData.word1 = COLLISION_FLAG_BOMB_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	// 1.0f = density
+	PxRigidBodyExt::updateMassAndInertia(*aSphereActor, 1.0f);
+
+	// Set velocity to be same direction of player, but faster 
+	vec3 velocity = lastState->getPlayer(playerID)->getForward();
+	float speedMod = lastState->getPlayer(playerID)->getFSpeed() * 2;
+	// Ensures forwards throwing when moving backwards or not moving
+	if (speedMod < 30) {
+		speedMod = 30;
+	}
+	velocity = speedMod * velocity;
+	aSphereActor->setLinearVelocity(getPxVec3(velocity));
+
+	gScene->addActor(*aSphereActor);
+
+	bombActors.push_back(aSphereActor);
+	dynamicActors.push_back(aSphereActor);
+
+	return bombActors.size() - 1;
+}
+
+
+void Physics::bombExplosion(int bombID) {
+	for (int i = 0; i < vehicleActors.size(); i++) {
+		vec3 vec = lastState->getPlayer(i)->getPos() - getVec3(bombActors[bombID]->getGlobalPose().p);
+		float distance = length(vec);
+		vec = normalize(vec);
+
+		float force = 6000000;
+		vec = (force * (1 / (distance * distance))) * vec;
+		vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
+	}
+
+	for (int i = 0; i < bombActors.size(); i++) {
+		if (i != bombID) {
+			PxVec3 vec = bombActors[i]->getGlobalPose().p - bombActors[bombID]->getGlobalPose().p;
+			float distance = length(getVec3(vec));
+			vec = getPxVec3(normalize(getVec3(vec)));
+
+			float force = 10000;
+			vec = (force * (1 / (distance * distance))) * vec;
+			bombActors[i]->addForce(vec);
+		}
+	}
+
+	gScene->removeActor(*bombActors[bombID]);
+
+	for (int i = 0; i < dynamicActors.size(); i++) {
+		if (dynamicActors[i] == bombActors[bombID]) {
+			dynamicActors.erase(dynamicActors.begin() + i);
+		}
+	}
+	bombActors.erase(bombActors.begin() + bombID);
+
+	for (int i = 0; i < lastState->numberOfPowerups(); i++) {
+		// Subtract 1 from physics id if spot in bombs list was modified
+		if (i > bombID) {
+			lastState->getPowerup(i)->setPhysicsID(lastState->getPowerup(i)->getPhysicsID() - 1);
+		}
+	}
+
+	lastState->removePowerup(bombID);
+}
 
 #endif 

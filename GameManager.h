@@ -84,6 +84,7 @@ public:
 	void createGroundPlane(vec3 normal, float offset);
 	void createLevel(unsigned int objectID);
 	void createCoin(unsigned int coinIndex);
+	void createPowerup(unsigned int objectID);
 	void createBoostPad(vec3 position);
 	void createPowerups();
 	void createPowerupBoxes();

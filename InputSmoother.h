@@ -4,6 +4,7 @@
 #include "Input.h"
 #include "Timer.h"
 #include <iostream>
+#include <vector>
 
 using namespace std;
 
@@ -17,6 +18,9 @@ public:
 	float difference;
 
 private:
+	vector<Input> lastInputs;
+	bool checkKonamiCode();
+
 	float lastForward = 0.f;
 	float lastBackward = 0.f;
 	float lastTurnL = 0.f;
@@ -50,6 +54,15 @@ private:
 	bool jumpLock = false;
 	timeb jumpTime;
 	float jumpCounterMax = 5.0f / 60.0f;
+
+	bool cheatLock = false;
+	timeb cheatTime;
+	float cheatCounterMax = 5.0f / 60.0f;
+
+	bool konamiLock = false;
+	timeb konamiTime;
+	// 5 seconds before another code can be entered
+	float konamiCounterMax = 5.0f;
 };
 
 #endif // INPUTSMOOTHER_H

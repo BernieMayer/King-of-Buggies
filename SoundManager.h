@@ -33,21 +33,31 @@ private:
 	void initOpenAL(GameState state);
 	void initListener(GameState state);
 	void startMusic(GameState state);
+	float distanceVolumeAdjuster(float volume, vec3 pos);
 	void startEngineSounds(GameState state);
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);
 	void updateHonks(GameState state, Input inputs[]);
+	void startFuse(GameState state);
+	void updateFuses(GameState state);
+	void stopFuse(int fuseNum);
 	void loadWavToBuf(string fileName, ALuint* source, ALuint *buffer);
 	void playSound(string fileName, vec3 pos, float volume);
-	void playSecret(GameState state);
-	void playSecret2(GameState state);
+	void playSecretMusic(GameState state);
+	void playPauseSong(GameState state);
 	void updateMusicPitch(GameState state, Input input);
+	void cleanOneTimeUseSources();
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
 	ALuint engineSources[5];
 	ALuint listener;
+	vector<ALuint> oneTimeUseBuffers;
+	vector<ALuint> oneTimeUseSources;
+	vec3 listenerPos;
+	// Higher and distance will have less of an effect on volume, lower will increase the effect
+	float distanceDivider = 15.0f;
 
 	float musicVolume = 1.0;
 	float idleEngineVolume = 0.08;
@@ -56,8 +66,12 @@ private:
 	vector<bool> honking;
 	vector<ALuint> honkSources;
 
+	vector<ALuint> fuseBuffers;
+	vector<ALuint> fuseSources;
+
+	bool paused = false;
 	bool secretPlaying = false;
-	bool secret2Unlocked = false;
+	int lastSecretPlayed = -1;
 };
 
 #endif // SOUNDMANAGER_H

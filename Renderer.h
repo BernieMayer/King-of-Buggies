@@ -178,6 +178,13 @@ public:
 	//Update
 	void updateObjectTransforms(GameState* state);
 
+	//External buffer loading
+	bool loadVertUVBuffer(vector<vec3>* verts, vector<vec2>* uvs);
+
+	//Window dimensions
+	unsigned int getHeight();
+	unsigned int getWidth();
+
 };
 
 void displayVec4(const vec4& vec);

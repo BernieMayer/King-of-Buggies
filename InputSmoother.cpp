@@ -15,7 +15,22 @@ InputSmoother::~InputSmoother()
 }
 
 Input InputSmoother::smooth(Input in, bool inAir) {
+	// Keeps 3 seconds of input
+	if (lastInputs.size() > 180) {
+		lastInputs.erase(lastInputs.begin());
+	}
+	lastInputs.push_back(in);
+	
+	if (konamiLock) {
+		if (timer.getTimeSince(konamiTime) >= konamiCounterMax) {
+			konamiLock = false;
+		}
+	}
+
 	Input out = in;
+	if (!konamiLock) {
+		out.konamiCode = checkKonamiCode();
+	}
 
 	difference = timer.getTimeSince(movementTime);
 	movementTime = timer.getCurrentTime();
@@ -173,8 +188,181 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		jumpLock = false;
 	}
 	
+	if (out.cheat_coin && !cheatLock) {
+		cheatLock = true;
+		cheatTime = timer.getCurrentTime();
+	}
+	else if (cheatLock && timer.getTimeSince(cheatTime) < cheatCounterMax) {
+		out.cheat_coin = false;
+	}
+	else if (cheatLock && timer.getTimeSince(cheatTime) >= cheatCounterMax) {
+		out.cheat_coin = false;
+		cheatLock = false;
+	}
+
 
 	return out;
+}
+
+bool InputSmoother::checkKonamiCode() {
+	if (lastInputs.back().menu) {
+		// If last part right, continue checking backwards
+		int counter = lastInputs.size() - 2;
+		int konamiStep = 0;
+		while (counter >= 0) {
+			Input in = lastInputs[counter];
+			if (konamiStep == 0) {
+				if (in.drift || in.menu ||
+					in.horn || in.powerup) {
+					return false;
+				}
+				else if (in.jump) {
+					// A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 1) {
+				if (in.drift || in.menu || in.horn) {
+					return false;
+				}
+				else if (in.jump) {
+					// Do nothing
+					// Allows for a button press of A which lasts for more than 
+					// 1 frame
+				}
+				else if (in.powerup) {
+					// B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 2) {
+				if (in.drift || in.menu || in.horn || in.jump) {
+					return false;
+				}
+				else if (in.powerup) {
+					//Do nothing
+				}
+				else if (-in.turnR >= 0.9) {
+					// right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 3) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (-in.turnR > 0) {
+					// Do nothing
+				}
+				else if (-in.turnL > 0.9) {
+					// left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 4) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (-in.turnL > 0) {
+					// Do nothing
+				}
+				else if (-in.turnR > 0.9) {
+					// right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 5) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (-in.turnR > 0) {
+					// Do nothing
+				}
+				else if (-in.turnL > 0.9) {
+					// left, right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 6) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (in.tiltBackward > 0.9) {
+					// down, left, right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 7) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (in.tiltBackward > 0.1) {
+					// Do nothing
+				}
+				else {
+					// neutral, down, left, right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 8) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (in.tiltBackward < 0.9) {
+					// Do nothing
+				}
+				else {
+					// down, down, left, right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 9) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (in.tiltForward < 0.9) {
+					// Do nothing
+				}
+				else {
+					// up, down, down, left, right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 10) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (in.tiltForward > 0.2) {
+					// do nothing
+				}
+				else {
+					// neutral, up, down, down, left, right, left, right, B, A, start
+					konamiStep++;
+				}
+			}
+			else if (konamiStep == 11) {
+				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
+					return false;
+				}
+				else if (in.tiltForward < 0.9) {
+					// Do nothing
+				}
+				else {
+					// up, up, down, down, left, right, left, right, B, A, start
+					cout << "Code entered\n";
+					konamiLock = true;
+					konamiTime = timer.getCurrentTime();
+					return true;
+				}
+			}
+			counter--;
+		}
+		return false;
+	}
+	else {
+		// Otherwise, stop checking
+		return false;
+	}
 }
 
 #endif
