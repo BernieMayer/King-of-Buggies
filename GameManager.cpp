@@ -375,6 +375,25 @@ void GameManager::gameLoop()
 			}
 		}
 
+		//Allow for nitro/powerup activation her
+		if (inputs[0].cheat_coin){
+
+			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
+			//traits.print();
+
+
+			//VehicleTraits temp = VehicleTraits(physics.getMaterial());
+			//traits.loadConfiguration("base");
+			//temp.print();
+
+			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
+
+			if (state.numberOfMines() < 20){
+				printf("cheated in placing a Mine \n");
+				createPowerup(MINE);
+			}
+		}
+
 		//Update game state and renderer
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
@@ -419,26 +438,6 @@ void GameManager::gameLoop()
 				physics.applyMineExplosion(i);
 				renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
 				state.removeMine(hasMineCollision);
-			}
-		}
-
-
-		//Allow for nitro/powerup activation her
-		if (inputs[0].cheat_coin){
-			
-			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
-			//traits.print();
-
-
-			//VehicleTraits temp = VehicleTraits(physics.getMaterial());
-			//traits.loadConfiguration("base");
-			//temp.print();
-
-			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
-			
-			if (state.numberOfMines() < 20){
-				printf("cheated in placing a Mine \n");
-				createPowerup(MINE);
 			}
 		}
 
@@ -515,8 +514,6 @@ void GameManager::gameLoop()
 
 		_interface.drawAll(&renderer);
 		
-		//printf("player score: %d\n", _interface.getScoreBarWidth(&state));
-
 		// increase score and check win conditions
 		state.getGoldenBuggy()->incrementScore();
 		int theScore = state.getGoldenBuggy()->getScore();
