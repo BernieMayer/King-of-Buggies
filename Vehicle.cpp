@@ -26,9 +26,10 @@ Vehicle::Vehicle(PxPhysics& phys, PxCooking& cook, PxScene& aScene, VehicleTrait
 	vehicle_create(traits, initPos);
 }
 
-Vehicle::Vehicle(PxVehicleDrive4W& veh)
+Vehicle::Vehicle(PxVehicleDrive4W& veh, VehicleTraits Vehtraits)
 {
 	vehDrive4W = &veh;
+	traits = Vehtraits;
 }
 
 void updateGameState(GameState* state)
@@ -61,6 +62,16 @@ void Vehicle::applyNitroBoost()
 	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
 	forceVec = 39050.f * forceVec * vec3(1, 0, 1);
 	vehBody->addForce(getPxVec3(forceVec));
+}
+
+PxVehicleDrive4W* Vehicle::getVehDrive4W()
+{
+	return vehDrive4W;
+}
+
+void Vehicle::setVehDrive4W(PxVehicleDrive4W* veh)
+{
+	vehDrive4W = veh;
 }
 
 unsigned int Vehicle::vehicle_create(VehicleTraits traits, vec3 initPos)
