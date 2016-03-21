@@ -80,10 +80,10 @@ void InterfaceManager::initSquare()
 {
 	float halfWidth = 0.5f;
 
-	vec3 p00 (-halfWidth, -halfWidth, 0.99f);
-	vec3 p10(halfWidth, -halfWidth, 0.99f);
-	vec3 p01(-halfWidth, halfWidth, 0.99f);
-	vec3 p11(halfWidth, halfWidth, 0.99f);
+	vec3 p00 (-halfWidth, -halfWidth, -0.99f);
+	vec3 p10(halfWidth, -halfWidth, -0.99f);
+	vec3 p01(-halfWidth, halfWidth, -0.99f);
+	vec3 p11(halfWidth, halfWidth, -0.99f);
 
 	vec2 uv00(0.f, 0.f);
 	vec2 uv10(1.f, 0.f);
