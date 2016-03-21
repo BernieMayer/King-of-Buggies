@@ -153,7 +153,7 @@ Physics::Physics() {
 unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	PxVehicleDrive4W* veh = initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z));
-	vehicleActors.push_back(Vehicle(* veh));
+	vehicleActors.push_back(Vehicle(* veh, traits));
 
 	//This shouldn't be in physics at all
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggy
@@ -229,7 +229,7 @@ void Physics::applyMineExplosion(unsigned int vehicleNum)
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(forceVec));
 
 		vec3 upVec = lastState->getPlayer(vehicleNum)->getUp();
-		upVec = 400000.f * upVec * vec3(0,1,0);
+		upVec = 800000.f * upVec * vec3(0,1,0);
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 
@@ -495,6 +495,13 @@ void Physics::updateGameState(GameState* state, float time)
 		// 2 second lock
 		if (clock.getTimeSince(gbLockStartTime) >= 2) {
 			goldenBuggyLock = false;
+		}
+	}
+
+	for (int i = 0; i < bombActors.size(); i++) {
+		if (clock.getTimeSince(bombStartTimes[i]) >= 5.0f) {
+			bombExplosion(i);
+			i--;
 		}
 	}
 }
@@ -1451,6 +1458,7 @@ int Physics::createBomb(vec3 location, int playerID) {
 
 	bombActors.push_back(aSphereActor);
 	dynamicActors.push_back(aSphereActor);
+	bombStartTimes.push_back(clock.getCurrentTime());
 
 	return bombActors.size() - 1;
 }
@@ -1486,7 +1494,9 @@ void Physics::bombExplosion(int bombID) {
 			dynamicActors.erase(dynamicActors.begin() + i);
 		}
 	}
+	bombActors[bombID]->release();
 	bombActors.erase(bombActors.begin() + bombID);
+	bombStartTimes.erase(bombStartTimes.begin() + bombID);
 
 	for (int i = 0; i < lastState->numberOfPowerups(); i++) {
 		// Subtract 1 from physics id if spot in bombs list was modified

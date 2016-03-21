@@ -54,10 +54,14 @@ public:
 	void applyNitroBoost();
 
 	Vehicle(PxPhysics& phys, PxCooking& cook, PxScene& aScene, VehicleTraits traits, vec3 initPos);
-	Vehicle(PxVehicleDrive4W& veh);
+	Vehicle(PxVehicleDrive4W& veh, VehicleTraits Vehtraits);
 	Vehicle(){};
 
 	PxVec3 getPxVec3(const vec3& vec);
+
+	PxVehicleDrive4W* getVehDrive4W();
+	void setVehDrive4W(PxVehicleDrive4W* veh);
+
 
 private:
 
@@ -65,6 +69,7 @@ private:
 	PxPhysics* mPhysics = NULL;
 	PxCooking* mCooking = NULL;
 	PxScene* gScene = NULL;
+	VehicleTraits traits = NULL;
 
 
 	PxVehicleDrive4W* initVehicle(VehicleTraits traits, PxVec3 initPos);

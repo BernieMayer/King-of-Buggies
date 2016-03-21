@@ -342,7 +342,7 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	
 
 	for (int i = 0; i < radarVecs.size(); i++){
-		vec3 vec = vec3((windowWidth / 2) + radarVecs[i].x * (windowWidth / 10), (windowHeight / 2) + radarVecs[i].y * (windowHeight / 10), 0);
+		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 10), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 10), 0);
 		glVertex3f(vec.x, vec.y, vec.z);
 		//REMOVE IN PRODUCTION
 		if (i >= 2 && i < 5){

@@ -103,8 +103,8 @@ vector<vec2> GameState::setupRadar(int playerId)
 	
 	vec3 player3DposUp = player->getForward();
 
-	vec3 player3DposRight = rightVector;
-	vec3 player3DposLeft = - rightVector;
+	vec3 player3DposRight = -rightVector;
+	vec3 player3DposLeft = rightVector;
 
 	vec2 playerLeft =  vec2(player3DposLeft.x, player3DposLeft.z);
 	vec2 playerRight = vec2(player3DposRight.x, player3DposRight.z);
@@ -118,7 +118,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vectors.push_back( playerRight);
 
 	int radarSize = 50;
-	for (unsigned int i = 0; i < numberOfPlayers(); i++)
+	for (unsigned int i = 9; i < numberOfPlayers(); i++)
 	{
 		if (i != playerId)
 		{

@@ -115,6 +115,7 @@ private:
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 	vector<PxRigidDynamic*> bombActors;
+	vector<timeb> bombStartTimes;
 
 	Vehicle* goldenBuggy;	       //Should be a vehicle
 
