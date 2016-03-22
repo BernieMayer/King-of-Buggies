@@ -153,12 +153,11 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 	// effects triggering on button pressed happening too often
 	if (out.menu && !menuLock) {
 		menuLock = true;
-		menuTime = timer.getCurrentTime();
 	}
-	else if (menuLock && timer.getTimeSince(menuTime) < menuCounterMax) {
+	else if (menuLock && out.menu) {
 		out.menu = false;
 	}
-	else if (menuLock && timer.getTimeSince(menuTime) >= menuCounterMax) {
+	else if (menuLock && !out.menu) {
 		out.menu = false;
 		menuLock = false;
 	}

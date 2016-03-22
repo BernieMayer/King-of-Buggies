@@ -258,6 +258,29 @@ void GameManager::createBoostPad(vec3 position)
 	state.addBoostPad(newBoostPad);
 
 }
+
+void GameManager::initMenus() {
+	int currentMenu = 0;
+	int lastMenu = 2;
+
+	unsigned int menuBackground = LoadTexture("menus/KoB_CarScreen.bmp");
+	unsigned int menu = _interface.generateComponentID();
+	_interface.assignSquare(menu);
+
+
+	_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(menu, 1.f, -1.f, 1.f, 1.f, ANCHOR::TOP_LEFT);
+
+	while (currentMenu != lastMenu) {
+		_interface.drawAll(&renderer);
+
+		//Swap buffers  
+		glfwSwapBuffers(window);
+		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+		glfwPollEvents();
+	}
+}
+
 void GameManager::gameLoop()
 {
 	vector<vec3> polygons;
@@ -641,6 +664,7 @@ void GameManager::initTestScene()
 
 
 	//Add dummy objects to interface
+	/*
 	carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
@@ -648,7 +672,7 @@ void GameManager::initTestScene()
 
 	_interface.assignTexture(centerBox, skyboxTextureID, ComponentInfo::UP_TEXTURE);
 	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
-
+	*/
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods

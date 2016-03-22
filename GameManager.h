@@ -80,6 +80,8 @@ private:
 public:
 	GameManager(GLFWwindow* newWindow);
 
+	void initMenus();
+
 	// create physics and render objects through GameState
 	void createPlayer(vec3 position, VehicleTraits traits);		//Add forward parameter later, maybe also VehicleTraits
 	void createAI(vec3 position);

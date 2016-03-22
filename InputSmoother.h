@@ -43,21 +43,19 @@ private:
 	float movementCounterEnd = 1.0f / 60.0f;
 
 	bool menuLock = false;
-	timeb menuTime;
-	// 5/60th of a second since 5 frames seemed to work nicely
-	float menuCounterMax = 5.0f / 60.0f;
 
 	bool powerupLock = false;
 	timeb powerupTime;
-	float powerupCounterMax = 5.0f / 60.0f;
+	// 10 60ths of a second might be better than 5
+	float powerupCounterMax = 10.0f / 60.0f;
 
 	bool jumpLock = false;
 	timeb jumpTime;
-	float jumpCounterMax = 5.0f / 60.0f;
+	float jumpCounterMax = 10.0f / 60.0f;
 
 	bool cheatLock = false;
 	timeb cheatTime;
-	float cheatCounterMax = 5.0f / 60.0f;
+	float cheatCounterMax = 10.0f / 60.0f;
 
 	bool konamiLock = false;
 	timeb konamiTime;
