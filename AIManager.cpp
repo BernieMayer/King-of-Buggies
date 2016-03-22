@@ -44,7 +44,6 @@ bool AIManager::findNewPath(unsigned int playerNum, vec3 target, bool updateOld)
 {
 	pathToGoal[playerNum].clear();
 	pointOnPath[playerNum] = 0;
-
 	return nav.getPathPoints(&pathToGoal[playerNum], &nodesToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target, updateOld);
 }
 
@@ -121,8 +120,10 @@ Input AIManager::followPath(unsigned int playerNum)
 {
 	if (collisionRecovery)
 		return recover(playerNum);
-
 	else if (pathToGoal[playerNum].size() > 0)
+		if ((pathToGoal[playerNum].size() <= 2 || pathToGoal.size() >= 1) && playerNum != indexOfGoldenBuggy)
+			return testAIChase(playerNum);
+		else 
 		return driveToPoint(playerNum, pathToGoal[playerNum][pointOnPath[playerNum]]);
 	else
 		return Input();
@@ -137,7 +138,13 @@ void AIManager::getPathAsLines(unsigned int playerNum, vector<vec3>* lines)
 	}
 }
 
+Input AIManager::getInput(unsigned int playerNum, GameState state)
+{
+	indexOfGoldenBuggy = state.getGoldenBuggyID();
 
+	return getInput(playerNum);
+
+}
 
 Input AIManager::getInput(unsigned int playerNum)
 {
@@ -157,6 +164,7 @@ Input AIManager::getInput(unsigned int playerNum)
 
 Input AIManager::testAIChase(unsigned int aiNum){
 	/*
+	Notes about AI stuff
 	point vec=hispos-prevpos; 	// vec is the 1-frame position difference
 	vec=vec*N; 					// we project N frames into the future
 	point futurepos=hispos+vec; // and build the future projection
@@ -164,6 +172,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	mypos.x = mypos.x + cos(myyaw) * speed;
 	mypos.z = mypos.z + sin(myyaw) * speed;
 	*/
+
 	vec3 goldenBuggyLoc = state->getGoldenBuggy()->getPos();
 	prevPosition[aiNum] = goldenBuggyLoc;
 	vec3 myPos = state->getPlayer(aiNum)->getPos();

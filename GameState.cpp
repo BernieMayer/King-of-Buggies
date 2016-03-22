@@ -93,6 +93,8 @@ unsigned int GameState::getGoldenBuggyID() { return goldenBuggy; }
 
 vector<vec2> GameState::setupRadar(int playerId)
 {
+
+	
 	vector<vec2> vectors;
 
 	PlayerInfo* player = getPlayer(playerId);
@@ -108,7 +110,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 	vec2 playerLeft =  vec2(player3DposLeft.x, player3DposLeft.z);
 	vec2 playerRight = vec2(player3DposRight.x, player3DposRight.z);
-	vec2 playerUp =  vec2(player3DposUp.x, player3DposUp.z);
+	vec2 playerUp =  vec2(-player3DposUp.x, -player3DposUp.z);
 
 
 	vec3 origin = vec3((playerLeft.x + playerRight.x) / 2, 0, (playerLeft.y + playerRight.y) / 2);

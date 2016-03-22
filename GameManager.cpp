@@ -342,7 +342,7 @@ void GameManager::gameLoop()
 					frameCount = 0;
 				}
 
-				inputs[i] = ai.getInput(i);
+				inputs[i] = ai.getInput(i, state);
 			}
 			else {
 				inputs[i] = input.getInput(i + 1);

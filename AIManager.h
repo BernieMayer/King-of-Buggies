@@ -36,6 +36,7 @@ public:
 	Input followPath(unsigned int playerNum);
 	vec3 getRandomTarget();
 
+	Input getInput(unsigned int playerNum, GameState state);
 	Input getInput(unsigned int playerNum);		//Main interface into ai
 
 	int updateCounter;
@@ -81,6 +82,7 @@ private:
 	float carSpeed = 1.0f;
 	// Default drive to position
 	vec3 lastDriveToPos = vec3(-13, 0.5, -15);
+	int indexOfGoldenBuggy = 0;
 	float aiType = 0;
 
 	float facing(Entity* object, Entity* target);
