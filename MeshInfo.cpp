@@ -12,7 +12,8 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 	
 	meshLoader.loadModel("models\\cube.obj");
-	MeshObject cubeObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	unsigned int texID = LoadTexture("textures\\cubetexture.png");
+	MeshObject cubeObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(cubeObject);
 
 	meshLoader.clearData();
@@ -30,7 +31,7 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\mine.obj");
-	unsigned int texID = LoadTexture("textures\\minetexture.png");
+	texID = LoadTexture("textures\\minetexture.png");
 	MeshObject mineObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(mineObject);
 
