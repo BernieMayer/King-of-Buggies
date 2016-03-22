@@ -621,12 +621,14 @@ void GameManager::initTestScene()
 	ai.initAI();
 	sound = SoundManager(state);
 
+	/*
 	//Add dummy objects to interface
+	carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
-	_interface.assignTexture(centerBox, skyboxTextureID, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(centerBox, -1.f, 1.f, 1.f, 1.f, ANCHOR::TOP_LEFT);
-
+	_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(centerBox, -1.f, 1.f, 4.f, 2.f, ANCHOR::TOP_LEFT);
+	*/
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 

@@ -75,6 +75,8 @@ private:
 	unsigned int skyboxID;
 	Unshaded skyMaterial;
 
+	unsigned int carSelectScreen;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 
