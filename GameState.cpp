@@ -329,7 +329,7 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 			if (coins[i].getCountdown() < 0) {
 				// reset coin to original spawn location
 				vec3 newPos = pos;
-				newPos.y = pos.y + 4;
+				newPos.y = pos.y + 20;
 				coins[i].setPos(newPos);
 				coins[i].setCollided(false);
 			}
@@ -340,7 +340,7 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 			//change coin to spawn below level if it is hit by a player
 			if ((abs(difference.x) < 1.4) && (abs(difference.y) < 1.4) && (abs(difference.z) < 1.4)) {
 				vec3 newPos = pos;
-				newPos.y = pos.y - 4;
+				newPos.y = pos.y - 20;
 				coins[i].setPos(newPos);
 				coins[i].setCollided(true);
 				coins[i].startCountdown();

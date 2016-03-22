@@ -12,7 +12,7 @@ bool Coin::isCollided() {
 }
 
 void Coin::startCountdown() {
-	countdown = 200;
+	countdown = 600;
 }
 
 void Coin::decrementCountdown() {

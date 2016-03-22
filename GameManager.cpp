@@ -457,27 +457,28 @@ void GameManager::gameLoop()
 
 		vec3 diff = posAI - posPlayer;
 
+		if (!paused) {
+			// Check for player/coin collisions, and coin respawns also check for other collisions
+			for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+				bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+				bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
+				int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
+				if (hasCoinCollision){
+					//TODO change to all
+					physics.modifySpeed(i, 0.3333f);
+					sound.playDingSound(state.getPlayer(i)->getPos());
+				}
 
-		// Check for player/coin collisions, and coin respawns also check for other collisions
-		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-			bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
-			bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
-			int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
-			if (hasCoinCollision){
-				//TODO change to all
-				physics.modifySpeed(i, 0.3333f);
-				sound.playDingSound(state.getPlayer(i)->getPos());
-			}
+				if (hasBoostPadCollision){
+					//physics.applySpeedPadBoost(i);
+				}
 
-			if (hasBoostPadCollision){
-				//physics.applySpeedPadBoost(i);
-			}
-
-			if (hasMineCollision > -1){
-				printf("Mine Explosion! \n");
-				physics.applyMineExplosion(i);
-				renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
-				state.removeMine(hasMineCollision);
+				if (hasMineCollision > -1){
+					printf("Mine Explosion! \n");
+					physics.applyMineExplosion(i);
+					renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
+					state.removeMine(hasMineCollision);
+				}
 			}
 		}
 
@@ -554,23 +555,25 @@ void GameManager::gameLoop()
 
 		_interface.drawAll(&renderer);
 		
-		// increase score and check win conditions
-		state.getGoldenBuggy()->incrementScore();
-		int theScore = state.getGoldenBuggy()->getScore();
-		if ((theScore % 100) == 0) {
-			std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
-		}
-		if (theScore >= state.getMaxScore() && gameOver == false) {
-			winner = state.getGoldenBuggyID();
-			printf("Player %i is the winner!\n", winner);
-			if (winner == 0) {
-				sound.playWinSound(state.getPlayer(0)->getPos());
+		if (!paused) {
+			// increase score and check win conditions
+			state.getGoldenBuggy()->incrementScore();
+			int theScore = state.getGoldenBuggy()->getScore();
+			if ((theScore % 100) == 0) {
+				std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
 			}
-			else {
-				sound.playLossSound(state.getPlayer(0)->getPos());
+			if (theScore >= state.getMaxScore() && gameOver == false) {
+				winner = state.getGoldenBuggyID();
+				printf("Player %i is the winner!\n", winner);
+				if (winner == 0) {
+					sound.playWinSound(state.getPlayer(0)->getPos());
+				}
+				else {
+					sound.playLossSound(state.getPlayer(0)->getPos());
+				}
+				gameOver = true;
+				//break;
 			}
-			gameOver = true;
-			//break;
 		}
 
 		//Get path
