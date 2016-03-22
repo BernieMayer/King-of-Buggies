@@ -89,7 +89,7 @@ public:
 	void createPowerup(unsigned int objectID);
 	void createBoostPad(vec3 position);
 	void createPowerups();
-	void createPowerupBoxes();
+	void createPowerupBox();
 	void createBall(float radius);
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);

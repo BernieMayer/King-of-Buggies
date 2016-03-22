@@ -153,7 +153,7 @@ Physics::Physics() {
 unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 {
 	PxVehicleDrive4W* veh = initVehicle(traits, PxVec3(initPos.x, initPos.y, initPos.z));
-	vehicleActors.push_back(Vehicle(* veh));
+	vehicleActors.push_back(Vehicle(* veh, traits));
 
 	//This shouldn't be in physics at all
 	//Easy way for PHYSX to be notified that a vehicle is the goldenBuggy
@@ -229,7 +229,7 @@ void Physics::applyMineExplosion(unsigned int vehicleNum)
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(forceVec));
 
 		vec3 upVec = lastState->getPlayer(vehicleNum)->getUp();
-		upVec = 400000.f * upVec * vec3(0,1,0);
+		upVec = 800000.f * upVec * vec3(0,1,0);
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
 	}
 

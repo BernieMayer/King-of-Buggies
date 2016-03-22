@@ -230,6 +230,23 @@ void GameManager::createPowerup(unsigned int objectID)
 	state.addMine(newMine);
 }
 
+void GameManager::createPowerupBox()
+{
+	unsigned int box = renderer.generateObjectID();
+	//state.getPowerupBox(i)->setRenderID(box);
+
+	MeshObject* boxMesh = meshInfo.getMeshPointer(CUBE);
+
+	renderer.assignMeshObject(box, boxMesh);
+	renderer.assignMaterial(box, &tsMat);
+	renderer.assignTexture(box, boxMesh->getTextureID());
+
+	PowerupBox newBox = PowerupBox();
+	newBox.setRenderID(box);
+	newBox.setPos(vec3(0.f, 0.f, 2.f));
+	state.addPowerupBox(newBox);
+}
+
 void GameManager::createBoostPad(vec3 position)
 {
 	BoostPad newBoostPad;
@@ -610,6 +627,7 @@ void GameManager::initTestScene()
 		createCoin(i);
 	}
 
+	createPowerupBox();
 	//createBoostPad(vec3(10.f, -0.3f, 10.f));
 	//createBoostPad(vec3(10.f, -0.3f, 10.f));
 	
@@ -621,14 +639,17 @@ void GameManager::initTestScene()
 	ai.initAI();
 	sound = SoundManager(state);
 
-	/*
+
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
-	_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(centerBox, -1.f, 1.f, 4.f, 2.f, ANCHOR::TOP_LEFT);
-	*/
+
+
+	_interface.assignTexture(centerBox, skyboxTextureID, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
+
+
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 
@@ -639,33 +660,5 @@ void GameManager::quitGame(unsigned int winnerID)
 {
 
 }
-
-
-
-/*
-
-
-void GameManager::createPowerupBoxes()
-{
-int i = 0;
-while (i < NUM_POWERBOXES) {
-unsigned int box = renderer.generateObjectID();
-state.getPowerupBox(i)->setRenderID(box);
-
-// leave commented for now, there's no powerup meshes
-//MeshObject coinMesh = meshInfo.getMesh(POWERUP);
-MeshObject boxMesh = meshInfo.getMesh(SPHERE);
-vector<vec3> boxVerts = boxMesh.getVertices();
-vector<vec3> boxNormals = boxMesh.getNormals();
-vector<unsigned int> boxIndices = boxMesh.getIndices();
-
-renderer.assignMesh(box, &boxVerts);
-renderer.assignNormals(box, &boxNormals);
-renderer.assignIndices(box, &boxIndices);
-renderer.assignMaterial(box, &tsMat);
-i++;
-}
-}
-*/
 
 #endif // GAMEMANAGER_CPP
