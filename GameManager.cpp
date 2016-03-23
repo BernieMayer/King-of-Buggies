@@ -272,7 +272,7 @@ void GameManager::initMenus() {
 	_interface.setDimensions(menu, 1.f, -1.f, 4.f, 2.f, ANCHOR::BOTTOM_RIGHT);
 
 	while (currentMenu != lastMenu) {
-		renderer.clearDrawBuffers();
+		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
 		_interface.drawAll(&renderer);
 
@@ -535,7 +535,7 @@ void GameManager::gameLoop()
 			displayDebugging = !displayDebugging;
 
 		//Draw scene
-		renderer.clearDrawBuffers();
+		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 		renderer.drawAll();
 		renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 		renderer.drawRadar(state.setupRadar(0));

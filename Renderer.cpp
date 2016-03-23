@@ -263,8 +263,9 @@ void Renderer::updateObjectTransforms(GameState* state)
 /**
 * Rendering functionality
 **/
-void Renderer::clearDrawBuffers()
+void Renderer::clearDrawBuffers(vec3 color)
 {
+	glClearColor(color.x, color.y, color.z, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

@@ -159,7 +159,7 @@ public:
 	void disableShadowCasting(unsigned int object);
 
 	//Drawing calls
-	void clearDrawBuffers();
+	void clearDrawBuffers(vec3 color);
 	void draw(unsigned int object);
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
