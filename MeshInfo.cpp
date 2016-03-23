@@ -44,6 +44,13 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
+	meshLoader.loadModel("models\\boost.obj");
+	//texID = LoadTexture("textures\\bombtexture.png");
+	MeshObject boostObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);//, texID);
+	meshes.push_back(boostObject);
+
+	meshLoader.clearData();
+
 	meshLoader.loadModel("models\\donutlevel.obj");
 	texID = LoadTexture("textures\\donutleveltexture.png");
 	MeshObject levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);

@@ -224,6 +224,8 @@ unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
 void GameState::addBoostPad(const BoostPad& boostPad) { boostPads.push_back(boostPad); }
 
+BoostPad* GameState::getBoostPad(unsigned int boostNum) { return &boostPads[boostNum]; }
+
 unsigned int GameState::numberOfBoostPads(){ return boostPads.size(); }
 
 bool GameState::checkBoostPadCollision(vec3 playerPos)

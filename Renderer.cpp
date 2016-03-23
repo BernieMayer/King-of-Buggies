@@ -257,6 +257,13 @@ void Renderer::updateObjectTransforms(GameState* state)
 		Mine* mine = state->getMine(i);
 		assignTransform(mine->getRenderID(), mine->getTransform());
 	}
+
+	for (unsigned int i = 0; i < state->numberOfBoostPads(); i++)
+	{
+		BoostPad* boost = state->getBoostPad(i);
+		assignTransform(boost->getRenderID(), boost->getTransform());
+	}
+
 }
 
 
