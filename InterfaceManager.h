@@ -58,6 +58,8 @@ public:
 	unsigned int getScoreBarHeight();
 
 	void setWindowDim(int width, int height);
+
+	void clear();
 	
 	vector<vector<vec3>> generateScoreBars(GameState* state);
 

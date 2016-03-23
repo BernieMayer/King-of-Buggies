@@ -69,6 +69,11 @@ InterfaceManager::InterfaceManager(unsigned int windowWidth, unsigned int window
 
 }
 
+void InterfaceManager::clear()
+{
+	components.clear();
+}
+
 void InterfaceManager::updateWinRatio()
 {
 	float minDim = min((float)wWidth, (float)wHeight);
