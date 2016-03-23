@@ -87,8 +87,8 @@ public:
 
 	//BoostPad management
 	void addBoostPad(const BoostPad& boostPad);
+	BoostPad* getBoostPad(unsigned int boostNum);
 	//TODO setBoostPad
-	//TODO getBoostPad
 	unsigned int numberOfBoostPads();
 	bool checkBoostPadCollision(vec3 playerPos);
 

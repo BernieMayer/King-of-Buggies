@@ -244,14 +244,21 @@ void GameManager::createPowerupBox()
 
 void GameManager::createBoostPad(vec3 position)
 {
-	BoostPad newBoostPad;
+	unsigned int boost = renderer.generateObjectID();
+	//state.getPowerupBox(i)->setRenderID(box);
+
+	MeshObject* boostMesh = meshInfo.getMeshPointer(BOOST);
+
+	renderer.assignMeshObject(boost, boostMesh);
+	renderer.assignMaterial(boost, &tsMat);
+	//renderer.assignTexture(boost, boostMesh->getTextureID());
+	renderer.assignColor(boost, vec3(0.f, 1.f, 0.f));
+
+	BoostPad newBoostPad = BoostPad();
 	newBoostPad.setDefault(position);
-	//Set up the mesh here...
-
-	//renderer stuff here
-
+	newBoostPad.setRenderID(boost);
+	newBoostPad.setPos(vec3(0.f, 0.f, 2.f));
 	state.addBoostPad(newBoostPad);
-
 }
 
 void GameManager::initMenus() {

@@ -201,6 +201,7 @@ bool MeshInfoLoader::loadModel(char *filename)
 
 	sharedIndices(_faces, _nfaces, _uvfaces, _normals, _uvs, vertices, normals, uvs, indices);
 
+	fclose(f);
 	return true;
 }
 
