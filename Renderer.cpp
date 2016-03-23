@@ -331,6 +331,7 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	
 	glUseProgram(0);
 
+	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, windowWidth, 0, windowHeight);
