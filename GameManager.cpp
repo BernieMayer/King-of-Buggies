@@ -3,11 +3,6 @@
 
 #include "GameManager.h"
 
-unsigned char testTexture[12] = {	0, 0, 255,
-									0, 255, 0,
-									255, 0, 0,
-									255, 255, 255};
-
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
 	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
 {
@@ -640,7 +635,12 @@ void GameManager::initTestScene()
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
+	createPlayer(vec3(-5.f, 5.f, 15.f), traits);
+	createPlayer(vec3(5.f, 5.f, -15.f), traits);
+
 	state.getPlayer(1)->setAI(true);
+	state.getPlayer(2)->setAI(true);
+	state.getPlayer(3)->setAI(true);
 	
 	//Create skybox
 	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");

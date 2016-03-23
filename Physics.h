@@ -133,7 +133,7 @@ private:
 
 	PxMaterial* mMaterial = NULL;		//A version of this has been added to Vehicle (Bernie Mayer)
 
-	PxVehicleDrive4WRawInputData* inputs[4];	//Move to Vehicle.h & Vehicle.cpp
+	PxVehicleDrive4WRawInputData* inputs[5];	//Move to Vehicle.h & Vehicle.cpp
 
 	PxBatchQuery*			gBatchQuery = NULL;
 	PxVehicleDrivableSurfaceToTireFrictionPairs* gFrictionPairs = NULL;

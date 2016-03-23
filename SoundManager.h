@@ -51,7 +51,7 @@ private:
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
-	ALuint engineSources[5];
+	ALuint engineSources[105];
 	ALuint listener;
 	vector<ALuint> oneTimeUseBuffers;
 	vector<ALuint> oneTimeUseSources;

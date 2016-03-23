@@ -366,6 +366,9 @@ void SoundManager::loadWavToBuf(string fileName, ALuint* source, ALuint* buffer)
 	}
 
 	alBufferData(*buffer, format, buf, dataSize, frequency);
+
+	delete[] buf;
+	fclose(fp);
 }
 
 /*
