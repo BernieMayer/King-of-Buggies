@@ -31,6 +31,8 @@ bool LevelInfoLoader::loadLevelData(char *filename)
 			levelData.push_back(vert);
 		}	
 	}
+
+	fclose(f);
 	return true;
 }
 
