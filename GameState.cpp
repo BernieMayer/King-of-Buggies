@@ -101,16 +101,16 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 	vec3 player3Dpos = player->getPos();
 
-	vec3 rightVector = cross(player->getForward() , player->getUp());
+	vec3 rightVector = player->getRight();
 	
 	vec3 player3DposUp = player->getForward();
 
 	vec3 player3DposRight = -rightVector;
 	vec3 player3DposLeft = rightVector;
 
-	vec2 playerLeft =  vec2(player3DposLeft.x, player3DposLeft.z);
-	vec2 playerRight = vec2(player3DposRight.x, player3DposRight.z);
-	vec2 playerUp =  vec2(-player3DposUp.x, -player3DposUp.z);
+	vec2 playerLeft =  vec2(player3DposRight.x, -player3DposRight.z);
+	vec2 playerRight = vec2(player3DposLeft.x, -player3DposLeft.z);
+	vec2 playerUp =  vec2(player3DposUp.x, -player3DposUp.z);
 
 
 	vec3 origin = vec3((playerLeft.x + playerRight.x) / 2, 0, (playerLeft.y + playerRight.y) / 2);
@@ -120,7 +120,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vectors.push_back( playerRight);
 
 	int radarSize = 50;
-	for (unsigned int i = 9; i < numberOfPlayers(); i++)
+	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
 		if (i != playerId)
 		{
@@ -141,9 +141,9 @@ vector<vec2> GameState::setupRadar(int playerId)
 				vec3 otherPlayer3DUp =   getPlayer(i)->getForward();
 				vec3 otherPlayer3DRight =cross(getPlayer(i)->getForward(), getPlayer(i)->getUp());
 				
-				vec2 otherPlayerLeft = vec2(otherPlayerCenter.x - otherPlayer3DRight.x, otherPlayerCenter.z - otherPlayer3DRight.z);
-				vec2 otherPlayerRight = vec2(otherPlayerCenter.x + otherPlayer3DRight.x, otherPlayerCenter.z + otherPlayer3DRight.z);
-				vec2 otherPlayerUp = vec2(otherPlayerCenter.x + otherPlayer3DUp.x, otherPlayerCenter.z + otherPlayer3DUp.z);
+				vec2 otherPlayerLeft = vec2(otherPlayerCenter.x - otherPlayer3DRight.x, -(otherPlayerCenter.z - otherPlayer3DRight.z));
+				vec2 otherPlayerRight = vec2(otherPlayerCenter.x + otherPlayer3DRight.x, -(otherPlayerCenter.z + otherPlayer3DRight.z));
+				vec2 otherPlayerUp = vec2(otherPlayerCenter.x + otherPlayer3DUp.x, -(otherPlayerCenter.z + otherPlayer3DUp.z));
 			
 				vectors.push_back(otherPlayerLeft);
 				vectors.push_back(otherPlayerUp);
