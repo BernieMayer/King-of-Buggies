@@ -32,6 +32,37 @@ void PlayerInfo::setAI(bool value) { ai = value; }
 int PlayerInfo::getScore() { return score; }
 void PlayerInfo::incrementScore() {	score++; }
 
+void PlayerInfo::addPowerUp(int id)
+{
+	powerUps.push_back(id);
+}
+
+int PlayerInfo::usePowerUp()
+{
+	if (powerUps.size() == 0)
+	{
+		return -1;
+	}
+	else
+	{
+		int powerUpID = powerUps[0];
+		powerUps.pop_back();
+		return powerUpID;
+	}
+}
+
+void PlayerInfo::removePowerup()
+{
+	if (powerUps.size() == 0)
+	{
+		return;
+	}
+	else
+	{
+		powerUps.pop_back();
+	}
+}
+
 unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 {
 	if (wheelNum < 4)

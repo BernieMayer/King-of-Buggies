@@ -7,19 +7,25 @@ GameState::GameState()
 {
 	maxScore = 2000;
 }
-
-GameState::GameState(MeshObject* selectedLevel, char *coinsFile)
+/*
+GameState::GameState(MeshObject* selectedLevel, char *coinsFile, char *boostFile)
 {
 	maxScore = 2000;
-	map = LevelInfo(selectedLevel, coinsFile);
+	map = LevelInfo(selectedLevel, coinsFile, boostFile);
 	vector<vec3> coinCoords = map.getCoinLocations();
 	for (unsigned int i = 0; i < coinCoords.size(); i++) {
 		Coin newCoin = Coin();
 		newCoin.setPos(coinCoords[i]);
 		addCoin(newCoin);
 	}
+	vector<vec3> boostCoords = map.getBoostLocations();
+	for (unsigned int i = 0; i < boostCoords.size(); i++) {
+		BoostPad newBoost = BoostPad();
+		newBoost.setDefault(boostCoords[i]);
+		addBoostPad(newBoost);
+	}
 }
-
+*/
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
 void GameState::addAI(const PlayerInfo& pinfo){ ai.push_back(pinfo); }
 
@@ -220,7 +226,26 @@ Mine* GameState::getMine(unsigned int mineNum)
 
 unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
+void GameState::checkCoinRespawns() 
+{
+	for (unsigned int i = 0; i < coins.size(); i++) {
+		vec3 pos = coins[i].getPos();
 
+		coins[i].setTransform(coins[i].getRotation((1.f / 60.f)*2.f*3.1415926f));
+
+		if (coins[i].isCollided()) {
+			// countdown to coin respawn
+			coins[i].decrementCountdown();
+			if (coins[i].getCountdown() < 0) {
+				// reset coin to original spawn location
+				vec3 newPos = pos;
+				newPos.y = pos.y + 20;
+				coins[i].setPos(newPos);
+				coins[i].setCollided(false);
+			}
+		}
+	}
+}
 
 void GameState::addBoostPad(const BoostPad& boostPad) { boostPads.push_back(boostPad); }
 
@@ -325,20 +350,7 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 	for (unsigned int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
 		
-		coins[i].setTransform(coins[i].getRotation((1.f/60.f)*2.f*3.1415926f));
-
-		if (coins[i].isCollided()) {
-			// countdown to coin respawn
-			coins[i].decrementCountdown();
-			if (coins[i].getCountdown() < 0) {
-				// reset coin to original spawn location
-				vec3 newPos = pos;
-				newPos.y = pos.y + 20;
-				coins[i].setPos(newPos);
-				coins[i].setCollided(false);
-			}
-		}
-		else {
+		if (!coins[i].isCollided()) {
 			vec3 difference = pos - playerPos;
 
 			//change coin to spawn below level if it is hit by a player
@@ -379,14 +391,28 @@ void GameState::clearEvents()
 	events.clear();
 }
 
-void GameState::setMap(MeshObject* arena, char *coinLocations) 
+void GameState::setMap(MeshObject* arena, char *coinLocations, char *boostLocations, char *boxLocations) 
 {
-	map = LevelInfo(arena, coinLocations);
+	map = LevelInfo(arena, coinLocations, boostLocations, boxLocations);
 	vector<vec3> coinCoords = map.getCoinLocations();
+	vector<vec3> boostCoords = map.getBoostLocations();
+	vector<vec3> boxCoords = map.getBoxLocations();
+
 	for (unsigned int i = 0; i < coinCoords.size(); i++) {
 		Coin newCoin = Coin();
 		newCoin.setPos(coinCoords[i]);
 		addCoin(newCoin);
+	}
+	for (unsigned int i = 0; i < boostCoords.size(); i++) {
+		BoostPad newBoost = BoostPad();
+		newBoost.setDefault(boostCoords[i]);
+		addBoostPad(newBoost);
+	}
+
+	for (unsigned int i = 0; i < boxCoords.size(); i++) {
+		PowerupBox newBox = PowerupBox();
+		newBox.setPos(boxCoords[i]);
+		addPowerupBox(newBox);
 	}
 }
 

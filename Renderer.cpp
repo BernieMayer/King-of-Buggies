@@ -267,6 +267,11 @@ void Renderer::updateObjectTransforms(GameState* state)
 		assignTransform(boost->getRenderID(), boost->getTransform());
 	}
 
+	for (unsigned int i = 0; i < state->numberOfPowerupBoxes(); i++)
+	{
+		PowerupBox* box = state->getPowerupBox(i);
+		assignTransform(box->getRenderID(), box->getTransform());
+	}
 }
 
 /**
@@ -415,6 +420,14 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 		//REMOVE IN PRODUCTION
 		if (i >= 2 && i < 5){
 			glColor3f(0, 0, 1);
+		}
+		else if (i >= 5 && i < 8)
+		{
+			glColor3f(0, 1, 0);
+		}
+		else if (i >= 8 && i < 11)
+		{
+			glColor3f(1, 1, 0);
 		}
 	}
 	

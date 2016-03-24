@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include "Entity.h"
+#include <vector>
 
 class PlayerInfo: public Entity {
 public:
@@ -37,11 +38,17 @@ public:
 	bool getInAir() { return inAir; }
 	void setInAir(bool air) { inAir = air; }
 
+	void addPowerUp(int id);
+	int usePowerUp();
+	void removePowerup();
+	
+
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
 	vec3 velocity;
 
+	std::vector<int> powerUps;
 	int powerup;
 	int numCoins;
 	int powerupCounter;

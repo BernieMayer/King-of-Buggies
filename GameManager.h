@@ -17,6 +17,17 @@
 
 #include <GLFW/glfw3.h>  
 
+/*
+1 - Nitro Boost
+2 - Bomb
+3 - Mine
+4 - Coin?
+5 - Decoy?
+*/
+struct POWERUPS{
+	enum { NITROBOOST = 0, BOMB, MINE, COIN,  DECOY, COUNT };
+};
+
 class GameManager {
 private:
 	// Object materials
@@ -68,6 +79,7 @@ private:
 	vector<unsigned int> ballIndices;	//TEMPORARY
 	vector<vec2> ballUVs;				//TEMPORARY
 
+	
 	//Skybox - Temporary
 	vector<vec3> skyboxVerts;
 	vector<vec2> skyboxUVs;
@@ -75,6 +87,15 @@ private:
 	unsigned int skyboxTextureID;
 	unsigned int skyboxID;
 	Unshaded skyMaterial;
+
+	vector<bool> hasPowerup;
+	/*
+	vector<int> player1powerUpList;
+	vector<int> player2powerUpList;
+	vector<int> player3powerUpList;
+	vector<int> player4powerUpList;
+	*/
+
 
 	unsigned int carSelectScreen;
 
@@ -90,9 +111,8 @@ public:
 	void createLevel(unsigned int objectID);
 	void createCoin(unsigned int coinIndex);
 	void createPowerup(unsigned int objectID);
-	void createBoostPad(vec3 position);
-	void createPowerups();
-	void createPowerupBox();
+	void createBoostPad(unsigned int objectID);
+	void createPowerupBox(unsigned int objectID);
 	void createBall(float radius);
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);
@@ -105,6 +125,8 @@ public:
 	void gameInit();
 	void initTestScene();
 	void quitGame(unsigned int winnerID);
+
+	int randomPowerup();
 
 
 };
