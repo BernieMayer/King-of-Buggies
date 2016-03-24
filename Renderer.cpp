@@ -389,6 +389,14 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 		if (i >= 2 && i < 5){
 			glColor3f(0, 0, 1);
 		}
+		else if (i >= 5 && i < 8)
+		{
+			glColor3f(0, 1, 0);
+		}
+		else if (i >= 8 && i < 11)
+		{
+			glColor3f(1, 1, 0);
+		}
 	}
 	
 

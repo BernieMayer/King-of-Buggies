@@ -6,6 +6,7 @@
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
 	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
 {
+	srand(time(NULL));
 	window = newWindow;
 	mat = Diffuse();
 	shinyMat = Specular(20.f);
@@ -331,6 +332,11 @@ void GameManager::gameLoop()
 
 	timeb loopStart = clock.getCurrentTime();
 
+	hasPowerup.push_back(false);
+	
+	
+
+
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -416,6 +422,9 @@ void GameManager::gameLoop()
 				renderer.assignMaterial(b.getRenderID(), &tsMat);
 				renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(BOMB)->getTextureID());
 				state.pushEvent(new BombCreationEvent(location));
+
+
+				
 			}
 		}
 
@@ -433,9 +442,63 @@ void GameManager::gameLoop()
 			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 
 			if (state.numberOfMines() < 20){
-				printf("cheated in placing a Mine \n");
-				createPowerup(MINE);
+				//printf("cheated in placing a Mine \n");
+				//createPowerup(MINE);
 			}
+
+			if (hasPowerup.at(0))
+			{
+				
+				
+				/*
+				1 - Nitro Boost
+				2 - Bomb
+				3 - Mine
+				4 - Coin?
+				5 - Decoy?
+				*/
+
+				
+				int powerUpID = state.getPlayer(0)->usePowerUp();
+				printf("Powerup id is %d \n", powerUpID);
+
+				
+
+				hasPowerup.at(0) = false;
+
+			} 
+			else {
+			
+				int powerUpId = randomPowerup();
+				if (powerUpId == POWERUPS::NITROBOOST)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					printf("Nitro Boost \n");
+				}
+				else if (powerUpId == POWERUPS::BOMB)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					printf("Bomb \n");
+				}
+				else if (powerUpId == POWERUPS::MINE)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					createPowerup(MINE);
+					printf("Mine \n");
+				}
+				else if (powerUpId == POWERUPS::COIN)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					printf("Coin? \n");
+				}
+				else if (powerUpId == POWERUPS::DECOY)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					printf("Decoy? \n");
+				}
+				hasPowerup.at(0) = true;
+			}
+			
 		}
 
 		//Update game state and renderer
@@ -706,6 +769,23 @@ void GameManager::initTestScene()
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 
 	
+}
+
+int GameManager::randomPowerup()
+{
+	/*
+	1 - Nitro Boost
+	2 - Bomb 
+	3 - Mine
+	4 - Coin?
+	5 - Decoy?
+
+	*/
+	/* initialize random seed: */
+	
+
+	int powerupId = rand() % 4;
+	return powerupId;
 }
 
 void GameManager::quitGame(unsigned int winnerID)
