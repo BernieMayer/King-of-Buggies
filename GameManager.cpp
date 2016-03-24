@@ -484,6 +484,7 @@ void GameManager::gameLoop()
 					state.removeMine(hasMineCollision);
 				}
 			}
+			state.checkCoinRespawns();
 		}
 
 		//Update camera position

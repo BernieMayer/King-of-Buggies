@@ -82,8 +82,8 @@ public:
 	void addCoin(const Coin& coin);
 	void setCoin(unsigned int coinNum, const Coin& coin);
 	Coin* getCoin(unsigned int coinNum);
-	Mine* getMine(unsigned int mineNum);
 	unsigned int numberOfCoins();
+	void checkCoinRespawns();
 
 	//BoostPad management
 	void addBoostPad(const BoostPad& boostPad);
@@ -95,6 +95,7 @@ public:
 	//Mine management
 	void addMine(const Mine& mine);
 	void removeMine(unsigned int objectID);
+	Mine* getMine(unsigned int mineNum);
 	//TODO setMine
 	unsigned int numberOfMines();
 	int checkMineCollision(vec3 playerPos);

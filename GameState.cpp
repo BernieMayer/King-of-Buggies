@@ -220,7 +220,26 @@ Mine* GameState::getMine(unsigned int mineNum)
 
 unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
+void GameState::checkCoinRespawns() 
+{
+	for (unsigned int i = 0; i < coins.size(); i++) {
+		vec3 pos = coins[i].getPos();
 
+		coins[i].setTransform(coins[i].getRotation((1.f / 60.f)*2.f*3.1415926f));
+
+		if (coins[i].isCollided()) {
+			// countdown to coin respawn
+			coins[i].decrementCountdown();
+			if (coins[i].getCountdown() < 0) {
+				// reset coin to original spawn location
+				vec3 newPos = pos;
+				newPos.y = pos.y + 20;
+				coins[i].setPos(newPos);
+				coins[i].setCollided(false);
+			}
+		}
+	}
+}
 
 void GameState::addBoostPad(const BoostPad& boostPad) { boostPads.push_back(boostPad); }
 
@@ -325,20 +344,7 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 	for (unsigned int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
 		
-		coins[i].setTransform(coins[i].getRotation((1.f/60.f)*2.f*3.1415926f));
-
-		if (coins[i].isCollided()) {
-			// countdown to coin respawn
-			coins[i].decrementCountdown();
-			if (coins[i].getCountdown() < 0) {
-				// reset coin to original spawn location
-				vec3 newPos = pos;
-				newPos.y = pos.y + 20;
-				coins[i].setPos(newPos);
-				coins[i].setCollided(false);
-			}
-		}
-		else {
+		if (!coins[i].isCollided()) {
 			vec3 difference = pos - playerPos;
 
 			//change coin to spawn below level if it is hit by a player
