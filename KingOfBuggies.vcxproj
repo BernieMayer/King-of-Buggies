@@ -95,6 +95,8 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="CollisionEvent.h" />
+    <ClInclude Include="Definitions.h" />
+    <ClInclude Include="TimedEvent.h" />
     <ClInclude Include="unshaded.h" />
     <ClInclude Include="diffuse.h" />
     <ClInclude Include="DrivingController.h" />

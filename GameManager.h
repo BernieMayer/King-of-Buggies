@@ -12,6 +12,7 @@
 #include "SoundManager.h"
 #include "NavMesh.h"
 #include "Timer.h"
+#include "Definitions.h"
 
 
 #include <GLFW/glfw3.h>  

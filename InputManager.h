@@ -9,6 +9,7 @@
 #include "Keybindings.h"
 #include "InputSmoother.h"
 #include "Timer.h"
+#include "Definitions.h"
 
 class InputManager
 {
@@ -28,11 +29,11 @@ private:
 	const int honkButton = 3;
 
 	GLFWwindow* window;
-	Gamepad gamepads[105];
+	Gamepad gamepads[MAX_PLAYERS];
 	int numPlayers;
 	Timer rumbleTimer;
-	timeb rumbleStartTimes[105];
-	float rumbleEndTimes[105];
+	timeb rumbleStartTimes[MAX_PLAYERS];
+	float rumbleEndTimes[MAX_PLAYERS];
 	
 };
 

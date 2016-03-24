@@ -170,6 +170,10 @@
     <ClInclude Include="Bomb.h">
       <Filter>Entities</Filter>
     </ClInclude>
+    <ClInclude Include="TimedEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Definitions.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

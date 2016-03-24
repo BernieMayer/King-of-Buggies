@@ -35,6 +35,12 @@ struct VBO{
 	enum { VERT = 0, NORMALS, UVS, INDICES, COUNT };
 };
 
+struct Viewport{
+	unsigned int x, y, width, height;
+
+	Viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) :x(x), y(y), width(width), height(height){}
+};
+
 const unsigned int DEFAULT_WIDTH = 800;
 const unsigned int DEFAULT_HEIGHT = 800;
 
@@ -76,6 +82,7 @@ private:
 
 	vector<ObjectInfo> objects;		//Objects to be drawn
 	vector<LightInfo> lights;
+	vector<Viewport> viewports;
 
 	//Transform matrices
 	mat4 projection;
@@ -169,6 +176,12 @@ public:
 	//Debugging draw calls
 	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);
+
+	//Viewports
+	unsigned int addViewport(float x, float y, float width, float height);	//Set viewport in 0 to 1 floats
+	unsigned int addViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);	  //Set viewport in pixels
+	void useViewport(unsigned int index);
+	void useDefaultViewport();
 
 	//Delete objects
 	void deleteDrawableObject(int object);

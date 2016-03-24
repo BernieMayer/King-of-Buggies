@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include "GameState.h"
 #include "Input.h"
+#include "Definitions.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -51,7 +52,7 @@ private:
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicSource;
-	ALuint engineSources[105];
+	ALuint engineSources[MAX_PLAYERS];
 	ALuint listener;
 	vector<ALuint> oneTimeUseBuffers;
 	vector<ALuint> oneTimeUseSources;

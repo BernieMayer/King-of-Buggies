@@ -311,7 +311,7 @@ void GameManager::gameLoop()
 
 	// 5 because of 4 players and the inital golden buggy which is not
 	// a player
-	Input inputs[105];
+	Input inputs[MAX_PLAYERS];
 
 	//Test code (Gives AI initial random path
 	ai.testTarget = ai.getRandomTarget();

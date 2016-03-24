@@ -266,6 +266,38 @@ void Renderer::updateObjectTransforms(GameState* state)
 
 }
 
+/**
+* Viewports
+**/
+unsigned int Renderer::addViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
+{
+	viewports.push_back(Viewport(x, y, width, height));
+	return viewports.size() - 1;
+}
+
+unsigned int Renderer::addViewport(float x, float y, float width, float height)
+{
+	unsigned int x_int = (unsigned int)(x*(float)windowWidth);
+	unsigned int y_int = (unsigned int)(y*(float)windowHeight);
+	unsigned int width_int = (unsigned int)(width*(float)windowWidth);
+	unsigned int height_int = (unsigned int)(height*(float)windowHeight);
+
+	return addViewport(x_int, y_int, width_int, height_int);
+}
+
+void Renderer::useViewport(unsigned int viewport)
+{
+	Viewport& vp = viewports[viewport];
+
+	glViewport(vp.x, vp.y, vp.width, vp.height);
+}
+
+void Renderer::useDefaultViewport()
+{
+	glViewport(0, 0, windowWidth, windowHeight);
+}
+
+
 
 /**
 * Rendering functionality
