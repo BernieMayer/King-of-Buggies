@@ -41,7 +41,7 @@ struct Viewport{
 
 	const unsigned int DEFAULT = 0;
 
-	Viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) :x(x), y(y), width(width), height(height):winRatio(1.f) {}
+	Viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) :x(x), y(y), width(width), height(height), winRatio(1.f) {}
 };
 
 const unsigned int DEFAULT_WIDTH = 800;
