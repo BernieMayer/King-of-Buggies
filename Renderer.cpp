@@ -74,6 +74,9 @@ projection(1.f), modelview(1.f)
 
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 
+	addViewport(0.f, 0.f, 1.f, 1.f);
+
+
 	initializeVAOs();
 	
 }
@@ -285,6 +288,29 @@ unsigned int Renderer::addViewport(float x, float y, float width, float height)
 	return addViewport(x_int, y_int, width_int, height_int);
 }
 
+void Renderer::splitScreenViewports(unsigned int numViewports)
+{
+	switch (numViewports)
+	{
+	case 2:
+		addViewport(0.f, 0.f, 1.f, 0.5f);
+		addViewport(0.f, 0.5f, 1.f, 0.5f);
+		break;
+	case 3:
+		addViewport(0.f, 0.f, 0.5f, 0.5f);
+		addViewport(0.5f, 0.f, 0.5f, 0.5f);
+		addViewport(0.f, 0.5f, 1.f, 0.5f);
+		break;
+	case 4:
+		addViewport(0.f, 0.f, 0.5f, 0.5f);
+		addViewport(0.5f, 0.f, 0.5f, 0.5f);
+		addViewport(0.f, 0.5f, 0.5f, 0.5f);
+		addViewport(0.5f, 0.5f, 0.5f, 0.5f);
+	}
+
+
+}
+
 void Renderer::useViewport(unsigned int viewport)
 {
 	Viewport& vp = viewports[viewport];
@@ -292,12 +318,13 @@ void Renderer::useViewport(unsigned int viewport)
 	glViewport(vp.x, vp.y, vp.width, vp.height);
 }
 
-void Renderer::useDefaultViewport()
+void Renderer::updateViewportSizes()
 {
-	glViewport(0, 0, windowWidth, windowHeight);
+	for (unsigned int i = 0; i < viewports.size(); i++)
+	{
+
+	}
 }
-
-
 
 /**
 * Rendering functionality

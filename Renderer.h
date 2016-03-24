@@ -36,9 +36,12 @@ struct VBO{
 };
 
 struct Viewport{
-	unsigned int x, y, width, height;
+	unsigned int x, y, width, height;		//Change to floats
+	mat4 winRatio;							//Get rid of?
 
-	Viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) :x(x), y(y), width(width), height(height){}
+	const unsigned int DEFAULT = 0;
+
+	Viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) :x(x), y(y), width(width), height(height):winRatio(1.f) {}
 };
 
 const unsigned int DEFAULT_WIDTH = 800;
@@ -181,7 +184,9 @@ public:
 	unsigned int addViewport(float x, float y, float width, float height);	//Set viewport in 0 to 1 floats
 	unsigned int addViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height);	  //Set viewport in pixels
 	void useViewport(unsigned int index);
-	void useDefaultViewport();
+	void splitScreenViewports(unsigned int numViewports);
+	mat4 getViewportRatio(unsigned int viewport);
+	void updateViewportSizes();		//Call to allow viewports to adjust to rescaling
 
 	//Delete objects
 	void deleteDrawableObject(int object);
