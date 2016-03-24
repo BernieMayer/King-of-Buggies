@@ -114,7 +114,7 @@ public:
 	unsigned int numberOfPowerupBoxes();
 
 	// Map management
-	void setMap(MeshObject* arena, char *coinLocations, char *boostLocations);
+	void setMap(MeshObject* arena, char *coinLocations, char *boostLocations, char *boxLocations);
 
 	bool checkCoinCollision(vec3 playerPos);
 };

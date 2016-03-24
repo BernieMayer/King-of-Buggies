@@ -225,35 +225,29 @@ void GameManager::createPowerup(unsigned int objectID)
 	state.addMine(newMine);
 }
 
-void GameManager::createPowerupBox()
+void GameManager::createPowerupBox(unsigned int objectID)
 {
 	unsigned int box = renderer.generateObjectID();
-	//state.getPowerupBox(i)->setRenderID(box);
-
 	MeshObject* boxMesh = meshInfo.getMeshPointer(CUBE);
 
 	renderer.assignMeshObject(box, boxMesh);
 	renderer.assignMaterial(box, &tsMat);
 	renderer.assignTexture(box, boxMesh->getTextureID());
-
-	PowerupBox newBox = PowerupBox();
-	newBox.setRenderID(box);
-	newBox.setPos(vec3(0.f, 0.f, 2.f));
-	state.addPowerupBox(newBox);
+	
+	state.getPowerupBox(objectID)->setRenderID(box);
 }
 
 void GameManager::createBoostPad(unsigned int objectID)
 {
-	BoostPad* newBoost = state.getBoostPad(objectID);
 	MeshObject* boostMesh = meshInfo.getMeshPointer(BOOST);
-
 	unsigned int boost = renderer.generateObjectID();
+
 	renderer.assignMeshObject(boost, boostMesh);
 	renderer.assignMaterial(boost, &tsMat);
 	renderer.assignColor(boost, vec3(0.f, 1.f, 0.f));
 	//renderer.assignTexture
 
-	newBoost->setRenderID(boost);
+	state.getBoostPad(objectID)->setRenderID(boost);
 }
 
 void GameManager::initMenus() {
@@ -614,7 +608,7 @@ void GameManager::gameInit()
 	// temporary since we only have one level right now
 	createLevel(DONUTLEVEL);
 	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj");
+	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
 
 	initTestScene();
 }
@@ -670,8 +664,7 @@ void GameManager::initTestScene()
 
 	for (unsigned int i = 0; i < state.numberOfBoostPads(); i++) { createBoostPad(i); }
 
-	createPowerupBox();
-	
+	for (unsigned int i = 0; i < state.numberOfPowerupBoxes(); i++) { createPowerupBox(i); }
 
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();

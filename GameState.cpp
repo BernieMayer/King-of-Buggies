@@ -7,7 +7,7 @@ GameState::GameState()
 {
 	maxScore = 2000;
 }
-
+/*
 GameState::GameState(MeshObject* selectedLevel, char *coinsFile, char *boostFile)
 {
 	maxScore = 2000;
@@ -25,7 +25,7 @@ GameState::GameState(MeshObject* selectedLevel, char *coinsFile, char *boostFile
 		addBoostPad(newBoost);
 	}
 }
-
+*/
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
 void GameState::addAI(const PlayerInfo& pinfo){ ai.push_back(pinfo); }
 
@@ -391,11 +391,12 @@ void GameState::clearEvents()
 	events.clear();
 }
 
-void GameState::setMap(MeshObject* arena, char *coinLocations, char *boostLocations) 
+void GameState::setMap(MeshObject* arena, char *coinLocations, char *boostLocations, char *boxLocations) 
 {
-	map = LevelInfo(arena, coinLocations, boostLocations);
+	map = LevelInfo(arena, coinLocations, boostLocations, boxLocations);
 	vector<vec3> coinCoords = map.getCoinLocations();
 	vector<vec3> boostCoords = map.getBoostLocations();
+	vector<vec3> boxCoords = map.getBoxLocations();
 
 	for (unsigned int i = 0; i < coinCoords.size(); i++) {
 		Coin newCoin = Coin();
@@ -406,6 +407,12 @@ void GameState::setMap(MeshObject* arena, char *coinLocations, char *boostLocati
 		BoostPad newBoost = BoostPad();
 		newBoost.setDefault(boostCoords[i]);
 		addBoostPad(newBoost);
+	}
+
+	for (unsigned int i = 0; i < boxCoords.size(); i++) {
+		PowerupBox newBox = PowerupBox();
+		newBox.setPos(boxCoords[i]);
+		addPowerupBox(newBox);
 	}
 }
 

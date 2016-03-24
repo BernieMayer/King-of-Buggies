@@ -264,6 +264,11 @@ void Renderer::updateObjectTransforms(GameState* state)
 		assignTransform(boost->getRenderID(), boost->getTransform());
 	}
 
+	for (unsigned int i = 0; i < state->numberOfPowerupBoxes(); i++)
+	{
+		PowerupBox* box = state->getPowerupBox(i);
+		assignTransform(box->getRenderID(), box->getTransform());
+	}
 }
 
 /**
