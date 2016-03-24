@@ -379,7 +379,7 @@ void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
 	glBegin(GL_QUADS);
 	
 	// each vector in segments stores the scorebar information for an individual player
-	for (unsigned int i = 0; i < segments.size(); i++) {
+	for (unsigned int i = 0; i < min(segments.size(), colors.size()); i++) {
 		vec3 color = colors[i];
 		glColor3f(color.x, color.y, color.z);
 

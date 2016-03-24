@@ -28,11 +28,11 @@ private:
 	const int honkButton = 3;
 
 	GLFWwindow* window;
-	Gamepad gamepads[5];
+	Gamepad gamepads[105];
 	int numPlayers;
 	Timer rumbleTimer;
-	timeb rumbleStartTimes[5];
-	float rumbleEndTimes[5];
+	timeb rumbleStartTimes[105];
+	float rumbleEndTimes[105];
 	
 };
 

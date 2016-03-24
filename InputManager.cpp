@@ -191,7 +191,7 @@ InputManager::InputManager(GLFWwindow* w)
 
 	numPlayers = 1;
 
-	for (int i = 1; i < 5; i++) {
+	for (int i = 1; i < 105; i++) {
 		Gamepad temp = Gamepad(i);
 
 		gamepads[i - 1] = temp;

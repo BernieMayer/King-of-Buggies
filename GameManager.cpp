@@ -311,7 +311,7 @@ void GameManager::gameLoop()
 
 	// 5 because of 4 players and the inital golden buggy which is not
 	// a player
-	Input inputs[5];
+	Input inputs[105];
 
 	//Test code (Gives AI initial random path
 	ai.testTarget = ai.getRandomTarget();
@@ -635,6 +635,7 @@ void GameManager::initTestScene()
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
 	traits.print();
 
+	unsigned int TOO_MANY = 0;
 
 	VehicleTraits temp = VehicleTraits(physics.getMaterial());
 	traits.loadConfiguration("base");
@@ -645,9 +646,19 @@ void GameManager::initTestScene()
 	createPlayer(vec3(-5.f, 5.f, 15.f), traits);
 	createPlayer(vec3(5.f, 5.f, -15.f), traits);
 
+	for (unsigned int i = 0; i < TOO_MANY; i++)
+	{
+		createPlayer(vec3(5.f, 5.f, -15.f), traits);
+	}
+
 	state.getPlayer(1)->setAI(true);
 	state.getPlayer(2)->setAI(true);
 	state.getPlayer(3)->setAI(true);
+
+	for (unsigned int i = 4; i < TOO_MANY + 4; i++)
+	{
+		state.getPlayer(i)->setAI(true);
+	}
 	
 	//Create skybox
 	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
