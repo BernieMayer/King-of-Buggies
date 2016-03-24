@@ -111,9 +111,8 @@ public:
 	void createLevel(unsigned int objectID);
 	void createCoin(unsigned int coinIndex);
 	void createPowerup(unsigned int objectID);
-	void createBoostPad(vec3 position);
-	void createPowerups();
-	void createPowerupBox();
+	void createBoostPad(unsigned int objectID);
+	void createPowerupBox(unsigned int objectID);
 	void createBall(float radius);
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);

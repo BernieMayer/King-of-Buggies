@@ -226,40 +226,29 @@ void GameManager::createPowerup(unsigned int objectID)
 	state.addMine(newMine);
 }
 
-void GameManager::createPowerupBox()
+void GameManager::createPowerupBox(unsigned int objectID)
 {
 	unsigned int box = renderer.generateObjectID();
-	//state.getPowerupBox(i)->setRenderID(box);
-
 	MeshObject* boxMesh = meshInfo.getMeshPointer(CUBE);
 
 	renderer.assignMeshObject(box, boxMesh);
 	renderer.assignMaterial(box, &tsMat);
 	renderer.assignTexture(box, boxMesh->getTextureID());
-
-	PowerupBox newBox = PowerupBox();
-	newBox.setRenderID(box);
-	newBox.setPos(vec3(0.f, 0.f, 2.f));
-	state.addPowerupBox(newBox);
+	
+	state.getPowerupBox(objectID)->setRenderID(box);
 }
 
-void GameManager::createBoostPad(vec3 position)
+void GameManager::createBoostPad(unsigned int objectID)
 {
-	unsigned int boost = renderer.generateObjectID();
-	//state.getPowerupBox(i)->setRenderID(box);
-
 	MeshObject* boostMesh = meshInfo.getMeshPointer(BOOST);
+	unsigned int boost = renderer.generateObjectID();
 
 	renderer.assignMeshObject(boost, boostMesh);
 	renderer.assignMaterial(boost, &tsMat);
-	//renderer.assignTexture(boost, boostMesh->getTextureID());
 	renderer.assignColor(boost, vec3(0.f, 1.f, 0.f));
+	//renderer.assignTexture
 
-	BoostPad newBoostPad = BoostPad();
-	newBoostPad.setDefault(position);
-	newBoostPad.setRenderID(boost);
-	newBoostPad.setPos(vec3(0.f, 0.f, 2.f));
-	state.addBoostPad(newBoostPad);
+	state.getBoostPad(objectID)->setRenderID(boost);
 }
 
 void GameManager::initMenus() {
@@ -537,7 +526,7 @@ void GameManager::gameLoop()
 				}
 
 				if (hasBoostPadCollision){
-					//physics.applySpeedPadBoost(i);
+					physics.applySpeedPadBoost(i);
 				}
 
 				if (hasMineCollision > -1){
@@ -547,6 +536,7 @@ void GameManager::gameLoop()
 					state.removeMine(hasMineCollision);
 				}
 			}
+			state.checkCoinRespawns();
 		}
 
 		//Update camera position
@@ -681,7 +671,7 @@ void GameManager::gameInit()
 	// temporary since we only have one level right now
 	createLevel(DONUTLEVEL);
 	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj");
+	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
 
 	initTestScene();
 }
@@ -691,7 +681,8 @@ void GameManager::initTestScene()
 	vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car
 	vehicleColours.push_back(vec3(0.f, 1.f, 0.f)); // green car
 	vehicleColours.push_back(vec3(0.f, 0.f, 1.f)); // blue
-	vehicleColours.push_back(vec3(1.f, 1.f, 0.f)); // yellow
+	// Yellow car also sucks, so now it's orange
+	vehicleColours.push_back(vec3(1.f, 0.64f, 0.f)); // orange
 	// Black car sucks. it's purple now
 	vehicleColours.push_back(vec3(1.f, 0.f, 1.f)); // purple
 
@@ -732,14 +723,11 @@ void GameManager::initTestScene()
 	state.setGoldenBuggy(0);
 
 	// Add all coins as render objects
-	for (unsigned int i = 0; i < state.numberOfCoins(); i++) {
-		createCoin(i);
-	}
+	for (unsigned int i = 0; i < state.numberOfCoins(); i++) { createCoin(i); }
 
-	createPowerupBox();
-	//createBoostPad(vec3(10.f, -0.3f, 10.f));
-	//createBoostPad(vec3(10.f, -0.3f, 10.f));
-	
+	for (unsigned int i = 0; i < state.numberOfBoostPads(); i++) { createBoostPad(i); }
+
+	for (unsigned int i = 0; i < state.numberOfPowerupBoxes(); i++) { createPowerupBox(i); }
 
 	vec3 lightPos(60.f, 60.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();
