@@ -50,7 +50,7 @@ private:
 
 public:
 	GameState();
-	GameState(MeshObject* selectedLevel, char *coinLocations);
+	GameState(MeshObject* selectedLevel, char *coinLocations, char *boostLocations);
 
 	//Event management
 	void pushEvent(Event* newEvent);		//Pointer must be allocated on heap (using new)
@@ -114,7 +114,7 @@ public:
 	unsigned int numberOfPowerupBoxes();
 
 	// Map management
-	void setMap(MeshObject* arena, char *coinLocations);
+	void setMap(MeshObject* arena, char *coinLocations, char *boostLocations);
 
 	bool checkCoinCollision(vec3 playerPos);
 };

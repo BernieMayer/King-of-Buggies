@@ -90,7 +90,7 @@ public:
 	void createLevel(unsigned int objectID);
 	void createCoin(unsigned int coinIndex);
 	void createPowerup(unsigned int objectID);
-	void createBoostPad(vec3 position);
+	void createBoostPad(unsigned int objectID);
 	void createPowerups();
 	void createPowerupBox();
 	void createBall(float radius);

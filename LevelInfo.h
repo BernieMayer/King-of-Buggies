@@ -13,14 +13,16 @@ private:
 	LevelInfoLoader loader;
 	MeshObject* arena;
 	vector<vec3> coinLocations;
+	vector<vec3> boostLocations;
 
 public:
 	LevelInfo();
 	LevelInfo(MeshObject* mesh);
-	LevelInfo(MeshObject* mesh, char *coinsInfoFile);
+	LevelInfo(MeshObject* mesh, char *coinsInfoFile, char* boostInfoFile);
 
 	MeshObject* getMeshObject();
 	vector<vec3> getCoinLocations();
+	vector<vec3> getBoostLocations();
 
 };
 
