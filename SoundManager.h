@@ -37,6 +37,7 @@ private:
 	float map(float value, float min, float max, float newMin, float newMax);
 	int lowestIdleVolume = 10;
 	int menuSongCounter = 0;
+	int menuSongCounterMax = 15;
 	void initOpenAL(GameState state);
 	void initListener(GameState state);
 	void startMusic(GameState state);

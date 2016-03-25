@@ -81,8 +81,8 @@ void SoundManager::updateMenuSong(GameState state) {
 	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
 	if (musicState == AL_STOPPED) {
 		menuSongCounter++;
-		if (menuSongCounter != 20) {
-			if (menuSongCounter == 21) {
+		if (menuSongCounter != menuSongCounterMax) {
+			if (menuSongCounter == menuSongCounterMax + 1) {
 				alDeleteBuffers(1, &musicBuffer);
 				alDeleteSources(1, &musicSource);
 

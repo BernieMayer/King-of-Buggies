@@ -278,6 +278,20 @@ void GameManager::initMenus() {
 
 	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
 	unsigned int menu = _interface.generateComponentID();
+
+	unsigned int p1Icon = 0;
+	unsigned int Icon1 = 0;
+	float p1X = 0.f;
+	float p1Y = 0.f;
+
+	unsigned int p2Icon = 0;
+	unsigned int Icon2 = 0;
+
+	unsigned int p3Icon = 0;
+	unsigned int Icon3 = 0;
+
+	unsigned int p4Icon = 0;
+	unsigned int Icon4 = 0;
 	
 
 	while (currentMenu <= lastMenu) {
@@ -289,6 +303,9 @@ void GameManager::initMenus() {
 		if (in.menu && currentMenu == 0) {
 			currentMenu++;
 			_interface.clear();
+
+			p1Icon = LoadTexture("menus/P1Icon.bmp");
+			Icon1 = _interface.generateComponentID();
 
 			levelSelectScreen = LoadTexture("menus/KoB_LevelScreen.bmp");
 			lScreen = _interface.generateComponentID();
@@ -319,6 +336,10 @@ void GameManager::initMenus() {
 			_interface.setDimensions(sScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
 		}
 		else if (currentMenu == 1) {
+			_interface.assignSquare(Icon1);
+			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(Icon1, p1X, p1Y, 0.4f, 0.3f, ANCHOR::CENTER);
+
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
