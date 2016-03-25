@@ -84,6 +84,9 @@
     <ClCompile Include="PowerupCollisionEvent.cpp">
       <Filter>Events</Filter>
     </ClCompile>
+    <ClCompile Include="PowerupBox.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />

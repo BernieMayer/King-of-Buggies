@@ -115,6 +115,7 @@ public:
 
 	// Map management
 	void setMap(MeshObject* arena, char *coinLocations, char *boostLocations, char *boxLocations);
+	void applyRotations();
 
 	bool checkCoinCollision(vec3 playerPos);
 };

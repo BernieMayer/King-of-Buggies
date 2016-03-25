@@ -6,6 +6,7 @@
 class PowerupBox: public Entity {
 public:
 	PowerupBox() {};
+	mat4 getRotation(float angle);
 };
 
 #endif //POWERUPBOX_H

@@ -675,6 +675,7 @@ void GameManager::gameLoop()
 				}
 			}
 			state.checkCoinRespawns();
+			state.applyRotations();
 		}
 
 		

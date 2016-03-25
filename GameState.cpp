@@ -231,8 +231,6 @@ void GameState::checkCoinRespawns()
 	for (unsigned int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
 
-		coins[i].setTransform(coins[i].getRotation((1.f / 60.f)*2.f*3.1415926f));
-
 		if (coins[i].isCollided()) {
 			// countdown to coin respawn
 			coins[i].decrementCountdown();
@@ -412,6 +410,16 @@ void GameState::setMap(MeshObject* arena, char *coinLocations, char *boostLocati
 		PowerupBox newBox = PowerupBox();
 		newBox.setPos(boxCoords[i]);
 		addPowerupBox(newBox);
+	}
+}
+
+void GameState::applyRotations()
+{
+	for (unsigned int i = 0; i < coins.size(); i++) {
+		coins[i].setTransform(coins[i].getRotation((1.f / 60.f)*2.f*3.1415926f));
+	}
+	for (unsigned int i = 0; i < boxes.size(); i++) {
+		boxes[i].setTransform(boxes[i].getRotation((1.f / 60.f)*2.f*3.1415926f));
 	}
 }
 

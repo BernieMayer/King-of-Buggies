@@ -166,6 +166,7 @@
     <ClCompile Include="NavMesh.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Powerup.cpp" />
+    <ClCompile Include="PowerupBox.cpp" />
     <ClCompile Include="PowerupCollisionEvent.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />
