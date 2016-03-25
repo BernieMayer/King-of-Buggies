@@ -6,6 +6,7 @@ Bomb::Bomb(int pID, int rID, vec3 newPos)
 	physicsID = pID;
 	renderID = rID;
 	pos = newPos;
+	type = POWERUPS::BOMB;
 }
 
 

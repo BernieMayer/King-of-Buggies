@@ -440,8 +440,11 @@ void GameManager::gameLoop()
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
 			}
-			else
+			else {
 				renderer.loadCamera(&cam[0]);
+
+
+			}
 		}
 
 		//Not AI code. AIManager shouldn't change the golden buggy
@@ -465,7 +468,7 @@ void GameManager::gameLoop()
 		}
 
 		
-		for (int i = 0; i < state.numberOfPlayers(); i++) {
+		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			if (inputs[i].powerup) {
 				vec3 location = 5.0f * state.getPlayer(i)->getForward() + state.getPlayer(i)->getPos();
 				Bomb b = Bomb(physics.createBomb(location, i), renderer.generateObjectID(), location);
@@ -524,31 +527,26 @@ void GameManager::gameLoop()
 				
 				if (powerUpId == POWERUPS::NITROBOOST)
 				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
 					physics.applyNitroBoost(0);//Revise this to allow for nitro to be a energy system
 					printf("Nitro Boost \n");
 				}
 				else if (powerUpId == POWERUPS::BOMB)
 				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
 					//Add bomb powerup logic
 					printf("Bomb \n");
 				}
 				else if (powerUpId == POWERUPS::MINE)
 				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
 					createPowerup(MINE);
 					printf("Mine \n");
 				}
 				else if (powerUpId == POWERUPS::COIN)
 				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
 					physics.modifySpeed(0, 0.3333f);	//Should change this..
 					printf("Coin? \n");
 				}
 				else if (powerUpId == POWERUPS::DECOY)
 				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
 					//Apply decoy powerup logic
 					printf("Decoy? \n");
 				}
@@ -606,11 +604,11 @@ void GameManager::gameLoop()
 			if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
 				// Remove bomb
 			}
-			else if (e->getType() == POWERUP_COLLISION_EVENT)
+			else if (e->getType() == POWERUPBOX_COLLISION_EVENT)
 			{
 				PowerupCollisionEvent* powerupEvent = dynamic_cast<PowerupCollisionEvent*>(e);
-				int vehicleId = powerupEvent->playerId;
-				int powerupId = powerupEvent->powerupId; //Delete the powerup, note the id is based on the order that the powerups are made.
+				int vehicleId = powerupEvent->ob1;
+				int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
 
 				hasPowerup[vehicleId] = true;
 				int powerUpType = randomPowerup();
@@ -766,7 +764,7 @@ void GameManager::gameLoop()
 		if (!paused) {
 			// increase score and check win conditions
 			state.getGoldenBuggy()->incrementScore();
-			int theScore = state.getGoldenBuggy()->getScore();
+			unsigned int theScore = state.getGoldenBuggy()->getScore();
 			if ((theScore % 100) == 0) {
 				std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
 			}

@@ -17,17 +17,6 @@
 
 #include <GLFW/glfw3.h>  
 
-/*
-1 - Nitro Boost
-2 - Bomb
-3 - Mine
-4 - Coin?
-5 - Decoy?
-*/
-struct POWERUPS{
-	enum { NITROBOOST = 0, BOMB, MINE, COIN,  DECOY, COUNT };
-};
-
 class GameManager {
 private:
 	// Object materials

@@ -48,10 +48,8 @@ protected:
 	mat4 wheelTransforms [4];
 	vec3 velocity;
 
-	std::vector<int> powerUps;
 	int powerup;
 	int numCoins;
-	int powerupCounter;
 	int score;
 	bool goldenBuggy;
 	bool ai;

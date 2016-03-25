@@ -3,14 +3,13 @@
 
 #include "PowerupCollisionEvent.h"
 
-PowerupCollisionEvent::PowerupCollisionEvent(int aPowerupId, int aPlayerId)
+PowerupCollisionEvent::PowerupCollisionEvent(int aPlayerId, int aPowerupId) :CollisionEvent(aPlayerId, aPowerupId, vec3(0, 0, 0), vec3(0, 0, 0), vec3(0, 0, 0))
 {
-	powerupId = aPowerupId;
-	playerId = aPlayerId;
+
 }
 
 unsigned int PowerupCollisionEvent::getType() {
-	return POWERUP_COLLISION_EVENT;
+	return POWERUPBOX_COLLISION_EVENT;
 }
 
 #endif

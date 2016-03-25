@@ -1439,7 +1439,7 @@ void Physics::onTrigger(PxTriggerPair* pairs, PxU32 count)
 				{
 					if (pairs[i].otherActor == vehicleActors[k].vehDrive4W->getRigidDynamicActor())
 					{
-						lastState->pushEvent(new PowerupCollisionEvent(j, k));
+						lastState->pushEvent(new PowerupCollisionEvent(k, j));
 					}
 				}
 			}

@@ -3,14 +3,14 @@
 
 #include "PlayerInfo.h"
 
-PlayerInfo::PlayerInfo() : powerup(0), powerupCounter(0), numCoins(0), score(0),
+PlayerInfo::PlayerInfo() : powerup(0), numCoins(0), score(0),
 							goldenBuggy(false), timeGolden(0.f)
 {
 
 }
 
 PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs, vec3 colour, unsigned int texID) :
-powerup(0), powerupCounter(0), numCoins(0), score(0),
+powerup(0), numCoins(0), score(0),
 goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID)
 {
 	renderID = _renderID;
@@ -34,33 +34,19 @@ void PlayerInfo::incrementScore() {	score++; }
 
 void PlayerInfo::addPowerUp(int id)
 {
-	powerUps.push_back(id);
+	powerup = id;
 }
 
 int PlayerInfo::usePowerUp()
 {
-	if (powerUps.size() == 0)
-	{
-		return -1;
-	}
-	else
-	{
-		int powerUpID = powerUps[0];
-		powerUps.pop_back();
-		return powerUpID;
-	}
+	int oldPowerupID = powerup;
+	powerup = -1;
+	return oldPowerupID;
 }
 
 void PlayerInfo::removePowerup()
 {
-	if (powerUps.size() == 0)
-	{
-		return;
-	}
-	else
-	{
-		powerUps.pop_back();
-	}
+	powerup = -1;
 }
 
 unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)

@@ -3,7 +3,19 @@
 
 #include "Entity.h"
 
+/*
+0 - Nitro Boost
+1 - Bomb
+2 - Mine
+3 - Coin?
+4 - Decoy?
+*/
+struct POWERUPS{
+	enum { NITROBOOST = 0, BOMB, MINE, COIN, DECOY, COUNT };
+};
+
 class Powerup : public Entity {
+protected:
 	int type;
 	vec3 velocity;
 

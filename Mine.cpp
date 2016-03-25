@@ -4,6 +4,7 @@
 Mine::Mine(double newRadius)
 {
 	radius = newRadius;
+	type = POWERUPS::MINE;
 }
 
 
