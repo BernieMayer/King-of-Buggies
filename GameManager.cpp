@@ -327,7 +327,7 @@ void GameManager::gameLoop()
 
 	hasPowerup.push_back(false);
 
-	unsigned int numScreens = 4;
+	unsigned int numScreens = input.getNumPlayers();
 	
 	renderer.splitScreenViewports(numScreens);
 
@@ -741,9 +741,11 @@ void GameManager::initTestScene()
 		createPlayer(vec3(5.f, 5.f, -15.f), traits);
 	}
 
-	state.getPlayer(1)->setAI(true);
-	state.getPlayer(2)->setAI(true);
-	state.getPlayer(3)->setAI(true);
+
+	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS - 1; i++)
+	{
+		state.getPlayer(i)->setAI(true);
+	}
 
 	for (unsigned int i = 4; i < TOO_MANY + 4; i++)
 	{
