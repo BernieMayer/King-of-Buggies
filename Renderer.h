@@ -36,12 +36,12 @@ struct VBO{
 };
 
 struct Viewport{
-	unsigned int x, y, width, height;		//Change to floats
-	mat4 winRatio;							//Get rid of?
+	float x, y, width, height;		//Change to floats
+	mat4 viewRatio;							//Get rid of?
 
 	const unsigned int DEFAULT = 0;
 
-	Viewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height) :x(x), y(y), width(width), height(height), winRatio(1.f) {}
+	Viewport(float x, float y, float width, float height);
 };
 
 const unsigned int DEFAULT_WIDTH = 800;
@@ -86,6 +86,8 @@ private:
 	vector<ObjectInfo> objects;		//Objects to be drawn
 	vector<LightInfo> lights;
 	vector<Viewport> viewports;
+
+	unsigned int activeViewport;
 
 	//Transform matrices
 	mat4 projection;
@@ -186,7 +188,7 @@ public:
 	void useViewport(unsigned int index);
 	void splitScreenViewports(unsigned int numViewports);
 	mat4 getViewportRatio(unsigned int viewport);
-	void updateViewportSizes();		//Call to allow viewports to adjust to rescaling
+	unsigned int numberOfViewports() { return viewports.size(); }
 
 	//Delete objects
 	void deleteDrawableObject(int object);

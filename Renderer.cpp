@@ -57,7 +57,7 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
 }
 
 Renderer::Renderer(GLFWwindow* _window) : window(_window), debugging(false), 
-projection(1.f), modelview(1.f)
+projection(1.f), modelview(1.f), activeViewport(0)
 {
 	shaderList.initShaders();
 
@@ -277,40 +277,55 @@ void Renderer::updateObjectTransforms(GameState* state)
 /**
 * Viewports
 **/
+
+Viewport::Viewport(float x, float y, float width, float height) :x(x), y(y), width(width), height(height), viewRatio(1.f) 
+{
+	float minDim = min(width, height);
+	viewRatio[0][0] = minDim / width;
+	viewRatio[1][1] = minDim / height;
+}
+
 unsigned int Renderer::addViewport(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 {
-	viewports.push_back(Viewport(x, y, width, height));
+	//viewports.push_back(Viewport(x, y, width, height));
 	return viewports.size() - 1;
 }
 
 unsigned int Renderer::addViewport(float x, float y, float width, float height)
 {
-	unsigned int x_int = (unsigned int)(x*(float)windowWidth);
+	/*unsigned int x_int = (unsigned int)(x*(float)windowWidth);
 	unsigned int y_int = (unsigned int)(y*(float)windowHeight);
 	unsigned int width_int = (unsigned int)(width*(float)windowWidth);
 	unsigned int height_int = (unsigned int)(height*(float)windowHeight);
 
-	return addViewport(x_int, y_int, width_int, height_int);
+	return addViewport(x_int, y_int, width_int, height_int);*/
+	viewports.push_back(Viewport(x, y, width, height));
+
+	return viewports.size() - 1;
 }
 
 void Renderer::splitScreenViewports(unsigned int numViewports)
 {
 	switch (numViewports)
 	{
+	case 1:
+		addViewport(0.f, 0.f, 1.f, 1.f);
+		break;
 	case 2:
-		addViewport(0.f, 0.f, 1.f, 0.5f);
 		addViewport(0.f, 0.5f, 1.f, 0.5f);
+		addViewport(0.f, 0.f, 1.f, 0.5f);
 		break;
 	case 3:
-		addViewport(0.f, 0.f, 0.5f, 0.5f);
-		addViewport(0.5f, 0.f, 0.5f, 0.5f);
-		addViewport(0.f, 0.5f, 1.f, 0.5f);
-		break;
-	case 4:
-		addViewport(0.f, 0.f, 0.5f, 0.5f);
-		addViewport(0.5f, 0.f, 0.5f, 0.5f);
 		addViewport(0.f, 0.5f, 0.5f, 0.5f);
 		addViewport(0.5f, 0.5f, 0.5f, 0.5f);
+		addViewport(0.f, 0.f, 1.f, 0.5f);
+		break;
+	case 4:
+		addViewport(0.f, 0.5f, 0.5f, 0.5f);
+		addViewport(0.5f, 0.5f, 0.5f, 0.5f);
+		addViewport(0.f, 0.f, 0.5f, 0.5f);
+		addViewport(0.5f, 0.f, 0.5f, 0.5f);
+		break;
 	}
 
 
@@ -320,15 +335,13 @@ void Renderer::useViewport(unsigned int viewport)
 {
 	Viewport& vp = viewports[viewport];
 
-	glViewport(vp.x, vp.y, vp.width, vp.height);
-}
+	unsigned int x_int = (unsigned int)(vp.x*(float)windowWidth);
+	unsigned int y_int = (unsigned int)(vp.y*(float)windowHeight);
+	unsigned int width_int = (unsigned int)(vp.width*(float)windowWidth);
+	unsigned int height_int = (unsigned int)(vp.height*(float)windowHeight);
 
-void Renderer::updateViewportSizes()
-{
-	for (unsigned int i = 0; i < viewports.size(); i++)
-	{
-
-	}
+	glViewport(x_int, y_int, width_int, height_int);
+	activeViewport = viewport;
 }
 
 /**
@@ -340,7 +353,7 @@ void Renderer::clearDrawBuffers(vec3 color)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::draw(unsigned int id)
+void Renderer::draw(unsigned  int id)
 {
 
 	ObjectInfo& object = objects[id];
@@ -359,9 +372,11 @@ void Renderer::draw(unsigned int id)
 	else
 		object.mat->useTextureShader();
 
+
+	//Object
 	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
 	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
-	mat4 projectionMatrix = winRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 projectionMatrix = winRatio*viewports[activeViewport].viewRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
 	mat4 modelviewMatrix = object.transform*object.scaling;
 
 	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
@@ -478,7 +493,7 @@ void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& o
 	glUseProgram(0);
 
 	mat4 modelTransform = modelview*camera->getMatrix()*objectTransform;
-	mat4 projTransform = winRatio*projection;
+	mat4 projTransform = winRatio*viewports[activeViewport].viewRatio*projection;
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(&projTransform[0][0]);

@@ -49,7 +49,7 @@ private:
 
 	Timer clock;
 
-	Camera cam;
+	Camera cam[MAX_PLAYERS];
 
 	GLFWwindow* window;
 

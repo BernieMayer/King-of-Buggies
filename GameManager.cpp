@@ -3,9 +3,13 @@
 
 #include "GameManager.h"
 
-GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), 
-	cam(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA)
+GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics()
 {
+	for (unsigned int i = 0; i < MAX_PLAYERS; i++)
+	{
+		cam[i] = Camera(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA);
+	}
+
 	srand(time(NULL));
 	window = newWindow;
 	mat = Diffuse();
@@ -17,7 +21,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	timePassedDecoy = 0;
 
 	renderer.loadPerspectiveTransform(0.1f, 100.f, 80.f);		//Near, far, fov
-	renderer.loadCamera(&cam);
+	renderer.loadCamera(&cam[0]);
 
 	ai = AIManager(&state);
 
@@ -322,8 +326,10 @@ void GameManager::gameLoop()
 	timeb loopStart = clock.getCurrentTime();
 
 	hasPowerup.push_back(false);
+
+	unsigned int numScreens = 4;
 	
-	
+	renderer.splitScreenViewports(numScreens);
 
 
 	while (!glfwWindowShouldClose(window))
@@ -362,13 +368,13 @@ void GameManager::gameLoop()
 
 			if (paused)
 			{
-				freeCam = cam;
+				freeCam = cam[0];
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
 			}
 			else
-				renderer.loadCamera(&cam);
+				renderer.loadCamera(&cam[0]);
 		}
 
 		//Not AI code. AIManager shouldn't change the golden buggy
@@ -539,14 +545,7 @@ void GameManager::gameLoop()
 			state.checkCoinRespawns();
 		}
 
-		//Update camera position
-		PlayerInfo* activePlayer = state.getPlayer(0);
-		vec4 cameraPosition = physics.vehicle_getGlobalPose(
-			activePlayer->getPhysicsID())*vec4(0.f, 0.f, 0.f, 1.f);
-		vec3 cPos = vec3(cameraPosition) / cameraPosition.w;
-
-		if (cPos != cam.getViewCenter())
-			cam.changeCenterAndPos(cPos - cam.getViewCenter());
+		
 
 		float scale = 0.1f;
 
@@ -556,23 +555,6 @@ void GameManager::gameLoop()
 			physics.getSim();
 
 			physics.startSim(frameTime);
-
-			//Update to accomodate more players and multiple cameras
-			cam.rotateView(inputs[0].camH*scale, inputs[0].camV*scale);
-
-			cameraEnvironmentCollision(&cam);
-
-			//Track camera around front of vehicle
-			vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
-			if ((inputs[0].camH == 0.f) && (inputs[0].camV == 0.f))
-				cam.trackDirAroundY(vec3(carDir), frameTime);
-
-			//Translate skydome
-			mat4 translation;
-			translation[3][0] = state.getPlayer(0)->getPos().x;
-			translation[3][1] = state.getPlayer(0)->getPos().y;
-			translation[3][2] = state.getPlayer(0)->getPos().z;
-			renderer.assignTransform(skyboxID, translation);
 		}
 		//Free camera movement
 		if (paused)
@@ -591,26 +573,80 @@ void GameManager::gameLoop()
 
 		//Draw scene
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
-		renderer.drawAll();
-		renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
-		renderer.drawRadar(state.setupRadar(0));
 
-		//Debugging
-		if (displayDebugging)
+		for (unsigned int i = 0; i < numScreens; i++)
 		{
-			ai.getPathAsLines(1, &path);
+			//Free camera movement
+			if (paused && (i == 0))
+			{
+				renderer.loadCamera(&freeCam);
+				//Debugging avoidance
+				ai.debugAIPath(&paths, 1, debugPathIterations);
+				if (inputs[0].jump)
+					debugPathIterations++;
 
-			renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
-			renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
-			//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+				freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
+				freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
+			}
+			else
+			{
+				renderer.loadCamera(&cam[i]);
+
+				//Update camera position
+				PlayerInfo* activePlayer = state.getPlayer(i);
+				vec4 cameraPosition = physics.vehicle_getGlobalPose(
+					activePlayer->getPhysicsID())*vec4(0.f, 0.f, 0.f, 1.f);
+				vec3 cPos = vec3(cameraPosition) / cameraPosition.w;
+
+				if (cPos != cam[i].getViewCenter())
+					cam[i].changeCenterAndPos(cPos - cam[i].getViewCenter());
+
+				//Update to accomodate more players and multiple cameras
+				cam[i].rotateView(inputs[i].camH*scale, inputs[i].camV*scale);
+
+				cameraEnvironmentCollision(&cam[i]);
+
+				//Track camera around front of vehicle
+				vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
+				if ((inputs[i].camH == 0.f) && (inputs[i].camV == 0.f))
+					cam[i].trackDirAroundY(vec3(carDir), frameTime);
+			}
+
+			
+
+			//Translate skydome
+			mat4 translation;
+			translation[3][0] = state.getPlayer(i)->getPos().x;
+			translation[3][1] = state.getPlayer(i)->getPos().y;
+			translation[3][2] = state.getPlayer(i)->getPos().z;
+			renderer.assignTransform(skyboxID, translation);
+
+			//Render
+			renderer.useViewport(i+1);
+			renderer.drawAll();
+			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
+			renderer.drawRadar(state.setupRadar(0));
+
+			//Debugging
+			if (displayDebugging)
+			{
+				ai.getPathAsLines(1, &path);
+
+				renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
+				renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
+				//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
+			}
+
+			if (paused)
+			{
+				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
+			}
+
+			_interface.drawAll(&renderer);
 		}
+		
 
-		if (paused)
-		{
-			renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
-		}
-
-		_interface.drawAll(&renderer);
+		
 		
 		if (!paused) {
 			// increase score and check win conditions
