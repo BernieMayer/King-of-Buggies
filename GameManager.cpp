@@ -208,7 +208,7 @@ void GameManager::createCoin(unsigned int coinIndex)
 	newCoin->setRenderID(coin);
 }
 
-void GameManager::createPowerup(unsigned int objectID)
+void GameManager::createMine()
 {
 	unsigned int powerup = renderer.generateObjectID();
 	MeshObject* powerupMesh = meshInfo.getMeshPointer(MINE);
@@ -228,6 +228,18 @@ void GameManager::createPowerup(unsigned int objectID)
 	newMine.setPos(vec3((placementVec.x), (placementVec.y - 1), (placementVec.z)));
 	newMine.setRenderID(powerup);
 	state.addMine(newMine);
+}
+
+void GameManager::createBomb(unsigned int playerID)
+{
+	vec3 location = 5.0f * state.getPlayer(playerID)->getForward() + state.getPlayer(playerID)->getPos();
+	Bomb b = Bomb(physics.createBomb(location, playerID), renderer.generateObjectID(), location);
+	state.addPowerup(b);
+
+	renderer.assignMeshObject(b.getRenderID(), meshInfo.getMeshPointer(BOMB));
+	renderer.assignMaterial(b.getRenderID(), &tsMat);
+	renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(BOMB)->getTextureID());
+	state.pushEvent(new BombCreationEvent(location));
 }
 
 void GameManager::createPowerupBox(unsigned int objectID)
@@ -491,23 +503,8 @@ void GameManager::gameLoop()
 		
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			if (inputs[i].powerup) {
-				vec3 location = 5.0f * state.getPlayer(i)->getForward() + state.getPlayer(i)->getPos();
-				Bomb b = Bomb(physics.createBomb(location, i), renderer.generateObjectID(), location);
-				state.addPowerup(b);
-
-				/*
-				vector<vec3> mesh;
-				vector<vec3> normals;
-				vector<vec2> uvs;
-				vector<unsigned int> indices;
-				renderer.assignSphere(b->getRenderID(), 0.5f, 5, &mesh, &normals, &uvs, &indices);
-				*/
-
-
-				renderer.assignMeshObject(b.getRenderID(), meshInfo.getMeshPointer(BOMB));
-				renderer.assignMaterial(b.getRenderID(), &tsMat);
-				renderer.assignTexture(b.getRenderID(), meshInfo.getMeshPointer(BOMB)->getTextureID());
-				state.pushEvent(new BombCreationEvent(location));
+				createBomb(i);
+				
 
 
 				
@@ -553,12 +550,12 @@ void GameManager::gameLoop()
 				}
 				else if (powerUpId == POWERUPS::BOMB)
 				{
-					//Add bomb powerup logic
+					createBomb(0);
 					printf("Bomb \n");
 				}
 				else if (powerUpId == POWERUPS::MINE)
 				{
-					createPowerup(MINE);
+					createMine();
 					printf("Mine \n");
 				}
 				else if (powerUpId == POWERUPS::COIN)

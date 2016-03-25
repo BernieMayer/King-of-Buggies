@@ -98,11 +98,14 @@ public:
 	void createAI(vec3 position);
 	void createGroundPlane(vec3 normal, float offset);
 	void createLevel(unsigned int objectID);
+	void createBall(float radius);
+	// These entities get created based on LevelInfo:
 	void createCoin(unsigned int coinIndex);
-	void createPowerup(unsigned int objectID);
 	void createBoostPad(unsigned int objectID);
 	void createPowerupBox(unsigned int objectID);
-	void createBall(float radius);
+	// These entities get created dynamically:
+	void createMine();
+	void createBomb(unsigned int playerID);
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);
 	void startDecoy(float time);
