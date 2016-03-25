@@ -28,10 +28,15 @@ public:
 	void playDingSound(vec3 pos);
 	void playWinSound(vec3 pos);
 	void playLossSound(vec3 pos);
+
+	void startMenuSong(GameState state);
+	void updateMenuSong(GameState state);
+	void stopMenuSong();
 	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
 	int lowestIdleVolume = 10;
+	int menuSongCounter = 0;
 	void initOpenAL(GameState state);
 	void initListener(GameState state);
 	void startMusic(GameState state);
@@ -52,6 +57,7 @@ private:
 	void cleanOneTimeUseSources();
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
+	ALuint musicBuffer;
 	ALuint musicSource;
 	ALuint engineSources[MAX_PLAYERS];
 	ALuint listener;

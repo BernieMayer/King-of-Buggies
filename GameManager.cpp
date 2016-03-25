@@ -257,33 +257,82 @@ void GameManager::createBoostPad(unsigned int objectID)
 }
 
 void GameManager::initMenus() {
+	sound.startMenuSong(state);
+	
 	int currentMenu = 0;
 	int lastMenu = 2;
 
-	unsigned int carSelectScreen = LoadTexture("menus/KoB_StartScreen.bmp");
-	unsigned int carScreen = _interface.generateComponentID();
-	_interface.assignSquare(carScreen);
-	_interface.assignTexture(carScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(carScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+	unsigned int startScreen = LoadTexture("menus/KoB_StartScreen.bmp");
+	unsigned int sScreen = _interface.generateComponentID();
+	
+	unsigned int levelSelectScreen = 0;
+	unsigned int lScreen = 0;
+
+	unsigned int carSelectScreen = 0;
+	unsigned int cScreen = 0;
 
 	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
 	unsigned int menu = _interface.generateComponentID();
-	_interface.assignSquare(menu);
-	_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(menu, 1.f, -1.f, 4.f, 2.f, ANCHOR::BOTTOM_RIGHT);
+	
 
-	while (currentMenu != lastMenu) {
+	while (currentMenu <= lastMenu) {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+
 
 		Input in = input.getInput(1);
 		in = smoothers[0].smooth(in, false);
-		if (in.menu) {
+		if (in.menu && currentMenu == 0) {
+			currentMenu++;
+			_interface.clear();
+
+			levelSelectScreen = LoadTexture("menus/KoB_LevelScreen.bmp");
+			lScreen = _interface.generateComponentID();
+
+			menuBackground = LoadTexture("menus/Background.bmp");
+			menu = _interface.generateComponentID();
+		}
+		else if (in.menu && currentMenu == 1) {
+			currentMenu++;
+			_interface.clear();
+
+			carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
+			cScreen = _interface.generateComponentID();
+
+			menuBackground = LoadTexture("menus/Background.bmp");
+			menu = _interface.generateComponentID();
+		}
+		else if (in.menu && currentMenu == lastMenu) {
+			sound.stopMenuSong();
 			sound.startSounds(state);
 			_interface.clear();
 			return;
 		}
 
+		if (currentMenu == 0) {
+			_interface.assignSquare(sScreen);
+			_interface.assignTexture(sScreen, startScreen, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(sScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+		}
+		else if (currentMenu == 1) {
+			_interface.assignSquare(lScreen);
+			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+		}
+		else if (currentMenu == 2) {
+			_interface.assignSquare(cScreen);
+			_interface.assignTexture(cScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(cScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+		}
+
+		_interface.assignSquare(menu);
+		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(menu, 1.f, -1.f, 4.f, 2.f, ANCHOR::BOTTOM_RIGHT);
+
+		
+
 		_interface.drawAll(&renderer);
+
+		sound.updateMenuSong(state);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);
