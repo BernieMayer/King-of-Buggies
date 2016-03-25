@@ -260,16 +260,28 @@ void GameManager::initMenus() {
 	int currentMenu = 0;
 	int lastMenu = 2;
 
-	unsigned int menuBackground = LoadTexture("menus/KoB_CarScreen.bmp");
+	unsigned int carSelectScreen = LoadTexture("menus/KoB_StartScreen.bmp");
+	unsigned int carScreen = _interface.generateComponentID();
+	_interface.assignSquare(carScreen);
+	_interface.assignTexture(carScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(carScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+
+	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
 	unsigned int menu = _interface.generateComponentID();
 	_interface.assignSquare(menu);
-
-
 	_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
 	_interface.setDimensions(menu, 1.f, -1.f, 4.f, 2.f, ANCHOR::BOTTOM_RIGHT);
 
 	while (currentMenu != lastMenu) {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+
+		Input in = input.getInput(1);
+		in = smoothers[0].smooth(in, false);
+		if (in.menu) {
+			sound.startSounds(state);
+			_interface.clear();
+			return;
+		}
 
 		_interface.drawAll(&renderer);
 

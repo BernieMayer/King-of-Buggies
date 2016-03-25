@@ -27,6 +27,9 @@ void SoundManager::initOpenAL(GameState state) {
 	alDopplerFactor(1.0f);
 
 	initListener(state);
+}
+
+void SoundManager::startSounds(GameState state) {
 	startMusic(state);
 	startEngineSounds(state);
 }
