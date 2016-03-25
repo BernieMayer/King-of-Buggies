@@ -515,7 +515,8 @@ void GameManager::gameLoop()
 				5 - Decoy?
 				*/
 
-				int powerUpId = state.getPlayer->usePowerup();
+				int powerUpId = state.getPlayer(0)->usePowerUp();
+				
 				if (powerUpId == POWERUPS::NITROBOOST)
 				{
 					state.getPlayer(0)->addPowerUp(powerUpId);
@@ -537,7 +538,7 @@ void GameManager::gameLoop()
 				else if (powerUpId == POWERUPS::COIN)
 				{
 					state.getPlayer(0)->addPowerUp(powerUpId);
-					physics.modifySpeed(i, 0.3333f);	//Should change this..
+					physics.modifySpeed(0, 0.3333f);	//Should change this..
 					printf("Coin? \n");
 				}
 				else if (powerUpId == POWERUPS::DECOY)
