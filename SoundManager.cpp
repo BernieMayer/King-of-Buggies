@@ -9,7 +9,6 @@ SoundManager::SoundManager() {
 
 SoundManager::SoundManager(GameState state) {
 	initOpenAL(state);
-	startSounds(state);
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		honking.push_back(false);
 		honkSources.push_back(0);

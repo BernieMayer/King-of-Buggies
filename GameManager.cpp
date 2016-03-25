@@ -259,7 +259,7 @@ void GameManager::initMenus() {
 	int currentMenu = 0;
 	int lastMenu = 2;
 
-	unsigned int carSelectScreen = LoadTexture("menus/CarSelect.bmp");
+	unsigned int carSelectScreen = LoadTexture("menus/KoB_StartScreen.bmp");
 	unsigned int carScreen = _interface.generateComponentID();
 	_interface.assignSquare(carScreen);
 	_interface.assignTexture(carScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
@@ -278,6 +278,7 @@ void GameManager::initMenus() {
 		in = smoothers[0].smooth(in, false);
 		if (in.menu) {
 			sound.startSounds(state);
+			_interface.clear();
 			return;
 		}
 
