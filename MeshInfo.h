@@ -22,11 +22,12 @@ public:
 	unsigned int getBuggyTexID(int index);
 	unsigned int getGoldenBuggyTexID();
 
+	vector<unsigned int> buggyTexIDs;
+
 	MeshInfoLoader meshLoader;
 
 private:
 	vector<MeshObject> meshes;
-	vector<unsigned int> buggyTexIDs;
 	unsigned int goldenBuggyTexID;
 };
 

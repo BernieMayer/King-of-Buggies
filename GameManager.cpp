@@ -259,6 +259,11 @@ void GameManager::createBoostPad(unsigned int objectID)
 void GameManager::initMenus() {
 	sound.startMenuSong(state);
 	
+	int redIndex = 0;
+	int greenIndex = 1;
+	int blueIndex = 2;
+	int purpleIndex = 3;
+
 	int currentMenu = 0;
 	int lastMenu = 2;
 
@@ -676,8 +681,10 @@ void GameManager::gameLoop()
 			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
 		}
 
-		if (inputs[0].menu)
-			displayDebugging = !displayDebugging;
+		
+		if (inputs[0].menu) {
+			//displayDebugging = !displayDebugging;
+		}
 
 		//Draw scene
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
