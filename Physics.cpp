@@ -500,6 +500,7 @@ void Physics::updateGameState(GameState* state, float time)
 
 	for (int i = 0; i < bombActors.size(); i++) {
 		if (clock.getTimeSince(bombStartTimes[i]) >= 5.0f) {
+			lastState->pushEvent(new VehicleBombCollisionEvent(-1, i, getVec3(bombActors[i]->getGlobalPose().p)));
 			bombExplosion(i);
 			i--;
 		}

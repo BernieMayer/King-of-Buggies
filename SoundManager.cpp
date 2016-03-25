@@ -50,20 +50,103 @@ void SoundManager::initListener(GameState state) {
 	alListenerfv(AL_ORIENTATION, ListenerOri);
 }
 
-/*
- * Initializes the music to be playing at the location of the player
- */
-void SoundManager::startMusic(GameState state) {
-	ALuint buffer;
-
-	loadWavToBuf("Dogsong.wav", &musicSource, &buffer);
+void SoundManager::startMenuSong(GameState state) {
+	loadWavToBuf("Menu.wav", &musicSource, &musicBuffer);
 
 	PlayerInfo* p1 = state.getPlayer(0);
 
 	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
 	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
 
-	alSourcei(musicSource, AL_BUFFER, buffer);
+	alSourcei(musicSource, AL_BUFFER, musicBuffer);
+	alSourcef(musicSource, AL_PITCH, 1.0f);
+	alSourcef(musicSource, AL_GAIN, musicVolume);
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+	alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(musicSource);
+}
+
+void SoundManager::updateMenuSong(GameState state) {
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+	alSourcefv(musicSource, AL_POSITION, SourcePos);
+	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+	
+	ALint musicState;
+	alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
+	if (musicState == AL_STOPPED) {
+		menuSongCounter++;
+		if (menuSongCounter != 20) {
+			if (menuSongCounter == 21) {
+				alDeleteBuffers(1, &musicBuffer);
+				alDeleteSources(1, &musicSource);
+
+				loadWavToBuf("Menu.wav", &musicSource, &musicBuffer);
+
+				PlayerInfo* p1 = state.getPlayer(0);
+
+				ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+				ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+				alSourcei(musicSource, AL_BUFFER, musicBuffer);
+				alSourcef(musicSource, AL_PITCH, 1.0f);
+				alSourcef(musicSource, AL_GAIN, musicVolume);
+				alSourcefv(musicSource, AL_POSITION, SourcePos);
+				alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+				alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+				alSourcePlay(musicSource);
+			}
+			else
+			{
+				alSourcePlay(musicSource);
+			}
+		}
+		else {
+			alDeleteBuffers(1, &musicBuffer);
+			alDeleteSources(1, &musicSource);
+
+			loadWavToBuf("Menu2.wav", &musicSource, &musicBuffer);
+
+			PlayerInfo* p1 = state.getPlayer(0);
+
+			ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+			ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+			alSourcei(musicSource, AL_BUFFER, musicBuffer);
+			alSourcef(musicSource, AL_PITCH, 1.0f);
+			alSourcef(musicSource, AL_GAIN, musicVolume);
+			alSourcefv(musicSource, AL_POSITION, SourcePos);
+			alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+			alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+			alSourcePlay(musicSource);
+		}
+	}
+}
+
+void SoundManager::stopMenuSong() {
+	alDeleteBuffers(1, &musicBuffer);
+	alDeleteSources(1, &musicSource);
+}
+
+/*
+ * Initializes the music to be playing at the location of the player
+ */
+void SoundManager::startMusic(GameState state) {
+	loadWavToBuf("Dogsong.wav", &musicSource, &musicBuffer);
+
+	PlayerInfo* p1 = state.getPlayer(0);
+
+	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+	alSourcei(musicSource, AL_BUFFER, musicBuffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
 	alSourcef(musicSource, AL_GAIN, musicVolume);
 	alSourcefv(musicSource, AL_POSITION, SourcePos);
@@ -526,6 +609,8 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	cleanOneTimeUseSources();
 
 	if (inputs[0].konamiCode) {
+		alDeleteBuffers(1, &musicBuffer);
+		alDeleteSources(1, &musicSource);
 		playSecretMusic(state);
 		secretPlaying = true;
 	}
@@ -534,6 +619,8 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	if (inputs[0].menu && !paused && !secretPlaying) {
 		paused = true;
 		if (!secretPlaying) {
+			alDeleteBuffers(1, &musicBuffer);
+			alDeleteSources(1, &musicSource);
 			playPauseSong(state);
 		}
 	}
@@ -541,6 +628,8 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		paused = false;
 		if (!secretPlaying) {
 			alSourceStop(musicSource);
+			alDeleteBuffers(1, &musicBuffer);
+			alDeleteSources(1, &musicSource);
 			startMusic(state);
 		}
 	}
@@ -551,9 +640,13 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		alSourceStop(musicSource);
 		secretPlaying = false;
 		if (paused) {
+			alDeleteBuffers(1, &musicBuffer);
+			alDeleteSources(1, &musicSource);
 			playPauseSong(state);
 		}
 		else {
+			alDeleteBuffers(1, &musicBuffer);
+			alDeleteSources(1, &musicSource);
 			startMusic(state);
 		}
 	}
