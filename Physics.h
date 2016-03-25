@@ -94,7 +94,7 @@ public:
 
 	// Implements PxSimulationEventCallback
 	virtual void  onContact(const PxContactPairHeader& pairHeader, const PxContactPair* pairs, PxU32 nbPairs);
-	virtual void  onTrigger(PxTriggerPair* pairs, PxU32 count){}
+	virtual void  onTrigger(PxTriggerPair* pairs, PxU32 count);
 	virtual void  onConstraintBreak(PxConstraintInfo*, PxU32) {}
 	virtual void  onWake(PxActor**, PxU32) {}
 	virtual void  onSleep(PxActor**, PxU32){}
@@ -107,6 +107,8 @@ public:
 	timeb gbLockStartTime;
 
 	int createBomb(vec3 location, int playerID);
+	//createConvexMesh
+	void createPowerupBox(vector<vec3> mesh, vec3 location);
 
 
 private:
@@ -115,6 +117,7 @@ private:
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 	vector<PxRigidDynamic*> bombActors;
+	vector<PxRigidDynamic*> powerupActors;
 	vector<timeb> bombStartTimes;
 
 	Vehicle* goldenBuggy;	       //Should be a vehicle
@@ -184,6 +187,7 @@ private:
 	PxConvexMesh* createChassisMesh(const PxVec3 dims, PxPhysics& physics, PxCooking& cooking);							//Now is a part of the Vehicle class
 	PxConvexMesh* createConvexMesh(const PxVec3* verts, const PxU32 numVerts, PxPhysics& physics, PxCooking& cooking);  //Now is a part of the Vehicle class
 	PxTriangleMesh* createTriangleMesh(const PxVec3* verts, const PxU32 numVerts, const PxU32* indices, const PxU32 triCount, PxPhysics& physics, PxCooking& cooking);
+	
 
 	void setupObstacleCollisionHandling(PxRigidActor* actor);
 

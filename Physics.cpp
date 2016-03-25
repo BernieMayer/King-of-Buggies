@@ -1322,6 +1322,8 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				}
 			}
 
+			
+
 			bool isBomb1 = false;
 			bool isBomb2 = false;
 			
@@ -1424,6 +1426,26 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 	}
 }
 
+void Physics::onTrigger(PxTriggerPair* pairs, PxU32 count)
+{
+	for (PxU32 i = 0; i < count; i++)
+	{
+		
+		for (int j = 0; j < powerupActors.size(); j++)
+			if (pairs[i].triggerActor == powerupActors[j])
+			{
+				for (int k = 0; k < vehicleActors.size(); k++)
+				{
+					if (pairs[i].otherActor == vehicleActors[k].vehDrive4W->getRigidDynamicActor())
+					{
+						//Create a event to send to the Game Manager here
+					}
+				}
+			}
+		
+	}
+}
+
 int Physics::createBomb(vec3 location, int playerID) {
 	// Add dynamic thrown ball to scene
 	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(getPxVec3(location)));
@@ -1461,6 +1483,34 @@ int Physics::createBomb(vec3 location, int playerID) {
 	bombStartTimes.push_back(clock.getCurrentTime());
 
 	return bombActors.size() - 1;
+}
+
+void Physics::createPowerupBox(vector<vec3> mesh, vec3 location)
+{
+
+	//gTreasureActor = createBox(rayHit.block.position+treasureDim, treasureDim, NULL, mTreasureMaterial, 1)->is<PxRigidDynamic>()
+	printf("Powerup created \n");
+	PxRigidDynamic* aSphereActor  = mPhysics->createRigidDynamic(PxTransform(getPxVec3(location)));
+	float radius = 2.0f;
+	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
+
+	PxShape* shapes[1];
+	aSphereActor->getShapes(shapes, 1);
+	aSphereActor->setActorFlag(PxActorFlag::eDISABLE_GRAVITY, true);
+	aSphereShape->setFlag(PxShapeFlag::eSIMULATION_SHAPE, false);
+	aSphereShape->setFlag(PxShapeFlag::eTRIGGER_SHAPE, true);
+
+	PxFilterData simFilterData;
+	simFilterData.word0 = COLLISION_FLAG_POWERUP;
+	simFilterData.word1 = COLLISION_FLAG_POWERUP_AGAINST;
+	shapes[0]->setSimulationFilterData(simFilterData);
+
+	gScene->addActor(*aSphereActor);
+
+	powerupActors.push_back(aSphereActor);
+
+	
+	
 }
 
 

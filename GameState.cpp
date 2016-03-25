@@ -261,7 +261,6 @@ bool GameState::checkBoostPadCollision(vec3 playerPos)
 
 		if (isWithinPolygon(playerPos, points))
 		{
-			printf("Collision with boostpad detected \n");
 			return true;
 		}
 	}

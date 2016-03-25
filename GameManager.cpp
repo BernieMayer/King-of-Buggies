@@ -240,6 +240,7 @@ void GameManager::createPowerupBox(unsigned int objectID)
 	renderer.assignTexture(box, boxMesh->getTextureID());
 	
 	state.getPowerupBox(objectID)->setRenderID(box);
+	physics.createPowerupBox(boxMesh->getVertices(), state.getPowerupBox(objectID)->getPos());
 }
 
 void GameManager::createBoostPad(unsigned int objectID)
@@ -733,19 +734,19 @@ void GameManager::initTestScene()
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
-	createPlayer(vec3(-5.f, 5.f, 15.f), traits);
-	createPlayer(vec3(5.f, 5.f, -15.f), traits);
+	//createPlayer(vec3(-5.f, 5.f, 15.f), traits);
+	//createPlayer(vec3(5.f, 5.f, -15.f), traits);
 
 	for (unsigned int i = 0; i < TOO_MANY; i++)
 	{
 		createPlayer(vec3(5.f, 5.f, -15.f), traits);
 	}
 
-
+	/*
 	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS - 1; i++)
 	{
 		state.getPlayer(i)->setAI(true);
-	}
+	}*/
 
 	for (unsigned int i = 4; i < TOO_MANY + 4; i++)
 	{
