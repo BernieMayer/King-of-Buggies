@@ -1556,7 +1556,6 @@ void Physics::bombExplosion(int bombID) {
 		}
 	}
 
-	lastState->removePowerup(bombID);
 }
 
 #endif 

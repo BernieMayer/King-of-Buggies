@@ -621,6 +621,10 @@ void GameManager::gameLoop()
 
 			if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
 				// Remove bomb
+				VehicleBombCollisionEvent* powerupEvent = (VehicleBombCollisionEvent*)(e);
+				Powerup* explodedBomb = state.getPowerup(powerupEvent->ob2);
+				renderer.deleteDrawableObject(explodedBomb->getRenderID());
+				state.removePowerup(powerupEvent->ob2);
 			}
 			else if (e->getType() == POWERUPBOX_COLLISION_EVENT)
 			{
