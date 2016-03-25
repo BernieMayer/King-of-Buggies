@@ -9,6 +9,7 @@ SoundManager::SoundManager() {
 
 SoundManager::SoundManager(GameState state) {
 	initOpenAL(state);
+	startSounds(state);
 	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		honking.push_back(false);
 		honkSources.push_back(0);
@@ -27,6 +28,9 @@ void SoundManager::initOpenAL(GameState state) {
 	alDopplerFactor(1.0f);
 
 	initListener(state);
+}
+
+void SoundManager::startSounds(GameState state) {
 	startMusic(state);
 	startEngineSounds(state);
 }
