@@ -1438,7 +1438,7 @@ void Physics::onTrigger(PxTriggerPair* pairs, PxU32 count)
 				{
 					if (pairs[i].otherActor == vehicleActors[k].vehDrive4W->getRigidDynamicActor())
 					{
-						//Create a event to send to the Game Manager here
+						lastState->pushEvent(new PowerupCollisionEvent(j, k));
 					}
 				}
 			}

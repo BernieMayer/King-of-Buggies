@@ -96,6 +96,7 @@
     <ClInclude Include="Coin.h" />
     <ClInclude Include="CollisionEvent.h" />
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="PowerupCollisionEvent.h" />
     <ClInclude Include="TimedEvent.h" />
     <ClInclude Include="unshaded.h" />
     <ClInclude Include="diffuse.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="NavMesh.cpp" />
     <ClCompile Include="Physics.cpp" />
     <ClCompile Include="Powerup.cpp" />
+    <ClCompile Include="PowerupCollisionEvent.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />

@@ -17,6 +17,7 @@
 #include "VehicleWallCollisionEvent.h"
 #include "VehicleBombCollisionEvent.h"
 #include "BombCreationEvent.h"
+#include "PowerupCollisionEvent.h"
 #include "Bomb.h"
 
 

@@ -81,6 +81,9 @@
     <ClCompile Include="Bomb.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="PowerupCollisionEvent.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -174,6 +177,9 @@
       <Filter>Events</Filter>
     </ClInclude>
     <ClInclude Include="Definitions.h" />
+    <ClInclude Include="PowerupCollisionEvent.h">
+      <Filter>Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

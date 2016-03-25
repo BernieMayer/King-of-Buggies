@@ -466,9 +466,37 @@ void GameManager::gameLoop()
 				5 - Decoy?
 				*/
 
-				
-				int powerUpID = state.getPlayer(0)->usePowerUp();
-				printf("Powerup id is %d \n", powerUpID);
+				int powerUpId = state.getPlayer->usePowerup();
+				if (powerUpId == POWERUPS::NITROBOOST)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					physics.applyNitroBoost(0);//Revise this to allow for nitro to be a energy system
+					printf("Nitro Boost \n");
+				}
+				else if (powerUpId == POWERUPS::BOMB)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					//Add bomb powerup logic
+					printf("Bomb \n");
+				}
+				else if (powerUpId == POWERUPS::MINE)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					createPowerup(MINE);
+					printf("Mine \n");
+				}
+				else if (powerUpId == POWERUPS::COIN)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					physics.modifySpeed(i, 0.3333f);	//Should change this..
+					printf("Coin? \n");
+				}
+				else if (powerUpId == POWERUPS::DECOY)
+				{
+					state.getPlayer(0)->addPowerUp(powerUpId);
+					//Apply decoy powerup logic
+					printf("Decoy? \n");
+				}
 
 				
 
@@ -477,6 +505,8 @@ void GameManager::gameLoop()
 			} 
 			else {
 			
+				//Test code should eventually be removed
+				/*
 				int powerUpId = randomPowerup();
 				if (powerUpId == POWERUPS::NITROBOOST)
 				{
@@ -504,7 +534,8 @@ void GameManager::gameLoop()
 					state.getPlayer(0)->addPowerUp(powerUpId);
 					printf("Decoy? \n");
 				}
-				hasPowerup.at(0) = true;
+				*/
+				//hasPowerup.at(0) = true;
 			}
 			
 		}
@@ -519,6 +550,20 @@ void GameManager::gameLoop()
 
 			if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
 				// Remove bomb
+			}
+			else if (e->getType() == POWERUP_COLLISION_EVENT)
+			{
+				PowerupCollisionEvent* powerupEvent = dynamic_cast<PowerupCollisionEvent*>(e);
+				int vehicleId = powerupEvent->playerId;
+				int powerupId = powerupEvent->powerupId; //Delete the powerup, note the id is based on the order that the powerups are made.
+
+				hasPowerup[vehicleId] = true;
+				int powerUpType = randomPowerup();
+				if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy	
+				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+				printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 			}
 		}
 		state.clearEvents();
@@ -746,19 +791,19 @@ void GameManager::initTestScene()
 
 	createPlayer(vec3(0.f, 5.f, 0.f), traits);
 	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
-	//createPlayer(vec3(-5.f, 5.f, 15.f), traits);
-	//createPlayer(vec3(5.f, 5.f, -15.f), traits);
+	createPlayer(vec3(-5.f, 5.f, 15.f), traits);
+	createPlayer(vec3(5.f, 5.f, -15.f), traits);
 
 	for (unsigned int i = 0; i < TOO_MANY; i++)
 	{
 		createPlayer(vec3(5.f, 5.f, -15.f), traits);
 	}
 
-	/*
+	
 	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS - 1; i++)
 	{
 		state.getPlayer(i)->setAI(true);
-	}*/
+	}
 
 	for (unsigned int i = 4; i < TOO_MANY + 4; i++)
 	{
