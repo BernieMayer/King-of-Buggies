@@ -9,10 +9,6 @@ SoundManager::SoundManager() {
 
 SoundManager::SoundManager(GameState state) {
 	initOpenAL(state);
-	for (int i = 0; i < state.numberOfPlayers(); i++) {
-		honking.push_back(false);
-		honkSources.push_back(0);
-	}
 }
 
 void SoundManager::initOpenAL(GameState state) {
@@ -38,25 +34,44 @@ void SoundManager::startSounds(GameState state) {
  * Initializes the listener at the location of the player
  */
 void SoundManager::initListener(GameState state) {
-	PlayerInfo* p1 = state.getPlayer(0);
+	ALfloat *ListenerPos;
+	ALfloat *ListenerVel;
+	if (state.numberOfPlayers() > 0) {
+		PlayerInfo* p1 = state.getPlayer(0);
 
-	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos()).data();
-	listenerPos = p1->getPos();
-	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
-	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp()).data();
+		ListenerPos = vec3ToALfloat(p1->getPos()).data();
+		ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
+	}
+	else {
+		ListenerPos = vec3ToALfloat(vec3(0.f, 5.f, 0.f)).data();
+		ListenerVel = vec3ToALfloat(vec3(0.0f, 0.0f, 0.0f)).data();
+	}
 
 	alListenerfv(AL_POSITION, ListenerPos);
 	alListenerfv(AL_VELOCITY, ListenerVel);
-	alListenerfv(AL_ORIENTATION, ListenerOri);
+
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		honking.push_back(false);
+		honkSources.push_back(0);
+	}
 }
 
 void SoundManager::startMenuSong(GameState state) {
 	loadWavToBuf("Menu.wav", &musicSource, &musicBuffer);
 
-	PlayerInfo* p1 = state.getPlayer(0);
+	ALfloat *SourcePos;
+	ALfloat *SourceVel;
 
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+	if (state.numberOfPlayers() > 0) {
+		PlayerInfo* p1 = state.getPlayer(0);
+
+		SourcePos = vec3ToALfloat(p1->getPos()).data();
+		SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+	}
+	else {
+		SourcePos = vec3ToALfloat(vec3(0.f, 5.f, 0.f)).data();
+		SourceVel = vec3ToALfloat(vec3(0.0f, 0.0f, 0.0f)).data();
+	}
 
 	alSourcei(musicSource, AL_BUFFER, musicBuffer);
 	alSourcef(musicSource, AL_PITCH, 1.0f);
@@ -69,10 +84,19 @@ void SoundManager::startMenuSong(GameState state) {
 }
 
 void SoundManager::updateMenuSong(GameState state) {
-	PlayerInfo* p1 = state.getPlayer(0);
+	ALfloat *SourcePos;
+	ALfloat *SourceVel;
 
-	ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-	ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+	if (state.numberOfPlayers() > 0) {
+		PlayerInfo* p1 = state.getPlayer(0);
+
+		SourcePos = vec3ToALfloat(p1->getPos()).data();
+		SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+	}
+	else {
+		SourcePos = vec3ToALfloat(vec3(0.f, 5.f, 0.f)).data();
+		SourceVel = vec3ToALfloat(vec3(0.0f, 0.0f, 0.0f)).data();
+	}
 
 	alSourcefv(musicSource, AL_POSITION, SourcePos);
 	alSourcefv(musicSource, AL_VELOCITY, SourceVel);
@@ -88,10 +112,19 @@ void SoundManager::updateMenuSong(GameState state) {
 
 				loadWavToBuf("Menu.wav", &musicSource, &musicBuffer);
 
-				PlayerInfo* p1 = state.getPlayer(0);
+				ALfloat *SourcePos;
+				ALfloat *SourceVel;
 
-				ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-				ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+				if (state.numberOfPlayers() > 0) {
+					PlayerInfo* p1 = state.getPlayer(0);
+
+					SourcePos = vec3ToALfloat(p1->getPos()).data();
+					SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+				}
+				else {
+					SourcePos = vec3ToALfloat(vec3(0.f, 5.f, 0.f)).data();
+					SourceVel = vec3ToALfloat(vec3(0.0f, 0.0f, 0.0f)).data();
+				}
 
 				alSourcei(musicSource, AL_BUFFER, musicBuffer);
 				alSourcef(musicSource, AL_PITCH, 1.0f);
@@ -113,10 +146,19 @@ void SoundManager::updateMenuSong(GameState state) {
 
 			loadWavToBuf("Menu2.wav", &musicSource, &musicBuffer);
 
-			PlayerInfo* p1 = state.getPlayer(0);
+			ALfloat *SourcePos;
+			ALfloat *SourceVel;
 
-			ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-			ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+			if (state.numberOfPlayers() > 0) {
+				PlayerInfo* p1 = state.getPlayer(0);
+
+				SourcePos = vec3ToALfloat(p1->getPos()).data();
+				SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+			}
+			else {
+				SourcePos = vec3ToALfloat(vec3(0.f, 5.f, 0.f)).data();
+				SourceVel = vec3ToALfloat(vec3(0.0f, 0.0f, 0.0f)).data();
+			}
 
 			alSourcei(musicSource, AL_BUFFER, musicBuffer);
 			alSourcef(musicSource, AL_PITCH, 1.0f);
@@ -205,11 +247,9 @@ void SoundManager::updateListener(GameState state) {
 	ALfloat *ListenerPos = vec3ToALfloat(p1->getPos()).data();
 	listenerPos = p1->getPos();
 	ALfloat *ListenerVel = vec3ToALfloat(p1->getVelocity()).data();
-	ALfloat *ListenerOri = vec3ToALfloat(p1->getForward(), p1->getUp()).data();
 
 	alListenerfv(AL_POSITION, ListenerPos);
 	alListenerfv(AL_VELOCITY, ListenerVel);
-	alListenerfv(AL_ORIENTATION, ListenerOri);
 }
 
 /*

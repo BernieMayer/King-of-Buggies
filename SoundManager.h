@@ -32,6 +32,10 @@ public:
 	void startMenuSong(GameState state);
 	void updateMenuSong(GameState state);
 	void stopMenuSong();
+
+	void initListener(GameState state);
+	void startMusic(GameState state);
+	void startEngineSounds(GameState state);
 	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
@@ -39,10 +43,8 @@ private:
 	int menuSongCounter = 0;
 	int menuSongCounterMax = 15;
 	void initOpenAL(GameState state);
-	void initListener(GameState state);
-	void startMusic(GameState state);
+	
 	float distanceVolumeAdjuster(float volume, vec3 pos);
-	void startEngineSounds(GameState state);
 	void updateListener(GameState state);
 	void updateMusic(GameState state);
 	void updateEngineSounds(GameState state, Input inputs[]);

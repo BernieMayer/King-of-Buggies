@@ -83,6 +83,8 @@ private:
 
 	timeb pauseTime;
 
+	vector<int> playerColours;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 

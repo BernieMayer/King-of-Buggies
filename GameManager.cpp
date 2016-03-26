@@ -25,6 +25,11 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 
 	ai = AIManager(&state);
 
+
+	for (int i = 0; i < 5; i++) {
+		smoothers.push_back(InputSmoother());
+	}
+
 	//TODO: Put this indexing somewhere useful;
 	ai.initAI(1);
 
@@ -34,7 +39,10 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	_interface = InterfaceManager(width, height);
 //	_interface.setWindowDim(width, height);
 
-	gameInit();
+	playerColours.push_back(0);
+	playerColours.push_back(1);
+	playerColours.push_back(2);
+	playerColours.push_back(3);
 }
 
 
@@ -100,9 +108,6 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
-	smoothers.push_back(InputSmoother());
-	
-
 }
 
 void GameManager::createDecoyGoldenBuggie(vec3 position, VehicleTraits traits)
@@ -268,6 +273,7 @@ void GameManager::createBoostPad(unsigned int objectID)
 }
 
 void GameManager::initMenus() {
+	sound = SoundManager(state);
 	sound.startMenuSong(state);
 	
 	int redIndex = 0;
@@ -354,9 +360,10 @@ void GameManager::initMenus() {
 			menu = _interface.generateComponentID();
 		}
 		else if (in.menu && currentMenu == lastMenu) {
-			sound.stopMenuSong();
-			sound.startSounds(state);
 			_interface.clear();
+
+			gameInit();
+
 			return;
 		}
 
@@ -399,18 +406,44 @@ void GameManager::initMenus() {
 			}
 			else if (p1Y == cSel2Y && in.tiltForward > 0.3f) {
 				p1Y = cSel1Y;
+
+				// if red is selected
+				if (p1X == cSel1X) {
+					selectedColour = 0;
+				}
+				// if green is selected
+				else {
+					selectedColour = 1;
+				}
 			}
 			else if (p1X == cSel1X && in.turnR < -0.3f) {
 				p1X = cSel2X;
+
+				// if green is selected
+				if (p1Y == cSel1Y) {
+					selectedColour = 1;
+				}
+				// if purple is selected
+				else {
+					selectedColour = 3;
+				}
 			}
 			else if (p1X == cSel2X && in.turnL < -0.3f) {
 				p1X = cSel1X;
+
+				// if red is selected
+				if (p1Y == cSel1Y) {
+					selectedColour = 0;
+				}
+				// if blue is selected
+				else {
+					selectedColour = 2;
+				}
 			}
 
 			if (selectedColour == 0 && redIndex != 0) {
-				unsigned int temp = meshInfo.buggyTexIDs[0];
-				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[redIndex];
-				meshInfo.buggyTexIDs[redIndex] = temp;
+				meshInfo.buggyTexIDs[redIndex] = meshInfo.buggyTexIDs[0];
+				playerColours[0] = 0;
 
 				if (blueIndex == 0) {
 					blueIndex = redIndex;
@@ -424,9 +457,8 @@ void GameManager::initMenus() {
 				redIndex = 0;
 			}
 			else if (selectedColour == 1 && greenIndex != 0) {
-				unsigned int temp = meshInfo.buggyTexIDs[0];
-				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[greenIndex];
-				meshInfo.buggyTexIDs[greenIndex] = temp;
+				playerColours[greenIndex] = playerColours[0];
+				playerColours[0] = 1;
 
 				if (redIndex == 0) {
 					redIndex = greenIndex;
@@ -440,9 +472,8 @@ void GameManager::initMenus() {
 				greenIndex = 0;
 			}
 			else if (selectedColour == 2 && blueIndex != 0) {
-				unsigned int temp = meshInfo.buggyTexIDs[0];
-				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[blueIndex];
-				meshInfo.buggyTexIDs[blueIndex] = temp;
+				playerColours[blueIndex] = playerColours[0];
+				playerColours[0] = 2;
 
 				if (redIndex == 0) {
 					redIndex = blueIndex;
@@ -456,9 +487,8 @@ void GameManager::initMenus() {
 				blueIndex = 0;
 			}
 			else if (selectedColour == 3 && purpleIndex != 0) {
-				unsigned int temp = meshInfo.buggyTexIDs[0];
-				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[purpleIndex];
-				meshInfo.buggyTexIDs[purpleIndex] = temp;
+				playerColours[purpleIndex] = playerColours[0];
+				playerColours[0] = 3;
 
 				if (redIndex == 0) {
 					redIndex = purpleIndex;
@@ -965,13 +995,27 @@ void GameManager::gameInit()
 
 void GameManager::initTestScene()
 {
-	vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car
-	vehicleColours.push_back(vec3(0.f, 1.f, 0.f)); // green car
-	vehicleColours.push_back(vec3(0.f, 0.f, 1.f)); // blue
+
+	for (int i = 0; i < playerColours.size(); i++) {
+		if (playerColours[i] == 0) {
+			vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car
+
+		}
+		else if (playerColours[i] == 1) {
+			vehicleColours.push_back(vec3(0.f, 1.f, 0.f)); // green car
+		}
+		else if (playerColours[i] == 2) {
+			vehicleColours.push_back(vec3(0.f, 0.f, 1.f)); // blue
+		}
+		else {
+			// Black car sucks. it's purple now
+			vehicleColours.push_back(vec3(1.f, 0.f, 1.f)); // purple
+		}
+	}
+	
 	// Yellow car also sucks, so now it's orange
 	vehicleColours.push_back(vec3(1.f, 0.64f, 0.f)); // orange
-	// Black car sucks. it's purple now
-	vehicleColours.push_back(vec3(1.f, 0.f, 1.f)); // purple
+
 
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
 	traits.print();
@@ -982,10 +1026,58 @@ void GameManager::initTestScene()
 	traits.loadConfiguration("base");
 	temp.print();
 
-	createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getRedBuggyTexID());
-	createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getBlueBuggyTexID());
-	createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getGreenBuggyTexID());
-	createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getOrangeBuggyTexID());
+	if (playerColours[0] == 0) {
+		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getRedBuggyTexID());
+	}
+	else if (playerColours[0] == 1) {
+		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getGreenBuggyTexID());
+	}
+	else if (playerColours[0] == 2) {
+		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getBlueBuggyTexID());
+	}
+	else if (playerColours[0] == 3) {
+		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getPurpleBuggyTexID());
+	}
+
+
+	if (playerColours[1] == 0) {
+		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getRedBuggyTexID());
+	}
+	else if (playerColours[1] == 1) {
+		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGreenBuggyTexID());
+	}
+	else if (playerColours[1] == 2) {
+		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getBlueBuggyTexID());
+	}
+	else if (playerColours[1] == 3) {
+		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getPurpleBuggyTexID());
+	}
+
+	if (playerColours[2] == 0) {
+		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getRedBuggyTexID());
+	}
+	else if (playerColours[2] == 1) {
+		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getGreenBuggyTexID());
+	}
+	else if (playerColours[2] == 2) {
+		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getBlueBuggyTexID());
+	}
+	else if (playerColours[2] == 3) {
+		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getPurpleBuggyTexID());
+	}
+
+	if (playerColours[3] == 0) {
+		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getRedBuggyTexID());
+	}
+	else if (playerColours[3] == 1) {
+		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getGreenBuggyTexID());
+	}
+	else if (playerColours[3] == 2) {
+		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getBlueBuggyTexID());
+	}
+	else if (playerColours[3] == 3) {
+		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getPurpleBuggyTexID());
+	}
 
 	for (unsigned int i = 0; i < TOO_MANY; i++)
 	{
@@ -1010,6 +1102,11 @@ void GameManager::initTestScene()
 	renderer.assignMaterial(skyboxID, &skyMaterial);
 
 	state.setGoldenBuggy(0);
+	sound.stopMenuSong();
+	sound.initListener(state);
+	sound.startSounds(state);
+
+
 
 	// Add all coins as render objects
 	for (unsigned int i = 0; i < state.numberOfCoins(); i++) { createCoin(i); }
@@ -1023,7 +1120,7 @@ void GameManager::initTestScene()
 	renderer.setLightPosition(lightID, lightPos);
 
 	ai.initAI();
-	sound = SoundManager(state);
+
 
 
 
