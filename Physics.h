@@ -60,6 +60,7 @@ public:
 	void setSpeed(unsigned int vehicleNum, float speed);
 	void applySpeedPadBoost(unsigned int vechicleNum);
 	void applyNitroBoost(unsigned int vehicleNum);
+	//void applyNitroBoost(unsigned int vehicleNum, float energy);
 	void applyMineExplosion(unsigned int vehicleNum);
 
 	/*

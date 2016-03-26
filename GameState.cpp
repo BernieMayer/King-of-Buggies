@@ -96,6 +96,65 @@ PlayerInfo* GameState::getGoldenBuggy()
 
 unsigned int GameState::getGoldenBuggyID() { return goldenBuggy; }
 
+vector<vec2> GameState::setupRadarSeeingOnlyGoldenBuggy(int playerId)
+{
+
+	vector<vec2> vectors;
+
+	PlayerInfo* player = getPlayer(playerId);
+
+	vec3 player3Dpos = player->getPos();
+
+	vec3 rightVector = player->getRight();
+
+	vec3 player3DposUp = player->getForward();
+
+	vec3 player3DposRight = -rightVector;
+	vec3 player3DposLeft = rightVector;
+
+	vec2 playerLeft = vec2(player3DposRight.x, -player3DposRight.z);
+	vec2 playerRight = vec2(player3DposLeft.x, -player3DposLeft.z);
+	vec2 playerUp = vec2(player3DposUp.x, -player3DposUp.z);
+
+
+	vec3 origin = vec3((playerLeft.x + playerRight.x) / 2, 0, (playerLeft.y + playerRight.y) / 2);
+
+	vectors.push_back(playerLeft);
+	vectors.push_back(playerUp);
+	vectors.push_back(playerRight);
+	int radarSize = 200;
+	if (playerId != getGoldenBuggyID())
+	{
+		vector<vec3> radarPoly;
+		vec3 otherPlayerPos = getPlayer(getGoldenBuggyID())->getPos();
+		radarPoly.push_back(player3Dpos - vec3(radarSize / 2, 0, radarSize / 2));
+		radarPoly.push_back(player3Dpos - vec3(radarSize / 2, 0, -radarSize / 2));
+		radarPoly.push_back(player3Dpos + vec3(radarSize / 2, 0, radarSize / 2));
+		radarPoly.push_back(player3Dpos + vec3(radarSize / 2, 0, -radarSize / 2));
+
+
+		if (isWithinPolygon(otherPlayerPos, radarPoly)){
+
+			double dist = length((otherPlayerPos - player3Dpos));
+
+			vec3 otherPlayerCenter = normalize(otherPlayerPos - player3Dpos);
+
+			vec3 otherPlayer3DUp = getPlayer(getGoldenBuggyID())->getForward();
+			vec3 otherPlayer3DRight = cross(getPlayer(getGoldenBuggyID())->getForward(), getPlayer(getGoldenBuggyID())->getUp());
+
+			vec2 otherPlayerLeft = vec2(otherPlayerCenter.x - otherPlayer3DRight.x, -(otherPlayerCenter.z - otherPlayer3DRight.z));
+			vec2 otherPlayerRight = vec2(otherPlayerCenter.x + otherPlayer3DRight.x, -(otherPlayerCenter.z + otherPlayer3DRight.z));
+			vec2 otherPlayerUp = vec2(otherPlayerCenter.x + otherPlayer3DUp.x, -(otherPlayerCenter.z + otherPlayer3DUp.z));
+
+			vectors.push_back(otherPlayerLeft);
+			vectors.push_back(otherPlayerUp);
+			vectors.push_back(otherPlayerRight);
+
+		}
+	}
+	return vectors;
+
+}
 
 vector<vec2> GameState::setupRadar(int playerId)
 {

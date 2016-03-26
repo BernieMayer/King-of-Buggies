@@ -41,13 +41,19 @@ public:
 	void addPowerUp(int id);
 	int usePowerUp();
 	void removePowerup();
+	int getCurrentPowerup();
+
 	
+	void removeEnergyForNitro(float nitro);
+	void setEnergyForNitro(float nitro);
+	float getEnergyForNitro();
 
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
 	vec3 velocity;
 
+	float energyForNitro;
 	int powerup;
 	int numCoins;
 	int score;

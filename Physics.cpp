@@ -197,7 +197,7 @@ void Physics::setSpeed(unsigned int vehicleNum, float speed)
 
 void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 {
-	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;;
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 downVec = -lastState->getPlayer(vehicleNum)->getUp();
@@ -212,13 +212,15 @@ void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 
 void Physics::applyNitroBoost(unsigned int vehicleNum)
 {
-	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;;
+	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
-	forceVec = 39050.f * forceVec * vec3(1, 0, 1);
+	forceVec = 80000.f * forceVec * vec3(1, 0, 1);
 	vehBody->addForce(getPxVec3(forceVec));
 }
+
+
 
 void Physics::applyMineExplosion(unsigned int vehicleNum)
 {

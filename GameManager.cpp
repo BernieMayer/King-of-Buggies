@@ -584,8 +584,6 @@ void GameManager::gameLoop()
 	unsigned int numScreens = input.getNumPlayers();
 	
 	renderer.splitScreenViewports(numScreens);
-
-
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -615,7 +613,6 @@ void GameManager::gameLoop()
 
 
 
-		//I'm leaving a comment here so that once we add powerups we change the pause key
 		if (inputs[0].menu)
 		{
 			paused = !paused;
@@ -696,8 +693,21 @@ void GameManager::gameLoop()
 				
 				if (powerUpId == POWERUPS::NITROBOOST)
 				{
-					physics.applyNitroBoost(0);//Revise this to allow for nitro to be a energy system
-					printf("Nitro Boost \n");
+				
+
+					if (state.getPlayer(0)->getEnergyForNitro() > 0.0f)
+					{
+						state.getPlayer(0)->removeEnergyForNitro(30);
+						physics.applyNitroBoost(0);
+						state.getPlayer(0)->addPowerUp(POWERUPS::NITROBOOST);
+						printf("Current energy level %f \n", state.getPlayer(0)->getEnergyForNitro());
+					}
+					else {
+						state.getPlayer(0)->addPowerUp(POWERUPS::NITROBOOST);
+						state.getPlayer(0)->setEnergyForNitro(300.0f);
+						printf("Nitro Boost with energy level  %f \n", state.getPlayer(0)->getEnergyForNitro());
+
+					}
 				}
 				else if (powerUpId == POWERUPS::BOMB)
 				{
@@ -721,8 +731,14 @@ void GameManager::gameLoop()
 				}
 
 				
-
-				hasPowerup.at(0) = false;
+				if (powerUpId == POWERUPS::NITROBOOST)
+				{
+					hasPowerup.at(0) = true;
+				}
+				else 
+				{
+					hasPowerup.at(0) = false;
+				}
 
 			} 
 			else {
@@ -787,9 +803,11 @@ void GameManager::gameLoop()
 				hasPowerup[vehicleId] = true;
 				int powerUpType = randomPowerup();
 				if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy	
+					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+				powerUpType = POWERUPS::NITROBOOST;	//REMOVE FOR PRODUCTION
 				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
+				
 				printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 			}
 		}
@@ -913,7 +931,7 @@ void GameManager::gameLoop()
 			renderer.useViewport(i+1);
 			renderer.drawAll();
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
-			renderer.drawRadar(state.setupRadar(0));
+			renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
 			//renderer.useViewport(i+1);
 			//Debugging

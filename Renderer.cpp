@@ -430,11 +430,11 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	
 
 	for (int i = 0; i < radarVecs.size(); i++){
-		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 10), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 10), 0);
+		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 15), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 15), 0);
 		glVertex3f(vec.x, vec.y, vec.z);
-		//REMOVE IN PRODUCTION
+		
 		if (i >= 2 && i < 5){
-			glColor3f(0, 0, 1);
+			glColor3f(1.f, 0.64f, 0.f);
 		}
 		else if (i >= 5 && i < 8)
 		{
@@ -450,6 +450,32 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	glEnd();
 	
 	glViewport(0,0, windowWidth, windowHeight);
+}
+
+void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int numOfPlayers, int playerScreen)
+{
+	if (numOfPlayers == 2)
+	{
+		if (playerScreen == 1){
+			glViewport(3/4 * (windowWidth/2) , windowHeight * 0.75, windowWidth * (0.25/2), windowHeight * (0.25/2));
+		}
+		else
+		{
+			glViewport(windowWidth * 0.75, windowHeight * 0.25, windowWidth * (0.25/2), windowHeight * (0.25/2));
+		}
+		
+	}
+	else if (numOfPlayers == 3)
+	{
+		if (playerScreen == 1)
+		{
+			//glViewport(windowWidth/4, windowHeight )
+		}
+	}
+	else if (numOfPlayers == 4)
+	{
+
+	}
 }
 
 void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)

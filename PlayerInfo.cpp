@@ -21,7 +21,7 @@ goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID)
 		wheelRenderIDs[i] = _wheelRenderIDs[i];
 		wheelTransforms[i] = mat4(1.f);
 	}
-
+	energyForNitro = 0;
 }
 
 bool PlayerInfo::isGoldenBuggy(){ return goldenBuggy; }
@@ -48,6 +48,42 @@ void PlayerInfo::removePowerup()
 {
 	powerup = -1;
 }
+
+int PlayerInfo::getCurrentPowerup()
+{
+	return powerup;
+}
+
+void PlayerInfo::setEnergyForNitro(float nitro)
+{
+	if (nitro < 0.0f)
+	{
+		energyForNitro = 0;
+	}
+	else
+	{
+		energyForNitro = nitro;
+	}
+}
+
+void PlayerInfo::removeEnergyForNitro(float nitro)
+{
+
+	if (energyForNitro - nitro < 0.0f)
+	{
+		energyForNitro = 0;
+	}
+	else
+	{
+		energyForNitro -= nitro;
+	}
+
+}
+float PlayerInfo::getEnergyForNitro()
+{
+	return energyForNitro;
+}
+
 
 unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 {
