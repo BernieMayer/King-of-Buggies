@@ -293,8 +293,21 @@ void GameManager::initMenus() {
 
 	unsigned int p1Icon = 0;
 	unsigned int Icon1 = 0;
-	float p1X = 0.f;
-	float p1Y = 0.f;
+	const float lSel1X = -0.4f;
+	const float lSel1Y = -0.89f;
+	const float lSel2X = 0.4f;
+	const float lSel2Y = -0.89f;
+	const float cSel1X = -0.6f;
+	const float cSel2X = 0.2f;
+	const float cSel1Y = -0.21f;
+	const float cSel2Y = -0.92f;
+	float p1Scale = 0.25f;
+	float p1X = lSel1X;
+	float p1Y = lSel1Y;
+	const float iconWidth = 0.1f;
+
+	// 0 = red, 1 = green, 2 = blue, 3 = purple
+	int selectedColour = 0;
 
 	unsigned int p2Icon = 0;
 	unsigned int Icon2 = 0;
@@ -316,7 +329,7 @@ void GameManager::initMenus() {
 			currentMenu++;
 			_interface.clear();
 
-			p1Icon = LoadTexture("menus/P1Icon.bmp");
+			p1Icon = LoadTexture("menus/P1Icon.png");
 			Icon1 = _interface.generateComponentID();
 
 			levelSelectScreen = LoadTexture("menus/KoB_LevelScreen.bmp");
@@ -328,6 +341,12 @@ void GameManager::initMenus() {
 		else if (in.menu && currentMenu == 1) {
 			currentMenu++;
 			_interface.clear();
+
+			p1X = -0.6f;
+			p1Y = -0.21f;
+			p1Scale = 0.15f;
+			p1Icon = LoadTexture("menus/P1Icon.png");
+			Icon1 = _interface.generateComponentID();
 
 			carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 			cScreen = _interface.generateComponentID();
@@ -347,16 +366,117 @@ void GameManager::initMenus() {
 			_interface.assignTexture(sScreen, startScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(sScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
 		}
+		// if level select menu
 		else if (currentMenu == 1) {
+			if (p1X == lSel1X && in.turnR < -0.3f) {
+				p1X = lSel2X;
+			}
+			else if (p1X == lSel2X && in.turnL < -0.3f) {
+				p1X = lSel1X;
+			}
+
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, p1X, p1Y, 0.4f, 0.3f, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, p1X, p1Y, p1Scale, p1Scale, ANCHOR::CENTER);
 
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
 		}
+		// If car select menu
 		else if (currentMenu == 2) {
+			if (p1Y == cSel1Y && in.tiltBackward > 0.3f)
+			{
+				p1Y = cSel2Y;
+
+				// Blue selected
+				if (p1X == cSel1X) {
+					selectedColour = 2;
+				}
+				// Purple selected
+				else {
+					selectedColour = 3;
+				}
+			}
+			else if (p1Y == cSel2Y && in.tiltForward > 0.3f) {
+				p1Y = cSel1Y;
+			}
+			else if (p1X == cSel1X && in.turnR < -0.3f) {
+				p1X = cSel2X;
+			}
+			else if (p1X == cSel2X && in.turnL < -0.3f) {
+				p1X = cSel1X;
+			}
+
+			if (selectedColour == 0 && redIndex != 0) {
+				unsigned int temp = meshInfo.buggyTexIDs[0];
+				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[redIndex];
+				meshInfo.buggyTexIDs[redIndex] = temp;
+
+				if (blueIndex == 0) {
+					blueIndex = redIndex;
+				}
+				else if (greenIndex == 0) {
+					greenIndex = redIndex;
+				}
+				else if (purpleIndex == 0) {
+					purpleIndex = redIndex;
+				}
+				redIndex = 0;
+			}
+			else if (selectedColour == 1 && greenIndex != 0) {
+				unsigned int temp = meshInfo.buggyTexIDs[0];
+				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[greenIndex];
+				meshInfo.buggyTexIDs[greenIndex] = temp;
+
+				if (redIndex == 0) {
+					redIndex = greenIndex;
+				}
+				else if (blueIndex == 0) {
+					blueIndex = greenIndex;
+				}
+				else if (purpleIndex == 0) {
+					purpleIndex = greenIndex;
+				}
+				greenIndex = 0;
+			}
+			else if (selectedColour == 2 && blueIndex != 0) {
+				unsigned int temp = meshInfo.buggyTexIDs[0];
+				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[blueIndex];
+				meshInfo.buggyTexIDs[blueIndex] = temp;
+
+				if (redIndex == 0) {
+					redIndex = blueIndex;
+				}
+				else if (greenIndex == 0) {
+					greenIndex = blueIndex;
+				}
+				else if (purpleIndex == 0) {
+					purpleIndex = blueIndex;
+				}
+				blueIndex = 0;
+			}
+			else if (selectedColour == 3 && purpleIndex != 0) {
+				unsigned int temp = meshInfo.buggyTexIDs[0];
+				meshInfo.buggyTexIDs[0] = meshInfo.buggyTexIDs[purpleIndex];
+				meshInfo.buggyTexIDs[purpleIndex] = temp;
+
+				if (redIndex == 0) {
+					redIndex = purpleIndex;
+				}
+				else if (greenIndex == 0) {
+					greenIndex = purpleIndex;
+				}
+				else if (blueIndex == 0) {
+					blueIndex = purpleIndex;
+				}
+				purpleIndex = 0;
+			}
+
+			_interface.assignSquare(Icon1);
+			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(Icon1, p1X, p1Y, p1Scale, p1Scale, ANCHOR::CENTER);
+
 			_interface.assignSquare(cScreen);
 			_interface.assignTexture(cScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(cScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
@@ -367,7 +487,6 @@ void GameManager::initMenus() {
 		_interface.setDimensions(menu, 1.f, -1.f, 4.f, 2.f, ANCHOR::BOTTOM_RIGHT);
 
 		
-
 		_interface.drawAll(&renderer);
 
 		sound.updateMenuSong(state);
@@ -701,7 +820,7 @@ void GameManager::gameLoop()
 
 		
 		if (inputs[0].menu) {
-			//displayDebugging = !displayDebugging;
+			displayDebugging = !displayDebugging;
 		}
 
 		//Draw scene
