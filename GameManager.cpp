@@ -804,7 +804,6 @@ void GameManager::gameLoop()
 				int powerUpType = randomPowerup();
 				if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
 					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-				powerUpType = POWERUPS::NITROBOOST;	//REMOVE FOR PRODUCTION
 				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 				
