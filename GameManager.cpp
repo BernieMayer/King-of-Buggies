@@ -68,7 +68,7 @@ void GameManager::cameraEnvironmentCollision(Camera* cam)
 	}
 }
 
-void GameManager::createPlayer(vec3 position, VehicleTraits traits)
+void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int texID)
 {
 	//Make argument to function later
 
@@ -76,7 +76,6 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits)
 	unsigned int physicsID = physics.vehicle_create(traits, position);
 
 	vec3 colour = vehicleColours[state.numberOfPlayers()];
-	unsigned int texID = meshInfo.getBuggyTexID(state.numberOfPlayers());
 
 	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
@@ -983,14 +982,14 @@ void GameManager::initTestScene()
 	traits.loadConfiguration("base");
 	temp.print();
 
-	createPlayer(vec3(0.f, 5.f, 0.f), traits);
-	createPlayer(vec3(-5.f, 5.f, -15.f), traits);
-	createPlayer(vec3(-5.f, 5.f, 15.f), traits);
-	createPlayer(vec3(5.f, 5.f, -15.f), traits);
+	createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getRedBuggyTexID());
+	createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getBlueBuggyTexID());
+	createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getGreenBuggyTexID());
+	createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getOrangeBuggyTexID());
 
 	for (unsigned int i = 0; i < TOO_MANY; i++)
 	{
-		createPlayer(vec3(5.f, 5.f, -15.f), traits);
+		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getBuggyTexID(0));
 	}
 
 	

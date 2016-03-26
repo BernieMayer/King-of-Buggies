@@ -78,11 +78,17 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	// load buggy textures
-	buggyTexIDs.push_back(LoadTexture("textures\\redbuggytexture.png"));
-	buggyTexIDs.push_back(LoadTexture("textures\\greenbuggytexture.png"));
-	buggyTexIDs.push_back(LoadTexture("textures\\bluebuggytexture.png"));
-	buggyTexIDs.push_back(LoadTexture("textures\\yellowbuggytexture.png"));
-	buggyTexIDs.push_back(LoadTexture("textures\\purplebuggytexture.png"));
+	redBuggyTexID = LoadTexture("textures\\redbuggytexture.png");
+	blueBuggyTexID = LoadTexture("textures\\greenbuggytexture.png");
+	greenBuggyTexID = LoadTexture("textures\\bluebuggytexture.png");
+	orangeBuggyTexID = LoadTexture("textures\\yellowbuggytexture.png");
+	purpleBuggyTexID = LoadTexture("textures\\purplebuggytexture.png");
+
+	buggyTexIDs.push_back(redBuggyTexID);
+	buggyTexIDs.push_back(blueBuggyTexID);
+	buggyTexIDs.push_back(greenBuggyTexID);
+	buggyTexIDs.push_back(orangeBuggyTexID);
+	buggyTexIDs.push_back(purpleBuggyTexID);
 
 	goldenBuggyTexID = LoadTexture("textures\\goldenbuggytexture.png");
 }
@@ -115,6 +121,14 @@ unsigned int MeshInfo::getBuggyTexID(int index) {
 	return buggyTexIDs[index];
 }
 
-unsigned int MeshInfo::getGoldenBuggyTexID() {
-	return goldenBuggyTexID;
-}
+unsigned int MeshInfo::getRedBuggyTexID() { return redBuggyTexID; }
+
+unsigned int MeshInfo::getBlueBuggyTexID() { return blueBuggyTexID; }
+
+unsigned int MeshInfo::getGreenBuggyTexID() { return greenBuggyTexID; }
+
+unsigned int MeshInfo::getOrangeBuggyTexID() { return orangeBuggyTexID; }
+
+unsigned int MeshInfo::getPurpleBuggyTexID() { return purpleBuggyTexID; }
+
+unsigned int MeshInfo::getGoldenBuggyTexID() { return goldenBuggyTexID; }

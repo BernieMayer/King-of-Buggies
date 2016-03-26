@@ -20,6 +20,11 @@ public:
 	vector<vec2> getMeshUvs(int objectType);
 	vector<unsigned int> getMeshIndices(int objectType);
 	unsigned int getBuggyTexID(int index);
+	unsigned int getRedBuggyTexID();
+	unsigned int getBlueBuggyTexID();
+	unsigned int getGreenBuggyTexID();
+	unsigned int getOrangeBuggyTexID();
+	unsigned int getPurpleBuggyTexID();
 	unsigned int getGoldenBuggyTexID();
 
 	vector<unsigned int> buggyTexIDs;
@@ -28,6 +33,11 @@ public:
 
 private:
 	vector<MeshObject> meshes;
+	unsigned int redBuggyTexID;
+	unsigned int blueBuggyTexID;
+	unsigned int greenBuggyTexID;
+	unsigned int orangeBuggyTexID;
+	unsigned int purpleBuggyTexID;
 	unsigned int goldenBuggyTexID;
 };
 

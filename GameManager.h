@@ -78,15 +78,10 @@ private:
 	Unshaded skyMaterial;
 
 	vector<bool> hasPowerup;
-	/*
-	vector<int> player1powerUpList;
-	vector<int> player2powerUpList;
-	vector<int> player3powerUpList;
-	vector<int> player4powerUpList;
-	*/
-
 
 	unsigned int carSelectScreen;
+
+	timeb pauseTime;
 
 public:
 	GameManager(GLFWwindow* newWindow);
@@ -94,7 +89,7 @@ public:
 	void initMenus();
 
 	// create physics and render objects through GameState
-	void createPlayer(vec3 position, VehicleTraits traits);		//Add forward parameter later, maybe also VehicleTraits
+	void createPlayer(vec3 position, VehicleTraits traits, unsigned int textureID);		//Add forward parameter later, maybe also VehicleTraits
 	void createAI(vec3 position);
 	void createGroundPlane(vec3 normal, float offset);
 	void createLevel(unsigned int objectID);
