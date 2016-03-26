@@ -330,7 +330,7 @@ void GameManager::initMenus() {
 
 		Input in = input.getInput(1);
 		in = smoothers[0].smooth(in, false);
-		if (in.menu && currentMenu == 0) {
+		if ((in.menu || in.powerup || in.jump || in.horn || in.drift) && currentMenu == 0) {
 			currentMenu++;
 			_interface.clear();
 
@@ -343,7 +343,7 @@ void GameManager::initMenus() {
 			menuBackground = LoadTexture("menus/Background.bmp");
 			menu = _interface.generateComponentID();
 		}
-		else if (in.menu && currentMenu == 1) {
+		else if (((in.jump && !in.isKeyboard) || (in.powerup && in.isKeyboard)) && currentMenu == 1) {
 			currentMenu++;
 			_interface.clear();
 
@@ -359,7 +359,7 @@ void GameManager::initMenus() {
 			menuBackground = LoadTexture("menus/Background.bmp");
 			menu = _interface.generateComponentID();
 		}
-		else if (in.menu && currentMenu == lastMenu) {
+		else if (((in.jump && !in.isKeyboard) || (in.powerup && in.isKeyboard)) && currentMenu == lastMenu) {
 			_interface.clear();
 
 			gameInit();
