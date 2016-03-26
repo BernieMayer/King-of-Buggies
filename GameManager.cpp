@@ -767,6 +767,7 @@ void GameManager::gameLoop()
 		renderer.updateObjectTransforms(&state);
 		sound.updateSounds(state, inputs);
 
+		//Put into function
 		for (int i = 0; i < state.getNbEvents(); i++) {
 			Event* e = state.getEvent(i);
 
@@ -841,7 +842,7 @@ void GameManager::gameLoop()
 
 			physics.startSim(frameTime);
 		}
-		//Free camera movement
+		/*//Free camera movement
 		if (paused)
 		{
 			//Debugging avoidance
@@ -851,10 +852,10 @@ void GameManager::gameLoop()
 
 			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
 			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
-		}
+		}*/
 
 		
-		if (inputs[0].menu) {
+		if (inputs[0].horn) {
 			displayDebugging = !displayDebugging;
 		}
 
@@ -914,8 +915,9 @@ void GameManager::gameLoop()
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			renderer.drawRadar(state.setupRadar(0));
 
+			//renderer.useViewport(i+1);
 			//Debugging
-			if (displayDebugging)
+			if (displayDebugging && (i == 0))
 			{
 				ai.getPathAsLines(1, &path);
 
@@ -924,7 +926,7 @@ void GameManager::gameLoop()
 				//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
 			}
 
-			if (paused)
+			if (paused && (i == 0))
 			{
 				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 			}

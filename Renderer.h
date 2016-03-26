@@ -189,6 +189,7 @@ public:
 	void splitScreenViewports(unsigned int numViewports);
 	mat4 getViewportRatio(unsigned int viewport);
 	unsigned int numberOfViewports() { return viewports.size(); }
+	Viewport getActiveViewport() { return viewports[activeViewport]; }
 
 	//Delete objects
 	void deleteDrawableObject(int object);

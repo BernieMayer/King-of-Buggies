@@ -490,6 +490,9 @@ void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
 
 void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
 {
+	GLint dimensions [4];
+	glGetIntegerv(GL_VIEWPORT, dimensions);
+
 	glUseProgram(0);
 
 	mat4 modelTransform = modelview*camera->getMatrix()*objectTransform;
