@@ -500,19 +500,16 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		
+		/*
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			if (inputs[i].powerup) {
-				createBomb(i);
-				
-
-
-				
+				createBomb(i);	
 			}
 		}
+		*/
 
 		//Allow for nitro/powerup activation her
-		if (inputs[0].cheat_coin){
+		if (inputs[0].cheat_coin || inputs[0].powerup){
 
 			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
