@@ -78,12 +78,18 @@ void GameManager::cameraEnvironmentCollision(Camera* cam)
 
 void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int texID)
 {
-	//Make argument to function later
+	vec3 colour;
+	// assign colour for this player's score bar
+	if (texID == meshInfo.getRedBuggyTexID()) { colour = vec3(1.f, 0.f, 0.f); } // red
+	else if (texID == meshInfo.getBlueBuggyTexID()) { colour = vec3(0.f, 0.f, 1.f); } // blue
+	else if (texID == meshInfo.getGreenBuggyTexID()) { colour = vec3(0.f, 1.f, 0.f); } // green
+	else if (texID == meshInfo.getOrangeBuggyTexID()) { colour = vec3(1.f, 0.64f, 0.f); } // orange
+	else { colour = vec3(1.f, 0.f, 1.f); } // purple
+
+	vehicleColours.push_back(colour);
 
 	unsigned int chassisRenderID = renderer.generateObjectID();
 	unsigned int physicsID = physics.vehicle_create(traits, position);
-
-	vec3 colour = vehicleColours[state.numberOfPlayers()];
 
 	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
@@ -995,7 +1001,6 @@ void GameManager::gameInit()
 
 void GameManager::initTestScene()
 {
-
 	for (int i = 0; i < playerColours.size(); i++) {
 		if (playerColours[i] == 0) {
 			vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car
@@ -1015,7 +1020,6 @@ void GameManager::initTestScene()
 	
 	// Yellow car also sucks, so now it's orange
 	vehicleColours.push_back(vec3(1.f, 0.64f, 0.f)); // orange
-
 
 	VehicleTraits traits = VehicleTraits(physics.getMaterial());
 	traits.print();
