@@ -42,14 +42,9 @@ void GameState::addDecoy(const PlayerInfo& decoyInfo)
 }
 void GameState::removeDecoy()
 {
-	numOfDecoys--;
-	if (numOfDecoys <= 0)
+	if (players.size() >= 5)
 	{
-		numOfDecoys = 0;
-	}
-	else
-	{
-		decoys.erase(decoys.begin());
+		players.erase(players.begin() + 5);
 	}
 }
 void GameState::setPlayer(unsigned int playerNum, const PlayerInfo& pinfo)
@@ -95,6 +90,31 @@ PlayerInfo* GameState::getGoldenBuggy()
 }
 
 unsigned int GameState::getGoldenBuggyID() { return goldenBuggy; }
+
+unsigned int GameState::getDecoyIndex()
+{
+	unsigned int index = 0;
+	for (unsigned int i = 0; i < players.size(); i++)
+	{
+		if (players[i].isDecoy()){
+			index = i;
+		}
+	}
+	return index;
+	
+
+}
+
+bool GameState::doesDecoyExist()
+{
+	for (unsigned int i = 0; i < players.size(); i++)
+	{
+		if (players[i].isDecoy()){
+			return true;
+		}
+	}
+	return false;
+}
 
 vector<vec2> GameState::setupRadarSeeingOnlyGoldenBuggy(int playerId)
 {

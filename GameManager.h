@@ -106,6 +106,7 @@ public:
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);
 	void startDecoy(float time);
+	float decrementDecoyTimer(float time);
 	bool isDecoyTimerUp();
 
 	void cameraEnvironmentCollision(Camera* cam);

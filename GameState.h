@@ -42,7 +42,6 @@ private:
 	unsigned int groundRenderID;
 
 	unsigned int goldenBuggy;
-	unsigned int numOfDecoys;
 
 	unsigned int maxScore;
 	
@@ -71,6 +70,9 @@ public:
 	unsigned int numberOfAIs();
 	PlayerInfo* getGoldenBuggy();
 	unsigned int getGoldenBuggyID();
+
+	unsigned int getDecoyIndex();
+	bool doesDecoyExist();
 
 	vector<vec2> setupRadarSeeingOnlyGoldenBuggy(int playerId);
 	vector<vec2> setupRadar(int playerID);
@@ -118,6 +120,7 @@ public:
 	void applyRotations();
 
 	bool checkCoinCollision(vec3 playerPos);
+	unsigned int numOfDecoys = 0;
 };
 
 #endif // GAMESTATE_H

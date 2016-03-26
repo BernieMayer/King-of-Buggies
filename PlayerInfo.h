@@ -14,6 +14,9 @@ public:
 	bool isAI();
 	void setAI(bool value);
 
+	bool isDecoy();
+	void setDecoy(bool value);
+
 	int getScore();
 	void incrementScore();
 
@@ -59,6 +62,7 @@ protected:
 	int score;
 	bool goldenBuggy;
 	bool ai;
+	bool decoy = false;
 	float timeGolden;
 	float fSpeed;
 	float sSpeed;

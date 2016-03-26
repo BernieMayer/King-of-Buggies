@@ -116,6 +116,7 @@ public:
 private:
 	Timer clock;
 	vector<Vehicle> vehicleActors;	//Eventually should be a vector of Vehicles
+	vector<Vehicle> vehiclesToDelete;
 	vector<PxRigidStatic*> groundActors;
 	vector<PxRigidDynamic*> dynamicActors;
 	vector<PxRigidDynamic*> bombActors;

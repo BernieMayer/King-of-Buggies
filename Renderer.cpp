@@ -452,31 +452,50 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	glViewport(0,0, windowWidth, windowHeight);
 }
 
-void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int numOfPlayers, int playerScreen)
+void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers)
 {
-	if (numOfPlayers == 2)
-	{
-		if (playerScreen == 1){
-			glViewport(3/4 * (windowWidth/2) , windowHeight * 0.75, windowWidth * (0.25/2), windowHeight * (0.25/2));
-		}
-		else
-		{
-			glViewport(windowWidth * 0.75, windowHeight * 0.25, windowWidth * (0.25/2), windowHeight * (0.25/2));
-		}
-		
-	}
-	else if (numOfPlayers == 3)
-	{
-		if (playerScreen == 1)
-		{
-			//glViewport(windowWidth/4, windowHeight )
-		}
-	}
-	else if (numOfPlayers == 4)
-	{
 
+	glViewport(viewportWidth * 0.75, viewportHeight * 0.75, viewportWidth * 0.25, viewportHeight * 0.25);
+
+	glUseProgram(0);
+
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0, windowWidth, 0, windowHeight);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glBegin(GL_TRIANGLES);
+	glColor3f(1, 0, 0);
+
+
+	for (int i = 0; i < radarVecs.size(); i++){
+		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 15), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 15), 0);
+		glVertex3f(vec.x, vec.y, vec.z);
+
+		if (i >= 2 && i < 5){
+			glColor3f(1.f, 0.64f, 0.f);
+		}
+		else if (i >= 5 && i < 8)
+		{
+			glColor3f(0, 1, 0);
+		}
+		else if (i >= 8 && i < 11)
+		{
+			glColor3f(1, 1, 0);
+		}
 	}
+
+
+	glEnd();
+
+	//I need a function here to deal with the viewport stuff...
+	//glViewport(0, 0, windowWidth, windowHeight);
+
 }
+
+
 
 void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
 {

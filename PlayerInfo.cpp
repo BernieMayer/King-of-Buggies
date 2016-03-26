@@ -16,6 +16,7 @@ goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID)
 	renderID = _renderID;
 	physicsID = _physicsID;
 	ai = false;
+	decoy = false;
 	for (unsigned int i = 0; i < 4; i++)
 	{
 		wheelRenderIDs[i] = _wheelRenderIDs[i];
@@ -28,6 +29,10 @@ bool PlayerInfo::isGoldenBuggy(){ return goldenBuggy; }
 void PlayerInfo::setGoldenBuggy(bool val) { goldenBuggy = val; }
 bool PlayerInfo::isAI(){ return ai; }
 void PlayerInfo::setAI(bool value) { ai = value; }
+
+
+bool PlayerInfo::isDecoy(){ return decoy; }
+void PlayerInfo::setDecoy(bool value){ decoy = value; }
 
 int PlayerInfo::getScore() { return score; }
 void PlayerInfo::incrementScore() {	score++; }

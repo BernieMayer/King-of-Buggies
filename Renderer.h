@@ -176,7 +176,7 @@ public:
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
 	void drawRadar(vector<vec2> radarVecs);
-	void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int numOfPlayers, int playerScreen);
+	void drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers);
 
 	void drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors);
 	//Debugging draw calls

@@ -155,12 +155,19 @@ void GameManager::createDecoyGoldenBuggie(vec3 position, VehicleTraits traits)
 
 void GameManager::startDecoy(float time)
 {
-	timePassedDecoy += time;
+	timePassedDecoy = time;
 }
+
+float GameManager::decrementDecoyTimer(float time)
+{
+	timePassedDecoy -= time;
+	return timePassedDecoy;
+}
+
 
 bool GameManager::isDecoyTimerUp()
 {
-	if (timePassedDecoy > 50000)
+	if (timePassedDecoy <  0)
 	{
 		timePassedDecoy = 0;
 		return true;
@@ -582,7 +589,6 @@ void GameManager::gameLoop()
 	hasPowerup.push_back(false);
 
 	unsigned int numScreens = input.getNumPlayers();
-	
 	renderer.splitScreenViewports(numScreens);
 	while (!glfwWindowShouldClose(window))
 	{
@@ -722,15 +728,28 @@ void GameManager::gameLoop()
 				else if (powerUpId == POWERUPS::COIN)
 				{
 					physics.modifySpeed(0, 0.3333f);	//Should change this..
-					printf("Coin? \n");
+					printf("Coin \n");
 				}
 				else if (powerUpId == POWERUPS::DECOY)
 				{
-					//Apply decoy powerup logic
-					printf("Decoy? \n");
+					printf("Decoy \n");
+					if (state.numOfDecoys >= 1) {
+						//nothing or stuff dealing with multiple decoys
+					}
+					else {
+						state.numOfDecoys += 1;
+						//Apply decoy powerup logic
+						VehicleTraits traits = VehicleTraits(physics.getMaterial());
+						createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
+						//state.getPlayer(state.numberOfPlayers()).setAI(true);
+						state.getPlayer(state.numberOfPlayers() -1)->setDecoy(true);
+						//also check the decoy timer here
+						printf("Decoy? \n");
+					}
 				}
 
 				
+				//might add decoy to this 
 				if (powerUpId == POWERUPS::NITROBOOST)
 				{
 					hasPowerup.at(0) = true;
@@ -987,7 +1006,7 @@ void GameManager::gameLoop()
 		float timeElapsed = clock.getElapsedTime();
 		if (frameTime > timeElapsed)
 			clock.waitUntil(frameTime - timeElapsed);
-		
+
 		//Display FPS
 		timeProgressed += max(timeElapsed, frameTime);
 		frameCount++;
@@ -1178,10 +1197,9 @@ int GameManager::randomPowerup()
 	5 - Decoy?
 
 	*/
-	/* initialize random seed: */
 	
 
-	int powerupId = rand() % 4;
+	int powerupId = rand() % 5;
 	return powerupId;
 }
 

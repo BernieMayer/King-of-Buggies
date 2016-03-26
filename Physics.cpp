@@ -1238,7 +1238,12 @@ GameState Physics::getSim() {
 	// Will get the simulation results
 	// True means that it will wait until the simulation is done if needed
 	gScene->fetchResults(true);
-
+	/*
+	if (vehiclesToDelete.size())
+	{
+		vehicleActors.erase(vehicleActors.begin() + vehicleActors.size() - 1);	//Should not be like this but is the easist way to handle this...
+	}
+	*/
 	return GameState();
 }
 
@@ -1369,9 +1374,21 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 					lastState->pushEvent(new VehicleWallCollisionEvent(index1, pos, normal, force));
 				}
 			}
+			int indexOfDecoy = -1;
+
+			if (lastState->doesDecoyExist())
+			{
+				indexOfDecoy = lastState->getDecoyIndex();
+				Vehicle* decoyBuggy = &vehicleActors[indexOfDecoy];
+				if ((pairHeader.actors[0] == decoyBuggy->vehDrive4W->getRigidDynamicActor()) || (pairHeader.actors[1] == decoyBuggy->vehDrive4W->getRigidDynamicActor()))
+				{
+					vehiclesToDelete.push_back(*decoyBuggy);
+					printf("There has been a collision with a decoy golden buggie... \n");
+				}
+			}
 
 			Vehicle* goldenBuggieContact =  &vehicleActors[indexOfGoldenBuggy];
-
+			//Vehicle* decoyBuggie = &vehicleActors[indexOfDecoyBuggy];
 			if ((pairHeader.actors[0] == goldenBuggieContact->vehDrive4W->getRigidDynamicActor()) || (pairHeader.actors[1] == goldenBuggieContact->vehDrive4W->getRigidDynamicActor()))
 			{
 				int pairIndexOfGoldenBuggy;
@@ -1382,44 +1399,52 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 
 				for (unsigned int i = 0; i < vehicleActors.size(); i++)
 				{
-					if (!goldenBuggyLock) {
-						if (pairIndexOfGoldenBuggy == 0){
-							if (pairHeader.actors[1] == vehicleActors[i].vehDrive4W->getRigidDynamicActor())
-							{
-								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
-								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
-								setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
-								indexOfGoldenBuggy = i;
-								goldenBuggy = &vehicleActors[i];
-								newGoldenBuggy = true;
-								modifySpeed(i, 3);
-								goldenBuggyLock = true;
-								gbLockStartTime = clock.getCurrentTime();
-								buggyExplosion(i);
-								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
-								break;
+					if (i != indexOfDecoy){
+						if (!goldenBuggyLock) {
+							if (pairIndexOfGoldenBuggy == 0){
+								if (pairHeader.actors[1] == vehicleActors[i].vehDrive4W->getRigidDynamicActor())
+								{
+									//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
+									indexOfOldGoldenBuggy = indexOfGoldenBuggy;
+									setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
+									indexOfGoldenBuggy = i;
+									goldenBuggy = &vehicleActors[i];
+									newGoldenBuggy = true;
+									modifySpeed(i, 3);
+									goldenBuggyLock = true;
+									gbLockStartTime = clock.getCurrentTime();
+									buggyExplosion(i);
+									lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
+									break;
+								}
 							}
-						}
-						else {
-							if (pairHeader.actors[0] == vehicleActors[i].vehDrive4W->getRigidDynamicActor())
-							{
-								//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
-								indexOfOldGoldenBuggy = indexOfGoldenBuggy;
-								setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
-								indexOfGoldenBuggy = i;
-								goldenBuggy = &vehicleActors[i];
-								newGoldenBuggy = true;
-								modifySpeed(i, 3);
-								goldenBuggyLock = true;
-								gbLockStartTime = clock.getCurrentTime();
-								buggyExplosion(i);
-								lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
-								break;
-							}
+							else {
+								if (pairHeader.actors[0] == vehicleActors[i].vehDrive4W->getRigidDynamicActor())
+								{
+									//cout << "A Golden buggie switch has happened and vehicle " << i << " is the golden buggie \n";
+									indexOfOldGoldenBuggy = indexOfGoldenBuggy;
+									setSpeed(indexOfOldGoldenBuggy, initVehicleSpeed);
+									indexOfGoldenBuggy = i;
+									goldenBuggy = &vehicleActors[i];
+									newGoldenBuggy = true;
+									modifySpeed(i, 3);
+									goldenBuggyLock = true;
+									gbLockStartTime = clock.getCurrentTime();
+									buggyExplosion(i);
+									lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
+									break;
+								}
 
+							}
 						}
 					}
 				}
+
+				
+				//Check if there is a decoy golden buggie...
+				//If yes...
+				//Vehicle* decoyBuggie = &vehicleActors[indexOfDecoyBuggy];
+				//Check if collision with decoy exists
 					
 
 				//cout << "A collision with the goldenBuggy has been detected \n";
