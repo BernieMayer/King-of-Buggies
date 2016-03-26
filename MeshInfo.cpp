@@ -79,8 +79,8 @@ MeshInfo::MeshInfo() {
 
 	// load buggy textures
 	redBuggyTexID = LoadTexture("textures\\redbuggytexture.png");
-	blueBuggyTexID = LoadTexture("textures\\greenbuggytexture.png");
-	greenBuggyTexID = LoadTexture("textures\\bluebuggytexture.png");
+	greenBuggyTexID = LoadTexture("textures\\greenbuggytexture.png");
+	blueBuggyTexID = LoadTexture("textures\\bluebuggytexture.png");
 	orangeBuggyTexID = LoadTexture("textures\\yellowbuggytexture.png");
 	purpleBuggyTexID = LoadTexture("textures\\purplebuggytexture.png");
 
