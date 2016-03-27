@@ -143,7 +143,7 @@ void InterfaceManager::draw(unsigned int id, Renderer* r)
 		uiMat.useTextureShader();
 		Viewport vp = r->getActiveViewport();
 
-		uiMat.loadUniforms(vp.viewRatio*components[id].getMatrix(winRatio), mat4(1.f), vec3(), vec3(), components[id].texIDs[components[id].state], 0);
+		uiMat.loadUniforms(components[id].getMatrix(winRatio*vp.viewRatio), mat4(1.f), vec3(), vec3(), components[id].texIDs[components[id].state], 0);
 
 		r->loadVertUVBuffer(components[id].vertices, components[id].uvs);
 

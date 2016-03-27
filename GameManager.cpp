@@ -1127,9 +1127,7 @@ void GameManager::initTestScene()
 	powerupComponentID = _interface.generateComponentID();
 	_interface.toggleActive(powerupComponentID, false);
 
-	//Add dummy objects to interface
-	
-	/*
+	/*//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);

@@ -449,7 +449,8 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 
 	glEnd();
 	
-	glViewport(0,0, windowWidth, windowHeight);
+	//glViewport(0,0, windowWidth, windowHeight);
+	useViewport(activeViewport);
 }
 
 void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers)
