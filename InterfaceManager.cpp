@@ -139,6 +139,9 @@ void InterfaceManager::setWindowDim(int width, int height)
 
 void InterfaceManager::draw(unsigned int id, Renderer* r)
 {
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	if (components[id].isActive) {
 		uiMat.useTextureShader();
 		Viewport vp = r->getActiveViewport();
@@ -149,6 +152,9 @@ void InterfaceManager::draw(unsigned int id, Renderer* r)
 
 		glDrawArrays(GL_TRIANGLES, 0, components[id].vertices->size());
 	}
+
+	glDisable(GL_BLEND);
+	glDepthMask(GL_TRUE);
 }
 
 void InterfaceManager::drawAll(Renderer* r)

@@ -1240,15 +1240,15 @@ void GameManager::initTestScene()
 	powerupComponentID = _interface.generateComponentID();
 	_interface.toggleActive(powerupComponentID, false);
 
-	/*//Add dummy objects to interface
-	carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
+	//Add dummy objects to interface
+	carSelectScreen = LoadTexture("menus/opacity-512.png");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
 
 
 	_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
 	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
-	*/
+	
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
