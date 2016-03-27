@@ -475,25 +475,46 @@ void GameManager::initMenus() {
 				}
 
 				if (in[i].jump && !playerSelected[i]) {
+					bool selectionOccured = false;
 					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[0]) {
 						selectedColours[i] = 0;
 						colourSelected[0] = true;
 						playerSelected[i] = true;
+						selectionOccured = true;
 					}
 					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[1]) {
 						selectedColours[i] = 1;
 						colourSelected[1] = true;
 						playerSelected[i] = true;
+						selectionOccured = true;
 					}
 					else if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel2Y && !colourSelected[2]) {
 						selectedColours[i] = 2;
 						colourSelected[2] = true;
 						playerSelected[i] = true;
+						selectionOccured = true;
 					}
 					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel2Y && !colourSelected[3]) {
 						selectedColours[i] = 3;
 						colourSelected[3] = true;
 						playerSelected[i] = true;
+						selectionOccured = true;
+					}
+
+					if (selectionOccured) {
+						if (i == 0) {
+							p1Icon = LoadTexture("menus/P1IconSel.png");
+						}
+						else if (i == 1) {
+							p2Icon = LoadTexture("menus/P2IconSel.png");
+						}
+						else if (i == 2) {
+							p3Icon = LoadTexture("menus/P3IconSel.png");
+						}
+						else if (i == 3) {
+							p4Icon = LoadTexture("menus/P4IconSel.png");
+						}
+
 					}
 				}
 				else if (in[i].powerup && playerSelected[i]) {
@@ -509,6 +530,19 @@ void GameManager::initMenus() {
 					}
 					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel2Y) {
 						colourSelected[3] = false;
+					}
+
+					if (i == 0) {
+						p1Icon = LoadTexture("menus/P1Icon.png");
+					}
+					else if (i == 1) {
+						p2Icon = LoadTexture("menus/P2Icon.png");
+					}
+					else if (i == 2) {
+						p3Icon = LoadTexture("menus/P3Icon.png");
+					}
+					else if (i == 3) {
+						p4Icon = LoadTexture("menus/P4Icon.png");
 					}
 				}
 
