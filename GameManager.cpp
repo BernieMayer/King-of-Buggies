@@ -659,7 +659,7 @@ void GameManager::gameLoop()
 	vector<vec3> edges;
 	
 	mat4 lineTransform;
-	lineTransform[3][1] = -6.f;
+	lineTransform[3][1] = -2.f;
 
 	NavMesh nav;
 	ai.nav.loadNavMesh("donutLevelNavMesh.obj");
@@ -696,6 +696,7 @@ void GameManager::gameLoop()
 	bool paused = false;
 
 	unsigned int debugPathIterations = 0;
+	unsigned int debuggedAI = 2;
 
 	timeb loopStart = clock.getCurrentTime();
 
@@ -977,7 +978,7 @@ void GameManager::gameLoop()
 			{
 				renderer.loadCamera(&freeCam);
 				//Debugging avoidance
-				ai.debugAIPath(&paths, 1, debugPathIterations);
+				ai.debugAIPath(&paths, state.getGoldenBuggyID(), debugPathIterations);
 				if (inputs[0].jump)
 					debugPathIterations++;
 
@@ -1023,11 +1024,11 @@ void GameManager::gameLoop()
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
-			//renderer.useViewport(i+1);
+			renderer.useViewport(i+1);
 			//Debugging
 			if (displayDebugging && (i == 0))
 			{
-				ai.getPathAsLines(1, &path);
+				ai.getPathAsLines(state.getGoldenBuggyID(), &path);
 
 				renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
 				renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
