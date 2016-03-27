@@ -77,6 +77,9 @@ public:
 	void changeState(unsigned int id, unsigned int state);
 	void toggleActive(unsigned int id, bool isActive);
 
+	float getComponentWidth(int num) { return components[num].width; }
+	float getComponentHeight(int num) { return components[num].height; }
+
 	vector<vec3>* storeVertices(vector<vec3>* vertices);
 	vector<vec2>* storeUVs(vector<vec2>* uvs);
 

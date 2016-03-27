@@ -315,12 +315,12 @@ void GameManager::initMenus() {
 	vector<float> xOffsets;
 	vector<float> yOffsets;
 
-	const float lSel1X = -0.4f;
+	const float lSel1X = -0.3f;
 	const float lSel1Y = -0.89f;
-	const float lSel2X = 0.4f;
+	const float lSel2X = 0.27f;
 	const float lSel2Y = -0.89f;
-	const float cSel1X = -0.6f;
-	const float cSel2X = 0.2f;
+	const float cSel1X = -0.43f;
+	const float cSel2X = 0.15f;
 	const float cSel1Y = -0.21f;
 	const float cSel2Y = -0.92f;
 
@@ -328,7 +328,7 @@ void GameManager::initMenus() {
 	yOffsets.push_back(lSel1Y);
 
 	float p1Scale = 0.25f;
-	const float iconWidth = 0.11f;
+	const float iconWidth = 0.08f;
 
 	xOffsets.push_back(cSel1X + iconWidth);
 	xOffsets.push_back(cSel1X + iconWidth * 2);
