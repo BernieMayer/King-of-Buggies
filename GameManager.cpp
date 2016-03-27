@@ -311,6 +311,10 @@ void GameManager::initMenus() {
 
 	unsigned int p1Icon = 0;
 	unsigned int Icon1 = 0;
+
+	vector<float> xOffsets;
+	vector<float> yOffsets;
+
 	const float lSel1X = -0.4f;
 	const float lSel1Y = -0.89f;
 	const float lSel2X = 0.4f;
@@ -319,13 +323,29 @@ void GameManager::initMenus() {
 	const float cSel2X = 0.2f;
 	const float cSel1Y = -0.21f;
 	const float cSel2Y = -0.92f;
+
+	xOffsets.push_back(lSel1X);
+	yOffsets.push_back(lSel1Y);
+
 	float p1Scale = 0.25f;
-	float p1X = lSel1X;
-	float p1Y = lSel1Y;
 	const float iconWidth = 0.1f;
 
+	xOffsets.push_back(cSel1X + iconWidth);
+	xOffsets.push_back(cSel1X + iconWidth * 2);
+	xOffsets.push_back(cSel1X + iconWidth * 3);
+	yOffsets.push_back(cSel1Y);
+	yOffsets.push_back(cSel1Y);
+	yOffsets.push_back(cSel1Y);
+
+
+	bool colourSelected[4] = { false, false, false, false };
+	bool playerSelected[4] = { true, true, true, true };
+	for (int i = 0; i < input.getNumPlayers(); i++) {
+		playerSelected[i] = false;
+	}
+
 	// 0 = red, 1 = green, 2 = blue, 3 = purple
-	int selectedColour = 0;
+	int selectedColours[] = { 0, 1, 2, 3 };
 
 	unsigned int p2Icon = 0;
 	unsigned int Icon2 = 0;
@@ -341,9 +361,11 @@ void GameManager::initMenus() {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
 
-		Input in = input.getInput(1);
-		in = smoothers[0].smooth(in, false);
-		if ((in.menu || in.powerup || in.jump || in.horn || in.drift) && currentMenu == 0) {
+		vector<Input> in;
+		for (int i = 1; i <= input.getNumPlayers(); i++) {
+			in.push_back(smoothers[i].smooth(input.getInput(i), false));
+		}
+		if ((in[0].menu || in[0].powerup || in[0].jump || in[0].horn || in[0].drift) && currentMenu == 0) {
 			currentMenu++;
 			_interface.clear();
 
@@ -356,12 +378,13 @@ void GameManager::initMenus() {
 			menuBackground = LoadTexture("menus/Background.bmp");
 			menu = _interface.generateComponentID();
 		}
-		else if (((in.jump && !in.isKeyboard) || (in.powerup && in.isKeyboard)) && currentMenu == 1) {
+		else if (((in[0].jump && !in[0].isKeyboard) || (in[0].powerup && in[0].isKeyboard)) && currentMenu == 1) {
 			currentMenu++;
 			_interface.clear();
 
-			p1X = -0.6f;
-			p1Y = -0.21f;
+
+			xOffsets[0] = cSel1X;
+			yOffsets[0] = cSel1Y;
 			p1Scale = 0.15f;
 			p1Icon = LoadTexture("menus/P1Icon.png");
 			Icon1 = _interface.generateComponentID();
@@ -371,8 +394,20 @@ void GameManager::initMenus() {
 
 			menuBackground = LoadTexture("menus/Background.bmp");
 			menu = _interface.generateComponentID();
+
+			// Clear input so no input given for new menu on transition frame
+			for (int i = 0; i < in.size(); i++) {
+				in[i].jump = false;
+				in[i].menu = false;
+				in[i].powerup = false;
+				in[i].tiltBackward = 0;
+				in[i].tiltForward = 0;
+				in[i].turnL = 0;
+				in[i].turnR = 0;
+			}
+			
 		}
-		else if (((in.jump && !in.isKeyboard) || (in.powerup && in.isKeyboard)) && currentMenu == lastMenu) {
+		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[4])) {
 			_interface.clear();
 
 			gameInit();
@@ -387,16 +422,16 @@ void GameManager::initMenus() {
 		}
 		// if level select menu
 		else if (currentMenu == 1) {
-			if (p1X == lSel1X && in.turnR < -0.3f) {
-				p1X = lSel2X;
+			if (xOffsets[0] == lSel1X && in[0].turnR < -0.3f) {
+				xOffsets[0] = lSel2X;
 			}
-			else if (p1X == lSel2X && in.turnL < -0.3f) {
-				p1X = lSel1X;
+			else if (xOffsets[0] == lSel2X && in[0].turnL < -0.3f) {
+				xOffsets[0] = lSel1X;
 			}
 
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, p1X, p1Y, p1Scale, p1Scale, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
 
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
@@ -404,120 +439,131 @@ void GameManager::initMenus() {
 		}
 		// If car select menu
 		else if (currentMenu == 2) {
-			if (p1Y == cSel1Y && in.tiltBackward > 0.3f)
-			{
-				p1Y = cSel2Y;
 
-				// Blue selected
-				if (p1X == cSel1X) {
-					selectedColour = 2;
-				}
-				// Purple selected
-				else {
-					selectedColour = 3;
-				}
-			}
-			else if (p1Y == cSel2Y && in.tiltForward > 0.3f) {
-				p1Y = cSel1Y;
+			for (int i = 0; i < in.size(); i++) {
 
-				// if red is selected
-				if (p1X == cSel1X) {
-					selectedColour = 0;
+				// Only move if nothing is selected
+				if (!playerSelected[i]) {
+					if (yOffsets[i] == cSel1Y && in[i].tiltBackward > 0.3f)
+					{
+						yOffsets[i] = cSel2Y;
+					}
+					else if (yOffsets[i] == cSel2Y && in[i].tiltForward > 0.3f) {
+						yOffsets[i] = cSel1Y;
+					}
+					else if (xOffsets[i] == cSel1X + iconWidth * i && in[i].turnR < -0.3f) {
+						xOffsets[i] = cSel2X + iconWidth * i;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && in[i].turnL < -0.3f) {
+						xOffsets[i] = cSel1X + iconWidth * i;
+					}
 				}
-				// if green is selected
-				else {
-					selectedColour = 1;
-				}
-			}
-			else if (p1X == cSel1X && in.turnR < -0.3f) {
-				p1X = cSel2X;
 
-				// if green is selected
-				if (p1Y == cSel1Y) {
-					selectedColour = 1;
+				if (in[i].jump && !playerSelected[i]) {
+					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[0]) {
+						selectedColours[i] = 0;
+						colourSelected[0] = true;
+						playerSelected[i] = true;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[1]) {
+						selectedColours[i] = 1;
+						colourSelected[1] = true;
+						playerSelected[i] = true;
+					}
+					else if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel2Y && !colourSelected[2]) {
+						selectedColours[i] = 2;
+						colourSelected[2] = true;
+						playerSelected[i] = true;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel2Y && !colourSelected[3]) {
+						selectedColours[i] = 3;
+						colourSelected[3] = true;
+						playerSelected[i] = true;
+					}
 				}
-				// if purple is selected
-				else {
-					selectedColour = 3;
+				else if (in[i].powerup && playerSelected[i]) {
+					playerSelected[i] = false;
+					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y) {
+						colourSelected[0] = false;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel1Y) {
+						colourSelected[1] = false;
+					}
+					else if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel2Y) {
+						colourSelected[2] = false;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel2Y) {
+						colourSelected[3] = false;
+					}
 				}
-			}
-			else if (p1X == cSel2X && in.turnL < -0.3f) {
-				p1X = cSel1X;
 
-				// if red is selected
-				if (p1Y == cSel1Y) {
-					selectedColour = 0;
-				}
-				// if blue is selected
-				else {
-					selectedColour = 2;
-				}
-			}
 
-			if (selectedColour == 0 && redIndex != 0) {
-				meshInfo.buggyTexIDs[redIndex] = meshInfo.buggyTexIDs[0];
-				playerColours[0] = 0;
+				if (selectedColours[i] == 0 && redIndex != i) {
+					playerColours[redIndex] = playerColours[i];
+					playerColours[i] = 0;
 
-				if (blueIndex == 0) {
-					blueIndex = redIndex;
+					if (blueIndex == i) {
+						blueIndex = redIndex;
+					}
+					else if (greenIndex == i) {
+						greenIndex = redIndex;
+					}
+					else if (purpleIndex == i) {
+						purpleIndex = redIndex;
+					}
+					redIndex = i;
 				}
-				else if (greenIndex == 0) {
-					greenIndex = redIndex;
-				}
-				else if (purpleIndex == 0) {
-					purpleIndex = redIndex;
-				}
-				redIndex = 0;
-			}
-			else if (selectedColour == 1 && greenIndex != 0) {
-				playerColours[greenIndex] = playerColours[0];
-				playerColours[0] = 1;
+				else if (selectedColours[i] == 1 && greenIndex != i) {
+					playerColours[greenIndex] = playerColours[i];
+					playerColours[i] = 1;
 
-				if (redIndex == 0) {
-					redIndex = greenIndex;
+					if (redIndex == i) {
+						redIndex = greenIndex;
+					}
+					else if (blueIndex == i) {
+						blueIndex = greenIndex;
+					}
+					else if (purpleIndex == i) {
+						purpleIndex = greenIndex;
+					}
+					greenIndex = i;
 				}
-				else if (blueIndex == 0) {
-					blueIndex = greenIndex;
-				}
-				else if (purpleIndex == 0) {
-					purpleIndex = greenIndex;
-				}
-				greenIndex = 0;
-			}
-			else if (selectedColour == 2 && blueIndex != 0) {
-				playerColours[blueIndex] = playerColours[0];
-				playerColours[0] = 2;
+				else if (selectedColours[i] == 2 && blueIndex != i) {
+					playerColours[blueIndex] = playerColours[i];
+					playerColours[i] = 2;
 
-				if (redIndex == 0) {
-					redIndex = blueIndex;
-				}
-				else if (greenIndex == 0) {
-					greenIndex = blueIndex;
-				}
-				else if (purpleIndex == 0) {
-					purpleIndex = blueIndex;
-				}
-				blueIndex = 0;
-			}
-			else if (selectedColour == 3 && purpleIndex != 0) {
-				playerColours[purpleIndex] = playerColours[0];
-				playerColours[0] = 3;
+					if (redIndex == i) {
+						redIndex = blueIndex;
+					}
+					else if (greenIndex == i) {
+						greenIndex = blueIndex;
+					}
+					else if (purpleIndex == i) {
+						purpleIndex = blueIndex;
+					}
 
-				if (redIndex == 0) {
-					redIndex = purpleIndex;
+					blueIndex = i;
 				}
-				else if (greenIndex == 0) {
-					greenIndex = purpleIndex;
+				else if (selectedColours[i] == 3 && purpleIndex != i) {
+					playerColours[purpleIndex] = playerColours[i];
+					playerColours[i] = 3;
+
+					if (redIndex == i) {
+						redIndex = purpleIndex;
+					}
+					else if (greenIndex == i) {
+						greenIndex = purpleIndex;
+					}
+					else if (blueIndex == i) {
+						blueIndex = purpleIndex;
+					}
+					purpleIndex = i;
 				}
-				else if (blueIndex == 0) {
-					blueIndex = purpleIndex;
-				}
-				purpleIndex = 0;
 			}
 
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, p1X, p1Y, p1Scale, p1Scale, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
 
 			_interface.assignSquare(cScreen);
 			_interface.assignTexture(cScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
