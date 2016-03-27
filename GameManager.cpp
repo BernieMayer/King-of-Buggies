@@ -328,7 +328,7 @@ void GameManager::initMenus() {
 	yOffsets.push_back(lSel1Y);
 
 	float p1Scale = 0.25f;
-	const float iconWidth = 0.1f;
+	const float iconWidth = 0.11f;
 
 	xOffsets.push_back(cSel1X + iconWidth);
 	xOffsets.push_back(cSel1X + iconWidth * 2);
@@ -388,6 +388,21 @@ void GameManager::initMenus() {
 			p1Scale = 0.15f;
 			p1Icon = LoadTexture("menus/P1Icon.png");
 			Icon1 = _interface.generateComponentID();
+
+			if (in.size() > 1) {
+				p2Icon = LoadTexture("menus/P2Icon.png");
+				Icon2 = _interface.generateComponentID();
+			}
+
+			if (in.size() > 2) {
+				p3Icon = LoadTexture("menus/P3Icon.png");
+				Icon3 = _interface.generateComponentID();
+			}
+
+			if (in.size() > 3) {
+				p4Icon = LoadTexture("menus/P4Icon.png");
+				Icon4 = _interface.generateComponentID();
+			}
 
 			carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 			cScreen = _interface.generateComponentID();
@@ -564,6 +579,24 @@ void GameManager::initMenus() {
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
+
+			if (in.size() > 1) {
+				_interface.assignSquare(Icon2);
+				_interface.assignTexture(Icon2, p2Icon, ComponentInfo::UP_TEXTURE);
+				_interface.setDimensions(Icon2, xOffsets[1], yOffsets[1], p1Scale, p1Scale, ANCHOR::CENTER);
+			}
+
+			if (in.size() > 2) {
+				_interface.assignSquare(Icon3);
+				_interface.assignTexture(Icon3, p3Icon, ComponentInfo::UP_TEXTURE);
+				_interface.setDimensions(Icon3, xOffsets[2], yOffsets[2], p1Scale, p1Scale, ANCHOR::CENTER);
+			}
+
+			if (in.size() > 3) {
+				_interface.assignSquare(Icon4);
+				_interface.assignTexture(Icon4, p4Icon, ComponentInfo::UP_TEXTURE);
+				_interface.setDimensions(Icon4, xOffsets[3], yOffsets[3], p1Scale, p1Scale, ANCHOR::CENTER);
+			}
 
 			_interface.assignSquare(cScreen);
 			_interface.assignTexture(cScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
