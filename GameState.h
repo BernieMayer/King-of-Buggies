@@ -85,7 +85,7 @@ public:
 	void setCoin(unsigned int coinNum, const Coin& coin);
 	Coin* getCoin(unsigned int coinNum);
 	unsigned int numberOfCoins();
-	void checkCoinRespawns();
+	void checkRespawns();
 
 	//BoostPad management
 	void addBoostPad(const BoostPad& boostPad);

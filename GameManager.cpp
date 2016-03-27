@@ -702,7 +702,8 @@ void GameManager::gameLoop()
 
 	hasPowerup.push_back(false);
 
-	unsigned int numScreens = input.getNumPlayers();
+	//unsigned int numScreens = input.getNumPlayers();
+	unsigned int numScreens = 2;
 	renderer.splitScreenViewports(numScreens);
 	while (!glfwWindowShouldClose(window))
 	{
@@ -885,21 +886,32 @@ void GameManager::gameLoop()
 				int vehicleId = powerupEvent->ob1;
 				int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
 
-				hasPowerup[vehicleId] = true;
-				int powerUpType = randomPowerup();
-				if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
-				
-				// display powerup information in HUD for any non-AI players
-				if (!state.getPlayer(vehicleId)->isAI()) {
-					_interface.assignSquare(powerupComponentID);
-					_interface.assignTexture(powerupComponentID, meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-					_interface.setDimensions(powerupComponentID, -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
-					_interface.toggleActive(powerupComponentID, true);
-				}
+				if (!state.getPowerupBox(powerupId)->getCollided()) {
+					// temporarily remove powerup from board
+					PowerupBox* collided = state.getPowerupBox(powerupId);
+					vec3 pos = collided->getPos();
+					vec3 newPos = pos;
+					newPos.y = pos.y - 20;
+					collided->setPos(newPos);
+					collided->setCollided(true);
+					collided->startCountdown();
 
-				printf("Player %d has powerup %d \n", vehicleId, powerUpType);
+					hasPowerup[vehicleId] = true;
+					int powerUpType = randomPowerup();
+					if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+						powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+					// display powerup information in HUD for any non-AI players
+					if (!state.getPlayer(vehicleId)->isAI()) {
+						_interface.assignSquare(powerupComponentID);
+						_interface.assignTexture(powerupComponentID, meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+						_interface.setDimensions(powerupComponentID, -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+						_interface.toggleActive(powerupComponentID, true);
+					}
+
+					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
+				}
 			}
 		}
 		state.clearEvents();
@@ -936,7 +948,7 @@ void GameManager::gameLoop()
 					state.removeMine(hasMineCollision);
 				}
 			}
-			state.checkCoinRespawns();
+			state.checkRespawns();
 			state.applyRotations();
 		}
 
