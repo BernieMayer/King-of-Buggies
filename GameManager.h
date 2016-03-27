@@ -85,6 +85,8 @@ private:
 
 	vector<int> playerColours;
 
+	unsigned int powerupComponentID;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 

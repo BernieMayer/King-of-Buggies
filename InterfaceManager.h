@@ -22,6 +22,8 @@ public:
 	mat4 getMatrix(const mat4& winRatio);
 
 	enum {UP_TEXTURE=0, OVER_TEXTURE, DOWN_TEXTURE};
+
+	bool isActive;
 };
 
 //Determines which corner UI elements are anchored from
@@ -73,6 +75,7 @@ public:
 	//Coordinates run from -1 to 1 (-1, -1 being bottom left corner)
 	void setDimensions(unsigned int id, float xOffset, float yOffset, float width, float height, unsigned int anchor);
 	void changeState(unsigned int id, unsigned int state);
+	void toggleActive(unsigned int id, bool isActive);
 
 	vector<vec3>* storeVertices(vector<vec3>* vertices);
 	vector<vec2>* storeUVs(vector<vec2>* uvs);

@@ -9,7 +9,8 @@ ComponentInfo::ComponentInfo() :
 	yOffset(0.f),
 	width(1.f),
 	height(1.f),
-	state(STATE::UP)
+	state(STATE::UP),
+	isActive(true)
 {
 	for (unsigned int i = 0; i < 3; i++)
 		texIDs[i] = NO_VALUE;
@@ -138,14 +139,16 @@ void InterfaceManager::setWindowDim(int width, int height)
 
 void InterfaceManager::draw(unsigned int id, Renderer* r)
 {
-	uiMat.useTextureShader();
-	Viewport vp = r->getActiveViewport();
+	if (components[id].isActive) {
+		uiMat.useTextureShader();
+		Viewport vp = r->getActiveViewport();
 
-	uiMat.loadUniforms(vp.viewRatio*components[id].getMatrix(winRatio), mat4(1.f), vec3(), vec3(), components[id].texIDs[components[id].state], 0);
+		uiMat.loadUniforms(vp.viewRatio*components[id].getMatrix(winRatio), mat4(1.f), vec3(), vec3(), components[id].texIDs[components[id].state], 0);
 
-	r->loadVertUVBuffer(components[id].vertices, components[id].uvs);
+		r->loadVertUVBuffer(components[id].vertices, components[id].uvs);
 
-	glDrawArrays(GL_TRIANGLES, 0, components[id].vertices->size());
+		glDrawArrays(GL_TRIANGLES, 0, components[id].vertices->size());
+	}
 }
 
 void InterfaceManager::drawAll(Renderer* r)
@@ -213,6 +216,11 @@ void InterfaceManager::setDimensions(unsigned int id, float xOffset, float yOffs
 	components[id].width = width;
 	components[id].height = height;
 	components[id].anchorPoint = anchor;
+}
+
+void InterfaceManager::toggleActive(unsigned int id, bool isActive)
+{
+	components[id].isActive = isActive;
 }
 
 vector<vec3>* InterfaceManager::storeVertices(vector<vec3>* vertices)

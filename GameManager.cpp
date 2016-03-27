@@ -629,11 +629,13 @@ void GameManager::gameLoop()
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
+
+				_interface.toggleActive(powerupComponentID, false);
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
-
-
+				if (state.getPlayer(0)->getCurrentPowerup() > -1)
+					_interface.toggleActive(powerupComponentID, true);
 			}
 		}
 
@@ -657,16 +659,8 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		/*
-		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-			if (inputs[i].powerup) {
-				createBomb(i);	
-			}
-		}
-		*/
-
 		//Allow for nitro/powerup activation her
-		if (inputs[0].cheat_coin || inputs[0].powerup){
+		if ((inputs[0].cheat_coin || inputs[0].powerup) && !paused) {
 
 			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
@@ -678,15 +672,8 @@ void GameManager::gameLoop()
 
 			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 
-			if (state.numberOfMines() < 20){
-				//printf("cheated in placing a Mine \n");
-				//createPowerup(MINE);
-			}
-
 			if (hasPowerup.at(0))
 			{
-				
-				
 				/*
 				1 - Nitro Boost
 				2 - Bomb
@@ -718,12 +705,10 @@ void GameManager::gameLoop()
 				else if (powerUpId == POWERUPS::BOMB)
 				{
 					createBomb(0);
-					printf("Bomb \n");
 				}
 				else if (powerUpId == POWERUPS::MINE)
 				{
 					createMine();
-					printf("Mine \n");
 				}
 				else if (powerUpId == POWERUPS::COIN)
 				{
@@ -759,41 +744,8 @@ void GameManager::gameLoop()
 					hasPowerup.at(0) = false;
 				}
 
+				_interface.toggleActive(powerupComponentID, false);
 			} 
-			else {
-			
-				//Test code should eventually be removed
-				/*
-				int powerUpId = randomPowerup();
-				if (powerUpId == POWERUPS::NITROBOOST)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Nitro Boost \n");
-				}
-				else if (powerUpId == POWERUPS::BOMB)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Bomb \n");
-				}
-				else if (powerUpId == POWERUPS::MINE)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					createPowerup(MINE);
-					printf("Mine \n");
-				}
-				else if (powerUpId == POWERUPS::COIN)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Coin? \n");
-				}
-				else if (powerUpId == POWERUPS::DECOY)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Decoy? \n");
-				}
-				*/
-				//hasPowerup.at(0) = true;
-			}
 			
 		}
 
@@ -824,8 +776,15 @@ void GameManager::gameLoop()
 				if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
 					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
 				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
-
 				
+				// display powerup information in HUD for any non-AI players
+				if (!state.getPlayer(vehicleId)->isAI()) {
+					_interface.assignSquare(powerupComponentID);
+					_interface.assignTexture(powerupComponentID, meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+					_interface.setDimensions(powerupComponentID, -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+					_interface.toggleActive(powerupComponentID, true);
+				}
+
 				printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 			}
 		}
@@ -1163,11 +1122,10 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 
+	// setup for displaying obtained powerups to the UI
 
-
-
-
-
+	powerupComponentID = _interface.generateComponentID();
+	_interface.toggleActive(powerupComponentID, false);
 
 	//Add dummy objects to interface
 	

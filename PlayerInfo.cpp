@@ -10,7 +10,7 @@ PlayerInfo::PlayerInfo() : powerup(0), numCoins(0), score(0),
 }
 
 PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs, vec3 colour, unsigned int texID) :
-powerup(0), numCoins(0), score(0),
+powerup(-1), numCoins(0), score(0),
 goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID)
 {
 	renderID = _renderID;

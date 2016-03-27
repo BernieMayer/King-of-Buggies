@@ -29,6 +29,12 @@ public:
 
 	vector<unsigned int> buggyTexIDs;
 
+	unsigned int getUInitroID();
+	unsigned int getUIbombID();
+	unsigned int getUImineID();
+
+	unsigned int getUIcomponentID(unsigned int itemType);
+
 	MeshInfoLoader meshLoader;
 
 private:
@@ -39,6 +45,12 @@ private:
 	unsigned int orangeBuggyTexID;
 	unsigned int purpleBuggyTexID;
 	unsigned int goldenBuggyTexID;
+
+	unsigned int UInitroID;
+	unsigned int UIbombID;
+	unsigned int UImineID;
+
+	vector<unsigned int> UIcomponentIDs;
 };
 
 #endif // MESHINFO_H
