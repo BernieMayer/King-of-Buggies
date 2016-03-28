@@ -491,6 +491,7 @@ void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth
 	glEnd();
 
 	//I need a function here to deal with the viewport stuff...
+	useViewport(activeViewport);
 	//glViewport(0, 0, windowWidth, windowHeight);
 
 }

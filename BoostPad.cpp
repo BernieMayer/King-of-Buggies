@@ -15,7 +15,7 @@ void BoostPad::setDefault(vec3 newCenter)
 
 	std::vector<vec3> v;
 
-	double defaultDim = 10;
+	double defaultDim = 6;
 
 	v.push_back(newCenter - vec3(defaultDim / 2, 0, defaultDim / 2));
 	v.push_back(newCenter - vec3(defaultDim / 2, 0, -defaultDim / 2));
