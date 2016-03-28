@@ -186,7 +186,15 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 
 }
 void GameManager::createLevel(unsigned int objectID) {
-	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+
+	MeshObject* levelMesh;
+	if (selectedLevel == 1) {
+		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+	}
+	else if (selectedLevel == 0) {
+		levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
+	}
+	
 	surfacePhysicsID = physics.ground_createGeneric(levelMesh);
 
 	surfaceRenderID = renderer.generateObjectID();
@@ -194,7 +202,10 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &tsMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
-	renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
+	if (selectedLevel == 1) {
+		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
+	}
+	
 
 }
 
@@ -381,6 +392,13 @@ void GameManager::initMenus() {
 		else if (((in[0].jump && !in[0].isKeyboard) || (in[0].powerup && in[0].isKeyboard)) && currentMenu == 1) {
 			currentMenu++;
 			_interface.clear();
+
+			if (xOffsets[0] == lSel1X) {
+				selectedLevel = 0;
+			}
+			else if (xOffsets[0] == lSel2X) {
+				selectedLevel = 1;
+			}
 
 
 			xOffsets[0] = cSel1X;
@@ -1114,10 +1132,18 @@ void GameManager::gameInit()
 {
 	gameOver = false;
 	
-	// temporary since we only have one level right now
-	createLevel(DONUTLEVEL);
-	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+
+	if (selectedLevel == 1) {
+		// temporary since we only have one level right now
+		createLevel(DONUTLEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+		state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+	}
+	else if (selectedLevel == 0) {
+		createLevel(OLDLEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
+		state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+	}
 
 	initTestScene();
 }

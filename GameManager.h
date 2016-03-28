@@ -87,6 +87,8 @@ private:
 
 	unsigned int powerupComponentID;
 
+	int selectedLevel = 1;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 
