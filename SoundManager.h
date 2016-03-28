@@ -28,6 +28,7 @@ public:
 	void playDingSound(vec3 pos);
 	void playWinSound(vec3 pos);
 	void playLossSound(vec3 pos);
+	void playMineExplosionSound(vec3 pos);
 
 	void startMenuSong(GameState state);
 	void updateMenuSong(GameState state);

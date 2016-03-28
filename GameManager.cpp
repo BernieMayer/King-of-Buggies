@@ -456,6 +456,17 @@ void GameManager::initMenus() {
 		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[4])) {
 			_interface.clear();
 
+			// Clear input so no input given for new menu on transition frame
+			for (int i = 0; i < in.size(); i++) {
+				in[i].jump = false;
+				in[i].menu = false;
+				in[i].powerup = false;
+				in[i].tiltBackward = 0;
+				in[i].tiltForward = 0;
+				in[i].turnL = 0;
+				in[i].turnR = 0;
+			}
+
 			gameInit();
 
 			return;
@@ -987,6 +998,7 @@ void GameManager::gameLoop()
 					physics.applyMineExplosion(i);
 					renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
 					state.removeMine(hasMineCollision);
+					sound.playMineExplosionSound(state.getPlayer(i)->getPos());
 				}
 			}
 			state.checkRespawns();
