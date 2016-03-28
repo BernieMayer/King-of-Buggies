@@ -193,6 +193,18 @@ void Renderer::setLightPosition(unsigned int id, vec3 lightPos)
 * Framebuffers
 **/
 
+mat4 Framebuffer::ratioMatrix()
+{
+	mat4 ratio(1.f);
+
+	float minDim = min((float)width,  (float)height);
+
+	ratio[0][0] = (float)width / minDim;
+	ratio[1][1] = (float)height / minDim;
+
+	return ratio;
+}
+
 unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height)
 {
 	GLuint fb, fb_texture;
@@ -238,6 +250,8 @@ void Renderer::useFramebuffer(unsigned int id)
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo[id].id);
 		glDrawBuffer(GL_NONE);
 	}
+
+	activeFramebuffer = id;
 }
 
 
@@ -315,9 +329,16 @@ void Renderer::loadCamera(Camera* _camera)
 	camera = _camera;
 }
 
-void Renderer::positionLightCamera(vec3 sceneCenter, float boundingRadius)
+void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float boundingRadius)
 {
+	cam = Camera(sceneCenter + pos, vec3(0.f, 1.f, 0.f), normalize(-pos));
 
+	projection = orthographicMatrix(length(pos) - boundingRadius, length(pos) + boundingRadius, boundingRadius, boundingRadius);
+}
+
+void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)
+{
+	lights[lightID].positionCamera(sceneCenter, boundingRadius);
 }
 
 
@@ -442,6 +463,43 @@ void Renderer::clearDrawBuffers(vec3 color)
 {
 	glClearColor(color.x, color.y, color.z, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Renderer::drawShadow(unsigned int id, unsigned int lightID)
+{
+	ObjectInfo& object = objects[id];
+	if (object.deleted)
+		return;
+
+	LightInfo light;
+	if (lights.size() < 1)		//If no light, add a default light to scene
+		light = LightInfo();
+	else
+		light = lights[0];		//Else, use first light in array
+
+	shadow.useShader();		//Use shadow map shader
+
+	//Object
+	mat4 cameraMatrix = lights[lightID].cam.getMatrix();
+	mat4 projectionMatrix = fbo[activeFramebuffer].ratioMatrix()*lights[lightID].projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	shadow.loadUniforms(projectionMatrix, modelviewMatrix);
+
+	loadBuffers(object);
+
+	if (object.indices != NULL)
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+}
+
+void Renderer::drawShadowAll(unsigned int lightID)
+{
+	for (unsigned int i = 0; i < objects.size(); i++)
+	{
+		drawShadow(i, lightID);
+	}
 }
 
 void Renderer::draw(unsigned  int id)
@@ -682,13 +740,13 @@ bool Renderer::loadBuffers(const ObjectInfo& object)
 {
 	bool success = false;
 
-	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL))
+	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL) && (object.mat->buffersUsed() & (Material::VERTICES | Material::NORMALS | Material::UVS)))
 		success = loadVertNormalUVBuffer(object);
-	else if ((object.mesh != NULL) && (object.normals != NULL))
+	else if ((object.mesh != NULL) && (object.normals != NULL) && (object.mat->buffersUsed() & (Material::VERTICES | Material::NORMALS)))
 		success = loadVertNormalBuffer(object);
-	else if ((object.mesh != NULL) && (object.uvs != NULL))
+	else if ((object.mesh != NULL) && (object.uvs != NULL) && (object.mat->buffersUsed() & (Material::VERTICES | Material::UVS)))
 		success = loadVertUVBuffer(object);
-	else if (object.mesh != NULL)
+	else if ((object.mesh != NULL) && (object.mat->buffersUsed() & (Material::VERTICES)))
 		success = loadVertBuffer(object);
 	else
 	{

@@ -15,6 +15,7 @@
 #include "diffuse.h"
 #include "torranceSparrow.h"
 #include "unshaded.h"
+#include "shadow.h"
 #include "GameState.h"
 
 using namespace std;
@@ -56,6 +57,8 @@ struct Framebuffer{
 	enum { DEPTH, COLOR };
 
 	Framebuffer(GLuint id, GLuint texture, unsigned int width, unsigned int height, unsigned int type) :id(id), texture(texture), width(width), height(height), type(type) {}
+
+	mat4 ratioMatrix();
 };
 
 const unsigned int DEFAULT_WIDTH = 800;
@@ -88,8 +91,12 @@ private:
 	public:
 		vec3 pos;
 		bool deleted;
+		Camera cam;
+		mat4 projection;
 
 		LightInfo();
+
+		void positionCamera(vec3 sceneCenter, float boundingRadius);
 
 	};
 
@@ -102,15 +109,16 @@ private:
 	vector<Viewport> viewports;
 
 	unsigned int activeViewport;
+	unsigned int activeFramebuffer;
 
 	//Transform matrices
 	mat4 projection;
 	mat4 modelview;
-	mat4 shadowProjection;
 
 	Camera* camera;
 	Camera lightCamera;
 
+	Shadow shadow;
 
 	GLuint vao[VAO::COUNT];
 	GLuint vbo[VBO::COUNT];
@@ -145,7 +153,7 @@ public:
 	void loadPerspectiveTransformShadow(float near, float far, float fov);
 	void loadOrthographicTransformShadow(float near, float far, float width, float height);
 	void loadCamera(Camera* _camera);
-	void positionLightCamera(vec3 sceneCenter, float boundingRadius);	//Sets up light camera and projection
+	void positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius);	//Sets up light camera and projection
 
 	//Drawable objects
 	unsigned int generateObjectID();
@@ -211,6 +219,10 @@ public:
 	//Debugging draw calls
 	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);
+
+	//Draw shadow map
+	void drawShadow(unsigned int id, unsigned int lightID);
+	void drawShadowAll(unsigned int lightID);
 
 	//Viewports
 	unsigned int addViewport(float x, float y, float width, float height);	//Set viewport in 0 to 1 floats
