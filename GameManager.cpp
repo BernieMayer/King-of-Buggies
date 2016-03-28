@@ -754,6 +754,9 @@ void GameManager::gameLoop()
 	timeb loopStart = clock.getCurrentTime();
 
 	hasPowerup.push_back(false);
+	hasPowerup.push_back(false);
+	hasPowerup.push_back(false);
+	hasPowerup.push_back(false);
 
 	unsigned int numScreens = input.getNumPlayers();
 	//unsigned int numScreens = 2;
