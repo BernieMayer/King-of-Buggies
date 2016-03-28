@@ -325,20 +325,34 @@ void GameManager::initMenus() {
 	vector<float> xOffsets;
 	vector<float> yOffsets;
 
-	const float lSel1X = -0.3f;
-	const float lSel1Y = -0.89f;
-	const float lSel2X = 0.27f;
-	const float lSel2Y = -0.89f;
-	const float cSel1X = -0.43f;
-	const float cSel2X = 0.15f;
-	const float cSel1Y = -0.21f;
-	const float cSel2Y = -0.92f;
+	const float lSel1XBase = -0.3f;
+	const float lSel1YBase = -0.89f;
+	const float lSel2XBase = 0.27f;
+	const float lSel2YBase = -0.89f;
+	const float cSel1XBase = -0.43f;
+	const float cSel2XBase = 0.15f;
+	const float cSel1YBase = -0.21f;
+	const float cSel2YBase = -0.92f;
+
+	float lSel1X = lSel1XBase;
+	float lSel1Y = lSel1YBase;
+	float lSel2X = lSel2XBase;
+	float lSel2Y = lSel2YBase;
+	float cSel1X = cSel1XBase;
+	float cSel2X = cSel2XBase;
+	float cSel1Y = cSel1YBase;
+	float cSel2Y = cSel2YBase;
+
+	float xMod = 1.0f;
+	float yMod = 1.0f;
 
 	xOffsets.push_back(lSel1X);
 	yOffsets.push_back(lSel1Y);
 
 	float p1Scale = 0.25f;
-	const float iconWidth = 0.08f;
+	const float iconWidthBase = 0.08f;
+
+	float iconWidth = iconWidthBase;
 
 	xOffsets.push_back(cSel1X + iconWidth);
 	xOffsets.push_back(cSel1X + iconWidth * 2);
@@ -468,6 +482,10 @@ void GameManager::initMenus() {
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+
+			xMod = _interface.getComponentWidth(lScreen) / _interface.getWindowWidth();
+
+			//cout << "Window: " << _interface.getWindowWidth() << " Image: " << _interface.getComponentWidth(lScreen) << "\n";
 		}
 		// If car select menu
 		else if (currentMenu == 2) {

@@ -494,9 +494,39 @@ void Physics::updateGameState(GameState* state, float time)
 	lastState = state;
 	
 	if (goldenBuggyLock) {
-		// 2 second lock
-		if (clock.getTimeSince(gbLockStartTime) >= 2) {
+		// 1 second lock and pulse
+		if (clock.getTimeSince(gbLockStartTime) >= gbLockEndTime) {
 			goldenBuggyLock = false;
+		}
+		else {
+
+			float forceMod = (clock.getTimeSince(lastFrameEnd) / gbLockEndTime);
+			if (forceMod > 1) {
+				// Ensures that a larger force won't be applied if frame rate is bad
+				forceMod = 1;
+			}
+			for (int i = 0; i < vehicleActors.size(); i++) {
+				if (i != indexOfGoldenBuggy) {
+					vec3 vec = lastState->getPlayer(i)->getPos() - lastState->getPlayer(indexOfGoldenBuggy)->getPos();
+					float distance = length(vec);
+					vec = normalize(vec);
+
+					float force = 1500000;
+					vec = (force * (1 / (distance * distance))) * vec;
+					vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
+				}
+			}
+
+			for (int i = 0; i < bombActors.size(); i++) {
+
+				PxVec3 vec = bombActors[i]->getGlobalPose().p - vehicleActors[indexOfGoldenBuggy].vehDrive4W->getRigidDynamicActor()->getGlobalPose().p;
+				float distance = length(getVec3(vec));
+				vec = getPxVec3(normalize(getVec3(vec)));
+
+				float force = 2000;
+				vec = (force * (1 / (distance * distance))) * vec;
+				bombActors[i]->addForce(vec);
+			}
 		}
 	}
 
@@ -507,6 +537,8 @@ void Physics::updateGameState(GameState* state, float time)
 			i--;
 		}
 	}
+
+	lastFrameEnd = clock.getCurrentTime();
 }
 
 /**
@@ -1413,7 +1445,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 									modifySpeed(i, 3);
 									goldenBuggyLock = true;
 									gbLockStartTime = clock.getCurrentTime();
-									buggyExplosion(i);
+									//buggyExplosion(i);
 									lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 									break;
 								}
@@ -1430,7 +1462,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 									modifySpeed(i, 3);
 									goldenBuggyLock = true;
 									gbLockStartTime = clock.getCurrentTime();
-									buggyExplosion(i);
+									//buggyExplosion(i);
 									lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
 									break;
 								}

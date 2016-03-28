@@ -75,6 +75,8 @@ public:
 	unsigned int getScoreBarHeight();
 
 	void setWindowDim(int width, int height);
+	unsigned int getWindowWidth() { return wWidth; }
+	unsigned int getWindowHeight() { return wHeight; }
 
 	void clear();
 	
