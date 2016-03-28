@@ -467,6 +467,7 @@ void GameManager::initMenus() {
 				in[i].turnR = 0;
 			}
 
+			sound.playDingSound();
 			gameInit();
 
 			return;
