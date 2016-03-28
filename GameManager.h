@@ -87,7 +87,7 @@ private:
 
 	vector<int> playerColours;
 
-	unsigned int powerupComponentID;
+	vector<unsigned int> powerupComponentIDs;
 
 	int selectedLevel = 1;
 

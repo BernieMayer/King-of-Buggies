@@ -796,13 +796,9 @@ void GameManager::gameLoop()
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
-
-				_interface.toggleActive(powerupComponentID, false);
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
-				if (state.getPlayer(0)->getCurrentPowerup() > -1)
-					_interface.toggleActive(powerupComponentID, true);
 			}
 		}
 
@@ -911,7 +907,7 @@ void GameManager::gameLoop()
 					hasPowerup.at(0) = false;
 				}
 
-				_interface.toggleActive(powerupComponentID, false);
+				_interface.toggleActive(powerupComponentIDs[0], false);
 			} 
 			
 		}
@@ -955,12 +951,12 @@ void GameManager::gameLoop()
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 					// display powerup information in HUD for any non-AI players
-					if (!state.getPlayer(vehicleId)->isAI()) {
-						_interface.assignSquare(powerupComponentID);
-						_interface.assignTexture(powerupComponentID, meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-						_interface.setDimensions(powerupComponentID, -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
-						_interface.toggleActive(powerupComponentID, true);
-					}
+					//if (!state.getPlayer(vehicleId)->isAI()) {
+					_interface.assignSquare(powerupComponentIDs[vehicleId]);
+					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+					_interface.setDimensions(powerupComponentIDs[vehicleId], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+					//}
 
 					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 				}
@@ -1311,8 +1307,24 @@ void GameManager::initTestScene()
 
 	// setup for displaying obtained powerups to the UI
 
-	powerupComponentID = _interface.generateComponentID();
-	_interface.toggleActive(powerupComponentID, false);
+	// setup for displaying obtained powerups to the UI
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		powerupComponentIDs.push_back(_interface.generateComponentID());
+		_interface.toggleActive(powerupComponentIDs[i], false);
+
+		// set display filter for each player's indicator
+		if (i == 0)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D1);
+
+		else if (i == 1)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D2);
+
+		else if (i == 2)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D3);
+
+		else if (i == 3)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
+	}
 
 	//Add dummy objects to interface
 	/*carSelectScreen = LoadTexture("menus/opacity-512.png");
@@ -1341,7 +1353,7 @@ int GameManager::randomPowerup()
 	*/
 	
 
-	int powerupId = rand() % 5;
+	int powerupId = rand() % 3;
 	return powerupId;
 }
 
