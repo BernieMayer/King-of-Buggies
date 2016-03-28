@@ -745,6 +745,7 @@ void GameManager::gameLoop()
 	Camera freeCam;
 
 	bool paused = false;
+	bool firstFrame = true;
 
 	unsigned int debugPathIterations = 0;
 	unsigned int debuggedAI = 2;
@@ -784,9 +785,7 @@ void GameManager::gameLoop()
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
-
-
-		if (inputs[0].menu)
+		if (inputs[0].menu && !firstFrame)
 		{
 			paused = !paused;
 
@@ -801,6 +800,7 @@ void GameManager::gameLoop()
 				renderer.loadCamera(&cam[0]);
 			}
 		}
+		firstFrame = false;
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
