@@ -453,7 +453,7 @@ void GameManager::initMenus() {
 			}
 			
 		}
-		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[4])) {
+		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[3])) {
 			_interface.clear();
 
 			// Clear input so no input given for new menu on transition frame
