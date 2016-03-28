@@ -163,6 +163,8 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 	}
 	vehicleForwards.push_back(-1);
 	vehicleInAir.push_back(true);
+	vehicleStuck.push_back(false);
+	stuckTimer.push_back(clock.getCurrentTime());
 
 	
 
@@ -668,6 +670,24 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vec3 upVec = lastState->getPlayer(id)->getUp();
 		upVec = 500000.f * upVec;
 		vehicle->getRigidDynamicActor()->addForce(getPxVec3(upVec));
+	}
+
+	if (lastState != NULL) {
+		if (vehicleInAir[id] && abs(lastState->getPlayer(id)->getFSpeed()) < 0.1f && !vehicleStuck[id]) {
+			vehicleStuck[id] = true;
+			stuckTimer[id] = clock.getCurrentTime();
+		}
+		else if ((!vehicleInAir[id] || abs(lastState->getPlayer(id)->getFSpeed()) >= 0.1f) && vehicleStuck[id]) {
+			vehicleStuck[id] = false;
+		}
+
+		float difference = clock.getTimeSince(stuckTimer[id]);
+		
+		if (vehicleStuck[id] && difference >= 2.0f) {
+			vec3 forwardVec = lastState->getPlayer(id)->getForward();
+			forwardVec = 30000.0f * forwardVec;
+			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
+		}
 	}
 
 }
