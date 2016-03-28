@@ -31,7 +31,6 @@ Diffuse::Diffuse()
 {
 	shaderIndex = ShaderList::DIFFUSE;
 	programID = shaderList.shaderIDs[ShaderList::DIFFUSE];
-	//programID = GetShader("diffuse");
 }
 
 

@@ -728,6 +728,7 @@ void GameManager::gameLoop()
 	unsigned int numScreens = input.getNumPlayers();
 	//unsigned int numScreens = 2;
 	renderer.splitScreenViewports(numScreens);
+
 	while (!glfwWindowShouldClose(window))
 	{
 

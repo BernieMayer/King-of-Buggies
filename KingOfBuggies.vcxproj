@@ -97,6 +97,7 @@
     <ClInclude Include="CollisionEvent.h" />
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="PowerupCollisionEvent.h" />
+    <ClInclude Include="shadow.h" />
     <ClInclude Include="TimedEvent.h" />
     <ClInclude Include="unshaded.h" />
     <ClInclude Include="diffuse.h" />
@@ -172,6 +173,7 @@
     <ClCompile Include="material.cpp" />
     <ClCompile Include="PlayerInfo.cpp" />
     <ClCompile Include="LevelInfo.cpp" />
+    <ClCompile Include="shadow.cpp" />
     <ClCompile Include="SnippetVehicleFilterShader.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="specular.cpp" />
