@@ -33,6 +33,9 @@ public:
 	void createPhysicsMesh();
 	void setupTextureInfo(unsigned char data, unsigned int width, unsigned int height);
 
+	float getBoundingRadius();
+	vec3 getCenter();
+
 private:
 	vector<vec3> vertices, normals;
 	vector<vec2> uvs;

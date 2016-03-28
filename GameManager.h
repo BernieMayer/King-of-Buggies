@@ -42,6 +42,8 @@ private:
 
 	GLFWwindow* window;
 
+	MeshObject* levelMesh;
+
 	unsigned int winner;
 	bool gameOver;
 	bool displayDebugging = false;

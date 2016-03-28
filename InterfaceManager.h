@@ -12,6 +12,8 @@ public:
 	vector<unsigned int>* indices;
 	unsigned int texIDs[3];
 
+	unsigned int displayFilter;
+
 	unsigned int state;
 
 	unsigned int anchorPoint;
@@ -24,6 +26,19 @@ public:
 	enum {UP_TEXTURE=0, OVER_TEXTURE, DOWN_TEXTURE};
 
 	bool isActive;
+};
+
+enum DISPLAY{
+	ALL = 1,
+	D1	= (1 << 1),
+	D2	= (1 << 2),
+	D3	= (1 << 3),
+	D4	= (1 << 4),
+	D5	= (1 << 5),
+	D6	= (1 << 6),
+	D7	= (1 << 7),
+	D8	= (1 << 8),
+	D9	= (1 << 9)
 };
 
 //Determines which corner UI elements are anchored from
@@ -72,6 +87,7 @@ public:
 	void assignSquare(unsigned int id);		//Uses vertices and uvs of unit square
 	void assignTexture(unsigned int id, unsigned int texID, unsigned int textureType);
 	void assignIndices(unsigned int id, vector<unsigned int>* indices);
+	void setDisplayFilter(unsigned int id, unsigned int displayFilter);
 	//Coordinates run from -1 to 1 (-1, -1 being bottom left corner)
 	void setDimensions(unsigned int id, float xOffset, float yOffset, float width, float height, unsigned int anchor);
 	void changeState(unsigned int id, unsigned int state);
@@ -86,6 +102,7 @@ public:
 	//Drawing elements
 	void draw(unsigned int id, Renderer* r);
 	void drawAll(Renderer* r);
+	void drawAll(Renderer* r, unsigned int display);
 };
 
 #endif // INTERFACEMANAGER_H

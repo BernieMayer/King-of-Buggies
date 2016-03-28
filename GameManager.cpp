@@ -187,7 +187,6 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 }
 void GameManager::createLevel(unsigned int objectID) {
 
-	MeshObject* levelMesh;
 	if (selectedLevel == 1) {
 		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
 	}
@@ -1076,7 +1075,7 @@ void GameManager::gameLoop()
 				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 			}
 
-			_interface.drawAll(&renderer);
+			_interface.drawAll(&renderer, 1 << (i+1));
 		}
 		
 
@@ -1286,15 +1285,13 @@ void GameManager::initTestScene()
 	_interface.toggleActive(powerupComponentID, false);
 
 	//Add dummy objects to interface
-	/*
-	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	/*carSelectScreen = LoadTexture("menus/opacity-512.png");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
-
+	_interface.setDisplayFilter(centerBox, DISPLAY::D2);
 
 	_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
-	*/
+	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);*/
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
