@@ -28,8 +28,6 @@ public:
 
 extern ShaderList shaderList;
 
-
-
 class Material
 {
 protected:
@@ -38,7 +36,13 @@ protected:
 
 public:
 
+	enum {	VERTICES	= 1 << 0, 
+			NORMALS		= 1 << 1, 
+			UVS			= 1 << 2};
+
 	Material();
+
+	virtual unsigned int buffersUsed() { return VERTICES; }
 
 	virtual void loadUniforms(const mat4& transform, const mat4& objectTransform, 
 		vec3 viewer, vec3 light, vec3 color);

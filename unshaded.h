@@ -13,6 +13,8 @@ public:
 
 	void loadUniforms(const mat4& transform, const mat4& objectTransform,
 		vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit);
+
+	virtual unsigned int buffersUsed() { return VERTICES | UVS; }
 };
 
 
