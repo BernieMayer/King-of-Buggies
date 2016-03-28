@@ -235,7 +235,7 @@ void GameManager::createCoin(unsigned int coinIndex)
 	newCoin->setRenderID(coin);
 }
 
-void GameManager::createMine()
+void GameManager::createMine(unsigned int playerID)
 {
 	unsigned int powerup = renderer.generateObjectID();
 	MeshObject* powerupMesh = meshInfo.getMeshPointer(MINE);
@@ -245,8 +245,8 @@ void GameManager::createMine()
 	renderer.assignTexture(powerup, powerupMesh->getTextureID());
 	Mine newMine = Mine(3.0);
 	
-	vec3 playerPos = state.getPlayer(0)->getPos();
-	vec3 playerForward = state.getPlayer(0)->getForward();
+	vec3 playerPos = state.getPlayer(playerID)->getPos();
+	vec3 playerForward = state.getPlayer(playerID)->getForward();
 
 	// there is definitely a simpler way of doing this
 	vec3 placementVec = playerPos - (playerForward);
@@ -822,94 +822,95 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		//Allow for nitro/powerup activation her
-		if ((inputs[0].cheat_coin || inputs[0].powerup) && !paused) {
+		//Allow for nitro/powerup activation here
+		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused) {
 
-			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
-			//traits.print();
+				//VehicleTraits traits = VehicleTraits(physics.getMaterial());
+				//traits.print();
 
 
-			//VehicleTraits temp = VehicleTraits(physics.getMaterial());
-			//traits.loadConfiguration("base");
-			//temp.print();
+				//VehicleTraits temp = VehicleTraits(physics.getMaterial());
+				//traits.loadConfiguration("base");
+				//temp.print();
 
-			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
+				//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 
-			if (hasPowerup.at(0))
-			{
-				/*
-				1 - Nitro Boost
-				2 - Bomb
-				3 - Mine
-				4 - Coin?
-				5 - Decoy?
-				*/
-
-				int powerUpId = state.getPlayer(0)->usePowerUp();
-				
-				if (powerUpId == POWERUPS::NITROBOOST)
+				if (hasPowerup.at(i))
 				{
-				
+					/*
+					1 - Nitro Boost
+					2 - Bomb
+					3 - Mine
+					4 - Coin?
+					5 - Decoy?
+					*/
 
-					if (state.getPlayer(0)->getEnergyForNitro() > 0.0f)
+					int powerUpId = state.getPlayer(i)->usePowerUp();
+
+					if (powerUpId == POWERUPS::NITROBOOST)
 					{
-						state.getPlayer(0)->removeEnergyForNitro(30);
-						physics.applyNitroBoost(0);
-						state.getPlayer(0)->addPowerUp(POWERUPS::NITROBOOST);
-						printf("Current energy level %f \n", state.getPlayer(0)->getEnergyForNitro());
-					}
-					else {
-						state.getPlayer(0)->addPowerUp(POWERUPS::NITROBOOST);
-						state.getPlayer(0)->setEnergyForNitro(300.0f);
-						printf("Nitro Boost with energy level  %f \n", state.getPlayer(0)->getEnergyForNitro());
 
-					}
-				}
-				else if (powerUpId == POWERUPS::BOMB)
-				{
-					createBomb(0);
-				}
-				else if (powerUpId == POWERUPS::MINE)
-				{
-					createMine();
-				}
-				else if (powerUpId == POWERUPS::COIN)
-				{
-					physics.modifySpeed(0, 0.3333f);	//Should change this..
-					printf("Coin \n");
-				}
-				else if (powerUpId == POWERUPS::DECOY)
-				{
-					printf("Decoy \n");
-					if (state.numOfDecoys >= 1) {
-						//nothing or stuff dealing with multiple decoys
-					}
-					else {
-						state.numOfDecoys += 1;
-						//Apply decoy powerup logic
-						VehicleTraits traits = VehicleTraits(physics.getMaterial());
-						createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
-						//state.getPlayer(state.numberOfPlayers()).setAI(true);
-						state.getPlayer(state.numberOfPlayers() -1)->setDecoy(true);
-						//also check the decoy timer here
-						printf("Decoy? \n");
-					}
-				}
 
-				
-				//might add decoy to this 
-				if (powerUpId == POWERUPS::NITROBOOST)
-				{
-					hasPowerup.at(0) = true;
-				}
-				else 
-				{
-					hasPowerup.at(0) = false;
-				}
+						if (state.getPlayer(i)->getEnergyForNitro() > 0.0f)
+						{
+							state.getPlayer(i)->removeEnergyForNitro(30);
+							physics.applyNitroBoost(i);
+							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
+							printf("Current energy level %f \n", state.getPlayer(i)->getEnergyForNitro());
+						}
+						else {
+							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
+							state.getPlayer(i)->setEnergyForNitro(300.0f);
+							printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
 
-				_interface.toggleActive(powerupComponentIDs[0], false);
-			} 
-			
+						}
+					}
+					else if (powerUpId == POWERUPS::BOMB)
+					{
+						createBomb(i);
+					}
+					else if (powerUpId == POWERUPS::MINE)
+					{
+						createMine(i);
+					}
+					else if (powerUpId == POWERUPS::COIN)
+					{
+						physics.modifySpeed(i, 0.3333f);	//Should change this..
+						printf("Coin \n");
+					}
+					else if (powerUpId == POWERUPS::DECOY)
+					{
+						printf("Decoy \n");
+						if (state.numOfDecoys >= 1) {
+							//nothing or stuff dealing with multiple decoys
+						}
+						else {
+							state.numOfDecoys += 1;
+							//Apply decoy powerup logic
+							VehicleTraits traits = VehicleTraits(physics.getMaterial());
+							createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
+							//state.getPlayer(state.numberOfPlayers()).setAI(true);
+							state.getPlayer(state.numberOfPlayers() - 1)->setDecoy(true);
+							//also check the decoy timer here
+							printf("Decoy? \n");
+						}
+					}
+
+
+					//might add decoy to this 
+					if (powerUpId == POWERUPS::NITROBOOST)
+					{
+						hasPowerup.at(i) = true;
+					}
+					else
+					{
+						hasPowerup.at(i) = false;
+					}
+
+					_interface.toggleActive(powerupComponentIDs[i], false);
+				}
+			}
 		}
 
 		//Update game state and renderer
