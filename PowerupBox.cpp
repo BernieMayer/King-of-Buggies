@@ -12,3 +12,20 @@ mat4 PowerupBox::getRotation(float angle) {
 	mat4 oldTransform = this->getTransform();
 	return (oldTransform * rotation);
 }
+
+bool PowerupBox::getCollided() { return collided; }
+
+void PowerupBox::setCollided(bool isCollided) { collided = isCollided; }
+
+
+void PowerupBox::startCountdown() {
+	countdown = 600;
+}
+
+void PowerupBox::decrementCountdown() {
+	countdown--;
+}
+
+int PowerupBox::getCountdown() {
+	return countdown;
+}

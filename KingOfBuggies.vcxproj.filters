@@ -87,6 +87,9 @@
     <ClCompile Include="PowerupBox.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
+    <ClCompile Include="shadow.cpp">
+      <Filter>Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -182,6 +185,9 @@
     <ClInclude Include="Definitions.h" />
     <ClInclude Include="PowerupCollisionEvent.h">
       <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="shadow.h">
+      <Filter>Materials</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

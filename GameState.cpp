@@ -305,7 +305,7 @@ Mine* GameState::getMine(unsigned int mineNum)
 
 unsigned int GameState::numberOfCoins(){ return coins.size(); }
 
-void GameState::checkCoinRespawns() 
+void GameState::checkRespawns() 
 {
 	for (unsigned int i = 0; i < coins.size(); i++) {
 		vec3 pos = coins[i].getPos();
@@ -319,6 +319,22 @@ void GameState::checkCoinRespawns()
 				newPos.y = pos.y + 20;
 				coins[i].setPos(newPos);
 				coins[i].setCollided(false);
+			}
+		}
+	}
+
+	for (unsigned int i = 0; i < boxes.size(); i++) {
+		vec3 pos = boxes[i].getPos();
+
+		if (boxes[i].getCollided()) {
+			// countdown to coin respawn
+			boxes[i].decrementCountdown();
+			if (boxes[i].getCountdown() < 0) {
+				// reset coin to original spawn location
+				vec3 newPos = pos;
+				newPos.y = pos.y + 20;
+				boxes[i].setPos(newPos);
+				boxes[i].setCollided(false);
 			}
 		}
 	}

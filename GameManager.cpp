@@ -186,7 +186,14 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 
 }
 void GameManager::createLevel(unsigned int objectID) {
-	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+
+	if (selectedLevel == 1) {
+		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+	}
+	else if (selectedLevel == 0) {
+		levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
+	}
+	
 	surfacePhysicsID = physics.ground_createGeneric(levelMesh);
 
 	surfaceRenderID = renderer.generateObjectID();
@@ -194,7 +201,10 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &tsMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
-	renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
+	if (selectedLevel == 1) {
+		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
+	}
+	
 
 }
 
@@ -311,21 +321,55 @@ void GameManager::initMenus() {
 
 	unsigned int p1Icon = 0;
 	unsigned int Icon1 = 0;
-	const float lSel1X = -0.4f;
-	const float lSel1Y = -0.89f;
-	const float lSel2X = 0.4f;
-	const float lSel2Y = -0.89f;
-	const float cSel1X = -0.6f;
-	const float cSel2X = 0.2f;
-	const float cSel1Y = -0.21f;
-	const float cSel2Y = -0.92f;
+
+	vector<float> xOffsets;
+	vector<float> yOffsets;
+
+	const float lSel1XBase = -0.3f;
+	const float lSel1YBase = -0.89f;
+	const float lSel2XBase = 0.27f;
+	const float lSel2YBase = -0.89f;
+	const float cSel1XBase = -0.43f;
+	const float cSel2XBase = 0.15f;
+	const float cSel1YBase = -0.21f;
+	const float cSel2YBase = -0.92f;
+
+	float lSel1X = lSel1XBase;
+	float lSel1Y = lSel1YBase;
+	float lSel2X = lSel2XBase;
+	float lSel2Y = lSel2YBase;
+	float cSel1X = cSel1XBase;
+	float cSel2X = cSel2XBase;
+	float cSel1Y = cSel1YBase;
+	float cSel2Y = cSel2YBase;
+
+	float xMod = 1.0f;
+	float yMod = 1.0f;
+
+	xOffsets.push_back(lSel1X);
+	yOffsets.push_back(lSel1Y);
+
 	float p1Scale = 0.25f;
-	float p1X = lSel1X;
-	float p1Y = lSel1Y;
-	const float iconWidth = 0.1f;
+	const float iconWidthBase = 0.08f;
+
+	float iconWidth = iconWidthBase;
+
+	xOffsets.push_back(cSel1X + iconWidth);
+	xOffsets.push_back(cSel1X + iconWidth * 2);
+	xOffsets.push_back(cSel1X + iconWidth * 3);
+	yOffsets.push_back(cSel1Y);
+	yOffsets.push_back(cSel1Y);
+	yOffsets.push_back(cSel1Y);
+
+
+	bool colourSelected[4] = { false, false, false, false };
+	bool playerSelected[4] = { true, true, true, true };
+	for (int i = 0; i < input.getNumPlayers(); i++) {
+		playerSelected[i] = false;
+	}
 
 	// 0 = red, 1 = green, 2 = blue, 3 = purple
-	int selectedColour = 0;
+	int selectedColours[] = { 0, 1, 2, 3 };
 
 	unsigned int p2Icon = 0;
 	unsigned int Icon2 = 0;
@@ -341,9 +385,11 @@ void GameManager::initMenus() {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
 
-		Input in = input.getInput(1);
-		in = smoothers[0].smooth(in, false);
-		if ((in.menu || in.powerup || in.jump || in.horn || in.drift) && currentMenu == 0) {
+		vector<Input> in;
+		for (int i = 1; i <= input.getNumPlayers(); i++) {
+			in.push_back(smoothers[i].smooth(input.getInput(i), false));
+		}
+		if ((in[0].menu || in[0].powerup || in[0].jump || in[0].horn || in[0].drift) && currentMenu == 0) {
 			currentMenu++;
 			_interface.clear();
 
@@ -356,23 +402,58 @@ void GameManager::initMenus() {
 			menuBackground = LoadTexture("menus/Background.bmp");
 			menu = _interface.generateComponentID();
 		}
-		else if (((in.jump && !in.isKeyboard) || (in.powerup && in.isKeyboard)) && currentMenu == 1) {
+		else if (((in[0].jump && !in[0].isKeyboard) || (in[0].powerup && in[0].isKeyboard)) && currentMenu == 1) {
 			currentMenu++;
 			_interface.clear();
 
-			p1X = -0.6f;
-			p1Y = -0.21f;
+			if (xOffsets[0] == lSel1X) {
+				selectedLevel = 0;
+			}
+			else if (xOffsets[0] == lSel2X) {
+				selectedLevel = 1;
+			}
+
+
+			xOffsets[0] = cSel1X;
+			yOffsets[0] = cSel1Y;
 			p1Scale = 0.15f;
 			p1Icon = LoadTexture("menus/P1Icon.png");
 			Icon1 = _interface.generateComponentID();
+
+			if (in.size() > 1) {
+				p2Icon = LoadTexture("menus/P2Icon.png");
+				Icon2 = _interface.generateComponentID();
+			}
+
+			if (in.size() > 2) {
+				p3Icon = LoadTexture("menus/P3Icon.png");
+				Icon3 = _interface.generateComponentID();
+			}
+
+			if (in.size() > 3) {
+				p4Icon = LoadTexture("menus/P4Icon.png");
+				Icon4 = _interface.generateComponentID();
+			}
 
 			carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
 			cScreen = _interface.generateComponentID();
 
 			menuBackground = LoadTexture("menus/Background.bmp");
 			menu = _interface.generateComponentID();
+
+			// Clear input so no input given for new menu on transition frame
+			for (int i = 0; i < in.size(); i++) {
+				in[i].jump = false;
+				in[i].menu = false;
+				in[i].powerup = false;
+				in[i].tiltBackward = 0;
+				in[i].tiltForward = 0;
+				in[i].turnL = 0;
+				in[i].turnR = 0;
+			}
+			
 		}
-		else if (((in.jump && !in.isKeyboard) || (in.powerup && in.isKeyboard)) && currentMenu == lastMenu) {
+		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[4])) {
 			_interface.clear();
 
 			gameInit();
@@ -387,137 +468,204 @@ void GameManager::initMenus() {
 		}
 		// if level select menu
 		else if (currentMenu == 1) {
-			if (p1X == lSel1X && in.turnR < -0.3f) {
-				p1X = lSel2X;
+			if (xOffsets[0] == lSel1X && in[0].turnR < -0.3f) {
+				xOffsets[0] = lSel2X;
 			}
-			else if (p1X == lSel2X && in.turnL < -0.3f) {
-				p1X = lSel1X;
+			else if (xOffsets[0] == lSel2X && in[0].turnL < -0.3f) {
+				xOffsets[0] = lSel1X;
 			}
 
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, p1X, p1Y, p1Scale, p1Scale, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
 
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+
+			xMod = _interface.getComponentWidth(lScreen) / _interface.getWindowWidth();
+
+			//cout << "Window: " << _interface.getWindowWidth() << " Image: " << _interface.getComponentWidth(lScreen) << "\n";
 		}
 		// If car select menu
 		else if (currentMenu == 2) {
-			if (p1Y == cSel1Y && in.tiltBackward > 0.3f)
-			{
-				p1Y = cSel2Y;
 
-				// Blue selected
-				if (p1X == cSel1X) {
-					selectedColour = 2;
-				}
-				// Purple selected
-				else {
-					selectedColour = 3;
-				}
-			}
-			else if (p1Y == cSel2Y && in.tiltForward > 0.3f) {
-				p1Y = cSel1Y;
+			for (int i = 0; i < in.size(); i++) {
 
-				// if red is selected
-				if (p1X == cSel1X) {
-					selectedColour = 0;
+				// Only move if nothing is selected
+				if (!playerSelected[i]) {
+					if (yOffsets[i] == cSel1Y && in[i].tiltBackward > 0.3f)
+					{
+						yOffsets[i] = cSel2Y;
+					}
+					else if (yOffsets[i] == cSel2Y && in[i].tiltForward > 0.3f) {
+						yOffsets[i] = cSel1Y;
+					}
+					else if (xOffsets[i] == cSel1X + iconWidth * i && in[i].turnR < -0.3f) {
+						xOffsets[i] = cSel2X + iconWidth * i;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && in[i].turnL < -0.3f) {
+						xOffsets[i] = cSel1X + iconWidth * i;
+					}
 				}
-				// if green is selected
-				else {
-					selectedColour = 1;
-				}
-			}
-			else if (p1X == cSel1X && in.turnR < -0.3f) {
-				p1X = cSel2X;
 
-				// if green is selected
-				if (p1Y == cSel1Y) {
-					selectedColour = 1;
-				}
-				// if purple is selected
-				else {
-					selectedColour = 3;
-				}
-			}
-			else if (p1X == cSel2X && in.turnL < -0.3f) {
-				p1X = cSel1X;
+				if (in[i].jump && !playerSelected[i]) {
+					bool selectionOccured = false;
+					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[0]) {
+						selectedColours[i] = 0;
+						colourSelected[0] = true;
+						playerSelected[i] = true;
+						selectionOccured = true;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[1]) {
+						selectedColours[i] = 1;
+						colourSelected[1] = true;
+						playerSelected[i] = true;
+						selectionOccured = true;
+					}
+					else if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel2Y && !colourSelected[2]) {
+						selectedColours[i] = 2;
+						colourSelected[2] = true;
+						playerSelected[i] = true;
+						selectionOccured = true;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel2Y && !colourSelected[3]) {
+						selectedColours[i] = 3;
+						colourSelected[3] = true;
+						playerSelected[i] = true;
+						selectionOccured = true;
+					}
 
-				// if red is selected
-				if (p1Y == cSel1Y) {
-					selectedColour = 0;
-				}
-				// if blue is selected
-				else {
-					selectedColour = 2;
-				}
-			}
+					if (selectionOccured) {
+						if (i == 0) {
+							p1Icon = LoadTexture("menus/P1IconSel.png");
+						}
+						else if (i == 1) {
+							p2Icon = LoadTexture("menus/P2IconSel.png");
+						}
+						else if (i == 2) {
+							p3Icon = LoadTexture("menus/P3IconSel.png");
+						}
+						else if (i == 3) {
+							p4Icon = LoadTexture("menus/P4IconSel.png");
+						}
 
-			if (selectedColour == 0 && redIndex != 0) {
-				meshInfo.buggyTexIDs[redIndex] = meshInfo.buggyTexIDs[0];
-				playerColours[0] = 0;
+					}
+				}
+				else if (in[i].powerup && playerSelected[i]) {
+					playerSelected[i] = false;
+					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y) {
+						colourSelected[0] = false;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel1Y) {
+						colourSelected[1] = false;
+					}
+					else if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel2Y) {
+						colourSelected[2] = false;
+					}
+					else if (xOffsets[i] == cSel2X + iconWidth * i && yOffsets[i] == cSel2Y) {
+						colourSelected[3] = false;
+					}
 
-				if (blueIndex == 0) {
-					blueIndex = redIndex;
+					if (i == 0) {
+						p1Icon = LoadTexture("menus/P1Icon.png");
+					}
+					else if (i == 1) {
+						p2Icon = LoadTexture("menus/P2Icon.png");
+					}
+					else if (i == 2) {
+						p3Icon = LoadTexture("menus/P3Icon.png");
+					}
+					else if (i == 3) {
+						p4Icon = LoadTexture("menus/P4Icon.png");
+					}
 				}
-				else if (greenIndex == 0) {
-					greenIndex = redIndex;
-				}
-				else if (purpleIndex == 0) {
-					purpleIndex = redIndex;
-				}
-				redIndex = 0;
-			}
-			else if (selectedColour == 1 && greenIndex != 0) {
-				playerColours[greenIndex] = playerColours[0];
-				playerColours[0] = 1;
 
-				if (redIndex == 0) {
-					redIndex = greenIndex;
-				}
-				else if (blueIndex == 0) {
-					blueIndex = greenIndex;
-				}
-				else if (purpleIndex == 0) {
-					purpleIndex = greenIndex;
-				}
-				greenIndex = 0;
-			}
-			else if (selectedColour == 2 && blueIndex != 0) {
-				playerColours[blueIndex] = playerColours[0];
-				playerColours[0] = 2;
 
-				if (redIndex == 0) {
-					redIndex = blueIndex;
-				}
-				else if (greenIndex == 0) {
-					greenIndex = blueIndex;
-				}
-				else if (purpleIndex == 0) {
-					purpleIndex = blueIndex;
-				}
-				blueIndex = 0;
-			}
-			else if (selectedColour == 3 && purpleIndex != 0) {
-				playerColours[purpleIndex] = playerColours[0];
-				playerColours[0] = 3;
+				if (selectedColours[i] == 0 && redIndex != i) {
+					playerColours[redIndex] = playerColours[i];
+					playerColours[i] = 0;
 
-				if (redIndex == 0) {
-					redIndex = purpleIndex;
+					if (blueIndex == i) {
+						blueIndex = redIndex;
+					}
+					else if (greenIndex == i) {
+						greenIndex = redIndex;
+					}
+					else if (purpleIndex == i) {
+						purpleIndex = redIndex;
+					}
+					redIndex = i;
 				}
-				else if (greenIndex == 0) {
-					greenIndex = purpleIndex;
+				else if (selectedColours[i] == 1 && greenIndex != i) {
+					playerColours[greenIndex] = playerColours[i];
+					playerColours[i] = 1;
+
+					if (redIndex == i) {
+						redIndex = greenIndex;
+					}
+					else if (blueIndex == i) {
+						blueIndex = greenIndex;
+					}
+					else if (purpleIndex == i) {
+						purpleIndex = greenIndex;
+					}
+					greenIndex = i;
 				}
-				else if (blueIndex == 0) {
-					blueIndex = purpleIndex;
+				else if (selectedColours[i] == 2 && blueIndex != i) {
+					playerColours[blueIndex] = playerColours[i];
+					playerColours[i] = 2;
+
+					if (redIndex == i) {
+						redIndex = blueIndex;
+					}
+					else if (greenIndex == i) {
+						greenIndex = blueIndex;
+					}
+					else if (purpleIndex == i) {
+						purpleIndex = blueIndex;
+					}
+
+					blueIndex = i;
 				}
-				purpleIndex = 0;
+				else if (selectedColours[i] == 3 && purpleIndex != i) {
+					playerColours[purpleIndex] = playerColours[i];
+					playerColours[i] = 3;
+
+					if (redIndex == i) {
+						redIndex = purpleIndex;
+					}
+					else if (greenIndex == i) {
+						greenIndex = purpleIndex;
+					}
+					else if (blueIndex == i) {
+						blueIndex = purpleIndex;
+					}
+					purpleIndex = i;
+				}
 			}
 
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, p1X, p1Y, p1Scale, p1Scale, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
+
+			if (in.size() > 1) {
+				_interface.assignSquare(Icon2);
+				_interface.assignTexture(Icon2, p2Icon, ComponentInfo::UP_TEXTURE);
+				_interface.setDimensions(Icon2, xOffsets[1], yOffsets[1], p1Scale, p1Scale, ANCHOR::CENTER);
+			}
+
+			if (in.size() > 2) {
+				_interface.assignSquare(Icon3);
+				_interface.assignTexture(Icon3, p3Icon, ComponentInfo::UP_TEXTURE);
+				_interface.setDimensions(Icon3, xOffsets[2], yOffsets[2], p1Scale, p1Scale, ANCHOR::CENTER);
+			}
+
+			if (in.size() > 3) {
+				_interface.assignSquare(Icon4);
+				_interface.assignTexture(Icon4, p4Icon, ComponentInfo::UP_TEXTURE);
+				_interface.setDimensions(Icon4, xOffsets[3], yOffsets[3], p1Scale, p1Scale, ANCHOR::CENTER);
+			}
 
 			_interface.assignSquare(cScreen);
 			_interface.assignTexture(cScreen, carSelectScreen, ComponentInfo::UP_TEXTURE);
@@ -546,10 +694,15 @@ void GameManager::gameLoop()
 	vector<vec3> edges;
 	
 	mat4 lineTransform;
-	lineTransform[3][1] = -6.f;
+	lineTransform[3][1] = -2.f;
 
 	NavMesh nav;
-	ai.nav.loadNavMesh("donutLevelNavMesh.obj");
+	if (selectedLevel == 1) {
+		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
+	}
+	else if (selectedLevel == 0) {
+		ai.nav.loadNavMesh("HiResNavigationMesh.obj");
+	}
 	ai.nav.calculateImplicitEdges();
 	ai.nav.navMeshToLines(&polygons, &edges);
 
@@ -583,13 +736,16 @@ void GameManager::gameLoop()
 	bool paused = false;
 
 	unsigned int debugPathIterations = 0;
+	unsigned int debuggedAI = 2;
 
 	timeb loopStart = clock.getCurrentTime();
 
 	hasPowerup.push_back(false);
 
 	unsigned int numScreens = input.getNumPlayers();
+	//unsigned int numScreens = 2;
 	renderer.splitScreenViewports(numScreens);
+
 	while (!glfwWindowShouldClose(window))
 	{
 
@@ -629,11 +785,13 @@ void GameManager::gameLoop()
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
+
+				_interface.toggleActive(powerupComponentID, false);
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
-
-
+				if (state.getPlayer(0)->getCurrentPowerup() > -1)
+					_interface.toggleActive(powerupComponentID, true);
 			}
 		}
 
@@ -657,16 +815,8 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		/*
-		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-			if (inputs[i].powerup) {
-				createBomb(i);	
-			}
-		}
-		*/
-
 		//Allow for nitro/powerup activation her
-		if (inputs[0].cheat_coin || inputs[0].powerup){
+		if ((inputs[0].cheat_coin || inputs[0].powerup) && !paused) {
 
 			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
 			//traits.print();
@@ -678,15 +828,8 @@ void GameManager::gameLoop()
 
 			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 
-			if (state.numberOfMines() < 20){
-				//printf("cheated in placing a Mine \n");
-				//createPowerup(MINE);
-			}
-
 			if (hasPowerup.at(0))
 			{
-				
-				
 				/*
 				1 - Nitro Boost
 				2 - Bomb
@@ -718,12 +861,10 @@ void GameManager::gameLoop()
 				else if (powerUpId == POWERUPS::BOMB)
 				{
 					createBomb(0);
-					printf("Bomb \n");
 				}
 				else if (powerUpId == POWERUPS::MINE)
 				{
 					createMine();
-					printf("Mine \n");
 				}
 				else if (powerUpId == POWERUPS::COIN)
 				{
@@ -759,41 +900,8 @@ void GameManager::gameLoop()
 					hasPowerup.at(0) = false;
 				}
 
+				_interface.toggleActive(powerupComponentID, false);
 			} 
-			else {
-			
-				//Test code should eventually be removed
-				/*
-				int powerUpId = randomPowerup();
-				if (powerUpId == POWERUPS::NITROBOOST)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Nitro Boost \n");
-				}
-				else if (powerUpId == POWERUPS::BOMB)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Bomb \n");
-				}
-				else if (powerUpId == POWERUPS::MINE)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					createPowerup(MINE);
-					printf("Mine \n");
-				}
-				else if (powerUpId == POWERUPS::COIN)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Coin? \n");
-				}
-				else if (powerUpId == POWERUPS::DECOY)
-				{
-					state.getPlayer(0)->addPowerUp(powerUpId);
-					printf("Decoy? \n");
-				}
-				*/
-				//hasPowerup.at(0) = true;
-			}
 			
 		}
 
@@ -819,14 +927,32 @@ void GameManager::gameLoop()
 				int vehicleId = powerupEvent->ob1;
 				int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
 
-				hasPowerup[vehicleId] = true;
-				int powerUpType = randomPowerup();
-				if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-					powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+				if (!state.getPowerupBox(powerupId)->getCollided()) {
+					// temporarily remove powerup from board
+					PowerupBox* collided = state.getPowerupBox(powerupId);
+					vec3 pos = collided->getPos();
+					vec3 newPos = pos;
+					newPos.y = pos.y - 20;
+					collided->setPos(newPos);
+					collided->setCollided(true);
+					collided->startCountdown();
 
-				
-				printf("Player %d has powerup %d \n", vehicleId, powerUpType);
+					hasPowerup[vehicleId] = true;
+					int powerUpType = randomPowerup();
+					if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+						powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+					// display powerup information in HUD for any non-AI players
+					if (!state.getPlayer(vehicleId)->isAI()) {
+						_interface.assignSquare(powerupComponentID);
+						_interface.assignTexture(powerupComponentID, meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+						_interface.setDimensions(powerupComponentID, -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+						_interface.toggleActive(powerupComponentID, true);
+					}
+
+					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
+				}
 			}
 		}
 		state.clearEvents();
@@ -863,7 +989,7 @@ void GameManager::gameLoop()
 					state.removeMine(hasMineCollision);
 				}
 			}
-			state.checkCoinRespawns();
+			state.checkRespawns();
 			state.applyRotations();
 		}
 
@@ -905,7 +1031,7 @@ void GameManager::gameLoop()
 			{
 				renderer.loadCamera(&freeCam);
 				//Debugging avoidance
-				ai.debugAIPath(&paths, 1, debugPathIterations);
+				ai.debugAIPath(&paths, state.getGoldenBuggyID(), debugPathIterations);
 				if (inputs[0].jump)
 					debugPathIterations++;
 
@@ -951,11 +1077,11 @@ void GameManager::gameLoop()
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
-			//renderer.useViewport(i+1);
+			renderer.useViewport(i+1);
 			//Debugging
 			if (displayDebugging && (i == 0))
 			{
-				ai.getPathAsLines(1, &path);
+				ai.getPathAsLines(state.getGoldenBuggyID(), &path);
 
 				renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
 				renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
@@ -967,7 +1093,7 @@ void GameManager::gameLoop()
 				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 			}
 
-			_interface.drawAll(&renderer);
+			_interface.drawAll(&renderer, 1 << (i+1));
 		}
 		
 
@@ -1029,10 +1155,18 @@ void GameManager::gameInit()
 {
 	gameOver = false;
 	
-	// temporary since we only have one level right now
-	createLevel(DONUTLEVEL);
-	MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+
+	if (selectedLevel == 1) {
+		// temporary since we only have one level right now
+		createLevel(DONUTLEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+		state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+	}
+	else if (selectedLevel == 0) {
+		createLevel(OLDLEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
+		state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+	}
 
 	initTestScene();
 }
@@ -1163,23 +1297,19 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 
+	// setup for displaying obtained powerups to the UI
 
-
-
-
-
+	powerupComponentID = _interface.generateComponentID();
+	_interface.toggleActive(powerupComponentID, false);
 
 	//Add dummy objects to interface
-	
-	/*
-	carSelectScreen = LoadTexture("menus/KoB_CarScreen.bmp");
+	/*carSelectScreen = LoadTexture("menus/opacity-512.png");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
-
+	_interface.setDisplayFilter(centerBox, DISPLAY::D2);
 
 	_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
-	*/
+	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);*/
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods

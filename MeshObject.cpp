@@ -78,3 +78,31 @@ vector<physx::PxVec3> MeshObject::getPhysicsVertices()
 }
 
 unsigned int MeshObject::getTextureID() { return textureID; }
+
+float MeshObject::getBoundingRadius()
+{
+	float maxRadius = 0.f;
+
+	vec3 center = getCenter();
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		maxRadius = max(length(center - vertices[i]), maxRadius);
+	}
+
+	return maxRadius;
+}
+
+vec3 MeshObject::getCenter()
+{
+	vec3 center (0.f, 0.f, 0.f);
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		center += vertices[i];
+	}
+
+	center /= (float)vertices.size();
+
+	return center;
+}

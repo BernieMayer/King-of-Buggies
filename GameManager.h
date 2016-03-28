@@ -42,6 +42,8 @@ private:
 
 	GLFWwindow* window;
 
+	MeshObject* levelMesh;
+
 	unsigned int winner;
 	bool gameOver;
 	bool displayDebugging = false;
@@ -85,10 +87,15 @@ private:
 
 	vector<int> playerColours;
 
+	unsigned int powerupComponentID;
+
+	int selectedLevel = 1;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 
 	void initMenus();
+	void changePlayerIcon(int playerNum, bool selected);
 
 	// create physics and render objects through GameState
 	void createPlayer(vec3 position, VehicleTraits traits, unsigned int textureID);		//Add forward parameter later, maybe also VehicleTraits

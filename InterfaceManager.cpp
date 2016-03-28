@@ -9,7 +9,9 @@ ComponentInfo::ComponentInfo() :
 	yOffset(0.f),
 	width(1.f),
 	height(1.f),
-	state(STATE::UP)
+	state(STATE::UP),
+	isActive(true),
+	displayFilter(DISPLAY::ALL)
 {
 	for (unsigned int i = 0; i < 3; i++)
 		texIDs[i] = NO_VALUE;
@@ -138,17 +140,30 @@ void InterfaceManager::setWindowDim(int width, int height)
 
 void InterfaceManager::draw(unsigned int id, Renderer* r)
 {
-	uiMat.useTextureShader();
-	Viewport vp = r->getActiveViewport();
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	uiMat.loadUniforms(vp.viewRatio*components[id].getMatrix(winRatio), mat4(1.f), vec3(), vec3(), components[id].texIDs[components[id].state], 0);
+	if (components[id].isActive) {
+		uiMat.useTextureShader();
+		Viewport vp = r->getActiveViewport();
 
-	r->loadVertUVBuffer(components[id].vertices, components[id].uvs);
+		uiMat.loadUniforms(components[id].getMatrix(winRatio*vp.viewRatio), mat4(1.f), vec3(), vec3(), components[id].texIDs[components[id].state], 0);
 
-	glDrawArrays(GL_TRIANGLES, 0, components[id].vertices->size());
+		r->loadVertUVBuffer(components[id].vertices, components[id].uvs);
+
+		glDrawArrays(GL_TRIANGLES, 0, components[id].vertices->size());
+	}
+
+	glDisable(GL_BLEND);
+	glDepthMask(GL_TRUE);
 }
 
 void InterfaceManager::drawAll(Renderer* r)
+{
+	drawAll(r, DISPLAY::ALL);
+}
+
+void InterfaceManager::drawAll(Renderer* r, unsigned int displayFilter)
 {
 	wWidth = r->getWidth();
 	wHeight = r->getHeight();
@@ -156,7 +171,9 @@ void InterfaceManager::drawAll(Renderer* r)
 
 	for (unsigned int i = 0; i < components.size(); i++)
 	{
-		draw(i, r);
+		unsigned int mask = components[i].displayFilter & displayFilter;
+		if (components[i].displayFilter & displayFilter)	
+			draw(i, r);
 	}
 }
 
@@ -206,6 +223,11 @@ void InterfaceManager::assignSquare(unsigned int id)
 	assignUVs(id, &squareUVs);
 }
 
+void InterfaceManager::setDisplayFilter(unsigned int id, unsigned int displayFilter)
+{
+	components[id].displayFilter = displayFilter | DISPLAY::ALL;
+}
+
 void InterfaceManager::setDimensions(unsigned int id, float xOffset, float yOffset, float width, float height, unsigned int anchor)
 {
 	components[id].xOffset = xOffset;
@@ -213,6 +235,11 @@ void InterfaceManager::setDimensions(unsigned int id, float xOffset, float yOffs
 	components[id].width = width;
 	components[id].height = height;
 	components[id].anchorPoint = anchor;
+}
+
+void InterfaceManager::toggleActive(unsigned int id, bool isActive)
+{
+	components[id].isActive = isActive;
 }
 
 vector<vec3>* InterfaceManager::storeVertices(vector<vec3>* vertices)

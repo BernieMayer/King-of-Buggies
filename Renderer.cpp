@@ -190,8 +190,108 @@ void Renderer::setLightPosition(unsigned int id, vec3 lightPos)
 
 
 /**
+* Framebuffers
+**/
+
+mat4 Framebuffer::ratioMatrix()
+{
+	mat4 ratio(1.f);
+
+	float minDim = min((float)width,  (float)height);
+
+	ratio[0][0] = (float)width / minDim;
+	ratio[1][1] = (float)height / minDim;
+
+	return ratio;
+}
+
+unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height)
+{
+	GLuint fb, fb_texture;
+	glGenFramebuffers(1, &fb);
+	glGenTextures(1, &fb_texture);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fb);
+
+	glBindTexture(GL_TEXTURE_2D, fb_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, width, width, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fb_texture, 0);
+
+	glDrawBuffer(GL_NONE);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		cout << "Framebuffer initialization failed" << endl;
+
+	//Return to normal frame buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDrawBuffer(GL_FRONT);
+
+	fbo.push_back(Framebuffer(fb, fb_texture, width, height, Framebuffer::DEPTH));
+
+	return fbo.size() - 1;
+}
+
+void Renderer::useFramebuffer(unsigned int id)
+{
+	if (id == NO_VALUE)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDrawBuffer(GL_FRONT);
+	}
+	else
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo[id].id);
+		glDrawBuffer(GL_NONE);
+	}
+
+	activeFramebuffer = id;
+}
+
+
+/**
 * Transformations
 **/
+
+
+mat4 perspectiveMatrix(float n, float f, float fov)
+{
+	float angle = fov*M_PI / 180.f;
+
+	float width = tan(angle*0.5f)*n;
+	float height = tan(angle*0.5f)*n;
+
+	//printf("Width %f\nHeight %f\n", width, height);
+
+	mat4 perspective = mat4(1.0);
+
+	perspective[0][0] = n / width;
+	perspective[1][1] = n / height;
+	perspective[2][2] = -(f + n) / (f - n);
+	perspective[3][2] = -2 * f*n / (f - n);
+	perspective[2][3] = -1.f;
+	perspective[3][3] = 0.f;
+
+	return perspective;
+}
+
+mat4 orthographicMatrix(float n, float f, float width, float height)
+{
+	mat4 orthographic = mat4(1.f);
+
+	orthographic[0][0] = 2.f / width;
+	orthographic[1][1] = 2.f / height;
+	orthographic[3][3] = 1.f / (f - n);
+	orthographic[3][2] = -n / (f - n);
+
+	return orthographic;
+}
 
 void Renderer::loadModelviewTransform(const mat4& _modelview)
 {
@@ -205,28 +305,40 @@ void Renderer::loadProjectionTransform(const mat4& _projection)
 
 void Renderer::loadPerspectiveTransform(float n, float f, float fov)
 {
-	float angle = fov*M_PI / 180.f;
-
-	float width = tan(angle*0.5f)*n;
-	float height = tan(angle*0.5f)*n;
-
-	printf("Width %f\nHeight %f\n", width, height);
-
-	mat4 perspective = mat4(1.0);
-
-	perspective[0][0] = n / width;
-	perspective[1][1] = n/ height;
-	perspective[2][2] = -(f + n) / (f - n);
-	perspective[3][2] = -2*f*n / (f - n);
-	perspective[2][3] = -1.f;
-	perspective[3][3] = 0.f;
-
-	projection = perspective;
+	loadProjectionTransform(perspectiveMatrix(n, f, fov));
 }
+
+void Renderer::loadOrthographicTransform(float n, float f, float width, float height)
+{
+	loadProjectionTransform(orthographicMatrix(n, f, width, height));
+}
+
+void Renderer::loadPerspectiveTransformShadow(float n, float f, float fov)
+{
+	loadProjectionTransform(perspectiveMatrix(n, f, fov));
+}
+
+void Renderer::loadOrthographicTransformShadow(float n, float f, float width, float height)
+{
+	loadProjectionTransform(orthographicMatrix(n, f, width, height));
+}
+
 
 void Renderer::loadCamera(Camera* _camera)
 {
 	camera = _camera;
+}
+
+void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float boundingRadius)
+{
+	cam = Camera(sceneCenter + pos, vec3(0.f, 1.f, 0.f), normalize(-pos));
+
+	projection = orthographicMatrix(length(pos) - boundingRadius, length(pos) + boundingRadius, boundingRadius, boundingRadius);
+}
+
+void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)
+{
+	lights[lightID].positionCamera(sceneCenter, boundingRadius);
 }
 
 
@@ -353,6 +465,43 @@ void Renderer::clearDrawBuffers(vec3 color)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Renderer::drawShadow(unsigned int id, unsigned int lightID)
+{
+	ObjectInfo& object = objects[id];
+	if (object.deleted)
+		return;
+
+	LightInfo light;
+	if (lights.size() < 1)		//If no light, add a default light to scene
+		light = LightInfo();
+	else
+		light = lights[0];		//Else, use first light in array
+
+	shadow.useShader();		//Use shadow map shader
+
+	//Object
+	mat4 cameraMatrix = lights[lightID].cam.getMatrix();
+	mat4 projectionMatrix = fbo[activeFramebuffer].ratioMatrix()*lights[lightID].projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	shadow.loadUniforms(projectionMatrix, modelviewMatrix);
+
+	loadBuffers(object);
+
+	if (object.indices != NULL)
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+}
+
+void Renderer::drawShadowAll(unsigned int lightID)
+{
+	for (unsigned int i = 0; i < objects.size(); i++)
+	{
+		drawShadow(i, lightID);
+	}
+}
+
 void Renderer::draw(unsigned  int id)
 {
 
@@ -449,7 +598,8 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 
 	glEnd();
 	
-	glViewport(0,0, windowWidth, windowHeight);
+	//glViewport(0,0, windowWidth, windowHeight);
+	useViewport(activeViewport);
 }
 
 void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers)
@@ -591,13 +741,13 @@ bool Renderer::loadBuffers(const ObjectInfo& object)
 {
 	bool success = false;
 
-	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL))
+	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL) && (object.mat->buffersUsed() & (Material::VERTICES | Material::NORMALS | Material::UVS)))
 		success = loadVertNormalUVBuffer(object);
-	else if ((object.mesh != NULL) && (object.normals != NULL))
+	else if ((object.mesh != NULL) && (object.normals != NULL) && (object.mat->buffersUsed() & (Material::VERTICES | Material::NORMALS)))
 		success = loadVertNormalBuffer(object);
-	else if ((object.mesh != NULL) && (object.uvs != NULL))
+	else if ((object.mesh != NULL) && (object.uvs != NULL) && (object.mat->buffersUsed() & (Material::VERTICES | Material::UVS)))
 		success = loadVertUVBuffer(object);
-	else if (object.mesh != NULL)
+	else if ((object.mesh != NULL) && (object.mat->buffersUsed() & (Material::VERTICES)))
 		success = loadVertBuffer(object);
 	else
 	{

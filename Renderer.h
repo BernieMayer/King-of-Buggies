@@ -15,6 +15,7 @@
 #include "diffuse.h"
 #include "torranceSparrow.h"
 #include "unshaded.h"
+#include "shadow.h"
 #include "GameState.h"
 
 using namespace std;
@@ -25,7 +26,11 @@ using namespace glm;
 #define M_PI  3.14159265358979323846f
 
 struct SHADOW_BEHAVIOUR{
-	enum { CAST = 0, RECEIVE, CAST_AND_RECEIVE, NONE };
+	enum {
+			NONE	= 0,
+			CAST	= 1 << 0, 
+			RECEIVE = 1 << 1
+			 };
 };
 struct VAO{
 	enum { VERT = 0, VERT_NORMALS, VERT_UVS, VERT_NORMALS_UVS, COUNT };
@@ -42,6 +47,18 @@ struct Viewport{
 	const unsigned int DEFAULT = 0;
 
 	Viewport(float x, float y, float width, float height);
+};
+
+struct Framebuffer{
+	GLuint id, texture;
+	unsigned int width, height;
+	unsigned int type;
+
+	enum { DEPTH, COLOR };
+
+	Framebuffer(GLuint id, GLuint texture, unsigned int width, unsigned int height, unsigned int type) :id(id), texture(texture), width(width), height(height), type(type) {}
+
+	mat4 ratioMatrix();
 };
 
 const unsigned int DEFAULT_WIDTH = 800;
@@ -74,8 +91,12 @@ private:
 	public:
 		vec3 pos;
 		bool deleted;
+		Camera cam;
+		mat4 projection;
 
 		LightInfo();
+
+		void positionCamera(vec3 sceneCenter, float boundingRadius);
 
 	};
 
@@ -88,16 +109,20 @@ private:
 	vector<Viewport> viewports;
 
 	unsigned int activeViewport;
+	unsigned int activeFramebuffer;
 
 	//Transform matrices
 	mat4 projection;
 	mat4 modelview;
 
 	Camera* camera;
+	Camera lightCamera;
 
+	Shadow shadow;
 
 	GLuint vao[VAO::COUNT];
 	GLuint vbo[VBO::COUNT];
+	vector<Framebuffer> fbo;
 
 	bool debugging;
 
@@ -125,7 +150,10 @@ public:
 	void loadProjectionTransform(const mat4& _projection);
 	void loadPerspectiveTransform(float near, float far, float fov);
 	void loadOrthographicTransform(float near, float far, float width, float height);
+	void loadPerspectiveTransformShadow(float near, float far, float fov);
+	void loadOrthographicTransformShadow(float near, float far, float width, float height);
 	void loadCamera(Camera* _camera);
+	void positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius);	//Sets up light camera and projection
 
 	//Drawable objects
 	unsigned int generateObjectID();
@@ -170,11 +198,20 @@ public:
 	void enableShadowCasting(unsigned int object);
 	void disableShadowCasting(unsigned int object);
 
+	//Framebuffer objects
+	unsigned int createFramebuffer(unsigned int width, unsigned int height);
+	unsigned int createDepthbuffer(unsigned int width, unsigned int height);
+	void useFramebuffer(unsigned int id);		//NO_VALUE uses default framebuffer
+	GLuint getFramebufferTexture(unsigned int id) { return fbo[id].texture; }
+	void deleteFramebuffer(unsigned int id);
+
 	//Drawing calls
 	void clearDrawBuffers(vec3 color);
 	void draw(unsigned int object);
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
+	void drawDepth(unsigned int fbo, unsigned int lightID, unsigned int objectID);
+
 	void drawRadar(vector<vec2> radarVecs);
 	void drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers);
 
@@ -182,6 +219,10 @@ public:
 	//Debugging draw calls
 	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);
+
+	//Draw shadow map
+	void drawShadow(unsigned int id, unsigned int lightID);
+	void drawShadowAll(unsigned int lightID);
 
 	//Viewports
 	unsigned int addViewport(float x, float y, float width, float height);	//Set viewport in 0 to 1 floats

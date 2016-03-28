@@ -18,6 +18,8 @@ public:
 		vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit);
 
 	void setShininess(float _shininess);
+
+	virtual unsigned int buffersUsed() { return VERTICES | NORMALS | UVS; }
 };
 
 

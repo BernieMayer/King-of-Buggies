@@ -39,6 +39,7 @@ void ShaderList::initShaders()
 	shaderIDs[ShaderList::TORRANCE_SPARROW_TEX] = GetShader("torranceSparrowTex");
 	shaderIDs[ShaderList::UNSHADED] = GetShader("unshaded");
 	shaderIDs[ShaderList::UNSHADED_TEX] = GetShader("unshadedTex");
+	shaderIDs[ShaderList::SHADOW] = GetShader("shadow");
 
 }
 

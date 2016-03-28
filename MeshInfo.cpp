@@ -91,6 +91,16 @@ MeshInfo::MeshInfo() {
 	buggyTexIDs.push_back(purpleBuggyTexID);
 
 	goldenBuggyTexID = LoadTexture("textures\\goldenbuggytexture.png");
+
+	// load UI textures for displaying powerup information
+
+	UInitroID = LoadTexture("textures\\hud\\nitro.png");
+	UIbombID = LoadTexture("textures\\hud\\bomb.png");
+	UImineID = LoadTexture("textures\\hud\\mine.png");
+
+	UIcomponentIDs.push_back(UInitroID);
+	UIcomponentIDs.push_back(UIbombID);
+	UIcomponentIDs.push_back(UImineID);
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
@@ -132,3 +142,14 @@ unsigned int MeshInfo::getOrangeBuggyTexID() { return orangeBuggyTexID; }
 unsigned int MeshInfo::getPurpleBuggyTexID() { return purpleBuggyTexID; }
 
 unsigned int MeshInfo::getGoldenBuggyTexID() { return goldenBuggyTexID; }
+
+
+unsigned int MeshInfo::getUInitroID() { return UInitroID; }
+
+unsigned int MeshInfo::getUIbombID() { return UIbombID; }
+
+unsigned int MeshInfo::getUImineID() { return UImineID; }
+
+unsigned int MeshInfo::getUIcomponentID(unsigned int itemType) {
+	return UIcomponentIDs[itemType];
+}
