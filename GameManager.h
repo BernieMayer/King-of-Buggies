@@ -24,6 +24,7 @@ private:
 	Specular shinyMat;
 	TorranceSparrow tsMat;
 	TorranceSparrow matteMat;
+	Shadow shadowMat;
 
 	GameState state;
 	AIManager ai = AIManager(&state);
@@ -43,6 +44,8 @@ private:
 	GLFWwindow* window;
 
 	MeshObject* levelMesh;
+
+	unsigned int fbo;
 
 	unsigned int winner;
 	bool gameOver;

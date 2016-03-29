@@ -172,7 +172,7 @@ void InterfaceManager::drawAll(Renderer* r, unsigned int displayFilter)
 	for (unsigned int i = 0; i < components.size(); i++)
 	{
 		unsigned int mask = components[i].displayFilter & displayFilter;
-		if (components[i].displayFilter & displayFilter)	
+		if (components[i].displayFilter & (displayFilter | 1))	
 			draw(i, r);
 	}
 }
@@ -225,7 +225,7 @@ void InterfaceManager::assignSquare(unsigned int id)
 
 void InterfaceManager::setDisplayFilter(unsigned int id, unsigned int displayFilter)
 {
-	components[id].displayFilter = displayFilter | DISPLAY::ALL;
+	components[id].displayFilter = displayFilter;
 }
 
 void InterfaceManager::setDimensions(unsigned int id, float xOffset, float yOffset, float width, float height, unsigned int anchor)

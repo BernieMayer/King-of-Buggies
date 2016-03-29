@@ -17,6 +17,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	tsMat = TorranceSparrow(10.f);
 	matteMat = TorranceSparrow(0.5f);
 	skyMaterial = Unshaded();
+	shadowMat = Shadow();
 
 	timePassedDecoy = 0;
 
@@ -181,7 +182,7 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 
 	surfaceRenderID = renderer.generateObjectID();
 	renderer.assignPlane(surfaceRenderID, 30.f, &surfaceVertices, &surfaceNormals, &surfaceIndices);
-	renderer.assignMaterial(surfaceRenderID, &matteMat);
+	renderer.assignMaterial(surfaceRenderID, &tsMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 
 }
@@ -199,7 +200,7 @@ void GameManager::createLevel(unsigned int objectID) {
 	surfaceRenderID = renderer.generateObjectID();
 
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
-	renderer.assignMaterial(surfaceRenderID, &tsMat);
+	renderer.assignMaterial(surfaceRenderID, &matteMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 	if (selectedLevel == 1) {
 		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
@@ -1055,6 +1056,12 @@ void GameManager::gameLoop()
 
 			//Render
 			renderer.useViewport(i+1);
+
+			renderer.useFramebuffer(fbo);
+			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+			renderer.drawShadowAll(0);
+			renderer.useFramebuffer(NO_VALUE);
+
 			renderer.drawAll();
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
@@ -1074,6 +1081,11 @@ void GameManager::gameLoop()
 			{
 				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 			}
+
+			/*renderer.useFramebuffer(fbo);
+			renderer.clearDrawBuffers(1.f, 1.f, 1.f);
+			renderer.drawShadowAll(0);
+			renderer.useFramebuffer(NO_VALUE);		//Return to original frambuffer*/
 
 			_interface.drawAll(&renderer, 1 << (i+1));
 		}
@@ -1285,13 +1297,17 @@ void GameManager::initTestScene()
 	_interface.toggleActive(powerupComponentID, false);
 
 	//Add dummy objects to interface
-	/*carSelectScreen = LoadTexture("menus/opacity-512.png");
+	carSelectScreen = LoadTexture("menus/opacity-512.png");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
-	_interface.setDisplayFilter(centerBox, DISPLAY::D2);
+	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
 
-	_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);*/
+	fbo = renderer.createFramebuffer(500, 500);
+	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
+
+	_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
+	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods

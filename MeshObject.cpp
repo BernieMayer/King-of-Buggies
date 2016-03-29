@@ -102,7 +102,7 @@ vec3 MeshObject::getCenter()
 		center += vertices[i];
 	}
 
-	center /= (float)vertices.size();
+	center = center/(float)vertices.size();
 
 	return center;
 }

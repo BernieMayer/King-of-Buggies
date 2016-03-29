@@ -214,7 +214,7 @@ unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height
 	glBindFramebuffer(GL_FRAMEBUFFER, fb);
 
 	glBindTexture(GL_TEXTURE_2D, fb_texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, width, width, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -222,9 +222,9 @@ unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fb_texture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, fb_texture, 0);
 
-	glDrawBuffer(GL_NONE);
+	//glDrawBuffer(GL_NONE);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		cout << "Framebuffer initialization failed" << endl;
@@ -238,17 +238,52 @@ unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height
 	return fbo.size() - 1;
 }
 
+unsigned int Renderer::createFramebuffer(unsigned int width, unsigned int height)
+{
+	GLuint fb, fb_texture;
+	glGenFramebuffers(1, &fb);
+	glGenTextures(1, &fb_texture);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, fb);
+
+	glBindTexture(GL_TEXTURE_2D, fb_texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fb_texture, 0);
+
+	//glDrawBuffer(GL_NONE);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		cout << "Framebuffer initialization failed" << endl;
+
+	//Return to normal frame buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDrawBuffer(GL_FRONT);
+
+	fbo.push_back(Framebuffer(fb, fb_texture, width, height, Framebuffer::COLOR));
+
+	return fbo.size() - 1;
+}
+
 void Renderer::useFramebuffer(unsigned int id)
 {
 	if (id == NO_VALUE)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDrawBuffer(GL_FRONT);
+		useViewport(activeViewport);
 	}
 	else
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo[id].id);
-		glDrawBuffer(GL_NONE);
+		//glDrawBuffer(GL_NONE);
+		glViewport(0, 0, fbo[id].width, fbo[id].height);
 	}
 
 	activeFramebuffer = id;
@@ -331,9 +366,9 @@ void Renderer::loadCamera(Camera* _camera)
 
 void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float boundingRadius)
 {
-	cam = Camera(sceneCenter + pos, vec3(0.f, 1.f, 0.f), normalize(-pos));
+	cam = Camera(normalize(pos), vec3(0.f, 1.f, 0.f), sceneCenter + pos);
 
-	projection = orthographicMatrix(length(pos) - boundingRadius, length(pos) + boundingRadius, boundingRadius, boundingRadius);
+	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius*0.01f, length(pos+sceneCenter) + boundingRadius*0.01f, boundingRadius, boundingRadius);
 }
 
 void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)

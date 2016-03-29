@@ -29,7 +29,6 @@ public:
 };
 
 enum DISPLAY{
-	ALL = 1,
 	D1	= (1 << 1),
 	D2	= (1 << 2),
 	D3	= (1 << 3),
@@ -38,7 +37,8 @@ enum DISPLAY{
 	D6	= (1 << 6),
 	D7	= (1 << 7),
 	D8	= (1 << 8),
-	D9	= (1 << 9)
+	D9	= (1 << 9),
+	ALL = D1 | D2 | D3 | D4 | D5 | D6 | D7 | D8 | D9
 };
 
 //Determines which corner UI elements are anchored from
