@@ -384,10 +384,29 @@ void GameManager::initMenus() {
 	while (currentMenu <= lastMenu) {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
-
 		vector<Input> in;
 		for (int i = 1; i <= input.getNumPlayers(); i++) {
 			in.push_back(smoothers[i].smooth(input.getInput(i), false));
+		}
+
+		if (in[0].horn) {
+			_interface.clear();
+
+			// Clear input so no input given for new menu on transition frame
+			for (int i = 0; i < in.size(); i++) {
+				in[i].jump = false;
+				in[i].menu = false;
+				in[i].powerup = false;
+				in[i].tiltBackward = 0;
+				in[i].tiltForward = 0;
+				in[i].turnL = 0;
+				in[i].turnR = 0;
+			}
+
+			sound.playDingSound();
+			gameInit();
+
+			return;
 		}
 		if ((in[0].menu || in[0].powerup || in[0].jump || in[0].horn || in[0].drift) && currentMenu == 0) {
 			currentMenu++;
