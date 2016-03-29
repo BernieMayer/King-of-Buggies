@@ -376,7 +376,7 @@ void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float boundingRadius)
 {
 	cam = Camera(normalize(pos), vec3(0.f, 1.f, 0.f), sceneCenter + pos);
 
-	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius, length(pos+sceneCenter) + boundingRadius, 2.f*boundingRadius, 2.f*boundingRadius);
+	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius*0.2f, length(pos+sceneCenter) + boundingRadius*0.2f, 2.f*boundingRadius, 2.f*boundingRadius);
 }
 
 void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)
@@ -553,7 +553,7 @@ void Renderer::drawAllWithShadows(unsigned int shadowTexture, unsigned int light
 {
 	for (unsigned int i = 0; i < objects.size(); i++)
 	{
-		if (false)	//objects[i].shadowBehaviour & SHADOW_BEHAVIOUR::RECEIVE)
+		if (objects[i].shadowBehaviour & SHADOW_BEHAVIOUR::RECEIVE)
 			drawWithShadows(i, shadowTexture, lightID);
 		else
 			draw(i);

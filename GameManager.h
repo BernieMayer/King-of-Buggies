@@ -91,6 +91,8 @@ private:
 	vector<int> playerColours;
 
 	vector<unsigned int> powerupComponentIDs;
+	
+	vector<unsigned int> playerCoinIDs;
 
 	int selectedLevel = 1;
 
@@ -124,6 +126,7 @@ public:
 	void gameLoop();
 	void gameInit();
 	void initTestScene();
+	void initUI();
 	void quitGame(unsigned int winnerID);
 
 	int randomPowerup();

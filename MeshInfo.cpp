@@ -101,6 +101,17 @@ MeshInfo::MeshInfo() {
 	UIcomponentIDs.push_back(UInitroID);
 	UIcomponentIDs.push_back(UIbombID);
 	UIcomponentIDs.push_back(UImineID);
+
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\0.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\1.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\2.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\3.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\4.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\5.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\6.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\7.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\8.png"));
+	coinComponentIDs.push_back(LoadTexture("textures\\hud\\9.png"));
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
@@ -152,4 +163,8 @@ unsigned int MeshInfo::getUImineID() { return UImineID; }
 
 unsigned int MeshInfo::getUIcomponentID(unsigned int itemType) {
 	return UIcomponentIDs[itemType];
+}
+
+unsigned int MeshInfo::getCoinComponentID(unsigned int number) {
+	return coinComponentIDs[number];
 }

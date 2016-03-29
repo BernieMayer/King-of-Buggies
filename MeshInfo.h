@@ -35,6 +35,8 @@ public:
 
 	unsigned int getUIcomponentID(unsigned int itemType);
 
+	unsigned int getCoinComponentID(unsigned int number);
+
 	MeshInfoLoader meshLoader;
 
 private:
@@ -51,6 +53,8 @@ private:
 	unsigned int UImineID;
 
 	vector<unsigned int> UIcomponentIDs;
+
+	vector<unsigned int> coinComponentIDs;
 };
 
 #endif // MESHINFO_H

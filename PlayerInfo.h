@@ -46,6 +46,8 @@ public:
 	void removePowerup();
 	int getCurrentPowerup();
 
+	void addCoin();
+	int getNumCoins();
 	
 	void removeEnergyForNitro(float nitro);
 	void setEnergyForNitro(float nitro);

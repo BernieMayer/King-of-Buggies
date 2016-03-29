@@ -878,21 +878,17 @@ void GameManager::gameLoop()
 
 					if (powerUpId == POWERUPS::NITROBOOST)
 					{
-
-
 						if (state.getPlayer(i)->getEnergyForNitro() > 0.0f)
 						{
 							state.getPlayer(i)->removeEnergyForNitro(30);
 							physics.applyNitroBoost(i);
-							//sound.playNitroSound(state.getPlayer(i)->getPos());
+							sound.playNitroSound(state.getPlayer(i)->getPos());
 							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
 							printf("Current energy level %f \n", state.getPlayer(i)->getEnergyForNitro());
 						}
 						else {
-							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
-							state.getPlayer(i)->setEnergyForNitro(300.0f);
-							printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
-
+							_interface.toggleActive(powerupComponentIDs[i], false);
+							hasPowerup.at(i) = false;
 						}
 					}
 					else if (powerUpId == POWERUPS::BOMB)
@@ -927,18 +923,10 @@ void GameManager::gameLoop()
 						}
 					}
 
-
-					//might add decoy to this 
-					if (powerUpId == POWERUPS::NITROBOOST)
-					{
-						hasPowerup.at(i) = true;
-					}
-					else
-					{
+					if (powerUpId != POWERUPS::NITROBOOST) {
+						_interface.toggleActive(powerupComponentIDs[i], false);
 						hasPowerup.at(i) = false;
 					}
-
-					_interface.toggleActive(powerupComponentIDs[i], false);
 				}
 			}
 		}
@@ -977,17 +965,17 @@ void GameManager::gameLoop()
 
 					hasPowerup[vehicleId] = true;
 					int powerUpType = randomPowerup();
-					if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-						powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					if (powerUpType == POWERUPS::NITROBOOST) {
+						state.getPlayer(i)->setEnergyForNitro(300.0f);
+						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
+					}
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
-					// display powerup information in HUD for any non-AI players
-					//if (!state.getPlayer(vehicleId)->isAI()) {
-					_interface.assignSquare(powerupComponentIDs[vehicleId]);
+					// display powerup information in HUD
 					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-					_interface.setDimensions(powerupComponentIDs[vehicleId], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
 					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
-					//}
 
 					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 				}
@@ -1014,6 +1002,9 @@ void GameManager::gameLoop()
 					//TODO change to all
 					physics.modifySpeed(i, 0.3333f);
 					sound.playDingSound(state.getPlayer(i)->getPos());
+					state.getPlayer(i)->addCoin();
+					printf("Player %i coin number: %i", i, state.getPlayer(i)->getNumCoins());
+					_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
 				}
 
 				if (hasBoostPadCollision){
@@ -1368,11 +1359,52 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 
-	// setup for displaying obtained powerups to the UI
+	initUI();
+
+	//Add dummy objects to interface
+	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	//unsigned int centerBox = _interface.generateComponentID();
+	//_interface.assignSquare(centerBox);
+	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
+
+	fbo = renderer.createDepthbuffer(2000, 2000);
+	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
+
+	//_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
+	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
+	//_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
+
+	
+	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
+	
+}
+
+void GameManager::initUI()
+{
+	// setup for displaying each player's number of coins
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) { // 10 = textures for numbers 0-9, plus the coin icon texture
+		playerCoinIDs.push_back(_interface.generateComponentID());
+
+		_interface.assignSquare(playerCoinIDs[i]);
+		_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(0), ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(playerCoinIDs[i], -.6f, 1.f, 0.3f, 0.15f, ANCHOR::TOP_LEFT);
+
+		int display;
+		if (i == 0) { display = DISPLAY::D1; }
+		else if (i == 1) { display = DISPLAY::D2; }
+		else if (i == 2) { display = DISPLAY::D3; }
+		else if (i == 3) { display = DISPLAY::D4; }
+
+		_interface.setDisplayFilter(playerCoinIDs[i], display);
+		_interface.setDisplayFilter(playerCoinIDs[i], display);
+	}
 
 	// setup for displaying obtained powerups to the UI
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 		powerupComponentIDs.push_back(_interface.generateComponentID());
+
+		_interface.assignSquare(powerupComponentIDs[i]);
+		_interface.setDimensions(powerupComponentIDs[i], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
 		_interface.toggleActive(powerupComponentIDs[i], false);
 
 		// set display filter for each player's indicator
@@ -1389,9 +1421,6 @@ void GameManager::initTestScene()
 			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
 	}
 
-	fbo = renderer.createFramebuffer(500, 500);
-	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
-
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
 	//unsigned int centerBox = _interface.generateComponentID();
@@ -1404,8 +1433,6 @@ void GameManager::initTestScene()
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
-
-	
 }
 
 int GameManager::randomPowerup()
