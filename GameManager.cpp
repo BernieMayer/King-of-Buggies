@@ -1075,7 +1075,25 @@ void GameManager::gameLoop()
 			renderer.useViewport(i+1);
 			renderer.drawAll();
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
-			renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
+			//Should be in a for loop for every player
+			
+			vector<vec2> radarPos = state.setupRadar(0);
+			vector<vec3> coloursRadar;
+			for (int i = 0; i < state.numberOfPlayers(); i++)
+			{
+				if (state.getPlayer(i)->isGoldenBuggy())
+				{
+					// 	rgb(255,215,0)
+					coloursRadar.push_back(vec3(255.0f/255.0f, 215.0f/255.0f, 0.0));
+				}
+				else
+				{
+					coloursRadar.push_back(state.getPlayer(i)->getColour());
+				}
+			}
+			renderer.drawRadar(radarPos, coloursRadar);
+
+			//renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
 			renderer.useViewport(i+1);
 			//Debugging
