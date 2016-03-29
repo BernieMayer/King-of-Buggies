@@ -296,11 +296,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 		alSourcefv(engineSources[i], AL_POSITION, SourcePos);
 		alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 		alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
-	}
-}
 
-void SoundManager::updateHonks(GameState state, Input inputs[]) {
-	for (int i = 0; i < state.numberOfPlayers(); i++) {
 		if (inputs[i].horn) {
 			if (!honking[i]) {
 
@@ -341,6 +337,12 @@ void SoundManager::updateHonks(GameState state, Input inputs[]) {
 				honking[i] = false;
 			}
 		}
+	}
+}
+
+void SoundManager::updateHonks(GameState state, Input inputs[]) {
+	for (int i = 0; i < state.numberOfPlayers(); i++) {
+		
 	}
 }
 
@@ -598,7 +600,7 @@ void SoundManager::playLossSound(vec3 pos) {
 }
 
 void SoundManager::playMineExplosionSound(vec3 pos) {
-	playSound("LittleBoom.wav", pos, 1.0f);
+	playSound("MineExplosion.wav", pos, 1.0f);
 }
 
 void SoundManager::playSound(string fileName, vec3 pos, float volume) {
@@ -648,7 +650,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	updateEngineSounds(state, inputs);
 	updateFuses(state);
 
-	updateHonks(state, inputs);
+	//updateHonks(state, inputs);
 
 	cleanOneTimeUseSources();
 

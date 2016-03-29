@@ -860,6 +860,7 @@ void GameManager::gameLoop()
 						{
 							state.getPlayer(i)->removeEnergyForNitro(30);
 							physics.applyNitroBoost(i);
+							//sound.playNitroSound(state.getPlayer(i)->getPos());
 							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
 							printf("Current energy level %f \n", state.getPlayer(i)->getEnergyForNitro());
 						}
@@ -877,6 +878,7 @@ void GameManager::gameLoop()
 					else if (powerUpId == POWERUPS::MINE)
 					{
 						createMine(i);
+						sound.playMineCreationSound(state.getPlayer(i)->getPos());
 					}
 					else if (powerUpId == POWERUPS::COIN)
 					{

@@ -30,6 +30,8 @@ public:
 	void playWinSound(vec3 pos);
 	void playLossSound(vec3 pos);
 	void playMineExplosionSound(vec3 pos);
+	void playMineCreationSound(vec3 pos) { playSound("MinePlace.wav", pos, 1.0f); }
+	void playNitroSound(vec3 pos) { playSound("Nitro.wav", pos, 1.0f); }
 
 	void startMenuSong(GameState state);
 	void updateMenuSong(GameState state);
