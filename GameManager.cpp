@@ -874,21 +874,17 @@ void GameManager::gameLoop()
 
 					if (powerUpId == POWERUPS::NITROBOOST)
 					{
-
-
 						if (state.getPlayer(i)->getEnergyForNitro() > 0.0f)
 						{
 							state.getPlayer(i)->removeEnergyForNitro(30);
 							physics.applyNitroBoost(i);
-							//sound.playNitroSound(state.getPlayer(i)->getPos());
+							sound.playNitroSound(state.getPlayer(i)->getPos());
 							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
 							printf("Current energy level %f \n", state.getPlayer(i)->getEnergyForNitro());
 						}
 						else {
-							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
-							state.getPlayer(i)->setEnergyForNitro(300.0f);
-							printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
-
+							_interface.toggleActive(powerupComponentIDs[i], false);
+							hasPowerup.at(i) = false;
 						}
 					}
 					else if (powerUpId == POWERUPS::BOMB)
@@ -923,18 +919,10 @@ void GameManager::gameLoop()
 						}
 					}
 
-
-					//might add decoy to this 
-					if (powerUpId == POWERUPS::NITROBOOST)
-					{
-						hasPowerup.at(i) = true;
-					}
-					else
-					{
+					if (powerUpId != POWERUPS::NITROBOOST) {
+						_interface.toggleActive(powerupComponentIDs[i], false);
 						hasPowerup.at(i) = false;
 					}
-
-					_interface.toggleActive(powerupComponentIDs[i], false);
 				}
 			}
 		}
@@ -973,8 +961,12 @@ void GameManager::gameLoop()
 
 					hasPowerup[vehicleId] = true;
 					int powerUpType = randomPowerup();
-					if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-						powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					if (powerUpType == POWERUPS::NITROBOOST) {
+						state.getPlayer(i)->setEnergyForNitro(300.0f);
+						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
+					}
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 					// display powerup information in HUD for any non-AI players
