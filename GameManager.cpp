@@ -969,13 +969,9 @@ void GameManager::gameLoop()
 					}
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
-					// display powerup information in HUD for any non-AI players
-					//if (!state.getPlayer(vehicleId)->isAI()) {
-					_interface.assignSquare(powerupComponentIDs[vehicleId]);
+					// display powerup information in HUD
 					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-					_interface.setDimensions(powerupComponentIDs[vehicleId], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
 					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
-					//}
 
 					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 				}
@@ -1004,6 +1000,7 @@ void GameManager::gameLoop()
 					sound.playDingSound(state.getPlayer(i)->getPos());
 					state.getPlayer(i)->addCoin();
 					printf("Player %i coin number: %i", i, state.getPlayer(i)->getNumCoins());
+					_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
 				}
 
 				if (hasBoostPadCollision){
@@ -1355,26 +1352,7 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 
-	// setup for displaying each player's number of coins
-
-	// setup for displaying obtained powerups to the UI
-	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-		powerupComponentIDs.push_back(_interface.generateComponentID());
-		_interface.toggleActive(powerupComponentIDs[i], false);
-
-		// set display filter for each player's indicator
-		if (i == 0)
-			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D1);
-
-		else if (i == 1)
-			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D2);
-
-		else if (i == 2)
-			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D3);
-
-		else if (i == 3)
-			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
-	}
+	initUI();
 
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
@@ -1391,8 +1369,50 @@ void GameManager::initTestScene()
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
-
 	
+}
+
+void GameManager::initUI()
+{
+	// setup for displaying each player's number of coins
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) { // 10 = textures for numbers 0-9, plus the coin icon texture
+		playerCoinIDs.push_back(_interface.generateComponentID());
+
+		_interface.assignSquare(playerCoinIDs[i]);
+		_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(0), ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(playerCoinIDs[i], -.6f, 1.f, 0.3f, 0.15f, ANCHOR::TOP_LEFT);
+
+		int display;
+		if (i == 0) { display = DISPLAY::D1; }
+		else if (i == 1) { display = DISPLAY::D2; }
+		else if (i == 2) { display = DISPLAY::D3; }
+		else if (i == 3) { display = DISPLAY::D4; }
+
+		_interface.setDisplayFilter(playerCoinIDs[i], display);
+		_interface.setDisplayFilter(playerCoinIDs[i], display);
+	}
+
+	// setup for displaying obtained powerups to the UI
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		powerupComponentIDs.push_back(_interface.generateComponentID());
+
+		_interface.assignSquare(powerupComponentIDs[i]);
+		_interface.setDimensions(powerupComponentIDs[i], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+		_interface.toggleActive(powerupComponentIDs[i], false);
+
+		// set display filter for each player's indicator
+		if (i == 0)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D1);
+
+		else if (i == 1)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D2);
+
+		else if (i == 2)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D3);
+
+		else if (i == 3)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
+	}
 }
 
 int GameManager::randomPowerup()
