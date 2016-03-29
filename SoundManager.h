@@ -47,6 +47,7 @@ private:
 	int menuSongCounter = 0;
 	int menuSongCounterMax = 15;
 	void initOpenAL(GameState state);
+	bool initSuccess = true;
 	
 	float distanceVolumeAdjuster(float volume, vec3 pos);
 	void updateListener(GameState state);
