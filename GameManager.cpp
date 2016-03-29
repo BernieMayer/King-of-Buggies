@@ -540,7 +540,7 @@ void GameManager::initMenus() {
 					}
 				}
 
-				if (in[i].jump && !playerSelected[i]) {
+				if (((in[i].jump && !in[i].isKeyboard) || (in[i].powerup && in[i].isKeyboard)) && !playerSelected[i]) {
 					bool selectionOccured = false;
 					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y && !colourSelected[0]) {
 						selectedColours[i] = 0;
@@ -583,7 +583,7 @@ void GameManager::initMenus() {
 
 					}
 				}
-				else if (in[i].powerup && playerSelected[i]) {
+				else if (((in[i].powerup && !in[i].isKeyboard) || (in[i].drift && in[i].isKeyboard)) && playerSelected[i]) {
 					playerSelected[i] = false;
 					if (xOffsets[i] == cSel1X + iconWidth * i && yOffsets[i] == cSel1Y) {
 						colourSelected[0] = false;
