@@ -22,6 +22,8 @@ void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTran
 
 	GLuint uniformLocation = glGetUniformLocation(programID, "shininess");
 	glUniform1f(uniformLocation, shininess);
+
+	glErrorCheckMaterial("Uniforms - TorranceSparrow");
 }
 
 void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTransform,
@@ -32,6 +34,18 @@ void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTran
 	GLuint uniformLocation = glGetUniformLocation(programID, "shininess");
 	glUniform1f(uniformLocation, shininess);
 
+	glErrorCheckMaterial("Uniforms - TorranceSparrow Texture");
+
+}
+
+void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowID, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum)
+{
+	Material::loadUniforms(transform, objectTransform, shadowTransform, viewer, light, texID, texUnit, shadowID, shadowTexUnit, randomPoints, randomPointsNum);
+
+	GLuint uniformLocation = glGetUniformLocation(programID, "shininess");
+	glUniform1f(uniformLocation, shininess);
+
+	glErrorCheckMaterial("Uniforms - TorranceSparrow Shadow");
 }
 
 void TorranceSparrow::setShininess(float _shininess) { shininess = _shininess; }

@@ -17,9 +17,9 @@ class ShaderList
 {
 public:
 
-	enum {DIFFUSE=0, DIFFUSE_TEX, SPECULAR, SPECULAR_TEX, TORRANCE_SPARROW, TORRANCE_SPARROW_TEX, UNSHADED, UNSHADED_TEX, SHADOW, DUMMY, COUNT};
+	enum {DIFFUSE=0, DIFFUSE_TEX, SPECULAR, SPECULAR_TEX, TORRANCE_SPARROW, TORRANCE_SPARROW_TEX, TORRANCE_SPARROW_SHADOW, UNSHADED, UNSHADED_TEX, SHADOW, COUNT};
 
-	enum OFFSET {TEXTURE=1};
+	enum {TEXTURE_OFFSET=1, SHADOW_OFFSET=2};
 	
 	GLuint shaderIDs[COUNT];
 	void initShaders();		//Must call after glewInit but before using materials
@@ -48,8 +48,10 @@ public:
 		vec3 viewer, vec3 light, vec3 color);
 	virtual void loadUniforms(const mat4& transform, const mat4& objectTransform,
 		vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit);
+	virtual void loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowID, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum);
 	void useShader();
 	void useTextureShader();
+	void useShadowShader();
 };
 
 

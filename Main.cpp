@@ -79,5 +79,6 @@ int main() {
 
 	// Enter main game loop
 	manager.initMenus();
-	manager.gameLoop();    return 0;
+	manager.gameLoop();    
+	return 0;
 }

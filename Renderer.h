@@ -17,6 +17,7 @@
 #include "unshaded.h"
 #include "shadow.h"
 #include "GameState.h"
+#include "Definitions.h"
 
 using namespace std;
 using namespace glm;
@@ -78,7 +79,7 @@ private:
 		GLuint texID;
 		Material* mat;
 		vec3 color;
-		int shadowBehaviour;
+		unsigned int shadowBehaviour;
 		bool deleted;
 
 		//Information about object orientation
@@ -114,6 +115,7 @@ private:
 	//Transform matrices
 	mat4 projection;
 	mat4 modelview;
+	mat4 shadowProjection;
 
 	Camera* camera;
 	Camera lightCamera;
@@ -123,6 +125,8 @@ private:
 	GLuint vao[VAO::COUNT];
 	GLuint vbo[VBO::COUNT];
 	vector<Framebuffer> fbo;
+
+	float randomPoints[RANDOM_POINT_NUM];
 
 	bool debugging;
 
@@ -164,7 +168,7 @@ public:
 	void assignIndices(unsigned int object, vector<unsigned int>* indices);		//If no indices are assigned, will traverse mesh in order
 	void assignColor(unsigned int object, vec3 color);
 	void assignTexture(unsigned int objectID, unsigned int textureID);
-	void setShadowBehaviour(int object, int behaviour);
+	void setShadowBehaviour(unsigned int object, unsigned int behaviour);
 	void assignMaterial(unsigned int object, Material* mat);
 	void assignTransform(unsigned int object, const mat4& transform);
 	void assignScale(unsigned int object, const mat4& scaling);
@@ -212,6 +216,10 @@ public:
 	void drawAll();		//Easiest to optimize
 	void drawDepth(unsigned int fbo, unsigned int lightID, unsigned int objectID);
 
+	//Draw shadows
+	void drawAllWithShadows(unsigned int shadowTexture, unsigned int lightID);
+	void drawWithShadows(unsigned int object, unsigned int shadowTexture, unsigned int lightID);
+
 	void drawRadar(vector<vec2> radarVecs, vector<vec3> colours);
 	void drawRadarForSplitScreen(vector<vec2> radarVecs, vector<vec3> colours, int playerID);
 
@@ -222,8 +230,8 @@ public:
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);
 
 	//Draw shadow map
-	void drawShadow(unsigned int id, unsigned int lightID);
-	void drawShadowAll(unsigned int lightID);
+	void drawShadowMap(unsigned int id, unsigned int lightID);
+	void drawShadowMapAll(unsigned int lightID);
 
 	//Viewports
 	unsigned int addViewport(float x, float y, float width, float height);	//Set viewport in 0 to 1 floats
@@ -249,10 +257,13 @@ public:
 	unsigned int getHeight();
 	unsigned int getWidth();
 
+	void generatePointsOnDisk();
+
 };
 
 void displayVec4(const vec4& vec);
 void displayMat4(const mat4& mat);
+mat4 biasMatrix();
 
 void resizeFunc(GLFWwindow* window, int width, int height);
 

@@ -37,10 +37,10 @@ void ShaderList::initShaders()
 	shaderIDs[ShaderList::SPECULAR_TEX] = GetShader("specularTex");
 	shaderIDs[ShaderList::TORRANCE_SPARROW] = GetShader("torranceSparrow");
 	shaderIDs[ShaderList::TORRANCE_SPARROW_TEX] = GetShader("torranceSparrowTex");
+	shaderIDs[ShaderList::TORRANCE_SPARROW_SHADOW] = GetShader("torranceSparrowShadow");
 	shaderIDs[ShaderList::UNSHADED] = GetShader("unshaded");
 	shaderIDs[ShaderList::UNSHADED_TEX] = GetShader("unshadedTex");
 	shaderIDs[ShaderList::SHADOW] = GetShader("shadow");
-	shaderIDs[ShaderList::DUMMY] = GetShader("shadow");
 
 }
 
@@ -55,25 +55,39 @@ void Material::useShader(){
 	glUseProgram(programID); 
 }
 void Material::useTextureShader(){ 
-	programID = shaderList.shaderIDs[shaderIndex + ShaderList::OFFSET::TEXTURE];
+	programID = shaderList.shaderIDs[shaderIndex + ShaderList::TEXTURE_OFFSET];
 	glUseProgram(programID); 
+}
+void Material::useShadowShader(){
+	programID = shaderList.shaderIDs[shaderIndex + ShaderList::SHADOW_OFFSET];
+	glUseProgram(programID);
 }
 
 void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 							vec3 viewer, vec3 light, vec3 color)
 {
+	glErrorCheckMaterial("Uniforms 0");
+
 	GLuint uniformLocation = glGetUniformLocation(programID, "transform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &transform[0][0]);
+
+	glErrorCheckMaterial("Uniforms 1");
 
 	uniformLocation = glGetUniformLocation(programID, "objectTransform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &objectTransform[0][0]);
 
+	glErrorCheckMaterial("Uniforms 2");
+
 	uniformLocation = glGetUniformLocation(programID, "viewPos");
 	glUniform3f(uniformLocation, viewer.x, viewer.y, viewer.z);
+
+	glErrorCheckMaterial("Uniforms 3"); 
 
 	uniformLocation = glGetUniformLocation(programID, "light");
 	glUniform3f(uniformLocation, light.x, light.y, light.z);
 	
+	glErrorCheckMaterial("Uniforms4 ");
+
 	uniformLocation = glGetUniformLocation(programID, "color");
 	glUniform3f(uniformLocation, color.x, color.y, color.z);
 
@@ -84,27 +98,62 @@ void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 void Material::loadUniforms(const mat4& transform, const mat4& objectTransform,
 	vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit)
 {
+	glErrorCheckMaterial("Uniforms 0");
+
 	GLuint uniformLocation = glGetUniformLocation(programID, "transform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &transform[0][0]);
+
+	glErrorCheckMaterial("Uniforms 1");
 
 	uniformLocation = glGetUniformLocation(programID, "objectTransform");
 	glUniformMatrix4fv(uniformLocation, 1, false, &objectTransform[0][0]);
 
+	glErrorCheckMaterial("Uniforms 2");
+
 	uniformLocation = glGetUniformLocation(programID, "viewPos");
 	glUniform3f(uniformLocation, viewer.x, viewer.y, viewer.z);
+
+	glErrorCheckMaterial("Uniforms 3");
 
 	uniformLocation = glGetUniformLocation(programID, "light");
 	glUniform3f(uniformLocation, light.x, light.y, light.z);
 
+	glErrorCheckMaterial("Uniforms 4");
+
 	uniformLocation = glGetUniformLocation(programID, "colorTexture");
 	glActiveTexture(GL_TEXTURE0+texUnit);
 	glBindTexture(GL_TEXTURE_2D, texID);
-	glUniform1i(uniformLocation, 0);
+	glUniform1i(uniformLocation, texUnit);
 
 	glErrorCheckMaterial("Uniforms");
 
 }
 
+mat4 biasMatrix2()
+{
+	return mat4(0.5f, 0, 0, 0,
+		0, 0.5f, 0, 0,
+		0, 0, 0.5f, 0,
+		0.5f, 0.5f, 0.5f, 1);
+}
+
+void Material::loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowID, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum)
+{
+	loadUniforms(transform, objectTransform, viewer, light, texID, texUnit);
+
+	GLuint uniformLocation = glGetUniformLocation(programID, "shadowMatrix");
+	glUniformMatrix4fv(uniformLocation, 1, false, &shadowTransform[0][0]);
+
+	uniformLocation = glGetUniformLocation(programID, "shadowMap");
+	glActiveTexture(GL_TEXTURE0 + shadowTexUnit);		//Move elsewhere! This is just temporary
+	glBindTexture(GL_TEXTURE_2D, shadowID);
+	glUniform1i(uniformLocation, shadowTexUnit);
+
+	uniformLocation = glGetUniformLocation(programID, "points");
+	glUniform2fv(uniformLocation, randomPointsNum, randomPoints);
+
+	glErrorCheckMaterial("Uniforms - Material Shadow");
+}
 
 
 /**

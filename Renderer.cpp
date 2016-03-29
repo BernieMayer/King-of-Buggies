@@ -76,6 +76,7 @@ projection(1.f), modelview(1.f), activeViewport(0)
 
 	addViewport(0.f, 0.f, 1.f, 1.f);
 
+	generatePointsOnDisk();		//Generates poisson disk points
 
 	initializeVAOs();
 	
@@ -168,6 +169,13 @@ void Renderer::assignScale(unsigned int id, const mat4& scaling)
 	if ((id >= objects.size()) || (objects[id].deleted))
 		return;
 	objects[id].scaling = scaling;
+}
+
+void Renderer::setShadowBehaviour(unsigned int id, unsigned int behaviour)
+{
+	if ((id >= objects.size()) || (objects[id].deleted))
+		return;
+	objects[id].shadowBehaviour = behaviour;
 }
 
 /**
@@ -322,7 +330,7 @@ mat4 orthographicMatrix(float n, float f, float width, float height)
 
 	orthographic[0][0] = 2.f / width;
 	orthographic[1][1] = 2.f / height;
-	orthographic[3][3] = 1.f / (f - n);
+	orthographic[2][2] = 1.f / (f - n);
 	orthographic[3][2] = -n / (f - n);
 
 	return orthographic;
@@ -368,7 +376,7 @@ void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float boundingRadius)
 {
 	cam = Camera(normalize(pos), vec3(0.f, 1.f, 0.f), sceneCenter + pos);
 
-	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius*0.01f, length(pos+sceneCenter) + boundingRadius*0.01f, boundingRadius, boundingRadius);
+	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius, length(pos+sceneCenter) + boundingRadius, 2.f*boundingRadius, 2.f*boundingRadius);
 }
 
 void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)
@@ -500,7 +508,7 @@ void Renderer::clearDrawBuffers(vec3 color)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::drawShadow(unsigned int id, unsigned int lightID)
+void Renderer::drawShadowMap(unsigned int id, unsigned int lightID)
 {
 	ObjectInfo& object = objects[id];
 	if (object.deleted)
@@ -516,8 +524,12 @@ void Renderer::drawShadow(unsigned int id, unsigned int lightID)
 
 	//Object
 	mat4 cameraMatrix = lights[lightID].cam.getMatrix();
-	mat4 projectionMatrix = fbo[activeFramebuffer].ratioMatrix()*lights[lightID].projection*modelview*cameraMatrix*object.transform*object.scaling;
+	shadowProjection = lights[lightID].projection*modelview*cameraMatrix;
+	mat4 projectionMatrix = shadowProjection*object.transform*object.scaling;
 	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	vec4 projectedPosition = projectionMatrix*vec4(4.f, 0.f, 0.f, 1.f);
+	vec3 normalizedPosition = vec3(projectedPosition) / projectedPosition.w;
 
 	shadow.loadUniforms(projectionMatrix, modelviewMatrix);
 
@@ -529,13 +541,100 @@ void Renderer::drawShadow(unsigned int id, unsigned int lightID)
 		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
 }
 
-void Renderer::drawShadowAll(unsigned int lightID)
+void Renderer::drawShadowMapAll(unsigned int lightID)
 {
 	for (unsigned int i = 0; i < objects.size(); i++)
 	{
-		drawShadow(i, lightID);
+		drawShadowMap(i, lightID);
 	}
 }
+
+void Renderer::drawAllWithShadows(unsigned int shadowTexture, unsigned int lightID)
+{
+	for (unsigned int i = 0; i < objects.size(); i++)
+	{
+		if (false)	//objects[i].shadowBehaviour & SHADOW_BEHAVIOUR::RECEIVE)
+			drawWithShadows(i, shadowTexture, lightID);
+		else
+			draw(i);
+	}
+}
+
+void Renderer::drawWithShadows(unsigned int id, unsigned int shadowTexture, unsigned int lightID)
+{
+	ObjectInfo& object = objects[id];
+	if (object.deleted)
+		return;
+
+	LightInfo light;
+	if (lights.size() < 1)		//If no light, add a default light to scene
+		light = LightInfo();
+	else
+		light = lights[0];		//Else, use first light in array
+
+	glErrorCheck("drawWithShadows - before useShadowShader()");
+
+	//Make into ObjectInfo function?
+	if (objects[id].texID == NO_VALUE)
+		cout << "No texID" << endl;
+	else
+		object.mat->useShadowShader();
+
+	glErrorCheck("drawWithShadows - useShadowShader()");
+
+	//Object
+	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
+	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
+	mat4 projectionMatrix = winRatio*viewports[activeViewport].viewRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+	mat4 shadowMatrix = biasMatrix()*shadowProjection*modelviewMatrix;
+
+	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
+		cout << "No texID or uvs" << endl;
+	else
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix, shadowMatrix,
+		viewPos, light.pos, objects[id].texID, 1, shadowTexture, 0, randomPoints, RANDOM_POINT_NUM);
+
+	loadBuffers(object);
+
+	glErrorCheck("drawWithShadows - post loading buffers");
+
+	if (object.indices != NULL)
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+
+	glErrorCheck("drawWithShadows - end function");
+	//*/
+
+	/*object.mat->useTextureShader();
+
+	//Object
+	mat4 cameraMatrix = lights[0].cam.getMatrix();
+	shadowProjection = lights[0].projection*modelview*cameraMatrix;
+	mat4 projectionMatrix = shadowProjection*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	vec4 projectedPosition = projectionMatrix*vec4(4.f, 0.f, 0.f, 1.f);
+	vec3 normalizedPosition = vec3(projectedPosition) / projectedPosition.w;
+
+
+	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+		light.pos, light.pos, object.color);
+	else
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+		light.pos, light.pos, objects[id].texID, 0);
+
+	loadBuffers(object);
+
+	if (object.indices != NULL)
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+	//*/
+}
+
 
 void Renderer::draw(unsigned  int id)
 {
@@ -577,6 +676,8 @@ void Renderer::draw(unsigned  int id)
 		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
 	else
 		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+
+	glErrorCheck("Draw - end function");
 	
 }
 
@@ -871,21 +972,6 @@ bool Renderer::loadVertUVBuffer(const ObjectInfo& object)
 
 	return loadVertUVBuffer(object.mesh, object.uvs);
 
-	/*glBindVertexArray(vao[VAO::VERT_UVS]);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VERT]);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec3)*object.mesh->size(),
-		&object.mesh->at(0),
-		GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::UVS]);
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec2)*object.uvs->size(),
-		&object.uvs->at(0),
-		GL_STATIC_DRAW);
-
-	return true;*/
 }
 
 bool Renderer::loadVertUVBuffer(vector<vec3>* verts, vector<vec2>* uvs)
@@ -1258,6 +1344,30 @@ void Renderer::assignSkyDome(unsigned int id, float radius, unsigned int divisio
 void Renderer::deleteDrawableObject(int objectID)
 {
 	objects[objectID].deleted = true;
+}
+
+
+mat4 biasMatrix()
+{
+	return mat4 (	0.5f, 0, 0, 0,
+					0, 0.5f, 0, 0,
+					0, 0, 0.5f, 0,
+					0.5f, 0.5f, 0.5f, 1);
+}
+
+void Renderer::generatePointsOnDisk()
+{
+	for (int i = 0; i + 1 < RANDOM_POINT_NUM * 2; i += 2)
+	{
+		float r = sqrt(((float)rand()) / RAND_MAX);
+		float phi = 2 * M_PI*((float)rand()) / RAND_MAX;
+
+		float y = sin(phi)*r;
+		float x = cos(phi)*r;
+
+		randomPoints[i] = x;
+		randomPoints[i + 1] = y;
+	}
 }
 
 

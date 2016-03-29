@@ -95,6 +95,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 	MeshObject* playerMesh = meshInfo.getMeshPointer(BUGGY);
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
+	renderer.setShadowBehaviour(chassisRenderID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 	if (state.numberOfPlayers() == 0) {
 		renderer.assignTexture(chassisRenderID, meshInfo.getGoldenBuggyTexID());
 	}
@@ -112,6 +113,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 		renderer.assignScale(wheelIDs[i], 
 			scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
 		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
+		//renderer.setShadowBehaviour(wheelIDs[i], SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
@@ -204,6 +206,7 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
 	if (selectedLevel == 1) {
 		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
+		renderer.setShadowBehaviour(surfaceRenderID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 	}
 	
 
@@ -278,6 +281,7 @@ void GameManager::createPowerupBox(unsigned int objectID)
 	renderer.assignMeshObject(box, boxMesh);
 	renderer.assignMaterial(box, &tsMat);
 	renderer.assignTexture(box, boxMesh->getTextureID());
+	renderer.setShadowBehaviour(box, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 	
 	state.getPowerupBox(objectID)->setRenderID(box);
 	physics.createPowerupBox(boxMesh->getVertices(), state.getPowerupBox(objectID)->getPos());
@@ -1056,6 +1060,12 @@ void GameManager::gameLoop()
 			displayDebugging = !displayDebugging;
 		}
 
+		//Render shadow map
+		renderer.useFramebuffer(fbo);
+		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+		renderer.drawShadowMapAll(0);
+		renderer.useFramebuffer(NO_VALUE);
+
 		//Draw scene
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
@@ -1109,12 +1119,9 @@ void GameManager::gameLoop()
 			//Render
 			renderer.useViewport(i+1);
 
-			renderer.useFramebuffer(fbo);
-			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
-			renderer.drawShadowAll(0);
-			renderer.useFramebuffer(NO_VALUE);
+			//renderer.drawAll();
+			renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
 
-			renderer.drawAll();
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			//Should be in a for loop for every player
 			
@@ -1382,18 +1389,18 @@ void GameManager::initTestScene()
 			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
 	}
 
-	//Add dummy objects to interface
-	carSelectScreen = LoadTexture("menus/opacity-512.png");
-	unsigned int centerBox = _interface.generateComponentID();
-	_interface.assignSquare(centerBox);
-	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
-
 	fbo = renderer.createFramebuffer(500, 500);
 	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
 
-	_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
+	//Add dummy objects to interface
+	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	//unsigned int centerBox = _interface.generateComponentID();
+	//_interface.assignSquare(centerBox);
+	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
+
+	//_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
 	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
+	//_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
 
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
