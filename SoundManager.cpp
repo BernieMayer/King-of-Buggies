@@ -662,7 +662,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	}
 
 	// Change to menu later
-	if (inputs[0].menu && !paused && !secretPlaying) {
+	if (inputs[0].menu && !paused && !secretPlaying && !firstFrame) {
 		paused = true;
 		if (!secretPlaying) {
 			alDeleteBuffers(1, &musicBuffer);
@@ -736,6 +736,10 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	}
 	// Feel free to remove this. It has no purpose, just sounds funny
 	//updateMusicPitch(state, inputs[0]);
+
+	if (firstFrame) {
+		firstFrame = false;
+	}
 }
 
 /**

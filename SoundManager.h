@@ -74,6 +74,8 @@ private:
 	// Higher and distance will have less of an effect on volume, lower will increase the effect
 	float distanceDivider = 15.0f;
 
+	bool firstFrame = true;
+
 	float musicVolume = 1.0;
 	float idleEngineVolume = 0.08;
 	float idleEnginePitch = 1.0;
