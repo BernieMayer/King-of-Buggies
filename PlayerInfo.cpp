@@ -125,4 +125,12 @@ unsigned int PlayerInfo::getTextureID() { return textureID; }
 
 vec3 PlayerInfo::getVelocity() { return velocity; }
 
+void PlayerInfo::addCoin() 
+{ 
+	if (numCoins < 9)
+		numCoins++; 
+}
+
+int PlayerInfo::getNumCoins() { return numCoins; }
+
 #endif // PLAYERINFO_CPP

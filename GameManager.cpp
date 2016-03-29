@@ -1002,6 +1002,8 @@ void GameManager::gameLoop()
 					//TODO change to all
 					physics.modifySpeed(i, 0.3333f);
 					sound.playDingSound(state.getPlayer(i)->getPos());
+					state.getPlayer(i)->addCoin();
+					printf("Player %i coin number: %i", i, state.getPlayer(i)->getNumCoins());
 				}
 
 				if (hasBoostPadCollision){
@@ -1353,7 +1355,7 @@ void GameManager::initTestScene()
 
 	ai.initAI();
 
-	// setup for displaying obtained powerups to the UI
+	// setup for displaying each player's number of coins
 
 	// setup for displaying obtained powerups to the UI
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {

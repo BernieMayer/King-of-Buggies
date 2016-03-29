@@ -91,6 +91,11 @@ private:
 	vector<int> playerColours;
 
 	vector<unsigned int> powerupComponentIDs;
+	
+	vector<unsigned int> p1CoinIDs;
+	vector<unsigned int> p2CoinIDs;
+	vector<unsigned int> p3CoinIDs;
+	vector<unsigned int> p4CoinIDs;
 
 	int selectedLevel = 1;
 
