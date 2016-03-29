@@ -597,6 +597,10 @@ void SoundManager::playLossSound(vec3 pos) {
 	playSound("Trombone.wav", pos, 1.0f);
 }
 
+void SoundManager::playMineExplosionSound(vec3 pos) {
+	playSound("LittleBoom.wav", pos, 1.0f);
+}
+
 void SoundManager::playSound(string fileName, vec3 pos, float volume) {
 	ALuint source;
 	ALuint buffer;

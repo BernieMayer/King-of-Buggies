@@ -87,7 +87,7 @@ private:
 
 	vector<int> playerColours;
 
-	unsigned int powerupComponentID;
+	vector<unsigned int> powerupComponentIDs;
 
 	int selectedLevel = 1;
 
@@ -108,7 +108,7 @@ public:
 	void createBoostPad(unsigned int objectID);
 	void createPowerupBox(unsigned int objectID);
 	// These entities get created dynamically:
-	void createMine();
+	void createMine(unsigned int playerID);
 	void createBomb(unsigned int playerID);
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);

@@ -235,7 +235,7 @@ void GameManager::createCoin(unsigned int coinIndex)
 	newCoin->setRenderID(coin);
 }
 
-void GameManager::createMine()
+void GameManager::createMine(unsigned int playerID)
 {
 	unsigned int powerup = renderer.generateObjectID();
 	MeshObject* powerupMesh = meshInfo.getMeshPointer(MINE);
@@ -245,8 +245,8 @@ void GameManager::createMine()
 	renderer.assignTexture(powerup, powerupMesh->getTextureID());
 	Mine newMine = Mine(3.0);
 	
-	vec3 playerPos = state.getPlayer(0)->getPos();
-	vec3 playerForward = state.getPlayer(0)->getForward();
+	vec3 playerPos = state.getPlayer(playerID)->getPos();
+	vec3 playerForward = state.getPlayer(playerID)->getForward();
 
 	// there is definitely a simpler way of doing this
 	vec3 placementVec = playerPos - (playerForward);
@@ -453,9 +453,21 @@ void GameManager::initMenus() {
 			}
 			
 		}
-		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[4])) {
+		else if (in[0].menu && currentMenu == lastMenu && (playerSelected[0] && playerSelected[1] && playerSelected[2] && playerSelected[3])) {
 			_interface.clear();
 
+			// Clear input so no input given for new menu on transition frame
+			for (int i = 0; i < in.size(); i++) {
+				in[i].jump = false;
+				in[i].menu = false;
+				in[i].powerup = false;
+				in[i].tiltBackward = 0;
+				in[i].tiltForward = 0;
+				in[i].turnL = 0;
+				in[i].turnR = 0;
+			}
+
+			sound.playDingSound();
 			gameInit();
 
 			return;
@@ -734,12 +746,16 @@ void GameManager::gameLoop()
 	Camera freeCam;
 
 	bool paused = false;
+	bool firstFrame = true;
 
 	unsigned int debugPathIterations = 0;
 	unsigned int debuggedAI = 2;
 
 	timeb loopStart = clock.getCurrentTime();
 
+	hasPowerup.push_back(false);
+	hasPowerup.push_back(false);
+	hasPowerup.push_back(false);
 	hasPowerup.push_back(false);
 
 	unsigned int numScreens = input.getNumPlayers();
@@ -773,9 +789,7 @@ void GameManager::gameLoop()
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
-
-
-		if (inputs[0].menu)
+		if (inputs[0].menu && !firstFrame)
 		{
 			paused = !paused;
 
@@ -785,15 +799,12 @@ void GameManager::gameLoop()
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
-
-				_interface.toggleActive(powerupComponentID, false);
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
-				if (state.getPlayer(0)->getCurrentPowerup() > -1)
-					_interface.toggleActive(powerupComponentID, true);
 			}
 		}
+		firstFrame = false;
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
@@ -815,94 +826,95 @@ void GameManager::gameLoop()
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
 		}
 
-		//Allow for nitro/powerup activation her
-		if ((inputs[0].cheat_coin || inputs[0].powerup) && !paused) {
+		//Allow for nitro/powerup activation here
+		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused) {
 
-			//VehicleTraits traits = VehicleTraits(physics.getMaterial());
-			//traits.print();
+				//VehicleTraits traits = VehicleTraits(physics.getMaterial());
+				//traits.print();
 
 
-			//VehicleTraits temp = VehicleTraits(physics.getMaterial());
-			//traits.loadConfiguration("base");
-			//temp.print();
+				//VehicleTraits temp = VehicleTraits(physics.getMaterial());
+				//traits.loadConfiguration("base");
+				//temp.print();
 
-			//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
+				//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 
-			if (hasPowerup.at(0))
-			{
-				/*
-				1 - Nitro Boost
-				2 - Bomb
-				3 - Mine
-				4 - Coin?
-				5 - Decoy?
-				*/
-
-				int powerUpId = state.getPlayer(0)->usePowerUp();
-				
-				if (powerUpId == POWERUPS::NITROBOOST)
+				if (hasPowerup.at(i))
 				{
-				
+					/*
+					1 - Nitro Boost
+					2 - Bomb
+					3 - Mine
+					4 - Coin?
+					5 - Decoy?
+					*/
 
-					if (state.getPlayer(0)->getEnergyForNitro() > 0.0f)
+					int powerUpId = state.getPlayer(i)->usePowerUp();
+
+					if (powerUpId == POWERUPS::NITROBOOST)
 					{
-						state.getPlayer(0)->removeEnergyForNitro(30);
-						physics.applyNitroBoost(0);
-						state.getPlayer(0)->addPowerUp(POWERUPS::NITROBOOST);
-						printf("Current energy level %f \n", state.getPlayer(0)->getEnergyForNitro());
-					}
-					else {
-						state.getPlayer(0)->addPowerUp(POWERUPS::NITROBOOST);
-						state.getPlayer(0)->setEnergyForNitro(300.0f);
-						printf("Nitro Boost with energy level  %f \n", state.getPlayer(0)->getEnergyForNitro());
 
-					}
-				}
-				else if (powerUpId == POWERUPS::BOMB)
-				{
-					createBomb(0);
-				}
-				else if (powerUpId == POWERUPS::MINE)
-				{
-					createMine();
-				}
-				else if (powerUpId == POWERUPS::COIN)
-				{
-					physics.modifySpeed(0, 0.3333f);	//Should change this..
-					printf("Coin \n");
-				}
-				else if (powerUpId == POWERUPS::DECOY)
-				{
-					printf("Decoy \n");
-					if (state.numOfDecoys >= 1) {
-						//nothing or stuff dealing with multiple decoys
-					}
-					else {
-						state.numOfDecoys += 1;
-						//Apply decoy powerup logic
-						VehicleTraits traits = VehicleTraits(physics.getMaterial());
-						createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
-						//state.getPlayer(state.numberOfPlayers()).setAI(true);
-						state.getPlayer(state.numberOfPlayers() -1)->setDecoy(true);
-						//also check the decoy timer here
-						printf("Decoy? \n");
-					}
-				}
 
-				
-				//might add decoy to this 
-				if (powerUpId == POWERUPS::NITROBOOST)
-				{
-					hasPowerup.at(0) = true;
-				}
-				else 
-				{
-					hasPowerup.at(0) = false;
-				}
+						if (state.getPlayer(i)->getEnergyForNitro() > 0.0f)
+						{
+							state.getPlayer(i)->removeEnergyForNitro(30);
+							physics.applyNitroBoost(i);
+							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
+							printf("Current energy level %f \n", state.getPlayer(i)->getEnergyForNitro());
+						}
+						else {
+							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
+							state.getPlayer(i)->setEnergyForNitro(300.0f);
+							printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
 
-				_interface.toggleActive(powerupComponentID, false);
-			} 
-			
+						}
+					}
+					else if (powerUpId == POWERUPS::BOMB)
+					{
+						createBomb(i);
+					}
+					else if (powerUpId == POWERUPS::MINE)
+					{
+						createMine(i);
+					}
+					else if (powerUpId == POWERUPS::COIN)
+					{
+						physics.modifySpeed(i, 0.3333f);	//Should change this..
+						printf("Coin \n");
+					}
+					else if (powerUpId == POWERUPS::DECOY)
+					{
+						printf("Decoy \n");
+						if (state.numOfDecoys >= 1) {
+							//nothing or stuff dealing with multiple decoys
+						}
+						else {
+							state.numOfDecoys += 1;
+							//Apply decoy powerup logic
+							VehicleTraits traits = VehicleTraits(physics.getMaterial());
+							createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
+							//state.getPlayer(state.numberOfPlayers()).setAI(true);
+							state.getPlayer(state.numberOfPlayers() - 1)->setDecoy(true);
+							//also check the decoy timer here
+							printf("Decoy? \n");
+						}
+					}
+
+
+					//might add decoy to this 
+					if (powerUpId == POWERUPS::NITROBOOST)
+					{
+						hasPowerup.at(i) = true;
+					}
+					else
+					{
+						hasPowerup.at(i) = false;
+					}
+
+					_interface.toggleActive(powerupComponentIDs[i], false);
+				}
+			}
 		}
 
 		//Update game state and renderer
@@ -944,12 +956,12 @@ void GameManager::gameLoop()
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 					// display powerup information in HUD for any non-AI players
-					if (!state.getPlayer(vehicleId)->isAI()) {
-						_interface.assignSquare(powerupComponentID);
-						_interface.assignTexture(powerupComponentID, meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-						_interface.setDimensions(powerupComponentID, -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
-						_interface.toggleActive(powerupComponentID, true);
-					}
+					//if (!state.getPlayer(vehicleId)->isAI()) {
+					_interface.assignSquare(powerupComponentIDs[vehicleId]);
+					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+					_interface.setDimensions(powerupComponentIDs[vehicleId], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+					//}
 
 					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
 				}
@@ -987,6 +999,7 @@ void GameManager::gameLoop()
 					physics.applyMineExplosion(i);
 					renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
 					state.removeMine(hasMineCollision);
+					sound.playMineExplosionSound(state.getPlayer(i)->getPos());
 				}
 			}
 			state.checkRespawns();
@@ -1317,8 +1330,24 @@ void GameManager::initTestScene()
 
 	// setup for displaying obtained powerups to the UI
 
-	powerupComponentID = _interface.generateComponentID();
-	_interface.toggleActive(powerupComponentID, false);
+	// setup for displaying obtained powerups to the UI
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		powerupComponentIDs.push_back(_interface.generateComponentID());
+		_interface.toggleActive(powerupComponentIDs[i], false);
+
+		// set display filter for each player's indicator
+		if (i == 0)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D1);
+
+		else if (i == 1)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D2);
+
+		else if (i == 2)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D3);
+
+		else if (i == 3)
+			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
+	}
 
 	//Add dummy objects to interface
 	/*carSelectScreen = LoadTexture("menus/opacity-512.png");
@@ -1347,7 +1376,7 @@ int GameManager::randomPowerup()
 	*/
 	
 
-	int powerupId = rand() % 5;
+	int powerupId = rand() % 3;
 	return powerupId;
 }
 

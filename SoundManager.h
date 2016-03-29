@@ -25,9 +25,11 @@ public:
 	void startSounds(GameState state);
 	void updateSounds(GameState state, Input inputs[]);
 	void playBumpSound(vec3 pos, float volume);
+	void playDingSound() { playDingSound(listenerPos); }
 	void playDingSound(vec3 pos);
 	void playWinSound(vec3 pos);
 	void playLossSound(vec3 pos);
+	void playMineExplosionSound(vec3 pos);
 
 	void startMenuSong(GameState state);
 	void updateMenuSong(GameState state);
