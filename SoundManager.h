@@ -25,9 +25,13 @@ public:
 	void startSounds(GameState state);
 	void updateSounds(GameState state, Input inputs[]);
 	void playBumpSound(vec3 pos, float volume);
+	void playDingSound() { playDingSound(listenerPos); }
 	void playDingSound(vec3 pos);
 	void playWinSound(vec3 pos);
 	void playLossSound(vec3 pos);
+	void playMineExplosionSound(vec3 pos);
+	void playMineCreationSound(vec3 pos) { playSound("MinePlace.wav", pos, 1.0f); }
+	void playNitroSound(vec3 pos) { playSound("Nitro.wav", pos, 1.0f); }
 
 	void startMenuSong(GameState state);
 	void updateMenuSong(GameState state);
@@ -43,6 +47,7 @@ private:
 	int menuSongCounter = 0;
 	int menuSongCounterMax = 15;
 	void initOpenAL(GameState state);
+	bool initSuccess = true;
 	
 	float distanceVolumeAdjuster(float volume, vec3 pos);
 	void updateListener(GameState state);
@@ -69,6 +74,8 @@ private:
 	vec3 listenerPos;
 	// Higher and distance will have less of an effect on volume, lower will increase the effect
 	float distanceDivider = 15.0f;
+
+	bool firstFrame = true;
 
 	float musicVolume = 1.0;
 	float idleEngineVolume = 0.08;

@@ -212,8 +212,9 @@ public:
 	void drawAll();		//Easiest to optimize
 	void drawDepth(unsigned int fbo, unsigned int lightID, unsigned int objectID);
 
-	void drawRadar(vector<vec2> radarVecs);
-	void drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers);
+	void drawRadar(vector<vec2> radarVecs, vector<vec3> colours);
+	void drawRadarForSplitScreen(vector<vec2> radarVecs, vector<vec3> colours, int playerID);
+
 
 	void drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors);
 	//Debugging draw calls

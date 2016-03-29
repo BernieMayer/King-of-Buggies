@@ -107,6 +107,8 @@ public:
 	float initVehicleSpeed = 500.f;
 	bool goldenBuggyLock = false;
 	timeb gbLockStartTime;
+	float gbLockEndTime = 1.0f;
+	timeb lastFrameEnd = clock.getCurrentTime();
 
 	int createBomb(vec3 location, int playerID);
 	//createConvexMesh
@@ -149,6 +151,8 @@ private:
 	//
 	vector<int> vehicleForwards;	//Vehicle class
 	vector<bool> vehicleInAir;
+	vector<bool> vehicleStuck;
+	vector<timeb> stuckTimer;
 
 	GameState* lastState = NULL;
 	float lastFrameTime = 1;

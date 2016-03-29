@@ -596,7 +596,7 @@ void Renderer::drawAll()
 	}
 }
 
-void Renderer::drawRadar(vector<vec2> radarVecs)
+void Renderer::drawRadar(vector<vec2> radarVecs, vector<vec3> colours)
 {
 	glViewport(windowWidth * 0.75, windowHeight * 0.75, windowWidth * 0.25, windowHeight * 0.25);
 	
@@ -610,23 +610,29 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glBegin(GL_TRIANGLES);
-	glColor3f(1, 0, 0);
+	glColor3f(colours[0].x, colours[0].y, colours[0].z);
 	
-
+	int j = 1;
 	for (int i = 0; i < radarVecs.size(); i++){
-		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 15), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 15), 0);
+		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 12), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 12), 0);
 		glVertex3f(vec.x, vec.y, vec.z);
 		
-		if (i >= 2 && i < 5){
-			glColor3f(1.f, 0.64f, 0.f);
+		if (i ==2){
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
+			//glColor3f(1.f, 0.64f, 0.f);
 		}
-		else if (i >= 5 && i < 8)
+		else if (i == 5)
 		{
-			glColor3f(0, 1, 0);
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
+			//glColor3f(0, 1, 0);
 		}
-		else if (i >= 8 && i < 11)
+		else if (i ==8)
 		{
-			glColor3f(1, 1, 0);
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
+			//glColor3f(1, 1, 0);
 		}
 	}
 	
@@ -637,8 +643,10 @@ void Renderer::drawRadar(vector<vec2> radarVecs)
 	useViewport(activeViewport);
 }
 
-void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth, int viewportHeight, int numPlayers, int maxPlayers)
+void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, vector<vec3> colours, int playerID)
 {
+	int viewportWidth = 0;
+	int viewportHeight = 0;
 
 	glViewport(viewportWidth * 0.75, viewportHeight * 0.75, viewportWidth * 0.25, viewportHeight * 0.25);
 
@@ -647,28 +655,31 @@ void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, windowWidth, 0, windowHeight);
+	gluOrtho2D(0, viewportWidth, 0, viewportHeight);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	glBegin(GL_TRIANGLES);
-	glColor3f(1, 0, 0);
+	glColor3f(colours[0].x , colours[0].y, colours[0].z);
 
-
+	int j = 0;
 	for (int i = 0; i < radarVecs.size(); i++){
 		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 15), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 15), 0);
 		glVertex3f(vec.x, vec.y, vec.z);
 
-		if (i >= 2 && i < 5){
-			glColor3f(1.f, 0.64f, 0.f);
+		if (i == 2){
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
 		}
-		else if (i >= 5 && i < 8)
+		else if (i ==5 )
 		{
-			glColor3f(0, 1, 0);
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
 		}
-		else if (i >= 8 && i < 11)
+		else if (i== 8)
 		{
-			glColor3f(1, 1, 0);
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
 		}
 	}
 
@@ -676,6 +687,7 @@ void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, int viewportWidth
 	glEnd();
 
 	//I need a function here to deal with the viewport stuff...
+	useViewport(activeViewport);
 	//glViewport(0, 0, windowWidth, windowHeight);
 
 }
