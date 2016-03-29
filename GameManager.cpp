@@ -1099,11 +1099,11 @@ void GameManager::gameLoop()
 
 			//Render
 			renderer.useViewport(i+1);
-
-			renderer.useFramebuffer(fbo);
+			
+			/*renderer.useFramebuffer(fbo);
 			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 			renderer.drawShadowAll(0);
-			renderer.useFramebuffer(NO_VALUE);
+			renderer.useFramebuffer(NO_VALUE);*/
 
 			renderer.drawAll();
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
@@ -1353,9 +1353,9 @@ void GameManager::initTestScene()
 	ai.initAI();
 
 	initUI();
-
+	
 	//Add dummy objects to interface
-	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	/*carSelectScreen = LoadTexture("menus/opacity-512.png");
 	unsigned int centerBox = _interface.generateComponentID();
 	_interface.assignSquare(centerBox);
 	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
@@ -1366,7 +1366,7 @@ void GameManager::initTestScene()
 	_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
 	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
 	_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
-
+	*/
 	
 	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
 	
