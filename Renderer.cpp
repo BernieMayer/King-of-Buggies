@@ -57,7 +57,7 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
 }
 
 Renderer::Renderer(GLFWwindow* _window) : window(_window), debugging(false), 
-projection(1.f), modelview(1.f), activeViewport(0)
+projection(1.f), modelview(1.f), activeViewport(0), shadowTexUnit(0)
 {
 	shaderList.initShaders();
 
@@ -520,6 +520,13 @@ void Renderer::clearDrawBuffers(vec3 color)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void Renderer::loadShadowMap(unsigned int texID)
+{
+	glActiveTexture(GL_TEXTURE0 + shadowTexUnit);		//Move elsewhere! This is just temporary
+	glBindTexture(GL_TEXTURE_2D, texID);
+
+}
+
 void Renderer::drawShadowMap(unsigned int id, unsigned int lightID)
 {
 	ObjectInfo& object = objects[id];
@@ -605,7 +612,7 @@ void Renderer::drawWithShadows(unsigned int id, unsigned int shadowTexture, unsi
 		cout << "No texID or uvs" << endl;
 	else
 		object.mat->loadUniforms(projectionMatrix, modelviewMatrix, shadowMatrix,
-		viewPos, light.pos, objects[id].texID, 1, shadowTexture, 0, randomPoints, RANDOM_POINT_NUM);
+		viewPos, light.pos, objects[id].texID, 1, shadowTexture, shadowTexUnit, randomPoints, RANDOM_POINT_NUM);
 
 	loadBuffers(object);
 

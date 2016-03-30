@@ -111,6 +111,7 @@ private:
 
 	unsigned int activeViewport;
 	unsigned int activeFramebuffer;
+	unsigned int shadowTexUnit;
 
 	//Transform matrices
 	mat4 projection;
@@ -193,6 +194,8 @@ public:
 					vector<vec2>* uvs,
 					vector<unsigned int>* indices,
 					unsigned int textureID);
+
+	void loadShadowMap(unsigned int texID);
 
 	//Lights
 	unsigned int generateLightObject();

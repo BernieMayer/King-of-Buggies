@@ -3,6 +3,7 @@
 
 const unsigned int MAX_PLAYERS = 5;
 const unsigned int RANDOM_POINT_NUM = 16;
+const bool USING_SHADOWS = false;
 
 
 

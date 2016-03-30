@@ -1052,11 +1052,14 @@ void GameManager::gameLoop()
 		}
 
 		//Render shadow map
-		renderer.useFramebuffer(fbo);
-		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
-		renderer.drawShadowMapAll(0);
-		renderer.useFramebuffer(NO_VALUE);
-
+		if (USING_SHADOWS)
+		{
+			renderer.useFramebuffer(fbo);
+			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+			renderer.drawShadowMapAll(0);
+			renderer.loadShadowMap(renderer.getFramebufferTexture(fbo));
+			renderer.useFramebuffer(NO_VALUE);
+		}
 		//Draw scene
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
@@ -1111,7 +1114,10 @@ void GameManager::gameLoop()
 			renderer.useViewport(i+1);
 
 			//renderer.drawAll();
-			renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
+			if (USING_SHADOWS)
+				renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
+			else
+				renderer.drawAll();
 
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			//Should be in a for loop for every player

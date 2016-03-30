@@ -145,8 +145,8 @@ void Material::loadUniforms(const mat4& transform, const mat4& objectTransform, 
 	glUniformMatrix4fv(uniformLocation, 1, false, &shadowTransform[0][0]);
 
 	uniformLocation = glGetUniformLocation(programID, "shadowMap");
-	glActiveTexture(GL_TEXTURE0 + shadowTexUnit);		//Move elsewhere! This is just temporary
-	glBindTexture(GL_TEXTURE_2D, shadowID);
+	//glActiveTexture(GL_TEXTURE0 + shadowTexUnit);		//Move elsewhere! This is just temporary
+	//glBindTexture(GL_TEXTURE_2D, shadowID);
 	glUniform1i(uniformLocation, shadowTexUnit);
 
 	uniformLocation = glGetUniformLocation(programID, "points");
