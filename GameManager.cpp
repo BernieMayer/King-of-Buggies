@@ -235,6 +235,7 @@ void GameManager::createCoin(unsigned int coinIndex)
 	renderer.assignMeshObject(coin, coinMesh);
 	renderer.assignMaterial(coin, &tsMat);
 	renderer.assignColor(coin, vec3(1.f, 1.f, 0.f));
+	renderer.setShadowBehaviour(coin, SHADOW_BEHAVIOUR::CAST);
 
 	newCoin->setRenderID(coin);
 }
@@ -1360,12 +1361,8 @@ void GameManager::initTestScene()
 	{
 		state.getPlayer(i)->setAI(true);
 	}
-	
-	//Create skybox
-	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
-	skyboxID = renderer.generateObjectID();
-	renderer.assignSkyDome(skyboxID, 70.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
-	renderer.assignMaterial(skyboxID, &skyMaterial);
+
+
 
 	state.setGoldenBuggy(0);
 	sound.stopMenuSong();
@@ -1392,12 +1389,19 @@ void GameManager::initTestScene()
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
 
 	//Setup shadowmapping
-	Camera tempCam (normalize(-lightPos), vec3(0.f, 1.f, 0.f), vec3(0.f));
+	Camera tempCam(normalize(-lightPos), vec3(0.f, 1.f, 0.f), vec3(0.f));
 	fbo = renderer.createDepthbuffer(2000, 2000);
 	float n, f, w, h = 1.f;
 	levelMesh->getFrustumBounds(tempCam.getDir(), tempCam.getRight(), tempCam.getUp(), &n, &f, &w, &h);
-//	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
+	//	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
 	renderer.positionLightCamera(0, levelMesh->getCenter(), n, f, w, h);
+
+	//Create skybox
+	//skyboxTextureID = renderer.getFramebufferTexture(fbo);
+	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
+	skyboxID = renderer.generateObjectID();
+	renderer.assignSkyDome(skyboxID, 70.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
+	renderer.assignMaterial(skyboxID, &skyMaterial);
 	
 }
 
