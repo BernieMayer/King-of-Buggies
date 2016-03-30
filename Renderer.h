@@ -98,7 +98,7 @@ private:
 		LightInfo();
 
 		void positionCamera(vec3 sceneCenter, float boundingRadius);
-
+		void positionCamera(vec3 sceneCenter, float nearP, float farP, float width, float height);
 	};
 
 	GLFWwindow * window;
@@ -152,12 +152,13 @@ public:
 	//Transformations
 	void loadModelviewTransform(const mat4& _modelview);
 	void loadProjectionTransform(const mat4& _projection);
-	void loadPerspectiveTransform(float near, float far, float fov);
-	void loadOrthographicTransform(float near, float far, float width, float height);
-	void loadPerspectiveTransformShadow(float near, float far, float fov);
-	void loadOrthographicTransformShadow(float near, float far, float width, float height);
+	void loadPerspectiveTransform(float nearP, float farP, float fov);
+	void loadOrthographicTransform(float nearP, float farP, float width, float height);
+	void loadPerspectiveTransformShadow(float nearP, float farP, float fov);
+	void loadOrthographicTransformShadow(float nearP, float farP, float width, float height);
 	void loadCamera(Camera* _camera);
 	void positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius);	//Sets up light camera and projection
+	void positionLightCamera(unsigned int lightID, vec3 sceneCenter, float nearP, float farP, float width, float height);
 
 	//Drawable objects
 	unsigned int generateObjectID();

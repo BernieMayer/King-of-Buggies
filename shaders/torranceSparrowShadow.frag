@@ -14,13 +14,13 @@ uniform float shininess = 0.7;
 uniform sampler2D colorTexture;
 uniform sampler2DShadow shadowMap;
 
-float ka = 0.1;
+float ka = 0.2;
 float kd = 0.5;
 float ks = 0.5;
 
 const float baseBias = 0.005;
 const float biasRange = 0.05;
-const float radius = 0.005; 
+const float radius = 0.002; 
 
 const float PI = 3.14159265359;
 
@@ -58,8 +58,8 @@ float testVisibility(vec4 point, float bias)
 
 	for(int i=0; i< POINT_SIZE; i++)
 	{
-		vec2 offset = points[i]*radius; //right*points[i].x + up*points[i].y;		//Static Poisson disk
-		//vec2 offset = right*points[i].x + up*points[i].y;		//Rotated Poisson disk
+		//vec2 offset = points[i]*radius; //right*points[i].x + up*points[i].y;		//Static Poisson disk
+		vec2 offset = right*points[i].x + up*points[i].y;		//Rotated Poisson disk
 		visibility += inLight(point, bias, offset);
 	} 
 	return visibility*(1.0/16.0);
@@ -95,7 +95,7 @@ void main(){
 	vec3 lightDir = normalize(light - worldPosition);
 	float bias = biasRange*(1-clamp(dot(normal, lightDir), 0.0, 1.0)+baseBias);	
 	
-	float visibility = inLight(shadowCoord, bias, vec2(0.f, 0.f)); //testVisibility(shadowCoord, bias);
+	float visibility = testVisibility(shadowCoord, bias);
 
 	//vec2 mc = mappedCoordinate(shadowCoord, bias, vec2(0.f, 0.f));	
 	//fragColor = vec3(mc.x, mc.y, 0.f);

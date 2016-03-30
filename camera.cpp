@@ -268,6 +268,8 @@ vec3 Camera::getDir(){ return dir; }
 
 vec3 Camera::getUp(){ return up; }
 
+vec3 Camera::getRight(){ return right; }
+
 void Camera::setCameraMode(int type)
 {
 	cameraMode = type;

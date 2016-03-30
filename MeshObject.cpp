@@ -106,3 +106,26 @@ vec3 MeshObject::getCenter()
 
 	return center;
 }
+
+void MeshObject::getFrustumBounds(vec3 direction, vec3 right, vec3 up, float* nearP, float* farP, float* width, float* height)
+{
+	*nearP = *farP = *width = *height = 0;
+
+	vec3 center = getCenter();
+
+	for (unsigned int i = 0; i < vertices.size(); i++)
+	{
+		vec3 diff = vertices[i] -center;
+		
+		*nearP = min(*nearP, dot(direction, diff));
+		*farP = max(*farP, dot(direction, diff));
+		*width = max(*width, abs(dot(right, diff)));
+		*height = max(*height, abs(dot(up, diff)));
+	}
+
+	*width *= 2.f;
+	*height *= 2.f;
+
+	*nearP *= 1.f;
+	*farP *= 1.f;
+}

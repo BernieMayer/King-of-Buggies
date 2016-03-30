@@ -376,12 +376,24 @@ void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float boundingRadius)
 {
 	cam = Camera(normalize(pos), vec3(0.f, 1.f, 0.f), sceneCenter + pos);
 
-	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius*0.2f, length(pos+sceneCenter) + boundingRadius*0.2f, 2.f*boundingRadius, 2.f*boundingRadius);
+	projection = orthographicMatrix(length(pos+sceneCenter) - boundingRadius, length(pos+sceneCenter) + boundingRadius, 2.f*boundingRadius, 2.f*boundingRadius);
+}
+
+void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float nearP, float farP, float width, float height)
+{
+	cam = Camera(normalize(pos), vec3(0.f, 1.f, 0.f), sceneCenter + pos);
+
+	projection = orthographicMatrix(length(pos + sceneCenter) + nearP*0.5f, length(pos + sceneCenter) + farP*0.5f, width, height);
 }
 
 void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)
 {
 	lights[lightID].positionCamera(sceneCenter, boundingRadius);
+}
+
+void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float nearP, float farP, float width, float height)
+{
+	lights[lightID].positionCamera(sceneCenter, nearP, farP, width, height);
 }
 
 

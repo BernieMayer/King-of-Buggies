@@ -35,6 +35,7 @@ public:
 
 	float getBoundingRadius();
 	vec3 getCenter();
+	void getFrustumBounds(vec3 direction, vec3 right, vec3 up, float* nearP, float* farP, float* width, float* height);
 
 private:
 	vector<vec3> vertices, normals;

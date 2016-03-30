@@ -45,6 +45,8 @@ public:
 
 	vec3 getUp();
 
+	vec3 getRight();
+
 	vec3 getViewCenter();
 
 	void setCameraMode(int type);

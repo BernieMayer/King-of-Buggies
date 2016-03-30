@@ -1353,7 +1353,7 @@ void GameManager::initTestScene()
 
 	for (unsigned int i = 0; i < state.numberOfPowerupBoxes(); i++) { createPowerupBox(i); }
 
-	vec3 lightPos(60.f, 60.f, 60.f);
+	vec3 lightPos(60.f, 120.f, 60.f);
 	unsigned int lightID = renderer.generateLightObject();
 	renderer.setLightPosition(lightID, lightPos);
 
@@ -1361,21 +1361,15 @@ void GameManager::initTestScene()
 
 	initUI();
 
-	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
-	//unsigned int centerBox = _interface.generateComponentID();
-	//_interface.assignSquare(centerBox);
-	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
 
+	//Setup shadowmapping
+	Camera tempCam (normalize(-lightPos), vec3(0.f, 1.f, 0.f), vec3(0.f));
 	fbo = renderer.createDepthbuffer(2000, 2000);
-	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
-
-	//_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
-	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	//_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
-
-	
-	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
+	float n, f, w, h = 1.f;
+	levelMesh->getFrustumBounds(tempCam.getDir(), tempCam.getRight(), tempCam.getUp(), &n, &f, &w, &h);
+//	renderer.positionLightCamera(0, levelMesh->getCenter(), levelMesh->getBoundingRadius());
+	renderer.positionLightCamera(0, levelMesh->getCenter(), n, f, w, h);
 	
 }
 
