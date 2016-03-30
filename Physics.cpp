@@ -514,6 +514,9 @@ void Physics::updateGameState(GameState* state, float time)
 					vec = normalize(vec);
 
 					float force = 1500000;
+					if (distance < 4.0f) {
+						distance = 4.0f;
+					}
 					vec = (force * (1 / (distance * distance))) * vec;
 					vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
 				}
@@ -1598,6 +1601,9 @@ void Physics::bombExplosion(int bombID) {
 	for (int i = 0; i < vehicleActors.size(); i++) {
 		vec3 vec = lastState->getPlayer(i)->getPos() - getVec3(bombActors[bombID]->getGlobalPose().p);
 		float distance = length(vec);
+		if (distance < 2.0f) {
+			distance = 2.0f;
+		}
 		vec = normalize(vec);
 
 		float force = 6000000;
