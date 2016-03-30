@@ -383,7 +383,7 @@ void Renderer::LightInfo::positionCamera(vec3 sceneCenter, float nearP, float fa
 {
 	cam = Camera(normalize(pos), vec3(0.f, 1.f, 0.f), sceneCenter + pos);
 
-	projection = orthographicMatrix(length(pos + sceneCenter) + nearP*0.5f, length(pos + sceneCenter) + farP*0.5f, width, height);
+	projection = orthographicMatrix(length(pos + sceneCenter) + nearP, length(pos + sceneCenter) + farP, width, height);
 }
 
 void Renderer::positionLightCamera(unsigned int lightID, vec3 sceneCenter, float boundingRadius)
@@ -529,8 +529,9 @@ void Renderer::loadShadowMap(unsigned int texID)
 
 void Renderer::drawShadowMap(unsigned int id, unsigned int lightID)
 {
+
 	ObjectInfo& object = objects[id];
-	if (object.deleted)
+	if (object.deleted || !(object.shadowBehaviour & SHADOW_BEHAVIOUR::CAST) )
 		return;
 
 	LightInfo light;
@@ -686,7 +687,7 @@ void Renderer::draw(unsigned  int id)
 						viewPos, light.pos, object.color);
 	else
 		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
-						viewPos, light.pos, objects[id].texID, 0);
+						viewPos, light.pos, objects[id].texID, 1);
 
 
 	loadBuffers(object);
@@ -926,7 +927,7 @@ bool Renderer::loadBuffers(const ObjectInfo& object)
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 			sizeof(unsigned int)*object.indices->size(),
 			&object.indices->at(0),
-			GL_STATIC_DRAW);
+			GL_DYNAMIC_DRAW);
 	}
 
 	return success;
@@ -945,7 +946,7 @@ bool Renderer::loadVertBuffer(const ObjectInfo& object)
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec3)*object.mesh->size(),
 		&object.mesh->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	return true;
 }
@@ -967,13 +968,13 @@ bool Renderer::loadVertNormalBuffer(const ObjectInfo& object)
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec3)*object.mesh->size(),
 		&object.mesh->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::NORMALS]);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec3)*object.normals->size(),
 		&object.normals->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	return true;
 }
@@ -1001,13 +1002,13 @@ bool Renderer::loadVertUVBuffer(vector<vec3>* verts, vector<vec2>* uvs)
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec3)*verts->size(),
 		&verts->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::UVS]);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec2)*uvs->size(),
 		&uvs->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	return true;
 }
@@ -1033,19 +1034,19 @@ bool Renderer::loadVertNormalUVBuffer(const ObjectInfo& object)
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec3)*object.mesh->size(),
 		&object.mesh->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::NORMALS]);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec3)*object.normals->size(),
 		&object.normals->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::UVS]);
 	glBufferData(GL_ARRAY_BUFFER,
 		sizeof(vec2)*object.uvs->size(),
 		&object.uvs->at(0),
-		GL_STATIC_DRAW);
+		GL_DYNAMIC_DRAW);
 
 	return true;
 }

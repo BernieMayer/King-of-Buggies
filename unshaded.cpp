@@ -39,7 +39,7 @@ void Unshaded::loadUniforms(const mat4& transform, const mat4& objectTransform,
 	uniformLocation = glGetUniformLocation(programID, "colorTexture");
 	glActiveTexture(GL_TEXTURE0 + texUnit);
 	glBindTexture(GL_TEXTURE_2D, texID);
-	glUniform1i(uniformLocation, 0);
+	glUniform1i(uniformLocation, texUnit);
 
 	glErrorCheckMaterial("Uniforms");
 

@@ -18,8 +18,8 @@ float ka = 0.2;
 float kd = 0.5;
 float ks = 0.5;
 
-const float baseBias = 0.005;
-const float biasRange = 0.05;
+const float baseBias = 0.004;
+const float biasRange = 0.002;
 const float radius = 0.002; 
 
 const float PI = 3.14159265359;
@@ -93,7 +93,7 @@ void main(){
     
 	vec3 normal = normalize(fragNormal);
 	vec3 lightDir = normalize(light - worldPosition);
-	float bias = biasRange*(1-clamp(dot(normal, lightDir), 0.0, 1.0)+baseBias);	
+	float bias = biasRange*(1-clamp(dot(normal, lightDir), 0.0, 1.0))+baseBias;	
 	
 	float visibility = testVisibility(shadowCoord, bias);
 

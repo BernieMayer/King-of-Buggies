@@ -1141,7 +1141,7 @@ void GameManager::gameLoop()
 
 			//Render
 			renderer.useViewport(i+1);
-
+			//renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 			//renderer.drawAll();
 			if (USING_SHADOWS)
 				renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
