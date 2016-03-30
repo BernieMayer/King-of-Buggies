@@ -1012,14 +1012,7 @@ void GameManager::gameLoop()
 		}
 		state.clearEvents();
 
-		//Test code...
-		PlayerInfo* player = state.getPlayer(0);
-		vec3 posPlayer = player->getPos();
-
-		PlayerInfo* ai_state = state.getPlayer(1);
-		vec3 posAI = ai_state->getPos();
-
-		vec3 diff = posAI - posPlayer;
+		
 
 		if (!paused) {
 			// Check for player/coin collisions, and coin respawns also check for other collisions
