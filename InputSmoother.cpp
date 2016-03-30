@@ -295,7 +295,7 @@ bool InputSmoother::checkKonamiCode() {
 				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
 					return false;
 				}
-				else if (in.tiltBackward > 0.1) {
+				else if (in.tiltBackward > 0.4) {
 					// Do nothing
 				}
 				else {
@@ -331,7 +331,7 @@ bool InputSmoother::checkKonamiCode() {
 				if (in.drift || in.menu || in.horn || in.powerup || in.jump) {
 					return false;
 				}
-				else if (in.tiltForward > 0.2) {
+				else if (in.tiltForward > 0.4) {
 					// do nothing
 				}
 				else {
