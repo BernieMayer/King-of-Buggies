@@ -330,14 +330,14 @@ void GameManager::initMenus() {
 	vector<float> xOffsets;
 	vector<float> yOffsets;
 
-	const float lSel1XBase = -0.3f;
+	const float lSel1XBase = -0.55f;
 	const float lSel1YBase = -0.89f;
-	const float lSel2XBase = 0.27f;
+	const float lSel2XBase = 0.525f;
 	const float lSel2YBase = -0.89f;
-	const float cSel1XBase = -0.43f;
-	const float cSel2XBase = 0.15f;
-	const float cSel1YBase = -0.21f;
-	const float cSel2YBase = -0.92f;
+	const float cSel1XBase = -0.79f;
+	const float cSel2XBase = 0.25f;
+	const float cSel1YBase = -0.22f;
+	const float cSel2YBase = -0.93f;
 
 	float lSel1X = lSel1XBase;
 	float lSel1Y = lSel1YBase;
@@ -355,7 +355,7 @@ void GameManager::initMenus() {
 	yOffsets.push_back(lSel1Y);
 
 	float p1Scale = 0.25f;
-	const float iconWidthBase = 0.08f;
+	const float iconWidthBase = 0.145f;
 
 	float iconWidth = iconWidthBase;
 
@@ -511,20 +511,49 @@ void GameManager::initMenus() {
 				xOffsets[0] = lSel1X;
 			}
 
+			if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
+				xMod = (float)_interface.getWindowWidth() / (float)_interface.getWindowHeight();
+				yMod = 1.0f;
+			}
+			else if (_interface.getWindowHeight() > _interface.getWindowWidth()) {
+				xMod = 1.0f;
+				yMod = (float)_interface.getWindowHeight() / (float)_interface.getWindowWidth();
+			}
+			else {
+				xMod = 1.0f;
+				yMod = 1.0f;
+			}
+
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, xOffsets[0] / xMod, yOffsets[0] / yMod, p1Scale, p1Scale, ANCHOR::CENTER);
 
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
-
-			xMod = _interface.getComponentWidth(lScreen) / _interface.getWindowWidth();
-
-			//cout << "Window: " << _interface.getWindowWidth() << " Image: " << _interface.getComponentWidth(lScreen) << "\n";
 		}
 		// If car select menu
 		else if (currentMenu == 2) {
+
+			if (xOffsets[0] == lSel1X && in[0].turnR < -0.3f) {
+				xOffsets[0] = lSel2X;
+			}
+			else if (xOffsets[0] == lSel2X && in[0].turnL < -0.3f) {
+				xOffsets[0] = lSel1X;
+			}
+
+			if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
+				xMod = (float)_interface.getWindowWidth() / (float)_interface.getWindowHeight();
+				yMod = 1.0f;
+			}
+			else if (_interface.getWindowHeight() > _interface.getWindowWidth()) {
+				xMod = 1.0f;
+				yMod = (float)_interface.getWindowHeight() / (float)_interface.getWindowWidth();
+			}
+			else {
+				xMod = 1.0f;
+				yMod = 1.0f;
+			}
 
 			for (int i = 0; i < in.size(); i++) {
 
@@ -683,24 +712,24 @@ void GameManager::initMenus() {
 
 			_interface.assignSquare(Icon1);
 			_interface.assignTexture(Icon1, p1Icon, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(Icon1, xOffsets[0], yOffsets[0], p1Scale, p1Scale, ANCHOR::CENTER);
+			_interface.setDimensions(Icon1, xOffsets[0] / xMod, yOffsets[0] / yMod, p1Scale, p1Scale, ANCHOR::CENTER);
 
 			if (in.size() > 1) {
 				_interface.assignSquare(Icon2);
 				_interface.assignTexture(Icon2, p2Icon, ComponentInfo::UP_TEXTURE);
-				_interface.setDimensions(Icon2, xOffsets[1], yOffsets[1], p1Scale, p1Scale, ANCHOR::CENTER);
+				_interface.setDimensions(Icon2, xOffsets[1] / xMod, yOffsets[1] / yMod, p1Scale, p1Scale, ANCHOR::CENTER);
 			}
 
 			if (in.size() > 2) {
 				_interface.assignSquare(Icon3);
 				_interface.assignTexture(Icon3, p3Icon, ComponentInfo::UP_TEXTURE);
-				_interface.setDimensions(Icon3, xOffsets[2], yOffsets[2], p1Scale, p1Scale, ANCHOR::CENTER);
+				_interface.setDimensions(Icon3, xOffsets[2] / xMod, yOffsets[2] / yMod, p1Scale, p1Scale, ANCHOR::CENTER);
 			}
 
 			if (in.size() > 3) {
 				_interface.assignSquare(Icon4);
 				_interface.assignTexture(Icon4, p4Icon, ComponentInfo::UP_TEXTURE);
-				_interface.setDimensions(Icon4, xOffsets[3], yOffsets[3], p1Scale, p1Scale, ANCHOR::CENTER);
+				_interface.setDimensions(Icon4, xOffsets[3] / xMod, yOffsets[3] / yMod, p1Scale, p1Scale, ANCHOR::CENTER);
 			}
 
 			_interface.assignSquare(cScreen);
@@ -710,7 +739,7 @@ void GameManager::initMenus() {
 
 		_interface.assignSquare(menu);
 		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(menu, 1.f, -1.f, 4.f, 2.f, ANCHOR::BOTTOM_RIGHT);
+		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
 
 		
 		_interface.drawAll(&renderer);
