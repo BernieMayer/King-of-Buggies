@@ -24,6 +24,7 @@ public:
 	bool loadNavMesh(const char* fileName);
 	bool findNewPath(unsigned int playerNum, unsigned int targetNum, bool updateOld);
 	bool findNewPath(unsigned int playerNum, vec3 target, bool updateOld);
+	bool findNewPathConsideringPowerups(unsigned int playerNum, vec3 target, bool updateOld);
 	unsigned int updatePathProgress(unsigned int playerNum);
 	void getPathAsLines(unsigned int playerNum, vector<vec3>* lines);
 	vec3 getCurrentTarget(unsigned int playerNum);
@@ -85,6 +86,7 @@ private:
 	int indexOfGoldenBuggy = 0;
 	float aiType = 0;
 
+	int indexOfClosestPowerup(int playerID);
 	float facing(Entity* object, Entity* target);
 	float facing(Entity* object, vec3 targetPos);
 	float beside(Entity* object, Entity* target);

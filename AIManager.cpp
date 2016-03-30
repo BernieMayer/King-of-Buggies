@@ -47,6 +47,19 @@ bool AIManager::findNewPath(unsigned int playerNum, vec3 target, bool updateOld)
 	return nav.getPathPoints(&pathToGoal[playerNum], &nodesToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target, updateOld);
 }
 
+bool AIManager::findNewPathConsideringPowerups(unsigned int playerNum, vec3 target, bool updateOld)
+{
+	pathToGoal[playerNum].clear();
+	pointOnPath[playerNum] = 0;
+	/*
+	
+		if the distance to a powerup is less than some constant the path should be towards the powerup
+	*/
+	return nav.getPathPoints(&pathToGoal[playerNum], &nodesToGoal[playerNum], state->getPlayer(playerNum)->getPos(), state->getPlayer(playerNum)->getForward(), target, updateOld);
+
+
+}
+
 bool AIManager::debugAIPath(vector<vec3>* pathFinding, unsigned int playerNum, unsigned int numIterations)
 {
 	pathFinding->clear();
@@ -416,6 +429,27 @@ float AIManager::facing(Entity* object, vec3 targetPos) {
 	float result = dot(difference, objectForward);
 
 	return result;
+}
+
+int AIManager::indexOfClosestPowerup(int playerID)
+{
+	vec3 playerPos = state->getPlayer(playerID)->getPos();
+	float currentIndex = -1;
+	vec3 positionOfClosest = vec3(1000, 1000, 1000);	//Huge number... should be good for our level
+	for (int i = 0; i < state->numberOfPowerupBoxes(); i++)
+	{
+		PowerupBox* p = state->getPowerupBox(i);
+		vec3 powerupPos = p->getPos();
+		if (!p->getCollided())
+		{
+			if (abs(length(playerPos - positionOfClosest)) > abs(length(playerPos - powerupPos)))
+			{
+				positionOfClosest = powerupPos;
+				currentIndex = i;
+			}
+		}
+	}
+	return currentIndex;
 }
 
 // Returns positive if target is to the right of object

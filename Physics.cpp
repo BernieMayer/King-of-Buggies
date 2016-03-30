@@ -202,6 +202,7 @@ void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
+
 	vec3 downVec = -lastState->getPlayer(vehicleNum)->getUp();
 	downVec = 100000.f * downVec;
 	vehBody->addForce(getPxVec3(downVec));
@@ -209,6 +210,11 @@ void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 	
 	vec3 forwardVec = lastState->getPlayer(vehicleNum)->getForward();
 	forwardVec = 156200.f * forwardVec * vec3(1, 0, 1);
+	if (vehicleForwards[vehicleNum] == 0)
+	{
+		forwardVec *= -1;
+	}
+
 	vehBody->addForce(getPxVec3(forwardVec));
 }
 
@@ -218,7 +224,7 @@ void Physics::applyNitroBoost(unsigned int vehicleNum)
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
-	forceVec = 80000.f * forceVec * vec3(1, 0, 1);
+	forceVec = 160000.f * forceVec * vec3(1, 0, 1);
 	vehBody->addForce(getPxVec3(forceVec));
 }
 
@@ -514,6 +520,9 @@ void Physics::updateGameState(GameState* state, float time)
 					vec = normalize(vec);
 
 					float force = 1500000;
+					if (distance < 4.0f) {
+						distance = 4.0f;
+					}
 					vec = (force * (1 / (distance * distance))) * vec;
 					vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
 				}
@@ -1290,12 +1299,14 @@ GameState Physics::getSim() {
 	// Will get the simulation results
 	// True means that it will wait until the simulation is done if needed
 	gScene->fetchResults(true);
+
 	/*
 	if (vehiclesToDelete.size())
 	{
 		vehicleActors.erase(vehicleActors.begin() + vehicleActors.size() - 1);	//Should not be like this but is the easist way to handle this...
 	}
 	*/
+	
 	return GameState();
 }
 
@@ -1598,6 +1609,9 @@ void Physics::bombExplosion(int bombID) {
 	for (int i = 0; i < vehicleActors.size(); i++) {
 		vec3 vec = lastState->getPlayer(i)->getPos() - getVec3(bombActors[bombID]->getGlobalPose().p);
 		float distance = length(vec);
+		if (distance < 2.0f) {
+			distance = 2.0f;
+		}
 		vec = normalize(vec);
 
 		float force = 6000000;
