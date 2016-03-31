@@ -1400,7 +1400,7 @@ void GameManager::initTestScene()
 	//skyboxTextureID = renderer.getFramebufferTexture(fbo);
 	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
 	skyboxID = renderer.generateObjectID();
-	renderer.assignSkyDome(skyboxID, 70.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
+	renderer.assignSkyDome(skyboxID, 80.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
 	
 }
