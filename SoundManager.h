@@ -61,6 +61,7 @@ private:
 	void playSound(string fileName, vec3 pos, float volume);
 	void playSecretMusic(GameState state);
 	void playPauseSong(GameState state);
+	void playPauseSong2(GameState state);
 	void updateMusicPitch(GameState state, Input input);
 	void cleanOneTimeUseSources();
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
@@ -74,6 +75,9 @@ private:
 	vec3 listenerPos;
 	// Higher and distance will have less of an effect on volume, lower will increase the effect
 	float distanceDivider = 15.0f;
+
+	ALuint winSoundBuffer;
+	ALuint winSoundSource;
 
 	bool firstFrame = true;
 
@@ -90,6 +94,9 @@ private:
 	bool paused = false;
 	bool secretPlaying = false;
 	int lastSecretPlayed = -1;
+
+	float pauseSongPitch = 1.0f;
+	bool pause2Playing = false;
 };
 
 #endif // SOUNDMANAGER_H

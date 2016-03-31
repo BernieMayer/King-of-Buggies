@@ -587,7 +587,7 @@ void SoundManager::playPauseSong(GameState state) {
 	if (initSuccess) {
 		alSourceStop(musicSource);
 		ALuint buffer;
-		loadWavToBuf("PauseSong.wav", &musicSource, &buffer);
+		loadWavToBuf("PauseSong2.wav", &musicSource, &buffer);
 
 		PlayerInfo* p1 = state.getPlayer(0);
 
@@ -599,7 +599,29 @@ void SoundManager::playPauseSong(GameState state) {
 		alSourcef(musicSource, AL_GAIN, musicVolume);
 		alSourcefv(musicSource, AL_POSITION, SourcePos);
 		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-		alSourcei(musicSource, AL_LOOPING, AL_TRUE);
+		alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+
+		alSourcePlay(musicSource);
+	}
+}
+
+void SoundManager::playPauseSong2(GameState state) {
+	if (initSuccess) {
+		alSourceStop(musicSource);
+		ALuint buffer;
+		loadWavToBuf("PauseSong3.wav", &musicSource, &buffer);
+
+		PlayerInfo* p1 = state.getPlayer(0);
+
+		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+		alSourcei(musicSource, AL_BUFFER, buffer);
+		alSourcef(musicSource, AL_PITCH, 1.0f);
+		alSourcef(musicSource, AL_GAIN, musicVolume);
+		alSourcefv(musicSource, AL_POSITION, SourcePos);
+		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+		alSourcei(musicSource, AL_LOOPING, AL_FALSE);
 
 		alSourcePlay(musicSource);
 	}
@@ -622,7 +644,22 @@ void SoundManager::updateMusicPitch(GameState state, Input input) {
 }
 
 void SoundManager::playWinSound(vec3 pos) {
-	playSound("Yay.wav", pos, 1.0f);
+	if (initSuccess) {
+		alSourcePause(musicSource);
+
+		loadWavToBuf("Win.wav", &winSoundSource, &winSoundBuffer);
+
+		ALfloat *SourcePos = vec3ToALfloat(pos).data();
+		float volume = distanceVolumeAdjuster(1.0f, pos);
+
+		alSourcei(winSoundSource, AL_BUFFER, winSoundBuffer);
+		alSourcef(winSoundSource, AL_PITCH, 1.0f);
+		alSourcef(winSoundSource, AL_GAIN, volume);
+		alSourcefv(winSoundSource, AL_POSITION, SourcePos);
+		alSourcei(winSoundSource, AL_LOOPING, AL_FALSE);
+
+		alSourcePlay(winSoundSource);
+	}
 }
 
 void SoundManager::playLossSound(vec3 pos) {
@@ -682,12 +719,12 @@ void SoundManager::cleanOneTimeUseSources() {
  */
 void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	if (initSuccess) {
-		updateListener(state);
-		updateMusic(state);
-		updateEngineSounds(state, inputs);
-		updateFuses(state);
-
-		//updateHonks(state, inputs);
+		if (!paused) {
+			updateListener(state);
+			updateMusic(state);
+			updateEngineSounds(state, inputs);
+			updateFuses(state);
+		}
 
 		cleanOneTimeUseSources();
 
@@ -701,6 +738,15 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		// Change to menu later
 		if (inputs[0].menu && !paused && !secretPlaying && !firstFrame) {
 			paused = true;
+			for (int i = 0; i < MAX_PLAYERS; i++) {
+				alSourcePause(engineSources[i]);
+				alSourcePause(honkSources[i]);
+			}
+
+			for (int i = 0; i < fuseSources.size(); i++) {
+				alSourcePause(fuseSources[i]);
+			}
+
 			if (!secretPlaying) {
 				alDeleteBuffers(1, &musicBuffer);
 				alDeleteSources(1, &musicSource);
@@ -709,12 +755,37 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		}
 		else if (inputs[0].menu && paused) {
 			paused = false;
+			for (int i = 0; i < MAX_PLAYERS; i++) {
+				alSourcePlay(engineSources[i]);
+				alSourcePlay(honkSources[i]);
+			}
+
+			for (int i = 0; i < fuseSources.size(); i++) {
+				alSourcePlay(fuseSources[i]);
+			}
 			if (!secretPlaying) {
 				alSourceStop(musicSource);
 				alDeleteBuffers(1, &musicBuffer);
 				alDeleteSources(1, &musicSource);
 				startMusic(state);
 			}
+			pause2Playing = false;
+			pauseSongPitch = 1.0f;
+		}
+
+		if (paused) {
+			if (!pause2Playing && pauseSongPitch < 2.0f) {
+				pauseSongPitch += 0.00006f;
+				alSourcef(musicSource, AL_PITCH, pauseSongPitch);
+			}
+		}
+
+		ALint winSoundState;
+		alGetSourcei(winSoundSource, AL_SOURCE_STATE, &winSoundState);
+		if (winSoundState == AL_STOPPED) {
+			alSourcePlay(musicSource);
+			alDeleteBuffers(1, &winSoundBuffer);
+			alDeleteSources(1, &winSoundSource);
 		}
 
 		ALint musicState;
@@ -725,7 +796,13 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			if (paused) {
 				alDeleteBuffers(1, &musicBuffer);
 				alDeleteSources(1, &musicSource);
-				playPauseSong(state);
+				if (pauseSongPitch >= 2.0f) {
+					playPauseSong2(state);
+					pause2Playing = true;
+				}
+				else {
+					playPauseSong(state);
+				}
 			}
 			else {
 				alDeleteBuffers(1, &musicBuffer);
