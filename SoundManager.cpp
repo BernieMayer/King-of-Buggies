@@ -60,6 +60,7 @@ void SoundManager::initListener(GameState state) {
 		for (int i = 0; i < state.numberOfPlayers(); i++) {
 			honking.push_back(false);
 			honkSources.push_back(0);
+			honkBuffers.push_back(0);
 		}
 	}
 }
@@ -230,9 +231,7 @@ float SoundManager::distanceVolumeAdjuster(float volume, vec3 pos) {
 void SoundManager::startEngineSounds(GameState state) {
 	if (initSuccess) {
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-			ALuint buffer;
-
-			loadWavToBuf("Idle.wav", &engineSources[i], &buffer);
+			loadWavToBuf("Idle.wav", &engineSources[i], &engineBuffers[i]);
 
 			PlayerInfo* player = state.getPlayer(i);
 
@@ -241,7 +240,7 @@ void SoundManager::startEngineSounds(GameState state) {
 
 			float volume = distanceVolumeAdjuster(idleEngineVolume, state.getPlayer(i)->getPos());
 
-			alSourcei(engineSources[i], AL_BUFFER, buffer);
+			alSourcei(engineSources[i], AL_BUFFER, engineBuffers[i]);
 			alSourcef(engineSources[i], AL_PITCH, 1.0f);
 			alSourcef(engineSources[i], AL_GAIN, volume);
 			alSourcefv(engineSources[i], AL_POSITION, SourcePos);
@@ -322,10 +321,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 
 			if (inputs[i].horn) {
 				if (!honking[i]) {
-
-					ALuint buffer;
-
-					loadWavToBuf("Honk.wav", &honkSources[i], &buffer);
+					loadWavToBuf("Honk.wav", &honkSources[i], &honkBuffers[i]);
 
 					PlayerInfo* player = state.getPlayer(i);
 
@@ -334,7 +330,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 
 
 					float volume = distanceVolumeAdjuster(1.0, state.getPlayer(i)->getPos());
-					alSourcei(honkSources[i], AL_BUFFER, buffer);
+					alSourcei(honkSources[i], AL_BUFFER, honkBuffers[i]);
 					alSourcef(honkSources[i], AL_PITCH, 1.0);
 					alSourcef(honkSources[i], AL_GAIN, volume);
 					alSourcefv(honkSources[i], AL_POSITION, SourcePos);
@@ -357,6 +353,9 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 			else {
 				if (honking[i]) {
 					alSourceStop(honkSources[i]);
+					alDeleteSources(1, &honkSources[i]);
+					alDeleteBuffers(1, &honkBuffers[i]);
+
 					honking[i] = false;
 				}
 			}
@@ -715,6 +714,74 @@ void SoundManager::cleanOneTimeUseSources() {
 }
 
 /*
+ * Pauses all sound effects, no effect on music
+ * Win sound is also excluded BECAUSE NOTHING CAN STOP IT
+ */
+void SoundManager::pauseAllSounds() {
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		alSourcePause(engineSources[i]);
+		alSourcePause(honkSources[i]);
+	}
+
+	for (int i = 0; i < oneTimeUseSources.size(); i++) {
+		alSourcePause(oneTimeUseSources[i]);
+	}
+
+	for (int i = 0; i < fuseSources.size(); i++) {
+		alSourcePause(fuseSources[i]);
+	}
+}
+
+/*
+ * Resumes all sound effects, no effect on music
+ */
+void SoundManager::resumeAllSounds() {
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		alSourcePlay(engineSources[i]);
+		alSourcePlay(honkSources[i]);
+	}
+
+	for (int i = 0; i < oneTimeUseSources.size(); i++) {
+		alSourcePlay(oneTimeUseSources[i]);
+	}
+
+	for (int i = 0; i < fuseSources.size(); i++) {
+		alSourcePlay(fuseSources[i]);
+	}
+}
+
+/*
+ * Deletes ALL sources and buffers
+ * Only to be used before restarting a game or closing the game
+ */
+void SoundManager::deleteAll() {
+	for (int i = 0; i < oneTimeUseSources.size(); i++) {
+		alDeleteSources(1, &oneTimeUseSources[i]);
+		oneTimeUseSources.erase(oneTimeUseSources.begin() + i);
+		alDeleteBuffers(1, &oneTimeUseBuffers[i]);
+		oneTimeUseBuffers.erase(oneTimeUseBuffers.begin() + i);
+	}
+
+	for (int i = 0; i < MAX_PLAYERS; i++) {
+		alDeleteSources(1, &engineSources[i]);
+		alDeleteBuffers(1, &engineBuffers[i]);
+
+		alDeleteSources(1, &honkSources[i]);
+		honkSources.erase(honkSources.begin() + i);
+		alDeleteBuffers(1, &honkBuffers[i]);
+		honkBuffers.erase(honkBuffers.begin() + i);
+	}
+
+	for (int i = 0; i < fuseSources.size(); i++) {
+		stopFuse(i);
+		i--;
+	}
+
+	alDeleteSources(1, &winSoundSource);
+	alDeleteBuffers(1, &winSoundBuffer);
+}
+
+/*
  * Updates all sounds
  */
 void SoundManager::updateSounds(GameState state, Input inputs[]) {
@@ -738,14 +805,7 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		// Change to menu later
 		if (inputs[0].menu && !paused && !secretPlaying && !firstFrame) {
 			paused = true;
-			for (int i = 0; i < MAX_PLAYERS; i++) {
-				alSourcePause(engineSources[i]);
-				alSourcePause(honkSources[i]);
-			}
-
-			for (int i = 0; i < fuseSources.size(); i++) {
-				alSourcePause(fuseSources[i]);
-			}
+			pauseAllSounds();
 
 			if (!secretPlaying) {
 				alDeleteBuffers(1, &musicBuffer);
@@ -755,14 +815,8 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 		}
 		else if (inputs[0].menu && paused) {
 			paused = false;
-			for (int i = 0; i < MAX_PLAYERS; i++) {
-				alSourcePlay(engineSources[i]);
-				alSourcePlay(honkSources[i]);
-			}
+			resumeAllSounds();
 
-			for (int i = 0; i < fuseSources.size(); i++) {
-				alSourcePlay(fuseSources[i]);
-			}
 			if (!secretPlaying) {
 				alSourceStop(musicSource);
 				alDeleteBuffers(1, &musicBuffer);

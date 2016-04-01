@@ -33,6 +33,11 @@ public:
 	void playMineCreationSound(vec3 pos) { playSound("MinePlace.wav", pos, 1.0f); }
 	void playNitroSound(vec3 pos) { playSound("Nitro.wav", pos, 1.0f); }
 
+	void pauseAllSounds();
+	void resumeAllSounds();
+
+	void deleteAll();
+
 	void startMenuSong(GameState state);
 	void updateMenuSong(GameState state);
 	void stopMenuSong();
@@ -68,6 +73,7 @@ private:
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicBuffer;
 	ALuint musicSource;
+	ALuint engineBuffers[MAX_PLAYERS];
 	ALuint engineSources[MAX_PLAYERS];
 	ALuint listener;
 	vector<ALuint> oneTimeUseBuffers;
@@ -87,6 +93,7 @@ private:
 
 	vector<bool> honking;
 	vector<ALuint> honkSources;
+	vector<ALuint> honkBuffers;
 
 	vector<ALuint> fuseBuffers;
 	vector<ALuint> fuseSources;

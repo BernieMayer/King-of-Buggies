@@ -44,6 +44,8 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	playerColours.push_back(1);
 	playerColours.push_back(2);
 	playerColours.push_back(3);
+
+	sound = SoundManager(state);
 }
 
 
@@ -302,7 +304,6 @@ void GameManager::createBoostPad(unsigned int objectID)
 }
 
 void GameManager::initMenus() {
-	sound = SoundManager(state);
 	sound.startMenuSong(state);
 	
 	int redIndex = 0;
@@ -395,7 +396,7 @@ void GameManager::initMenus() {
 			in.push_back(smoothers[i].smooth(input.getInput(i), false));
 		}
 
-		if (in[0].horn) {
+		if (in[0].horn || glfwWindowShouldClose(window)) {
 			_interface.clear();
 
 			// Clear input so no input given for new menu on transition frame
@@ -412,6 +413,7 @@ void GameManager::initMenus() {
 			sound.playDingSound();
 			gameInit();
 
+			gameLoop();
 			return;
 		}
 		if ((in[0].menu || in[0].powerup || in[0].jump || in[0].horn || in[0].drift) && currentMenu == 0) {
@@ -495,6 +497,7 @@ void GameManager::initMenus() {
 			sound.playDingSound();
 			gameInit();
 
+			gameLoop();
 			return;
 		}
 
@@ -816,7 +819,7 @@ void GameManager::gameLoop()
 	//unsigned int numScreens = 2;
 	renderer.splitScreenViewports(numScreens);
 
-	while (!glfwWindowShouldClose(window))
+	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
 
 		//Get inputs from players/ai
@@ -1236,7 +1239,8 @@ void GameManager::gameLoop()
 
 		clock.start();
 	}
-	quitGame(winner);
+	sound.pauseAllSounds();
+	displayEndScreen(winner);
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -1477,9 +1481,123 @@ int GameManager::randomPowerup()
 	return powerupId;
 }
 
-void GameManager::quitGame(unsigned int winnerID)
+void GameManager::displayEndScreen(unsigned int winnerID)
 {
+	_interface.clear();
 
+	const float xOffset1Base = -0.625f;
+	const float xOffset2Base = 0.6f;
+	const float yOffset1Base = -0.9f;
+	const float yOffset2Base = -0.9f;
+
+	float xOffset = xOffset1Base;
+	float yOffset = yOffset1Base;
+
+	float xMod = 1.0f;
+	float yMod = 1.0f;
+
+	unsigned int winnerTexture;
+	if (winner == 0) {
+		winnerTexture = LoadTexture("menus/Player1.png");
+	}
+	else if (winner == 1) {
+		winnerTexture = LoadTexture("menus/Player2.png");
+	}
+	else if (winner == 2) {
+		winnerTexture = LoadTexture("menus/Player3.png");
+	}
+	else {
+		winnerTexture = LoadTexture("menus/Player4.png");
+	}
+	unsigned int winnerIcon = _interface.generateComponentID();
+
+	unsigned int p1Texture = LoadTexture("menus/P1Icon.png");
+	unsigned int p1Icon = _interface.generateComponentID();
+
+	unsigned int endScreenTexture = LoadTexture("menus/KoB_EndScreen.bmp");
+	unsigned int endScreen = _interface.generateComponentID();
+
+	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
+	unsigned int menu = _interface.generateComponentID();
+
+
+	Input in = input.getInput(1);
+	bool doneLoop = false;
+	while (!doneLoop) {
+		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+
+		if (glfwWindowShouldClose(window)) {
+			return;
+		}
+
+		if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
+			xMod = (float)_interface.getWindowWidth() / (float)_interface.getWindowHeight();
+			yMod = 1.0f;
+		}
+		else if (_interface.getWindowHeight() > _interface.getWindowWidth()) {
+			xMod = 1.0f;
+			yMod = (float)_interface.getWindowHeight() / (float)_interface.getWindowWidth();
+		}
+		else {
+			xMod = 1.0f;
+			yMod = 1.0f;
+		}
+
+		Input in = input.getInput(1);
+		if (in.turnL < -0.3 && xOffset == xOffset2Base) {
+			xOffset = xOffset1Base;
+			yOffset = yOffset1Base;
+		}
+		else if (in.turnR < -0.3 && xOffset == xOffset1Base) {
+			xOffset = xOffset2Base;
+			yOffset = yOffset2Base;
+		}
+
+		_interface.assignSquare(p1Icon);
+		_interface.assignTexture(p1Icon, p1Texture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(p1Icon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
+
+		_interface.assignSquare(winnerIcon);
+		_interface.assignTexture(winnerIcon, winnerTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(winnerIcon, 0.0f, 0.2f, 1, 0.268f, ANCHOR::CENTER);
+
+		_interface.assignSquare(endScreen);
+		_interface.assignTexture(endScreen, endScreenTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(endScreen, 0.0f, 0.0f, 2, 2, ANCHOR::CENTER);
+
+		_interface.assignSquare(menu);
+		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(menuBackground, 0.0f, 0.0f, 16, 8, ANCHOR::CENTER);
+
+		if (in.jump && !in.isKeyboard) {
+			doneLoop = true;
+		}
+		else if (in.powerup && in.isKeyboard) {
+			doneLoop = true;
+		}
+
+		_interface.drawAll(&renderer);
+
+		//Swap buffers  
+		glfwSwapBuffers(window);
+		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+		glfwPollEvents();
+	}
+
+	if (xOffset == xOffset1Base) {
+		_interface.clear();
+		partialTeardown();
+		initMenus();
+	}
+	else {
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
+
+void GameManager::partialTeardown() {
+	vehicleColours.clear();
+
+	state.clear();
 }
 
 #endif // GAMEMANAGER_CPP

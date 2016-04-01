@@ -521,4 +521,10 @@ void GameState::applyRotations()
 	}
 }
 
+void GameState::clear() {
+	clearEvents();
+
+
+}
+
 #endif // GAMESTATE_CPP

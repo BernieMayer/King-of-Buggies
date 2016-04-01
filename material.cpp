@@ -56,6 +56,9 @@ void Material::useShader(){
 }
 void Material::useTextureShader(){ 
 	programID = shaderList.shaderIDs[shaderIndex + ShaderList::TEXTURE_OFFSET];
+	if (programID >= ShaderList::COUNT) {
+		cout << " ";
+	}
 	glUseProgram(programID); 
 }
 void Material::useShadowShader(){

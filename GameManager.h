@@ -127,11 +127,11 @@ public:
 	void gameInit();
 	void initTestScene();
 	void initUI();
-	void quitGame(unsigned int winnerID);
+	void displayEndScreen(unsigned int winnerID);
 
 	int randomPowerup();
 
-
+	void partialTeardown();
 };
 
 #endif // GAMEMANAGER_H

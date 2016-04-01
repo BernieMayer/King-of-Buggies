@@ -121,6 +121,8 @@ public:
 
 	bool checkCoinCollision(vec3 playerPos);
 	unsigned int numOfDecoys = 0;
+
+	void clear();
 };
 
 #endif // GAMESTATE_H
