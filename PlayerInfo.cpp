@@ -35,7 +35,10 @@ bool PlayerInfo::isDecoy(){ return decoy; }
 void PlayerInfo::setDecoy(bool value){ decoy = value; }
 
 float PlayerInfo::getScore() { return score; }
-void PlayerInfo::incrementScore(float timeSinceLastScoreUpdate) {	score += 1 * (timeSinceLastScoreUpdate / (1.0f / 60.0f)); }
+void PlayerInfo::incrementScore(float timeSinceLastScoreUpdate, float pausedTime) {	
+	score += 1 * (timeSinceLastScoreUpdate / (1.0f / 60.0f)); 
+	score -= (pausedTime / (1.0f / 60.0f));
+}
 
 void PlayerInfo::addPowerUp(int id)
 {

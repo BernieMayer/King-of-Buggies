@@ -18,7 +18,7 @@ public:
 	void setDecoy(bool value);
 
 	float getScore();
-	void incrementScore(float timeSinceLastScoreUpdate);
+	void incrementScore(float timeSinceLastScoreUpdate, float pausedTime);
 
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);

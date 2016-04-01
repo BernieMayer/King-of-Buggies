@@ -856,9 +856,11 @@ void GameManager::gameLoop()
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
+				pauseStartTime = clock.getCurrentTime();
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
+				totalPausedTime = clock.getTimeSince(pauseStartTime);
 			}
 		}
 		firstFrame = false;
@@ -1029,7 +1031,6 @@ void GameManager::gameLoop()
 					physics.modifySpeed(i, 0.3333f);
 					sound.playDingSound(state.getPlayer(i)->getPos());
 					state.getPlayer(i)->addCoin();
-					printf("Player %i coin number: %i", i, state.getPlayer(i)->getNumCoins());
 					_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
 				}
 
@@ -1195,8 +1196,10 @@ void GameManager::gameLoop()
 		
 		if (!paused) {
 			// increase score and check win conditions
-			state.getGoldenBuggy()->incrementScore(clock.getTimeSince(lastScoreUpdateTime));
+			state.getGoldenBuggy()->incrementScore(clock.getTimeSince(lastScoreUpdateTime), totalPausedTime);
 			lastScoreUpdateTime = clock.getCurrentTime();
+			totalPausedTime = 0.f;
+
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
 			if ((theScore % 100) == 0) {
 				std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
@@ -1453,6 +1456,8 @@ void GameManager::initUI()
 		else if (i == 3)
 			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
 	}
+
+	totalPausedTime = 0.f;
 
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");

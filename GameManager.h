@@ -38,6 +38,8 @@ private:
 	vector<InputSmoother> smoothers;
 
 	Timer clock;
+	timeb pauseStartTime;
+	float totalPausedTime;
 
 	Camera cam[MAX_PLAYERS];
 
