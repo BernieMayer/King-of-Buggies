@@ -662,7 +662,20 @@ void SoundManager::playWinSound(vec3 pos) {
 }
 
 void SoundManager::playLossSound(vec3 pos) {
-	playSound("Trombone.wav", pos, 1.0f);
+	alSourcePause(musicSource);
+
+	loadWavToBuf("Trombone.wav", &winSoundSource, &winSoundBuffer);
+
+	ALfloat *SourcePos = vec3ToALfloat(pos).data();
+	float volume = distanceVolumeAdjuster(1.0f, pos);
+
+	alSourcei(winSoundSource, AL_BUFFER, winSoundBuffer);
+	alSourcef(winSoundSource, AL_PITCH, 1.0f);
+	alSourcef(winSoundSource, AL_GAIN, volume);
+	alSourcefv(winSoundSource, AL_POSITION, SourcePos);
+	alSourcei(winSoundSource, AL_LOOPING, AL_FALSE);
+
+	alSourcePlay(winSoundSource);
 }
 
 void SoundManager::playMineExplosionSound(vec3 pos) {

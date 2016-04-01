@@ -202,20 +202,17 @@ void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
-
-	vec3 downVec = -lastState->getPlayer(vehicleNum)->getUp();
-	downVec = 100000.f * downVec;
-	vehBody->addForce(getPxVec3(downVec));
-
-	
-	vec3 forwardVec = lastState->getPlayer(vehicleNum)->getForward();
-	forwardVec = 156200.f * forwardVec * vec3(1, 0, 1);
-	if (vehicleForwards[vehicleNum] == 0)
+	if (!vehicleInAir[vehicleNum])
 	{
-		forwardVec *= -1;
-	}
+		vec3 forwardVec = lastState->getPlayer(vehicleNum)->getForward();
+		forwardVec = 156200.f * forwardVec * vec3(1, 0, 1);
+		if (vehicleForwards[vehicleNum] == 0)
+		{
+			forwardVec *= -1;
+		}
 
-	vehBody->addForce(getPxVec3(forwardVec));
+		vehBody->addForce(getPxVec3(forwardVec));
+	}
 }
 
 void Physics::applyNitroBoost(unsigned int vehicleNum)
@@ -554,6 +551,7 @@ void Physics::updateGameState(GameState* state, float time)
 
 /**
  * Converts the input from input manager
+ * Not used
  */
 void Physics::giveInput(Input input, int playernum) {
 
@@ -647,7 +645,38 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_LEFT, input->turnL);
 	vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_STEER_RIGHT, input->turnR);
-	if (lastState != NULL && vehicleInAir[id]) {
+
+	// If in air and no in air controls given
+	// Try to stabilize
+	if (lastState != NULL && vehicleInAir[id] && input->spinL == 0.0f && input->spinR == 0.0f && input->rollL == 0.0f && input->rollR == 0.0f && input->tiltForward == 0.0f && input->tiltBackward == 0.0f && !vehicleStuck[id]) {
+		// Dot vehicle right vector with <0.0, 1.0, 0.0> 
+		// If 0 then fine, if > 0 roll right, if <0 roll left
+		vec3 sideVec = cross(lastState->getPlayer(id)->getForward(), lastState->getPlayer(id)->getUp());
+		float sideDotProduct = dot(sideVec, vec3(0.0f, 1.0f, 0.0f));
+
+		vec3 forwardsVec = lastState->getPlayer(id)->getForward();
+		float forwardDotProduct = dot(forwardsVec, vec3(0.0f, 1.0f, 0.0f));
+
+		float force = 300.0f;
+		if (sideDotProduct > 0) {
+			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(force * forwardsVec));
+		}
+		else if (sideDotProduct < 0) {
+			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(-force * forwardsVec));
+		}
+
+		if (forwardDotProduct < 0) {
+			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(force * sideVec));
+		}
+		else if (forwardDotProduct > 0) {
+			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(-force * sideVec));
+		}
+
+		// Dot vehicle forwards vector with <0.0, 1.0, 0.0>
+		// If 0 then fine, if > 0 tilt forwards, if < 0 tilt backwards
+	}
+	// if in air and some in air controls given
+	else if (lastState != NULL && vehicleInAir[id]) {
 		
 		// Spinning
 		vec3 upVec = lastState->getPlayer(id)->getUp();
@@ -1338,7 +1367,7 @@ PxVehicleDrivableSurfaceToTireFrictionPairs* Physics::createFrictionPairs(const 
 }
 
 
-
+// Deprecated
 void Physics::buggyExplosion(int gBuggyIndex) {
 	for (int i = 0; i < vehicleActors.size(); i++) {
 		if (i != gBuggyIndex) {
