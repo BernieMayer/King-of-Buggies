@@ -47,7 +47,8 @@ Renderer::ObjectInfo::ObjectInfo():
 	deleted(false),
 	texID(NO_VALUE),
 	transform(1.f),
-	scaling(1.f)
+	scaling(1.f),
+	bufferedIndex(NO_VALUE)
 {
 }
 
@@ -57,7 +58,7 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
 }
 
 Renderer::Renderer(GLFWwindow* _window) : window(_window), debugging(false), 
-projection(1.f), modelview(1.f), activeViewport(0), shadowTexUnit(0)
+projection(1.f), modelview(1.f), activeViewport(0), shadowTexUnit(0), objectAdded(false)
 {
 	shaderList.initShaders();
 
@@ -1157,6 +1158,124 @@ void Renderer::initializeVAOs()
 		sizeof(vec2),	//Stride
 		(void*)0			//Offset
 		);
+	
+}
+
+void Renderer::initializeBufferedVAOs()
+{
+	//Vertex only VAO
+	glBindVertexArray(vao[VAO::VERT_BUFFERED]);		//Bind vertex array
+	//Vertex vbo
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::V_VERT_BUFFERED]);
+	glVertexAttribPointer(
+		0,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+
+	//Vertex and Normal VAO
+	glBindVertexArray(vao[VAO::VERT_NORMALS_BUFFERED]);		//Bind vertex array
+	//Vertex vbo
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VN_VERT_BUFFERED]);
+	glVertexAttribPointer(
+		0,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+
+	//Normal vbo
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VN_NORMALS_BUFFERED]);
+	glVertexAttribPointer(
+		1,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+
+	//Vertex and UV VAO
+	glBindVertexArray(vao[VAO::VERT_UVS]);		//Bind vertex array
+	//Vertex vbo
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VT_VERT_BUFFERED]);
+	glVertexAttribPointer(
+		0,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+
+	//UV vbo
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VT_UVS_BUFFERED]);
+	glVertexAttribPointer(
+		1,				//Attribute
+		2,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec2),	//Stride
+		(void*)0			//Offset
+		);
+
+
+	//Vertex, Normal and UV VAO
+	glBindVertexArray(vao[VAO::VERT_NORMALS_UVS_BUFFERED]);	//Bind vertex array
+	//Vertex vbo
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VNT_VERT_BUFFERED]);
+	glVertexAttribPointer(
+		0,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+
+	//Normal vbo
+	glEnableVertexAttribArray(1);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VNT_NORMALS_BUFFERED]);
+	glVertexAttribPointer(
+		1,				//Attribute
+		3,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec3),	//Stride
+		(void*)0			//Offset
+		);
+
+	//UV vbo
+	glEnableVertexAttribArray(2);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VNT_UVS_BUFFERED]);
+	glVertexAttribPointer(
+		2,				//Attribute
+		2,				//Size
+		GL_FLOAT,			//Type
+		GL_FALSE,			//Normalized?
+		sizeof(vec2),	//Stride
+		(void*)0			//Offset
+		);
+
+}
+
+
+void Renderer::loadOptimizedBuffers()
+{
+	if (!objectAdded)
+		return;
+
 	
 }
 

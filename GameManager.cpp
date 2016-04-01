@@ -21,7 +21,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 
 	timePassedDecoy = 0;
 
-	renderer.loadPerspectiveTransform(0.1f, 100.f, 80.f);		//Near, far, fov
+	renderer.loadPerspectiveTransform(0.1f, 100.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam[0]);
 
 	ai = AIManager(&state);
@@ -1213,6 +1213,8 @@ void GameManager::gameLoop()
 				//break;
 			}
 		}
+
+		renderer.useViewport(0);
 
 		//Get path
 		path.clear();

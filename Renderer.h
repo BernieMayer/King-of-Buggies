@@ -34,11 +34,17 @@ struct SHADOW_BEHAVIOUR{
 			 };
 };
 struct VAO{
-	enum { VERT = 0, VERT_NORMALS, VERT_UVS, VERT_NORMALS_UVS, COUNT };
+	enum { VERT = 0, VERT_NORMALS, VERT_UVS, VERT_NORMALS_UVS, 
+			VERT_BUFFERED, VERT_NORMALS_BUFFERED, VERT_UVS_BUFFERED, VERT_NORMALS_UVS_BUFFERED, COUNT };
 };
 
 struct VBO{
-	enum { VERT = 0, NORMALS, UVS, INDICES, COUNT };
+	enum { VERT = 0, NORMALS, UVS, INDICES, 
+			V_VERT_BUFFERED,
+			VN_VERT_BUFFERED, VN_NORMALS_BUFFERED,
+			VT_VERT_BUFFERED, VT_UVS_BUFFERED,
+			VNT_VERT_BUFFERED, VNT_NORMALS_BUFFERED, VNT_UVS_BUFFERED,
+			COUNT };
 };
 
 struct Viewport{
@@ -82,6 +88,8 @@ private:
 		unsigned int shadowBehaviour;
 		bool deleted;
 
+		unsigned int bufferedIndex;
+
 		//Information about object orientation
 		mat4 transform;
 		mat4 scaling;
@@ -109,6 +117,20 @@ private:
 	vector<LightInfo> lights;
 	vector<Viewport> viewports;
 
+	//Optimized buffers
+	vector<unsigned int> v_ind;
+	vector<vec3> v_verts;
+	vector<unsigned int> vn_ind;
+	vector<vec3> vn_verts;
+	vector<vec3> vn_normals;
+	vector<unsigned int> vt_ind;
+	vector<vec3> vt_verts;
+	vector<vec2> vt_uvs;
+	vector<unsigned int> vnt_ind;
+	vector<vec3> vnt_verts;
+	vector<vec3> vnt_normals;
+	vector<vec2> vnt_uvs;
+
 	unsigned int activeViewport;
 	unsigned int activeFramebuffer;
 	unsigned int shadowTexUnit;
@@ -130,12 +152,14 @@ private:
 	float randomPoints[RANDOM_POINT_NUM];
 
 	bool debugging;
+	bool objectAdded;
 
 	/**
 	* Functions
 	**/
 
-	void initializeVAOs();		
+	void initializeVAOs();
+	void initializeBufferedVAOs();
 	bool loadBuffers(const ObjectInfo& object);		
 	bool loadVertBuffer(const ObjectInfo& object);	
 	bool loadVertNormalBuffer(const ObjectInfo& object);
@@ -229,6 +253,7 @@ public:
 
 
 	void drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors);
+	
 	//Debugging draw calls
 	void drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform);
 	void drawPoints(const vector<vec3>& points, vec3 color, const mat4& objectTransform);
@@ -256,6 +281,9 @@ public:
 
 	//External buffer loading
 	bool loadVertUVBuffer(vector<vec3>* verts, vector<vec2>* uvs);
+
+	//Optimize buffer
+	void loadOptimizedBuffers();
 
 	//Window dimensions
 	unsigned int getHeight();
