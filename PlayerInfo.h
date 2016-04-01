@@ -17,8 +17,8 @@ public:
 	bool isDecoy();
 	void setDecoy(bool value);
 
-	int getScore();
-	void incrementScore();
+	float getScore();
+	void incrementScore(float timeSinceLastScoreUpdate);
 
 	unsigned int getWheelRenderID(unsigned int wheelNum);
 	mat4 getWheelTransform(unsigned int wheelNum);
@@ -61,7 +61,7 @@ protected:
 	float energyForNitro;
 	int powerup;
 	int numCoins;
-	int score;
+	float score;
 	bool goldenBuggy;
 	bool ai;
 	bool decoy = false;

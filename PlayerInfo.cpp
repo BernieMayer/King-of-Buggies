@@ -34,8 +34,8 @@ void PlayerInfo::setAI(bool value) { ai = value; }
 bool PlayerInfo::isDecoy(){ return decoy; }
 void PlayerInfo::setDecoy(bool value){ decoy = value; }
 
-int PlayerInfo::getScore() { return score; }
-void PlayerInfo::incrementScore() {	score++; }
+float PlayerInfo::getScore() { return score; }
+void PlayerInfo::incrementScore(float timeSinceLastScoreUpdate) {	score += 1 * (timeSinceLastScoreUpdate / (1.0f / 60.0f)); }
 
 void PlayerInfo::addPowerUp(int id)
 {

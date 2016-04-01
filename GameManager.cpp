@@ -1195,7 +1195,8 @@ void GameManager::gameLoop()
 		
 		if (!paused) {
 			// increase score and check win conditions
-			state.getGoldenBuggy()->incrementScore();
+			state.getGoldenBuggy()->incrementScore(clock.getTimeSince(lastScoreUpdateTime));
+			lastScoreUpdateTime = clock.getCurrentTime();
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
 			if ((theScore % 100) == 0) {
 				std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
@@ -1406,7 +1407,8 @@ void GameManager::initTestScene()
 	skyboxID = renderer.generateObjectID();
 	renderer.assignSkyDome(skyboxID, 80.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
-	
+
+	lastScoreUpdateTime = clock.getCurrentTime();
 }
 
 void GameManager::initUI()

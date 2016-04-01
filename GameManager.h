@@ -87,6 +87,7 @@ private:
 	unsigned int carSelectScreen;
 
 	timeb pauseTime;
+	timeb lastScoreUpdateTime;
 
 	vector<int> playerColours;
 
