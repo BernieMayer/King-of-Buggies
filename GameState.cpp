@@ -524,7 +524,14 @@ void GameState::applyRotations()
 void GameState::clear() {
 	clearEvents();
 
-
+	ai.clear();
+	players.clear();
+	decoys.clear();
+	coins.clear();
+	mines.clear();
+	boostPads.clear();
+	powerups.clear();
+	boxes.clear();
 }
 
 #endif // GAMESTATE_CPP

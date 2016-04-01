@@ -612,4 +612,29 @@ bool AIManager::atPoint(int playerNum, vec3 pos) {
 	}
 }
 
+void AIManager::clear() {
+	inputs.clear();
+	pastInfo.clear();
+
+	recoveryThreshold = 60;
+	collisionRecovery = false;
+	collisionRecoveryCounter = 0;
+	collisionRecoveryCounterMax = 1 * 60;
+
+	pathToGoal.clear();
+	nodesToGoal.clear();
+	pointOnPath.clear();
+	prevPosition.clear();
+
+	lastDot = NULL;
+	lastTurnL = false;
+	frameCounter = 0;
+	reversing.clear();
+	carSpeed = 1.0f;
+	// Default drive to position
+	lastDriveToPos = vec3(-13, 0.5, -15);
+	indexOfGoldenBuggy = 0;
+	aiType = 0;
+}
+
 #endif

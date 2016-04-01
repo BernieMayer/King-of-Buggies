@@ -1651,4 +1651,43 @@ void Physics::bombExplosion(int bombID) {
 
 }
 
+void Physics::clear() {
+	newGoldenBuggy = false;
+	indexOfGoldenBuggy = 0;
+	indexOfOldGoldenBuggy = 0;
+	initVehicleSpeed = 500.f;
+	goldenBuggyLock = false;
+	gbLockEndTime = 1.0f;
+	lastFrameEnd = clock.getCurrentTime();
+
+	// Their actors should be removed and released in clearing the ground/dynamic actors lists
+	vehicleActors.clear();
+	vehiclesToDelete.clear();
+	bombActors.clear();
+	powerupActors.clear();
+	
+	for (int i = 0; i < groundActors.size(); i++) {
+		gScene->removeActor(*groundActors[i]);
+		groundActors[i]->release();
+	}
+	groundActors.clear();
+
+	for (int i = 0; i < dynamicActors.size(); i++) {
+		gScene->removeActor(*dynamicActors[i]);
+		dynamicActors[i]->release();
+	}
+	dynamicActors.clear();
+
+
+	bombStartTimes.clear();
+
+	//
+	vehicleForwards.clear();	//Vehicle class
+	vehicleInAir.clear();
+	vehicleStuck.clear();
+	stuckTimer.clear();
+
+	float lastFrameTime = 1;
+}
+
 #endif 

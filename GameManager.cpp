@@ -1597,7 +1597,35 @@ void GameManager::displayEndScreen(unsigned int winnerID)
 void GameManager::partialTeardown() {
 	vehicleColours.clear();
 
+	surfaceVertices.clear();		//TEMPORARY
+	surfaceNormals.clear();		//TEMPORARY
+	surfaceIndices.clear();	//TEMPORARY
+
+	ballVertices.clear();			//TEMPORARY
+	ballNormals.clear();			//TEMPORARY
+	ballIndices.clear();	//TEMPORARY
+	ballUVs.clear();				//TEMPORARY
+
+
+	//Skybox - Temporary
+	skyboxVerts.clear();
+	skyboxUVs.clear();
+	skyboxIndices.clear();
+
+	hasPowerup.clear();
+
+	playerColours.clear();
+
+	powerupComponentIDs.clear();
+
+	playerCoinIDs.clear();
+
+	selectedLevel = 1;
+
 	state.clear();
+	physics.clear();
+	ai.clear();
+	_interface.clear();
 }
 
 #endif // GAMEMANAGER_CPP

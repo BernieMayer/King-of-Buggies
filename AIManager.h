@@ -66,6 +66,8 @@ public:
 
 	NavMesh nav;
 
+	void clear();
+
 
 private:
 	vector<vector<vec3>> pathToGoal;

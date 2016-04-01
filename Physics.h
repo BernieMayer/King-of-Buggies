@@ -114,7 +114,7 @@ public:
 	//createConvexMesh
 	void createPowerupBox(vector<vec3> mesh, vec3 location);
 
-
+	void clear();
 private:
 	Timer clock;
 	vector<Vehicle> vehicleActors;	//Eventually should be a vector of Vehicles
