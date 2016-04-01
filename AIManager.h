@@ -59,6 +59,7 @@ public:
 	int collisionRecoveryCounter = 0;
 	// 2 seconds to recover
 	int collisionRecoveryCounterMax = 1 * 60;
+	timeb collisionStartTime;
 
 	//Test code - Not for use in final product
 	vec3 testTarget;
@@ -87,6 +88,7 @@ private:
 	vec3 lastDriveToPos = vec3(-13, 0.5, -15);
 	int indexOfGoldenBuggy = 0;
 	float aiType = 0;
+	Timer timer;
 
 	int indexOfClosestPowerup(int playerID);
 	float facing(Entity* object, Entity* target);

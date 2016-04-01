@@ -19,7 +19,7 @@ void  AIManager::initAI(int pNum) {
 
 void  AIManager::initAI() {
 	//prevPosition = state->getPlayer(0)->getPos();
-
+	timer.start();
 	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
 	{
 		vector<vec3> path;
@@ -259,6 +259,8 @@ Input AIManager::recover(int playerNum) {
 		reversing[playerNum] = !reversing[playerNum];
 	}
 
+	
+
 	Input input = Input();
 	if (reversing[playerNum]) {
 		input.forward = 0;
@@ -318,6 +320,10 @@ Input AIManager::recover(int playerNum) {
 		}
 	}
 
+	if (timer.getTimeSince(collisionStartTime) >= 0.9f) {
+		input.jump = true;
+	}
+
 	return input;
 }
 
@@ -339,12 +345,15 @@ void AIManager::updateRecovery(unsigned int playerNum)
 	if (collisionRecovery) {
 		collisionRecoveryCounter++;
 		if (collisionRecoveryCounter > collisionRecoveryCounterMax) {
-			collisionRecovery = false;
 			collisionRecoveryCounter = 0;
+			if (!allSlow) {
+				collisionRecovery = false;
+			}
 		}
 	}
 
-	if (allSlow) {
+	if (allSlow && !collisionRecovery) {
+		collisionStartTime = timer.getCurrentTime();
 		collisionRecovery = true;
 		infoAtCollision = *state->getPlayer(playerNum);
 	}
