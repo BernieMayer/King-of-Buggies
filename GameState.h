@@ -118,6 +118,7 @@ public:
 	// Map management
 	void setMap(MeshObject* arena, unsigned int selectedLevel);
 	void applyRotations();
+	vec3 getStartCoord(unsigned int playerID);
 
 	bool checkCoinCollision(vec3 playerPos);
 	unsigned int numOfDecoys = 0;
