@@ -819,6 +819,16 @@ void GameManager::gameLoop()
 	//unsigned int numScreens = 2;
 	renderer.splitScreenViewports(numScreens);
 
+
+
+	unsigned int radarInterfaceID = _interface.generateComponentID();
+	_interface.assignSquare(radarInterfaceID);
+	_interface.setDimensions(radarInterfaceID, 0.0f, 0.0f, 0.0f, 0.0f, ANCHOR::TOP_RIGHT);
+
+	//use multiple of these to allow for split screen
+	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
+	_interface.assignTexture(radarInterfaceID, renderer.getFramebufferTexture(radarFBO), ComponentInfo::UP_TEXTURE); //Magic third parameter
+
 	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
 
@@ -1163,7 +1173,12 @@ void GameManager::gameLoop()
 					coloursRadar.push_back(state.getPlayer(i)->getColour());
 				}
 			}
+			//Draw the radar to the frameBuffer
+			renderer.useFramebuffer(radarFBO);
 			renderer.drawRadar(radarPos, coloursRadar);
+			renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
+
+			
 
 			//renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
