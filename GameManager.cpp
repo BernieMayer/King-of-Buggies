@@ -1567,7 +1567,7 @@ void GameManager::displayEndScreen(unsigned int winnerID)
 
 		_interface.assignSquare(menu);
 		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(menuBackground, 0.0f, 0.0f, 16, 8, ANCHOR::CENTER);
+		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
 
 		if (in.jump && !in.isKeyboard) {
 			doneLoop = true;
