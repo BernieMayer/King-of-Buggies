@@ -1258,14 +1258,13 @@ void GameManager::gameInit()
 		// temporary since we only have one level right now
 		createLevel(DONUTLEVEL);
 		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-		state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
 	}
 	else if (selectedLevel == 0) {
 		createLevel(OLDLEVEL);
 		MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
-		state.setMap(levelMesh, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
 	}
 
+	state.setMap(levelMesh, selectedLevel);
 	initTestScene();
 }
 

@@ -486,9 +486,12 @@ void GameState::clearEvents()
 	events.clear();
 }
 
-void GameState::setMap(MeshObject* arena, char *coinLocations, char *boostLocations, char *boxLocations) 
+void GameState::setMap(MeshObject* arena, unsigned int selectedLevel) 
 {
-	map = LevelInfo(arena, coinLocations, boostLocations, boxLocations);
+	if (selectedLevel == 0 || selectedLevel == 1) {
+		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+	}
+	
 	vector<vec3> coinCoords = map.getCoinLocations();
 	vector<vec3> boostCoords = map.getBoostLocations();
 	vector<vec3> boxCoords = map.getBoxLocations();
