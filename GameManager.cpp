@@ -1317,57 +1317,64 @@ void GameManager::initTestScene()
 	traits.loadConfiguration("base");
 	temp.print();
 
+	vec3 playerPos = state.getStartCoord(0);
+
 	if (playerColours[0] == 0) {
-		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getRedBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getRedBuggyTexID());
 	}
 	else if (playerColours[0] == 1) {
-		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getGreenBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getGreenBuggyTexID());
 	}
 	else if (playerColours[0] == 2) {
-		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getBlueBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getBlueBuggyTexID());
 	}
 	else if (playerColours[0] == 3) {
-		createPlayer(vec3(0.f, 5.f, 0.f), traits, meshInfo.getPurpleBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getPurpleBuggyTexID());
 	}
 
+	playerPos = state.getStartCoord(1);
 
 	if (playerColours[1] == 0) {
-		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getRedBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getRedBuggyTexID());
 	}
 	else if (playerColours[1] == 1) {
-		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGreenBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getGreenBuggyTexID());
 	}
 	else if (playerColours[1] == 2) {
-		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getBlueBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getBlueBuggyTexID());
 	}
 	else if (playerColours[1] == 3) {
-		createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getPurpleBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getPurpleBuggyTexID());
 	}
+
+	playerPos = state.getStartCoord(2);
 
 	if (playerColours[2] == 0) {
-		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getRedBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getRedBuggyTexID());
 	}
 	else if (playerColours[2] == 1) {
-		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getGreenBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getGreenBuggyTexID());
 	}
 	else if (playerColours[2] == 2) {
-		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getBlueBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getBlueBuggyTexID());
 	}
 	else if (playerColours[2] == 3) {
-		createPlayer(vec3(-5.f, 5.f, 15.f), traits, meshInfo.getPurpleBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getPurpleBuggyTexID());
 	}
 
+	playerPos = state.getStartCoord(3);
+
 	if (playerColours[3] == 0) {
-		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getRedBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getRedBuggyTexID());
 	}
 	else if (playerColours[3] == 1) {
-		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getGreenBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getGreenBuggyTexID());
 	}
 	else if (playerColours[3] == 2) {
-		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getBlueBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getBlueBuggyTexID());
 	}
 	else if (playerColours[3] == 3) {
-		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getPurpleBuggyTexID());
+		createPlayer(playerPos, traits, meshInfo.getPurpleBuggyTexID());
 	}
 
 	for (unsigned int i = 0; i < TOO_MANY; i++)

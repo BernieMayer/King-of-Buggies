@@ -489,7 +489,7 @@ void GameState::clearEvents()
 void GameState::setMap(MeshObject* arena, unsigned int selectedLevel) 
 {
 	if (selectedLevel == 0 || selectedLevel == 1) {
-		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj");
+		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
 	}
 	
 	vector<vec3> coinCoords = map.getCoinLocations();
@@ -523,6 +523,12 @@ void GameState::applyRotations()
 		boxes[i].setTransform(boxes[i].getRotation((1.f / 60.f)*2.f*3.1415926f));
 	}
 }
+
+vec3 GameState::getStartCoord(unsigned int playerID)
+{
+	return map.getStartLocation(playerID);
+}
+
 
 void GameState::clear() {
 	clearEvents();
