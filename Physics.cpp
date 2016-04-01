@@ -202,20 +202,17 @@ void Physics::applySpeedPadBoost(unsigned int vehicleNum)
 	PxVehicleDrive4W* veh = vehicleActors[vehicleNum].vehDrive4W;
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
-
-	vec3 downVec = -lastState->getPlayer(vehicleNum)->getUp();
-	downVec = 100000.f * downVec;
-	vehBody->addForce(getPxVec3(downVec));
-
-	
-	vec3 forwardVec = lastState->getPlayer(vehicleNum)->getForward();
-	forwardVec = 156200.f * forwardVec * vec3(1, 0, 1);
-	if (vehicleForwards[vehicleNum] == 0)
+	if (vehicleInAir(vehicleNum))
 	{
-		forwardVec *= -1;
-	}
+		vec3 forwardVec = lastState->getPlayer(vehicleNum)->getForward();
+		forwardVec = 156200.f * forwardVec * vec3(1, 0, 1);
+		if (vehicleForwards[vehicleNum] == 0)
+		{
+			forwardVec *= -1;
+		}
 
-	vehBody->addForce(getPxVec3(forwardVec));
+		vehBody->addForce(getPxVec3(forwardVec));
+	}
 }
 
 void Physics::applyNitroBoost(unsigned int vehicleNum)
