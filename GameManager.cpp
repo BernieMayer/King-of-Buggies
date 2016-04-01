@@ -1626,6 +1626,7 @@ void GameManager::partialTeardown() {
 	physics.clear();
 	ai.clear();
 	_interface.clear();
+	sound.deleteAll();
 }
 
 #endif // GAMEMANAGER_CPP
