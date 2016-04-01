@@ -78,7 +78,7 @@ int main() {
 	GameManager manager(window);
 
 	// Enter main game loop
-	manager.displayEndScreen(0);
+	//manager.displayEndScreen(0);
 	manager.initMenus();
 	
 	return 0;
