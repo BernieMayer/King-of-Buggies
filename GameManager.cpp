@@ -1154,7 +1154,12 @@ void GameManager::gameLoop()
 			if (USING_SHADOWS)
 				renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
 			else
+			{
 				renderer.drawAll();
+				//renderer.loadOptimizedBuffers();
+				//renderer.drawBufferedAll(false);
+			}
+				
 
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			//Should be in a for loop for every player

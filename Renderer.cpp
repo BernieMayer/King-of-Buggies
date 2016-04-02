@@ -57,8 +57,19 @@ Renderer::LightInfo::LightInfo() : pos(vec3(0.f, 0.f, 0.f)), deleted(false)
 
 }
 
+Renderer::ObjectMesh::ObjectMesh(vector<vec3>* verts, vector<vec3>* normals, vector<vec2>* uvs, vector<unsigned int>* indices, bool hasTexture) :
+verts(verts), normals(normals), uvs(uvs), indices(indices), hasTexture(hasTexture), offset(NO_VALUE)
+{
+	
+}
+
+bool Renderer::ObjectMesh::operator ==(const ObjectMesh& other) const
+{
+	return (verts == other.verts) && (normals == other.normals) && (uvs == other.uvs) && (hasTexture == other.hasTexture);
+}
+
 Renderer::Renderer(GLFWwindow* _window) : window(_window), debugging(false), 
-projection(1.f), modelview(1.f), activeViewport(0), shadowTexUnit(0), objectAdded(false)
+projection(1.f), modelview(1.f), activeViewport(0), shadowTexUnit(0)
 {
 	shaderList.initShaders();
 
@@ -96,6 +107,8 @@ Renderer::~Renderer()
 unsigned int Renderer::generateObjectID()
 {
 	objects.push_back(ObjectInfo());
+
+	newObjects.push_back(objects.size() - 1);
 
 	return objects.size() - 1;		//Handle for the object
 }
@@ -593,15 +606,11 @@ void Renderer::drawWithShadows(unsigned int id, unsigned int shadowTexture, unsi
 	else
 		light = lights[0];		//Else, use first light in array
 
-	glErrorCheck("drawWithShadows - before useShadowShader()");
-
 	//Make into ObjectInfo function?
 	if (objects[id].texID == NO_VALUE)
 		cout << "No texID" << endl;
 	else
 		object.mat->useShadowShader();
-
-	glErrorCheck("drawWithShadows - useShadowShader()");
 
 	//Object
 	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
@@ -617,8 +626,6 @@ void Renderer::drawWithShadows(unsigned int id, unsigned int shadowTexture, unsi
 		viewPos, light.pos, objects[id].texID, 1, shadowTexture, shadowTexUnit, randomPoints, RANDOM_POINT_NUM);
 
 	loadBuffers(object);
-
-	glErrorCheck("drawWithShadows - post loading buffers");
 
 	if (object.indices != NULL)
 		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
@@ -715,6 +722,69 @@ void Renderer::drawAll()
 	for (unsigned int i = 0; i < objects.size(); i++)
 	{
 		draw(i);
+	}
+}
+
+void Renderer::bindBufferedVAO(const ObjectInfo& object)
+{
+	if ((object.mesh != NULL) && (object.normals != NULL) && (object.uvs != NULL))
+		glBindVertexArray(vao[VAO::VERT_NORMALS_UVS_BUFFERED]);
+	else if ((object.mesh != NULL) && (object.normals != NULL))
+		glBindVertexArray(vao[VAO::VERT_NORMALS_BUFFERED]);
+	else if ((object.mesh != NULL) && (object.uvs != NULL))
+		glBindVertexArray(vao[VAO::VERT_UVS_BUFFERED]);
+	else if (object.mesh != NULL)
+		glBindVertexArray(vao[VAO::VERT_BUFFERED]);
+	else
+		debug_message("VAO not bound");
+}
+
+void Renderer::drawBuffered(unsigned int id, bool useShadows)
+{
+	ObjectInfo& object = objects[id];
+	if (object.deleted)
+		return;
+
+	LightInfo light;
+	if (lights.size() < 1)		//If no light, add a default light to scene
+		light = LightInfo();
+	else
+		light = lights[0];		//Else, use first light in array
+
+	//Make into ObjectInfo function?
+	if (objects[id].texID == NO_VALUE)
+		object.mat->useShader();
+	else
+		object.mat->useTextureShader();
+
+	//Object
+	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
+	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
+	mat4 projectionMatrix = winRatio*viewports[activeViewport].viewRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
+	mat4 modelviewMatrix = object.transform*object.scaling;
+
+	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+		viewPos, light.pos, object.color);
+	else
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
+		viewPos, light.pos, objects[id].texID, 1);
+
+	bindBufferedVAO(object);
+
+	if (object.indices != NULL)
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+
+	glErrorCheck("Draw - end function");
+}
+
+void Renderer::drawBufferedAll(bool useShadows)
+{
+	for (unsigned int i = 0; i < objects.size(); i++)
+	{
+		drawBuffered(i, useShadows);
 	}
 }
 
@@ -1270,13 +1340,313 @@ void Renderer::initializeBufferedVAOs()
 
 }
 
+void Renderer::getNewMeshes(vector<ObjectMesh>* newMeshes)
+{
+	if (newObjects.size() == 0)
+		return;
+
+	for (unsigned int i = 0; i < newObjects.size(); i++)
+	{
+		unsigned int index = newObjects[i];
+		ObjectMesh newMesh(objects[index].mesh, objects[index].normals, objects[index].uvs, objects[index].indices, objects[index].texID != NO_VALUE);
+
+		bool inBuffer = false;
+
+		for (unsigned int j = 0; j < distinctMeshes.size(); j++)
+		{
+			if (newMesh == distinctMeshes[j])
+			{
+				inBuffer = true;
+				objects[index].bufferedIndex = j;
+				break;
+			}
+		}
+
+		if (!inBuffer)
+		{
+			newMeshes->push_back(newMesh);
+			objects[index].bufferedIndex = newMeshes->size() - 1;
+		}
+	}
+
+	newObjects.clear();
+}
+
 
 void Renderer::loadOptimizedBuffers()
 {
-	if (!objectAdded)
+	unsigned int prevSize = distinctMeshes.size();
+	getNewMeshes(&distinctMeshes);
+
+	if (distinctMeshes.size() == prevSize)
 		return;
 
+	bool vChanged = false;
+	bool vnChanged = false;
+	bool vtChanged = false;
+	bool vntChanged = false;
+
+	//Check which buffers have changed
+	for (unsigned int i = prevSize; i < distinctMeshes.size(); i++)
+	{
+		if (distinctMeshes[i].hasTexture && (distinctMeshes[i].verts != NULL) && (distinctMeshes[i].normals != NULL) && (distinctMeshes[i].uvs != NULL))
+			vntChanged = true;
+		else if ((distinctMeshes[i].verts != NULL) && (distinctMeshes[i].normals != NULL))
+			vnChanged = true;
+		else if (distinctMeshes[i].hasTexture && (distinctMeshes[i].verts != NULL) && (distinctMeshes[i].uvs != NULL))
+			vtChanged = true;
+		else if (distinctMeshes[i].verts != NULL)
+			vChanged = true;
+	}
+
+	if (vChanged)
+		loadOptimizedVBuffers();
+	if (vnChanged)
+		loadOptimizedVNBuffers();
+	if (vntChanged)
+		loadOptimizedVNTBuffers();
+	if (vtChanged)
+		loadOptimizedVTBuffers();
+
+
 	
+}
+
+void Renderer::loadOptimizedVBuffers()
+{
+	v_verts.clear();
+
+	vector<unsigned int> ids;
+	unsigned int totalSize = 0;
+	unsigned int totalIndexSize = 0;
+
+	for (unsigned int i = 0; i < distinctMeshes.size(); i++)
+	{
+		if ((distinctMeshes[i].verts != NULL) && (distinctMeshes[i].normals == NULL) && (distinctMeshes[i].uvs == NULL))
+		{
+			//distinctMeshes[i].offset = totalIndexSize;		//Get offset for mesh
+
+			ids.push_back(i);
+			totalSize += distinctMeshes[i].verts->size();
+			totalIndexSize += distinctMeshes[i].indices->size();
+		}
+	}
+
+	//Allocate memory for buffer
+	v_verts.reserve(totalSize);
+	v_ind.reserve(totalIndexSize);
+
+	//Fill buffers
+	for (unsigned int i = 0; i < ids.size(); i++)
+	{
+		ObjectMesh& object = distinctMeshes[ids[i]];
+		object.offset = v_ind.size();
+
+		//Copy and adjust indices
+		for (unsigned int j = 0; j < object.indices->size(); j++)
+		{
+			v_ind.push_back(object.indices->at(j) + v_verts.size());
+		}
+
+		//Add mesh to optimized buffer
+		v_verts.insert(v_verts.end(), object.verts->begin(), object.verts->end());
+	}
+
+	//Load buffer
+	glBindVertexArray(vao[VAO::VERT_BUFFERED]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::V_VERT_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*v_verts.size(),
+		&v_verts[0],
+		GL_STATIC_DRAW);
+
+}
+
+void Renderer::loadOptimizedVNBuffers()
+{
+	vn_verts.clear();
+	vn_normals.clear();
+
+	vector<unsigned int> ids;
+	unsigned int totalSize = 0;
+	unsigned int totalIndexSize = 0;
+
+	for (unsigned int i = 0; i < distinctMeshes.size(); i++)
+	{
+		if ((distinctMeshes[i].verts != NULL) && (distinctMeshes[i].normals != NULL) && (distinctMeshes[i].uvs == NULL))
+		{
+			distinctMeshes[i].offset = totalIndexSize;		//Get offset for mesh
+
+			ids.push_back(i);
+			totalSize += distinctMeshes[i].verts->size();
+			totalIndexSize += distinctMeshes[i].indices->size();
+		}
+	}
+
+	//Allocate memory for buffer
+	vn_verts.reserve(totalSize);
+	vn_normals.reserve(totalSize);
+	vn_ind.reserve(totalIndexSize);
+
+	//Fill buffers
+	for (unsigned int i = 0; i < ids.size(); i++)
+	{
+		ObjectMesh& object = distinctMeshes[ids[i]];
+		object.offset = vn_ind.size();
+
+		//Copy and adjust indices
+		for (unsigned int j = 0; j < object.indices->size(); j++)
+		{
+			vn_ind.push_back(object.indices->at(j) + vn_verts.size());
+		}
+
+		//Add mesh to optimized buffer
+		vn_verts.insert(vn_verts.end(), object.verts->begin(), object.verts->end());
+		vn_normals.insert(vn_normals.end(), object.normals->begin(), object.normals->end());
+	}
+
+	glBindVertexArray(vao[VAO::VERT_NORMALS_BUFFERED]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VN_VERT_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*vn_verts.size(),
+		&vn_verts[0],
+		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VN_NORMALS_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*vn_normals.size(),
+		&vn_normals[0],
+		GL_STATIC_DRAW);
+
+}
+
+
+void Renderer::loadOptimizedVNTBuffers()
+{
+	vnt_verts.clear();
+	vnt_normals.clear();
+	vnt_uvs.clear();
+
+	vector<unsigned int> ids;
+	unsigned int totalSize = 0;
+	unsigned int totalIndexSize = 0;
+
+	for (unsigned int i = 0; i < distinctMeshes.size(); i++)
+	{
+		if ((distinctMeshes[i].verts != NULL) && (distinctMeshes[i].normals != NULL) && (distinctMeshes[i].uvs != NULL))
+		{
+			distinctMeshes[i].offset = totalIndexSize;		//Get offset for mesh
+
+			ids.push_back(i);
+			totalSize += distinctMeshes[i].verts->size();
+			totalIndexSize += distinctMeshes[i].indices->size();
+		}
+	}
+
+	//Allocate memory for buffer
+	vnt_verts.reserve(totalSize);
+	vnt_normals.reserve(totalSize);
+	vnt_ind.reserve(totalIndexSize);
+
+	//Fill buffers
+	for (unsigned int i = 0; i < ids.size(); i++)
+	{
+		ObjectMesh& object = distinctMeshes[ids[i]];
+		object.offset = vnt_ind.size();
+
+		//Copy and adjust indices
+		for (unsigned int j = 0; j < object.indices->size(); j++)
+		{
+			vnt_ind.push_back(object.indices->at(j) + vnt_verts.size());
+		}
+
+		//Add mesh to optimized buffer
+		vnt_verts.insert(vnt_verts.end(), object.verts->begin(), object.verts->end());
+		vnt_normals.insert(vnt_normals.end(), object.normals->begin(), object.normals->end());
+		vnt_uvs.insert(vnt_uvs.end(), object.uvs->begin(), object.uvs->end());
+	}
+
+	glBindVertexArray(vao[VAO::VERT_NORMALS_UVS_BUFFERED]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VNT_VERT_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*vnt_verts.size(),
+		&vnt_verts[0],
+		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VNT_NORMALS_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*vnt_normals.size(),
+		&vnt_normals[0],
+		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VNT_UVS_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec2)*vnt_uvs.size(),
+		&vnt_uvs[0],
+		GL_STATIC_DRAW);
+
+}
+
+
+void Renderer::loadOptimizedVTBuffers()
+{
+	vt_verts.clear();
+	vt_uvs.clear();
+
+	vector<unsigned int> ids;
+	unsigned int totalSize = 0;
+	unsigned int totalIndexSize = 0;
+
+	for (unsigned int i = 0; i < distinctMeshes.size(); i++)
+	{
+		if ((distinctMeshes[i].verts != NULL) && (distinctMeshes[i].normals == NULL) && (distinctMeshes[i].uvs != NULL))
+		{
+			distinctMeshes[i].offset = totalIndexSize;		//Get offset for mesh
+
+			ids.push_back(i);
+			totalSize += distinctMeshes[i].verts->size();
+			totalIndexSize += distinctMeshes[i].indices->size();
+		}
+	}
+
+	//Allocate memory for buffer
+	vt_verts.reserve(totalSize);
+	vt_ind.reserve(totalIndexSize);
+
+	//Fill buffers
+	for (unsigned int i = 0; i < ids.size(); i++)
+	{
+		ObjectMesh& object = distinctMeshes[ids[i]];
+		object.offset = vt_ind.size();
+
+		//Copy and adjust indices
+		for (unsigned int j = 0; j < object.indices->size(); j++)
+		{
+			vt_ind.push_back(object.indices->at(j) + vt_verts.size());
+		}
+
+		//Add mesh to optimized buffer
+		vt_verts.insert(vt_verts.end(), object.verts->begin(), object.verts->end());
+		vt_uvs.insert(vt_uvs.end(), object.uvs->begin(), object.uvs->end());
+	}
+
+	glBindVertexArray(vao[VAO::VERT_UVS_BUFFERED]);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VT_VERT_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec3)*vt_verts.size(),
+		&vt_verts[0],
+		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VT_UVS_BUFFERED]);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec2)*vt_uvs.size(),
+		&vt_uvs[0],
+		GL_STATIC_DRAW);
+
 }
 
 

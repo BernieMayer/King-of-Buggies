@@ -109,6 +109,21 @@ private:
 		void positionCamera(vec3 sceneCenter, float nearP, float farP, float width, float height);
 	};
 
+	class ObjectMesh
+	{
+	public:
+		vector<vec3>* verts;
+		vector<vec3>* normals;
+		vector<vec2>* uvs;
+		vector<unsigned int>* indices;
+		bool hasTexture;
+		unsigned int offset;
+
+		ObjectMesh(vector<vec3>* verts, vector<vec3>* normals, vector<vec2>* uvs, vector<unsigned int>* indices, bool hasTexture);
+
+		bool operator ==(const ObjectMesh& other) const;
+	};
+
 	GLFWwindow * window;
 	
 
@@ -116,6 +131,8 @@ private:
 	vector<ObjectInfo> objects;		//Objects to be drawn
 	vector<LightInfo> lights;
 	vector<Viewport> viewports;
+
+	vector<unsigned int> newObjects;
 
 	//Optimized buffers
 	vector<unsigned int> v_ind;
@@ -130,6 +147,8 @@ private:
 	vector<vec3> vnt_verts;
 	vector<vec3> vnt_normals;
 	vector<vec2> vnt_uvs;
+
+	vector<ObjectMesh> distinctMeshes;
 
 	unsigned int activeViewport;
 	unsigned int activeFramebuffer;
@@ -152,7 +171,7 @@ private:
 	float randomPoints[RANDOM_POINT_NUM];
 
 	bool debugging;
-	bool objectAdded;
+	
 
 	/**
 	* Functions
@@ -165,6 +184,15 @@ private:
 	bool loadVertNormalBuffer(const ObjectInfo& object);
 	bool loadVertUVBuffer(const ObjectInfo& object);	
 	bool loadVertNormalUVBuffer(const ObjectInfo& object);
+
+	//Optimized buffers
+	void getNewMeshes(vector<ObjectMesh>* newMeshes);
+	void loadOptimizedVNTBuffers();
+	void loadOptimizedVBuffers();
+	void loadOptimizedVNBuffers();
+	void loadOptimizedVTBuffers();
+
+	void bindBufferedVAO(const ObjectInfo& object);
 
 	//Debugging
 	void debug_message(string message);		
@@ -242,7 +270,10 @@ public:
 	void draw(unsigned int object);
 	void draw(vector<unsigned int> list);	//Preferred over individual calls, easier to optimize
 	void drawAll();		//Easiest to optimize
-	void drawDepth(unsigned int fbo, unsigned int lightID, unsigned int objectID);
+
+	//Preloaded drawing calls
+	void drawBuffered(unsigned int object, bool useShadows);
+	void drawBufferedAll(bool useShadows);
 
 	//Draw shadows
 	void drawAllWithShadows(unsigned int shadowTexture, unsigned int lightID);
@@ -283,7 +314,7 @@ public:
 	bool loadVertUVBuffer(vector<vec3>* verts, vector<vec2>* uvs);
 
 	//Optimize buffer
-	void loadOptimizedBuffers();
+	void loadOptimizedBuffers();		//Make call from outside
 
 	//Window dimensions
 	unsigned int getHeight();
