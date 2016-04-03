@@ -154,6 +154,8 @@ void InterfaceManager::draw(unsigned int id, Renderer* r)
 		glDrawArrays(GL_TRIANGLES, 0, components[id].vertices->size());
 	}
 
+	glBindVertexArray(0);
+
 	glDisable(GL_BLEND);
 	glDepthMask(GL_TRUE);
 }

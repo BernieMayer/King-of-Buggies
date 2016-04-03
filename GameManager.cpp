@@ -1071,18 +1071,7 @@ void GameManager::gameLoop()
 
 			physics.startSim(frameTime);
 		}
-		/*//Free camera movement
-		if (paused)
-		{
-			//Debugging avoidance
-			ai.debugAIPath(&paths, 1, debugPathIterations);
-			if (inputs[0].jump)
-				debugPathIterations++;
-
-			freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
-			freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
-		}*/
-
+		
 		
 		if (inputs[0].horn) {
 			displayDebugging = !displayDebugging;
@@ -1151,15 +1140,16 @@ void GameManager::gameLoop()
 			renderer.useViewport(i+1);
 			//renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 			//renderer.drawAll();
-			if (USING_SHADOWS)
+			/*if (USING_SHADOWS)
 				renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
 			else
 			{
 				renderer.drawAll();
-				//renderer.loadOptimizedBuffers();
-				//renderer.drawBufferedAll(false);
-			}
 				
+			}*/
+				
+			renderer.loadOptimizedBuffers();
+			renderer.drawBufferedAll(false);
 
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			//Should be in a for loop for every player

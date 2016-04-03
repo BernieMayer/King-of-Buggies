@@ -91,8 +91,12 @@ projection(1.f), modelview(1.f), activeViewport(0), shadowTexUnit(0)
 	generatePointsOnDisk();		//Generates poisson disk points
 
 	initializeVAOs();
+
+	initializeBufferedVAOs();
 	
 }
+
+
 
 Renderer::~Renderer()
 {
@@ -705,6 +709,9 @@ void Renderer::draw(unsigned  int id)
 	else
 		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
 
+	glBindVertexArray(0);
+	glUseProgram(0);
+
 	glErrorCheck("Draw - end function");
 	
 }
@@ -773,11 +780,12 @@ void Renderer::drawBuffered(unsigned int id, bool useShadows)
 	bindBufferedVAO(object);
 
 	if (object.indices != NULL)
-		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
-	else
-		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, (void*)(distinctMeshes[object.bufferedIndex].offset*sizeof(unsigned int)));
 
-	glErrorCheck("Draw - end function");
+	glBindVertexArray(0);
+	glUseProgram(0);
+
+	glErrorCheck("DrawBuffered - end function");
 }
 
 void Renderer::drawBufferedAll(bool useShadows)
@@ -1233,6 +1241,7 @@ void Renderer::initializeVAOs()
 
 void Renderer::initializeBufferedVAOs()
 {
+
 	//Vertex only VAO
 	glBindVertexArray(vao[VAO::VERT_BUFFERED]);		//Bind vertex array
 	//Vertex vbo
@@ -1246,6 +1255,7 @@ void Renderer::initializeBufferedVAOs()
 		sizeof(vec3),	//Stride
 		(void*)0			//Offset
 		);
+
 
 	//Vertex and Normal VAO
 	glBindVertexArray(vao[VAO::VERT_NORMALS_BUFFERED]);		//Bind vertex array
@@ -1274,7 +1284,7 @@ void Renderer::initializeBufferedVAOs()
 		);
 
 	//Vertex and UV VAO
-	glBindVertexArray(vao[VAO::VERT_UVS]);		//Bind vertex array
+	glBindVertexArray(vao[VAO::VERT_UVS_BUFFERED]);		//Bind vertex array
 	//Vertex vbo
 	glEnableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[VBO::VT_VERT_BUFFERED]);
@@ -1298,7 +1308,6 @@ void Renderer::initializeBufferedVAOs()
 		sizeof(vec2),	//Stride
 		(void*)0			//Offset
 		);
-
 
 	//Vertex, Normal and UV VAO
 	glBindVertexArray(vao[VAO::VERT_NORMALS_UVS_BUFFERED]);	//Bind vertex array
@@ -1337,6 +1346,8 @@ void Renderer::initializeBufferedVAOs()
 		sizeof(vec2),	//Stride
 		(void*)0			//Offset
 		);
+
+	glBindVertexArray(0);
 
 }
 
@@ -1397,6 +1408,8 @@ void Renderer::loadOptimizedBuffers()
 			vtChanged = true;
 		else if (distinctMeshes[i].verts != NULL)
 			vChanged = true;
+		else
+			cout << "Can't recognize mesh format" << endl;
 	}
 
 	if (vChanged)
@@ -1461,6 +1474,14 @@ void Renderer::loadOptimizedVBuffers()
 		&v_verts[0],
 		GL_STATIC_DRAW);
 
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[VBO::V_INDICES_BUFFERED]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(unsigned int)*v_ind.size(),
+		&v_ind[0],
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
 }
 
 void Renderer::loadOptimizedVNBuffers()
@@ -1519,6 +1540,14 @@ void Renderer::loadOptimizedVNBuffers()
 		sizeof(vec3)*vn_normals.size(),
 		&vn_normals[0],
 		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[VBO::VN_INDICES_BUFFERED]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(unsigned int)*vn_ind.size(),
+		&vn_ind[0],
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
 
 }
 
@@ -1588,6 +1617,14 @@ void Renderer::loadOptimizedVNTBuffers()
 		&vnt_uvs[0],
 		GL_STATIC_DRAW);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[VBO::VNT_INDICES_BUFFERED]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(unsigned int)*vnt_ind.size(),
+		&vnt_ind[0],
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
+
 }
 
 
@@ -1646,6 +1683,14 @@ void Renderer::loadOptimizedVTBuffers()
 		sizeof(vec2)*vt_uvs.size(),
 		&vt_uvs[0],
 		GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[VBO::VT_INDICES_BUFFERED]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(unsigned int)*vt_ind.size(),
+		&vt_ind[0],
+		GL_STATIC_DRAW);
+
+	glBindVertexArray(0);
 
 }
 
