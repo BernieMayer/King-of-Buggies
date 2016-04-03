@@ -571,10 +571,11 @@ void Renderer::drawShadowMap(unsigned int id, unsigned int lightID)
 
 	shadow.loadUniforms(projectionMatrix, modelviewMatrix);
 
-	loadBuffers(object);
+	//loadBuffers(object);
+	bindBufferedVAO(object);		//Change
 
 	if (object.indices != NULL)
-		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, object.indices->size(), GL_UNSIGNED_INT, (void*)(distinctMeshes[object.bufferedIndex].offset*sizeof(unsigned int)));
 	else
 		glDrawArrays(GL_TRIANGLES, 0, object.mesh->size());
 }
@@ -627,7 +628,7 @@ void Renderer::drawWithShadows(unsigned int id, unsigned int shadowTexture, unsi
 		cout << "No texID or uvs" << endl;
 	else
 		object.mat->loadUniforms(projectionMatrix, modelviewMatrix, shadowMatrix,
-		viewPos, light.pos, objects[id].texID, 1, shadowTexture, shadowTexUnit, randomPoints, RANDOM_POINT_NUM);
+		viewPos, light.pos, objects[id].texID, 1, shadowTexUnit, randomPoints, RANDOM_POINT_NUM);
 
 	loadBuffers(object);
 
@@ -761,18 +762,25 @@ void Renderer::drawBuffered(unsigned int id, bool useShadows)
 	//Make into ObjectInfo function?
 	if (objects[id].texID == NO_VALUE)
 		object.mat->useShader();
+	else if (useShadows && (object.shadowBehaviour & SHADOW_BEHAVIOUR::RECEIVE))
+		object.mat->useShadowShader();
 	else
 		object.mat->useTextureShader();
 
-	//Object
+	//Calculate transforms
 	mat4 cameraMatrix = (camera != NULL) ? camera->getMatrix() : mat4(1.f);
 	vec3 viewPos = (camera != NULL) ? camera->getPos() : vec3(0.f);
 	mat4 projectionMatrix = winRatio*viewports[activeViewport].viewRatio*projection*modelview*cameraMatrix*object.transform*object.scaling;
 	mat4 modelviewMatrix = object.transform*object.scaling;
+	mat4 shadowMatrix = biasMatrix()*shadowProjection*modelviewMatrix;
 
+	//Load uniforms
 	if ((objects[id].texID == NO_VALUE) || (objects[id].uvs == NULL))
 		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
 		viewPos, light.pos, object.color);
+	else if (useShadows && (object.shadowBehaviour & SHADOW_BEHAVIOUR::RECEIVE))
+		object.mat->loadUniforms(projectionMatrix, modelviewMatrix, shadowMatrix,
+		viewPos, light.pos, objects[id].texID, 1, shadowTexUnit, randomPoints, RANDOM_POINT_NUM);
 	else
 		object.mat->loadUniforms(projectionMatrix, modelviewMatrix,
 		viewPos, light.pos, objects[id].texID, 1);

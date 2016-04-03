@@ -38,9 +38,9 @@ void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTran
 
 }
 
-void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowID, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum)
+void TorranceSparrow::loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum)
 {
-	Material::loadUniforms(transform, objectTransform, shadowTransform, viewer, light, texID, texUnit, shadowID, shadowTexUnit, randomPoints, randomPointsNum);
+	Material::loadUniforms(transform, objectTransform, shadowTransform, viewer, light, texID, texUnit, shadowTexUnit, randomPoints, randomPointsNum);
 
 	GLuint uniformLocation = glGetUniformLocation(programID, "shininess");
 	glUniform1f(uniformLocation, shininess);

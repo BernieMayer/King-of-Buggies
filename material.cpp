@@ -139,7 +139,7 @@ mat4 biasMatrix2()
 		0.5f, 0.5f, 0.5f, 1);
 }
 
-void Material::loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowID, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum)
+void Material::loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum)
 {
 	loadUniforms(transform, objectTransform, viewer, light, texID, texUnit);
 

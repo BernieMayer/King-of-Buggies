@@ -1077,6 +1077,8 @@ void GameManager::gameLoop()
 			displayDebugging = !displayDebugging;
 		}
 
+		renderer.loadOptimizedBuffers();
+
 		//Render shadow map
 		if (USING_SHADOWS)
 		{
@@ -1148,8 +1150,7 @@ void GameManager::gameLoop()
 				
 			}*/
 				
-			renderer.loadOptimizedBuffers();
-			renderer.drawBufferedAll(false);
+			renderer.drawBufferedAll(USING_SHADOWS);
 
 			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			//Should be in a for loop for every player

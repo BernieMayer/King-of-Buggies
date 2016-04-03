@@ -17,7 +17,7 @@ public:
 	void loadUniforms(const mat4& transform, const mat4& objectTransform,
 		vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit);
 
-	virtual void loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowID, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum);
+	virtual void loadUniforms(const mat4& transform, const mat4& objectTransform, const mat4& shadowTransform, vec3 viewer, vec3 light, unsigned int texID, unsigned int texUnit, unsigned int shadowTexUnit, float* randomPoints, unsigned int randomPointsNum);
 
 	void setShininess(float _shininess);
 
