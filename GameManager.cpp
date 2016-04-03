@@ -1022,7 +1022,7 @@ void GameManager::gameLoop()
 					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
 					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
 
-					printf("Player %d has powerup %d \n", vehicleId, powerUpType);
+					sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
 				}
 			}
 		}
