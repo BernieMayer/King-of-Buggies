@@ -657,18 +657,18 @@ void Physics::handleInput(Input* input, unsigned int id){
 		vec3 forwardsVec = lastState->getPlayer(id)->getForward();
 		float forwardDotProduct = dot(forwardsVec, vec3(0.0f, 1.0f, 0.0f));
 
-		float force = 300.0f;
-		if (sideDotProduct > 0) {
+		float force = 600.0f;
+		if (sideDotProduct > -0.05) {
 			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(force * forwardsVec));
 		}
-		else if (sideDotProduct < 0) {
+		else if (sideDotProduct < 0.05) {
 			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(-force * forwardsVec));
 		}
 
-		if (forwardDotProduct < 0) {
+		if (forwardDotProduct < -0.05) {
 			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(force * sideVec));
 		}
-		else if (forwardDotProduct > 0) {
+		else if (forwardDotProduct > 0.05) {
 			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(-force * sideVec));
 		}
 
@@ -1689,22 +1689,27 @@ void Physics::clear() {
 	gbLockEndTime = 1.0f;
 	lastFrameEnd = clock.getCurrentTime();
 
+	for (int i = 0; i < groundActors.size(); i++) {
+		// Get shapes from actor and detach all
+		// Need to pass in PxShape**, size = all shapes and starting point of 0
+		// Shapes will be returned in the PxShape**
+		gScene->removeActor(*groundActors[i]);
+		groundActors[i]->release();
+	}
+
+	for (int i = 0; i < dynamicActors.size(); i++) {
+		gScene->removeActor(*dynamicActors[i]);
+		dynamicActors[i]->release();
+	}
+
 	// Their actors should be removed and released in clearing the ground/dynamic actors lists
 	vehicleActors.clear();
 	vehiclesToDelete.clear();
 	bombActors.clear();
 	powerupActors.clear();
 	
-	for (int i = 0; i < groundActors.size(); i++) {
-		gScene->removeActor(*groundActors[i]);
-		groundActors[i]->release();
-	}
+	
 	groundActors.clear();
-
-	for (int i = 0; i < dynamicActors.size(); i++) {
-		gScene->removeActor(*dynamicActors[i]);
-		dynamicActors[i]->release();
-	}
 	dynamicActors.clear();
 
 
