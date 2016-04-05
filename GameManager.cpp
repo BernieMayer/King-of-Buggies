@@ -928,8 +928,6 @@ void GameManager::checkCoinCollisions()
 
 void GameManager::updateCamera(unsigned int i, Input input, float frameTime)
 {
-	
-
 	//Update camera position
 	PlayerInfo* activePlayer = state.getPlayer(i);
 	vec4 cameraPosition = physics.vehicle_getGlobalPose(
@@ -970,7 +968,6 @@ void GameManager::gameLoop()
 
 	vector<vec3> path;
 	
-
 	clock.start();
 	float timeProgressed = 0.f;
 	unsigned int frameCount = 0;
@@ -1010,11 +1007,10 @@ void GameManager::gameLoop()
 	//unsigned int numScreens = 4;
 	renderer.splitScreenViewports(numScreens);
 
-
-
 	unsigned int radarInterfaceID = _interface.generateComponentID();
 	_interface.assignSquare(radarInterfaceID);
-	_interface.setDimensions(radarInterfaceID, 0.0f, 0.0f, 0.0f, 0.0f, ANCHOR::TOP_RIGHT);
+	//-1, -1 offset 0.5 width, 0.5 height. Screen space (-1, -1) to (1, 1)
+	_interface.setDimensions(radarInterfaceID, -1.0f, -1.0f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
 
 	//use multiple of these to allow for split screen
 	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
@@ -1087,14 +1083,29 @@ void GameManager::gameLoop()
 		processEvents();
 		state.clearEvents();
 
-		
+		//Wait until end of frame
+		float timeElapsed = clock.getElapsedTime();
+		if (frameTime > timeElapsed)
+			clock.waitUntil(frameTime - timeElapsed);
+
+		//Display FPS
+		timeProgressed += max(timeElapsed, frameTime);
+		frameCount++;
+		if (timeProgressed > 1.f)
+		{
+			printf("FPS = %d\n", frameCount);
+			frameCount = 0;
+			timeProgressed = 0.f;
+		}
+
+		clock.start();
 
 		if (!paused) {
 			checkCoinCollisions();
 
 			physics.getSim();
 
-			physics.startSim(frameTime);
+			physics.startSim(max(timeElapsed, frameTime));
 		}
 		
 		
@@ -1170,8 +1181,6 @@ void GameManager::gameLoop()
 			renderer.drawRadar(radarPos, coloursRadar);
 			renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
 
-			
-
 			//renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
 			//renderer.useViewport(i+1);
@@ -1228,22 +1237,7 @@ void GameManager::gameLoop()
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
 		glfwPollEvents();
 
-		//Wait until end of frame
-		float timeElapsed = clock.getElapsedTime();
-		if (frameTime > timeElapsed)
-			clock.waitUntil(frameTime - timeElapsed);
-
-		//Display FPS
-		timeProgressed += max(timeElapsed, frameTime);
-		frameCount++;
-		if (timeProgressed > 1.f)
-		{
-			printf("FPS = %d\n", frameCount);
-			frameCount = 0;
-			timeProgressed = 0.f;
-		}
-
-		clock.start();
+		
 	}
 	sound.pauseAllSounds();
 	displayEndScreen(winner);
