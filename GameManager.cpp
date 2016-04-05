@@ -757,6 +757,131 @@ void GameManager::initMenus() {
 	}
 }
 
+void GameManager::changeGoldenBuggy()
+{
+	physics.newGoldenBuggy = false;
+
+	//Switch the golden buggie
+	PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggy);
+	unsigned int chassisRenderId_goldenBuggy = p->getRenderID();
+	renderer.assignTexture(chassisRenderId_goldenBuggy, meshInfo.getGoldenBuggyTexID());
+
+
+	//Switch the player that used to be the golden buggy
+	PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
+	int chasisRenderId_reg = p_2->getRenderID();
+	// Switch buggy back to original colour
+	unsigned int origTexture = p_2->getTextureID();
+	renderer.assignTexture(chasisRenderId_reg, origTexture);
+
+	state.setGoldenBuggy(physics.indexOfGoldenBuggy);
+
+	switchBuggyUI();
+}
+
+
+void GameManager::processEvents()
+{
+	for (int i = 0; i < state.getNbEvents(); i++) {
+		Event* e = state.getEvent(i);
+
+		if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
+			// Remove bomb
+			VehicleBombCollisionEvent* powerupEvent = (VehicleBombCollisionEvent*)(e);
+			Powerup* explodedBomb = state.getPowerup(powerupEvent->ob2);
+			renderer.deleteDrawableObject(explodedBomb->getRenderID());
+			state.removePowerup(powerupEvent->ob2);
+		}
+		else if (e->getType() == POWERUPBOX_COLLISION_EVENT)
+		{
+			PowerupCollisionEvent* powerupEvent = dynamic_cast<PowerupCollisionEvent*>(e);
+			int vehicleId = powerupEvent->ob1;
+			int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
+
+			if (!state.getPowerupBox(powerupId)->getCollided()) {
+				// temporarily remove powerup from board
+				PowerupBox* collided = state.getPowerupBox(powerupId);
+				vec3 pos = collided->getPos();
+				vec3 newPos = pos;
+				newPos.y = pos.y - 20;
+				collided->setPos(newPos);
+				collided->setCollided(true);
+				collided->startCountdown();
+
+				hasPowerup[vehicleId] = true;
+				int powerUpType = randomPowerup();
+				//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+				//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+				if (powerUpType == POWERUPS::NITROBOOST) {
+					state.getPlayer(i)->setEnergyForNitro(300.0f);
+					printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
+				}
+				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+				// display powerup information in HUD
+				_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+				_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+
+				sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
+			}
+		}
+	}
+}
+
+void GameManager::checkCoinCollisions()
+{
+	// Check for player/coin collisions, and coin respawns also check for other collisions
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+		bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
+		int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
+		if (hasCoinCollision){
+			//TODO change to all
+			physics.modifySpeed(i, 0.3333f);
+			sound.playDingSound(state.getPlayer(i)->getPos());
+			state.getPlayer(i)->addCoin();
+			_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
+		}
+
+		if (hasBoostPadCollision){
+			physics.applySpeedPadBoost(i);
+		}
+
+		if (hasMineCollision > -1){
+			physics.applyMineExplosion(i);
+			renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
+			state.removeMine(hasMineCollision);
+			sound.playMineExplosionSound(state.getPlayer(i)->getPos());
+		}
+	}
+	state.checkRespawns();
+	state.applyRotations();
+}
+
+void GameManager::updateCamera(unsigned int i, Input input, float frameTime)
+{
+	
+
+	//Update camera position
+	PlayerInfo* activePlayer = state.getPlayer(i);
+	vec4 cameraPosition = physics.vehicle_getGlobalPose(
+		activePlayer->getPhysicsID())*vec4(0.f, 0.f, 0.f, 1.f);
+	vec3 cPos = vec3(cameraPosition) / cameraPosition.w;
+
+	if (cPos != cam[i].getViewCenter())
+		cam[i].changeCenterAndPos(cPos - cam[i].getViewCenter());
+
+	//Update to accomodate more players and multiple cameras
+	cam[i].rotateView(input.camH*CAM_SENSITIVITY, input.camV*CAM_SENSITIVITY);
+
+	cameraEnvironmentCollision(&cam[i]);
+
+	//Track camera around front of vehicle
+	vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
+	if ((input.camH == 0.f) && (input.camV == 0.f))
+		cam[i].trackDirAroundY(vec3(carDir), frameTime);
+}
+
 void GameManager::gameLoop()
 {
 	vector<vec3> polygons;
@@ -800,8 +925,6 @@ void GameManager::gameLoop()
 	vector<vec3> frontier;
 	vector<vec3> paths;
 
-	Camera freeCam;
-
 	bool paused = false;
 	bool firstFrame = true;
 
@@ -816,7 +939,7 @@ void GameManager::gameLoop()
 	hasPowerup.push_back(false);
 
 	unsigned int numScreens = input.getNumPlayers();
-	//unsigned int numScreens = 2;
+	//unsigned int numScreens = 4;
 	renderer.splitScreenViewports(numScreens);
 
 
@@ -877,37 +1000,12 @@ void GameManager::gameLoop()
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
-			physics.newGoldenBuggy = false;
-
-			//Switch the golden buggie
-			PlayerInfo* p = state.getPlayer(physics.indexOfGoldenBuggy);
-			unsigned int chassisRenderId_goldenBuggy = p->getRenderID();
-			renderer.assignTexture(chassisRenderId_goldenBuggy, meshInfo.getGoldenBuggyTexID());
-
-
-			//Switch the player that used to be the golden buggy
-			PlayerInfo* p_2 = state.getPlayer(physics.indexOfOldGoldenBuggy);
-			int chasisRenderId_reg = p_2->getRenderID();
-			// Switch buggy back to original colour
-			unsigned int origTexture = p_2->getTextureID();
-			renderer.assignTexture(chasisRenderId_reg, origTexture);
-
-			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
+			changeGoldenBuggy();
 		}
 
 		//Allow for nitro/powerup activation here
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused) {
-
-				//VehicleTraits traits = VehicleTraits(physics.getMaterial());
-				//traits.print();
-
-
-				//VehicleTraits temp = VehicleTraits(physics.getMaterial());
-				//traits.loadConfiguration("base");
-				//temp.print();
-
-				//createDecoyGoldenBuggie(vec3(-5.f, 5.f, -15.f), traits);
 
 				if (hasPowerup.at(i))
 				{
@@ -922,91 +1020,14 @@ void GameManager::gameLoop()
 		sound.updateSounds(state, inputs);
 
 		//Put into function
-		for (int i = 0; i < state.getNbEvents(); i++) {
-			Event* e = state.getEvent(i);
-
-			if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
-				// Remove bomb
-				VehicleBombCollisionEvent* powerupEvent = (VehicleBombCollisionEvent*)(e);
-				Powerup* explodedBomb = state.getPowerup(powerupEvent->ob2);
-				renderer.deleteDrawableObject(explodedBomb->getRenderID());
-				state.removePowerup(powerupEvent->ob2);
-			}
-			else if (e->getType() == POWERUPBOX_COLLISION_EVENT)
-			{
-				PowerupCollisionEvent* powerupEvent = dynamic_cast<PowerupCollisionEvent*>(e);
-				int vehicleId = powerupEvent->ob1;
-				int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
-
-				if (!state.getPowerupBox(powerupId)->getCollided()) {
-					// temporarily remove powerup from board
-					PowerupBox* collided = state.getPowerupBox(powerupId);
-					vec3 pos = collided->getPos();
-					vec3 newPos = pos;
-					newPos.y = pos.y - 20;
-					collided->setPos(newPos);
-					collided->setCollided(true);
-					collided->startCountdown();
-
-					hasPowerup[vehicleId] = true;
-					int powerUpType = randomPowerup();
-					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-					if (powerUpType == POWERUPS::NITROBOOST) {
-						state.getPlayer(i)->setEnergyForNitro(300.0f);
-						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
-					}
-					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
-
-					// display powerup information in HUD
-					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
-
-					sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
-				}
-			}
-		}
+		processEvents();
 		state.clearEvents();
 
 		
 
 		if (!paused) {
-			// Check for player/coin collisions, and coin respawns also check for other collisions
-			for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-				bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
-				bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
-				int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
-				if (hasCoinCollision){
-					//TODO change to all
-					physics.modifySpeed(i, 0.3333f);
-					sound.playDingSound(state.getPlayer(i)->getPos());
-					state.getPlayer(i)->addCoin();
-					_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
-				}
+			checkCoinCollisions();
 
-				if (hasBoostPadCollision){
-					physics.applySpeedPadBoost(i);
-				}
-
-				if (hasMineCollision > -1){
-					printf("Mine Explosion! \n");
-					physics.applyMineExplosion(i);
-					renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
-					state.removeMine(hasMineCollision);
-					sound.playMineExplosionSound(state.getPlayer(i)->getPos());
-				}
-			}
-			state.checkRespawns();
-			state.applyRotations();
-		}
-
-		
-
-		float scale = 0.1f;
-
-		if (!paused)
-		{
-			//Physics sim 
 			physics.getSim();
 
 			physics.startSim(frameTime);
@@ -1042,34 +1063,14 @@ void GameManager::gameLoop()
 				if (inputs[0].jump)
 					debugPathIterations++;
 
-				freeCam.rotateView(-inputs[0].camH*scale, -inputs[0].camV*scale);
+				freeCam.rotateView(-inputs[0].camH*CAM_SENSITIVITY, -inputs[0].camV*CAM_SENSITIVITY);
 				freeCam.move(vec3(inputs[0].turnL - inputs[0].turnR, 0, inputs[0].forward - inputs[0].backward));
 			}
 			else
 			{
+				updateCamera(i, inputs[i], frameTime);
 				renderer.loadCamera(&cam[i]);
-
-				//Update camera position
-				PlayerInfo* activePlayer = state.getPlayer(i);
-				vec4 cameraPosition = physics.vehicle_getGlobalPose(
-					activePlayer->getPhysicsID())*vec4(0.f, 0.f, 0.f, 1.f);
-				vec3 cPos = vec3(cameraPosition) / cameraPosition.w;
-
-				if (cPos != cam[i].getViewCenter())
-					cam[i].changeCenterAndPos(cPos - cam[i].getViewCenter());
-
-				//Update to accomodate more players and multiple cameras
-				cam[i].rotateView(inputs[i].camH*scale, inputs[i].camV*scale);
-
-				cameraEnvironmentCollision(&cam[i]);
-
-				//Track camera around front of vehicle
-				vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
-				if ((inputs[i].camH == 0.f) && (inputs[i].camV == 0.f))
-					cam[i].trackDirAroundY(vec3(carDir), frameTime);
 			}
-
-			
 
 			//Translate skydome
 			mat4 translation;
@@ -1080,15 +1081,6 @@ void GameManager::gameLoop()
 
 			//Render
 			renderer.useViewport(i+1);
-			//renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
-			//renderer.drawAll();
-			/*if (USING_SHADOWS)
-				renderer.drawAllWithShadows(renderer.getFramebufferTexture(fbo), 0);
-			else
-			{
-				renderer.drawAll();
-				
-			}*/
 				
 			renderer.drawBufferedAll(USING_SHADOWS);
 
@@ -1118,7 +1110,8 @@ void GameManager::gameLoop()
 
 			//renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
-			renderer.useViewport(i+1);
+			//renderer.useViewport(i+1);
+
 			//Debugging
 			if (displayDebugging && (i == 0))
 			{
@@ -1134,11 +1127,6 @@ void GameManager::gameLoop()
 				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
 			}
 
-			/*renderer.useFramebuffer(fbo);
-			renderer.clearDrawBuffers(1.f, 1.f, 1.f);
-			renderer.drawShadowAll(0);
-			renderer.useFramebuffer(NO_VALUE);		//Return to original frambuffer*/
-
 			_interface.drawAll(&renderer, 1 << (i+1));
 		}
 		
@@ -1152,12 +1140,9 @@ void GameManager::gameLoop()
 			totalPausedTime = 0.f;
 
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
-			if ((theScore % 100) == 0) {
-				std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
-			}
+
 			if (theScore >= state.getMaxScore() && gameOver == false) {
 				winner = state.getGoldenBuggyID();
-				printf("Player %i is the winner!\n", winner);
 				if (winner == 0) {
 					sound.playWinSound(state.getPlayer(0)->getPos());
 				}
@@ -1472,20 +1457,49 @@ void GameManager::initUI()
 			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
 	}
 
+	// setup UI that indicates which player is the golden buggy
+	unsigned int display = _interface.generateComponentID();
+	_interface.assignSquare(display);
+	_interface.assignTexture(display, meshInfo.getBuggyIndicator(), ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(display, 1.f, 1.f, .75f, 0.2f, ANCHOR::TOP_RIGHT);
+	_interface.setDisplayFilter(display, DISPLAY::ALL);
+
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		buggyIndicatorUIs.push_back(_interface.generateComponentID());
+		_interface.assignSquare(buggyIndicatorUIs[i]);
+		_interface.setDimensions(buggyIndicatorUIs[i], 1.f, .8f, .4f, 0.15f, ANCHOR::TOP_RIGHT);
+
+		if (i == 0) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D1); }
+		else if (i == 1) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D2); }
+		else if (i == 2) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D3); }
+		else if (i == 3) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D4); }
+	}
+	switchBuggyUI();
+
 	totalPausedTime = 0.f;
 
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
-	//unsigned int centerBox = _interface.generateComponentID();
-	//_interface.assignSquare(centerBox);
-	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
+}
 
-	//_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
-	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	//_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
+void GameManager::switchBuggyUI() {
+	unsigned int golden = state.getGoldenBuggyID();
+	vec3 goldenColour = state.getPlayer(golden)->getColour();
+	int texID;
+	// red is golden buggy
+	if (goldenColour == vec3(1.f, 0.f, 0.f)) { texID = meshInfo.getRedGoldenBuggy(); }
+	else if (goldenColour == vec3(0.f, 1.f, 0.f)) { texID = meshInfo.getGreenGoldenBuggy(); }
+	else if (goldenColour == vec3(0.f, 0.f, 1.f)) { texID = meshInfo.getBlueGoldenBuggy(); }
+	else if (goldenColour == vec3(1.f, 0.f, 1.f)) { texID = meshInfo.getPurpleGoldenBuggy(); }
 
-	
-	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		if (i != golden) {
+			_interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE);
+		}
+		else {
+			_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE);
+		}
+	}
 }
 
 int GameManager::randomPowerup()

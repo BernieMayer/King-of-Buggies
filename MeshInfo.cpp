@@ -119,6 +119,15 @@ MeshInfo::MeshInfo() {
 	coinComponentIDs.push_back(LoadTexture("textures\\hud\\7.png"));
 	coinComponentIDs.push_back(LoadTexture("textures\\hud\\8.png"));
 	coinComponentIDs.push_back(LoadTexture("textures\\hud\\9.png"));
+
+	// Load UI for displaying current buggy / score information
+	buggyIndicator = LoadTexture("textures\\hud\\buggyindicator.png");
+
+	redGoldenBuggy = LoadTexture("textures\\hud\\red.png");
+	greenGoldenBuggy = LoadTexture("textures\\hud\\green.png");
+	blueGoldenBuggy = LoadTexture("textures\\hud\\blue.png");
+	purpleGoldenBuggy = LoadTexture("textures\\hud\\purple.png");
+	youGoldenBuggy = LoadTexture("textures\\hud\\you.png");
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
@@ -148,25 +157,6 @@ vector<unsigned int> MeshInfo::getMeshIndices(int objectType) {
 unsigned int MeshInfo::getBuggyTexID(int index) {
 	return buggyTexIDs[index];
 }
-
-unsigned int MeshInfo::getRedBuggyTexID() { return redBuggyTexID; }
-
-unsigned int MeshInfo::getBlueBuggyTexID() { return blueBuggyTexID; }
-
-unsigned int MeshInfo::getGreenBuggyTexID() { return greenBuggyTexID; }
-
-unsigned int MeshInfo::getOrangeBuggyTexID() { return orangeBuggyTexID; }
-
-unsigned int MeshInfo::getPurpleBuggyTexID() { return purpleBuggyTexID; }
-
-unsigned int MeshInfo::getGoldenBuggyTexID() { return goldenBuggyTexID; }
-
-
-unsigned int MeshInfo::getUInitroID() { return UInitroID; }
-
-unsigned int MeshInfo::getUIbombID() { return UIbombID; }
-
-unsigned int MeshInfo::getUImineID() { return UImineID; }
 
 unsigned int MeshInfo::getUIcomponentID(unsigned int itemType) {
 	return UIcomponentIDs[itemType];

@@ -17,6 +17,8 @@
 
 #include <GLFW/glfw3.h>  
 
+const float CAM_SENSITIVITY = 0.1f;
+
 class GameManager {
 private:
 	// Object materials
@@ -42,6 +44,7 @@ private:
 	float totalPausedTime;
 
 	Camera cam[MAX_PLAYERS];
+	Camera freeCam;
 
 	GLFWwindow* window;
 
@@ -94,8 +97,14 @@ private:
 	vector<int> playerColours;
 
 	vector<unsigned int> powerupComponentIDs;
-	
 	vector<unsigned int> playerCoinIDs;
+	vector<unsigned int> buggyIndicatorUIs;
+
+	//Game loop functions
+	void changeGoldenBuggy();
+	void processEvents();
+	void checkCoinCollisions();
+	void updateCamera(unsigned int i, Input input, float frameTime);
 
 	int selectedLevel = 1;
 
@@ -123,8 +132,9 @@ public:
 	void startDecoy(float time);
 	float decrementDecoyTimer(float time);
 	bool isDecoyTimerUp();
-
 	void applyPowerupEffect(int playerNun);
+	void switchBuggyUI();
+
 	void cameraEnvironmentCollision(Camera* cam);
 	
 	void gameLoop();

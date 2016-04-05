@@ -20,22 +20,27 @@ public:
 	vector<vec2> getMeshUvs(int objectType);
 	vector<unsigned int> getMeshIndices(int objectType);
 	unsigned int getBuggyTexID(int index);
-	unsigned int getRedBuggyTexID();
-	unsigned int getBlueBuggyTexID();
-	unsigned int getGreenBuggyTexID();
-	unsigned int getOrangeBuggyTexID();
-	unsigned int getPurpleBuggyTexID();
-	unsigned int getGoldenBuggyTexID();
 
-	vector<unsigned int> buggyTexIDs;
+	unsigned int getRedBuggyTexID() { return redBuggyTexID; }
+	unsigned int getBlueBuggyTexID() { return blueBuggyTexID; }
+	unsigned int getGreenBuggyTexID() { return greenBuggyTexID; }
+	unsigned int getOrangeBuggyTexID() { return orangeBuggyTexID; }
+	unsigned int getPurpleBuggyTexID() { return purpleBuggyTexID; }
+	unsigned int getGoldenBuggyTexID() { return goldenBuggyTexID; }
 
-	unsigned int getUInitroID();
-	unsigned int getUIbombID();
-	unsigned int getUImineID();
+	unsigned int getUInitroID() { return UInitroID; }
+	unsigned int getUIbombID() { return UIbombID; }
+	unsigned int getUImineID() { return UImineID; }
 
 	unsigned int getUIcomponentID(unsigned int itemType);
-
 	unsigned int getCoinComponentID(unsigned int number);
+
+	unsigned int getRedGoldenBuggy() { return redGoldenBuggy; }
+	unsigned int getGreenGoldenBuggy() { return greenGoldenBuggy; }
+	unsigned int getBlueGoldenBuggy() { return blueGoldenBuggy; }
+	unsigned int getPurpleGoldenBuggy() { return purpleGoldenBuggy; }
+	unsigned int getYouGoldenBuggy() { return youGoldenBuggy; }
+	unsigned int getBuggyIndicator() { return buggyIndicator; }
 
 	MeshInfoLoader meshLoader;
 
@@ -48,13 +53,21 @@ private:
 	unsigned int purpleBuggyTexID;
 	unsigned int goldenBuggyTexID;
 
+	vector<unsigned int> buggyTexIDs;
+
 	unsigned int UInitroID;
 	unsigned int UIbombID;
 	unsigned int UImineID;
 
 	vector<unsigned int> UIcomponentIDs;
-
 	vector<unsigned int> coinComponentIDs;
+
+	unsigned int redGoldenBuggy;
+	unsigned int greenGoldenBuggy;
+	unsigned int blueGoldenBuggy;
+	unsigned int purpleGoldenBuggy;
+	unsigned int youGoldenBuggy;
+	unsigned int buggyIndicator;
 };
 
 #endif // MESHINFO_H
