@@ -816,7 +816,7 @@ void GameManager::gameLoop()
 	hasPowerup.push_back(false);
 
 	unsigned int numScreens = input.getNumPlayers();
-	//unsigned int numScreens = 2;
+	//unsigned int numScreens = 4;
 	renderer.splitScreenViewports(numScreens);
 
 
@@ -893,6 +893,8 @@ void GameManager::gameLoop()
 			renderer.assignTexture(chasisRenderId_reg, origTexture);
 
 			state.setGoldenBuggy(physics.indexOfGoldenBuggy);
+
+			switchBuggyUI();
 		}
 
 		//Allow for nitro/powerup activation here
@@ -1471,20 +1473,49 @@ void GameManager::initUI()
 			_interface.setDisplayFilter(powerupComponentIDs[i], DISPLAY::D4);
 	}
 
+	// setup UI that indicates which player is the golden buggy
+	unsigned int display = _interface.generateComponentID();
+	_interface.assignSquare(display);
+	_interface.assignTexture(display, meshInfo.getBuggyIndicator(), ComponentInfo::UP_TEXTURE);
+	_interface.setDimensions(display, 1.f, 1.f, .75f, 0.2f, ANCHOR::TOP_RIGHT);
+	_interface.setDisplayFilter(display, DISPLAY::ALL);
+
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		buggyIndicatorUIs.push_back(_interface.generateComponentID());
+		_interface.assignSquare(buggyIndicatorUIs[i]);
+		_interface.setDimensions(buggyIndicatorUIs[i], 1.f, .8f, .4f, 0.15f, ANCHOR::TOP_RIGHT);
+
+		if (i == 0) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D1); }
+		else if (i == 1) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D2); }
+		else if (i == 2) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D3); }
+		else if (i == 3) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D4); }
+	}
+	switchBuggyUI();
+
 	totalPausedTime = 0.f;
 
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
-	//unsigned int centerBox = _interface.generateComponentID();
-	//_interface.assignSquare(centerBox);
-	//_interface.setDisplayFilter(centerBox, DISPLAY::D2);
+}
 
-	//_interface.assignTexture(centerBox, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
-	//_interface.assignTexture(centerBox, carSelectScreen, ComponentInfo::UP_TEXTURE);
-	//_interface.setDimensions(centerBox, 1.f, -1.f, 1.f, 1.f, ANCHOR::BOTTOM_RIGHT);
+void GameManager::switchBuggyUI() {
+	unsigned int golden = state.getGoldenBuggyID();
+	vec3 goldenColour = state.getPlayer(golden)->getColour();
+	int texID;
+	// red is golden buggy
+	if (goldenColour == vec3(1.f, 0.f, 0.f)) { texID = meshInfo.getRedGoldenBuggy(); }
+	else if (goldenColour == vec3(0.f, 1.f, 0.f)) { texID = meshInfo.getGreenGoldenBuggy(); }
+	else if (goldenColour == vec3(0.f, 0.f, 1.f)) { texID = meshInfo.getBlueGoldenBuggy(); }
+	else if (goldenColour == vec3(1.f, 0.f, 1.f)) { texID = meshInfo.getPurpleGoldenBuggy(); }
 
-	
-	//createPlayer(vec3(0.f, 5.f, 3.f)); //SHOULD BE AI methods
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		if (i != golden) {
+			_interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE);
+		}
+		else {
+			_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE);
+		}
+	}
 }
 
 int GameManager::randomPowerup()

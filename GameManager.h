@@ -94,8 +94,8 @@ private:
 	vector<int> playerColours;
 
 	vector<unsigned int> powerupComponentIDs;
-	
 	vector<unsigned int> playerCoinIDs;
+	vector<unsigned int> buggyIndicatorUIs;
 
 	int selectedLevel = 1;
 
@@ -123,6 +123,8 @@ public:
 	void startDecoy(float time);
 	float decrementDecoyTimer(float time);
 	bool isDecoyTimerUp();
+
+	void switchBuggyUI();
 
 	void cameraEnvironmentCollision(Camera* cam);
 	
