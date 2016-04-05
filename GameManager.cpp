@@ -193,7 +193,7 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 void GameManager::createLevel(unsigned int objectID) {
 
 	if (selectedLevel == 1) {
-		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
 	}
 	else if (selectedLevel == 0) {
 		levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
