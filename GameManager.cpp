@@ -14,7 +14,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 	window = newWindow;
 	mat = Diffuse();
 	shinyMat = Specular(20.f);
-	tsMat = TorranceSparrow(10.f);
+	tsMat = TorranceSparrow(15.f);
 	matteMat = TorranceSparrow(0.5f);
 	skyMaterial = Unshaded();
 	shadowMat = Shadow();

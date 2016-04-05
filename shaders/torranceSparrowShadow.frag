@@ -55,14 +55,31 @@ float testVisibility(vec4 point, float bias)
 	up *= radius;
 
 	float visibility = 0.0;
+	float pointsTested = 0.0;
 
-	for(int i=0; i< POINT_SIZE; i++)
+	for(int i=0; i< 4; i++)
 	{
 		//vec2 offset = points[i]*radius; //right*points[i].x + up*points[i].y;		//Static Poisson disk
 		vec2 offset = right*points[i].x + up*points[i].y;		//Rotated Poisson disk
 		visibility += inLight(point, bias, offset);
-	} 
-	return visibility*(1.0/16.0);
+		pointsTested += 1.0;
+	}
+
+	if(visibility == 4.0)
+		return 1.0;
+	else
+	{
+		for(int i=4; i< POINT_SIZE; i++)
+		{
+			//vec2 offset = points[i]*radius; //right*points[i].x + up*points[i].y;		//Static Poisson disk
+			vec2 offset = right*points[i].x + up*points[i].y;		//Rotated Poisson disk
+			visibility += inLight(point, bias, offset);
+			pointsTested += 1.0;
+		} 
+
+
+		return visibility*(1.0/pointsTested);
+	}
 }
 
 vec2 mappedCoordinate(vec4 point, float bias, vec2 offset)
@@ -100,7 +117,8 @@ void main(){
 	//vec2 mc = mappedCoordinate(shadowCoord, bias, vec2(0.f, 0.f));	
 	//fragColor = vec3(mc.x, mc.y, 0.f);
 
-	
+	visibility = visibility*0.7 + 0.3;
+
 	vec3 color = texture(colorTexture, texCoord).rgb;
     fragColor = torranceSparrowLighting(visibility)*color;
 }
