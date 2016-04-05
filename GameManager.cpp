@@ -823,7 +823,7 @@ void GameManager::gameLoop()
 
 	unsigned int radarInterfaceID = _interface.generateComponentID();
 	_interface.assignSquare(radarInterfaceID);
-	_interface.setDimensions(radarInterfaceID, 0.0f, 0.0f, 0.0f, 0.0f, ANCHOR::TOP_RIGHT);
+	_interface.setDimensions(radarInterfaceID, 0.0f, 0.0f, 0.0f, 0.0f, ANCHOR::TOP_RIGHT);	//CHANGE THIS
 
 	//use multiple of these to allow for split screen
 	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
@@ -911,67 +911,7 @@ void GameManager::gameLoop()
 
 				if (hasPowerup.at(i))
 				{
-					/*
-					1 - Nitro Boost
-					2 - Bomb
-					3 - Mine
-					4 - Coin?
-					5 - Decoy?
-					*/
-
-					int powerUpId = state.getPlayer(i)->usePowerUp();
-
-					if (powerUpId == POWERUPS::NITROBOOST)
-					{
-						if (state.getPlayer(i)->getEnergyForNitro() > 0.0f)
-						{
-							state.getPlayer(i)->removeEnergyForNitro(30);
-							physics.applyNitroBoost(i);
-							sound.playNitroSound(state.getPlayer(i)->getPos());
-							state.getPlayer(i)->addPowerUp(POWERUPS::NITROBOOST);
-							printf("Current energy level %f \n", state.getPlayer(i)->getEnergyForNitro());
-						}
-						else {
-							_interface.toggleActive(powerupComponentIDs[i], false);
-							hasPowerup.at(i) = false;
-						}
-					}
-					else if (powerUpId == POWERUPS::BOMB)
-					{
-						createBomb(i);
-					}
-					else if (powerUpId == POWERUPS::MINE)
-					{
-						createMine(i);
-						sound.playMineCreationSound(state.getPlayer(i)->getPos());
-					}
-					else if (powerUpId == POWERUPS::COIN)
-					{
-						physics.modifySpeed(i, 0.3333f);	//Should change this..
-						printf("Coin \n");
-					}
-					else if (powerUpId == POWERUPS::DECOY)
-					{
-						printf("Decoy \n");
-						if (state.numOfDecoys >= 1) {
-							//nothing or stuff dealing with multiple decoys
-						}
-						else {
-							state.numOfDecoys += 1;
-							//Apply decoy powerup logic
-							VehicleTraits traits = VehicleTraits(physics.getMaterial());
-							createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
-							//state.getPlayer(state.numberOfPlayers()).setAI(true);
-							state.getPlayer(state.numberOfPlayers() - 1)->setDecoy(true);
-							//also check the decoy timer here
-							printf("Decoy? \n");
-						}
-					}
-
-					if (powerUpId != POWERUPS::NITROBOOST) {
-						_interface.toggleActive(powerupComponentIDs[i], false);
-						hasPowerup.at(i) = false;
-					}
+					applyPowerupEffect(i);
 				}
 			}
 		}
@@ -1261,6 +1201,63 @@ void GameManager::gameLoop()
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+}
+
+void GameManager::applyPowerupEffect(int playerNum)
+{
+	int powerUpId = state.getPlayer(playerNum)->usePowerUp();
+
+	if (powerUpId == POWERUPS::NITROBOOST)
+	{
+		if (state.getPlayer(playerNum)->getEnergyForNitro() > 0.0f)
+		{
+			state.getPlayer(playerNum)->removeEnergyForNitro(30);
+			physics.applyNitroBoost(playerNum);
+			sound.playNitroSound(state.getPlayer(playerNum)->getPos());
+			state.getPlayer(playerNum)->addPowerUp(POWERUPS::NITROBOOST);
+			printf("Current energy level %f \n", state.getPlayer(playerNum)->getEnergyForNitro());
+		}
+		else {
+			_interface.toggleActive(powerupComponentIDs[playerNum], false);
+			hasPowerup.at(playerNum) = false;
+		}
+	}
+	else if (powerUpId == POWERUPS::BOMB)
+	{
+		createBomb(playerNum);
+	}
+	else if (powerUpId == POWERUPS::MINE)
+	{
+		createMine(playerNum);
+		sound.playMineCreationSound(state.getPlayer(playerNum)->getPos());
+	}
+	else if (powerUpId == POWERUPS::COIN)
+	{
+		physics.modifySpeed(playerNum, 0.3333f);	//Should change this..
+		printf("Coin \n");
+	}
+	else if (powerUpId == POWERUPS::DECOY)
+	{
+		printf("Decoy \n");
+		if (state.numOfDecoys >= 1) {
+			//nothing or stuff dealing with multiple decoys
+		}
+		else {
+			state.numOfDecoys += 1;
+			//Apply decoy powerup logic
+			VehicleTraits traits = VehicleTraits(physics.getMaterial());
+			createPlayer(vec3(-5.f, 5.f, -15.f), traits, meshInfo.getGoldenBuggyTexID());
+			//state.getPlayer(state.numberOfPlayers()).setAI(true);
+			state.getPlayer(state.numberOfPlayers() - 1)->setDecoy(true);
+			//also check the decoy timer here
+			printf("Decoy? \n");
+		}
+	}
+
+	if (powerUpId != POWERUPS::NITROBOOST) {
+		_interface.toggleActive(powerupComponentIDs[playerNum], false);
+		hasPowerup.at(playerNum) = false;
+	}
 }
 
 void GameManager::gameInit()

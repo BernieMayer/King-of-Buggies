@@ -124,6 +124,7 @@ public:
 	float decrementDecoyTimer(float time);
 	bool isDecoyTimerUp();
 
+	void applyPowerupEffect(int playerNun);
 	void cameraEnvironmentCollision(Camera* cam);
 	
 	void gameLoop();

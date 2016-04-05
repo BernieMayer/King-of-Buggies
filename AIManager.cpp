@@ -218,6 +218,11 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	input.rollL = 0;
 	input.rollR = 0;
 
+	if (state->getPlayer(aiNum)->getCurrentPowerup() != -1)
+	{
+		input.powerup = true;
+	}
+
 	Entity* ai = state->getPlayer(aiNum);
 	Entity* goldenBuggy = state->getGoldenBuggy();
 
@@ -590,9 +595,17 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	input.rollL = 0;
 	input.rollR = 0;
 
+	
+
 	float dot = facing(ai, pos);
 	float side = beside(ai, pos);
 
+	//AI has a powerup
+	if (state->getPlayer(playerNum)->getCurrentPowerup() != -1)
+	{
+		input.powerup = true;
+	}
+	
 	// If not facing towards point
 	if (dot < 0.95f) {
 		// Turn
