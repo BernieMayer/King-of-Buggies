@@ -102,7 +102,6 @@ private:
 
 	//Game loop functions
 	void changeGoldenBuggy();
-	void activatePowerup(unsigned int i);
 	void processEvents();
 	void checkCoinCollisions();
 	void updateCamera(unsigned int i, Input input, float frameTime);
@@ -133,7 +132,7 @@ public:
 	void startDecoy(float time);
 	float decrementDecoyTimer(float time);
 	bool isDecoyTimerUp();
-
+	void applyPowerupEffect(int playerNun);
 	void switchBuggyUI();
 
 	void cameraEnvironmentCollision(Camera* cam);
