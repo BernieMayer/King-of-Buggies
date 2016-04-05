@@ -218,10 +218,7 @@ Input AIManager::testAIChase(unsigned int aiNum){
 	input.rollL = 0;
 	input.rollR = 0;
 
-	if (state->getPlayer(aiNum)->getCurrentPowerup() != -1)
-	{
-		input.powerup = true;
-	}
+	
 
 	Entity* ai = state->getPlayer(aiNum);
 	Entity* goldenBuggy = state->getGoldenBuggy();
@@ -249,6 +246,25 @@ Input AIManager::testAIChase(unsigned int aiNum){
 				input.turnL = result;
 			}
 
+		}
+	}
+
+	if (state->getPlayer(aiNum)->getCurrentPowerup() != -1)
+	{
+		if (state->getPlayer(aiNum)->getCurrentPowerup() != POWERUPS::BOMB)
+		{
+			input.powerup = true;
+		}
+		else
+		{
+			
+			double dist = abs(length(state->getPlayer(aiNum)->getPos() - state->getGoldenBuggy()->getPos()));
+
+			if (dist <= 5)
+			{
+				//Use the bomb powerup if the AI is close to the golden buggy
+				input.powerup = true;
+			}
 		}
 	}
 
@@ -600,11 +616,7 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	float dot = facing(ai, pos);
 	float side = beside(ai, pos);
 
-	//AI has a powerup
-	if (state->getPlayer(playerNum)->getCurrentPowerup() != -1)
-	{
-		input.powerup = true;
-	}
+	
 	
 	// If not facing towards point
 	if (dot < 0.95f) {
@@ -618,6 +630,23 @@ Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	}
 
 	prevPosition[playerNum] = aiPos;
+
+	//AI has a powerup
+	if (state->getPlayer(playerNum)->getCurrentPowerup() != -1)
+	{
+		if (state->getPlayer(playerNum)->getCurrentPowerup() != POWERUPS::BOMB){
+			input.powerup = true;
+		}
+		else {
+			double dist = abs(length(state->getPlayer(playerNum)->getPos() - state->getGoldenBuggy()->getPos()));
+
+			if (dist <= 5)
+			{
+				//Use the bomb powerup if the AI is close to the golden buggy
+				input.powerup = true;
+			}
+		}
+	}
 
 	return input;
 }
