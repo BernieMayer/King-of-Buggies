@@ -23,7 +23,7 @@
 
 
 
-const float gravity = -9.81f;
+const float gravity = -18.f;
 
 using namespace physx;
 

@@ -17,6 +17,8 @@
 
 #include <GLFW/glfw3.h>  
 
+const float CAM_SENSITIVITY = 0.1f;
+
 class GameManager {
 private:
 	// Object materials
@@ -42,6 +44,7 @@ private:
 	float totalPausedTime;
 
 	Camera cam[MAX_PLAYERS];
+	Camera freeCam;
 
 	GLFWwindow* window;
 
@@ -96,6 +99,13 @@ private:
 	vector<unsigned int> powerupComponentIDs;
 	vector<unsigned int> playerCoinIDs;
 	vector<unsigned int> buggyIndicatorUIs;
+
+	//Game loop functions
+	void changeGoldenBuggy();
+	void activatePowerup(unsigned int i);
+	void processEvents();
+	void checkCoinCollisions();
+	void updateCamera(unsigned int i, Input input, float frameTime);
 
 	int selectedLevel = 1;
 
