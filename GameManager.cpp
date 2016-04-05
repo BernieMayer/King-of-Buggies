@@ -193,7 +193,7 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 void GameManager::createLevel(unsigned int objectID) {
 
 	if (selectedLevel == 1) {
-		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
 	}
 	else if (selectedLevel == 0) {
 		levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
@@ -1049,7 +1049,6 @@ void GameManager::gameLoop()
 				}
 
 				if (hasMineCollision > -1){
-					printf("Mine Explosion! \n");
 					physics.applyMineExplosion(i);
 					renderer.deleteDrawableObject(state.getMine(hasMineCollision)->getRenderID());
 					state.removeMine(hasMineCollision);
@@ -1212,12 +1211,9 @@ void GameManager::gameLoop()
 			totalPausedTime = 0.f;
 
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
-			if ((theScore % 100) == 0) {
-				std::printf("Player %i score: %i\n", state.getGoldenBuggyID(), state.getGoldenBuggy()->getScore());
-			}
+
 			if (theScore >= state.getMaxScore() && gameOver == false) {
 				winner = state.getGoldenBuggyID();
-				printf("Player %i is the winner!\n", winner);
 				if (winner == 0) {
 					sound.playWinSound(state.getPlayer(0)->getPos());
 				}
