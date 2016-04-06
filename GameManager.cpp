@@ -399,7 +399,13 @@ void GameManager::initMenus() {
 			in.push_back(smoothers[i].smooth(input.getInput(i), false));
 		}
 
-		if (in[0].horn || glfwWindowShouldClose(window)) {
+		if (glfwWindowShouldClose(window)) {
+			glfwDestroyWindow(window);
+			glfwTerminate();
+			return;
+		}
+
+		if (in[0].horn) {
 			_interface.clear();
 
 			// Clear input so no input given for new menu on transition frame
