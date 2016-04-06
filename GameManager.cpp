@@ -192,7 +192,10 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 }
 void GameManager::createLevel(unsigned int objectID) {
 
-	if (selectedLevel == 1) {
+	if (selectedLevel == 2) {
+		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+	}
+	else if (selectedLevel == 1) {
 		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
 	}
 	else if (selectedLevel == 0) {
@@ -808,21 +811,23 @@ void GameManager::processEvents()
 				collided->setCollided(true);
 				collided->startCountdown();
 
-				hasPowerup[vehicleId] = true;
-				int powerUpType = randomPowerup();
-				//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-				//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-				if (powerUpType == POWERUPS::NITROBOOST) {
-					state.getPlayer(i)->setEnergyForNitro(300.0f);
-					printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
-				}
-				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
-
-				// display powerup information in HUD
-				_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-				_interface.toggleActive(powerupComponentIDs[vehicleId], true);
-
 				sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
+
+				if (state.getPlayer(vehicleId)->getCurrentPowerup() < 0) {
+					hasPowerup[vehicleId] = true;
+					int powerUpType = randomPowerup();
+					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					if (powerUpType == POWERUPS::NITROBOOST) {
+						state.getPlayer(i)->setEnergyForNitro(300.0f);
+						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
+					}
+					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+					// display powerup information in HUD
+					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+				}
 			}
 		}
 	}
@@ -889,7 +894,10 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -2.f;
 
 	NavMesh nav;
-	if (selectedLevel == 1) {
+	if (selectedLevel == 2) { // temporary
+		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
+	}
+	else if (selectedLevel == 1) {
 		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
 	}
 	else if (selectedLevel == 0) {
@@ -1114,6 +1122,7 @@ void GameManager::gameLoop()
 			}
 			//Draw the radar to the frameBuffer
 			renderer.useFramebuffer(radarFBO);
+			renderer.clearDrawBuffers(vec3(0.0f,0.0f,0.0f));
 			renderer.drawRadar(radarPos, coloursRadar);
 			renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
 
@@ -1244,7 +1253,12 @@ void GameManager::gameInit()
 	gameOver = false;
 	
 
-	if (selectedLevel == 1) {
+	if (selectedLevel == 2) {
+		// temporary since we only have one level right now
+		createLevel(PIPELEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+	}
+	else if (selectedLevel == 1) {
 		// temporary since we only have one level right now
 		createLevel(DONUTLEVEL);
 		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
@@ -1255,11 +1269,7 @@ void GameManager::gameInit()
 	}
 
 	state.setMap(levelMesh, selectedLevel);
-	initTestScene();
-}
 
-void GameManager::initTestScene()
-{
 	for (int i = 0; i < playerColours.size(); i++) {
 		if (playerColours[i] == 0) {
 			vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car

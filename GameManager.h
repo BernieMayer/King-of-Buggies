@@ -139,7 +139,6 @@ public:
 	
 	void gameLoop();
 	void gameInit();
-	void initTestScene();
 	void initUI();
 	void displayEndScreen(unsigned int winnerID);
 

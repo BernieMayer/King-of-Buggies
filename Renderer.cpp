@@ -257,7 +257,6 @@ unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height
 
 	//Return to normal frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//	glDrawBuffer(GL_FRONT);
 
 	fbo.push_back(Framebuffer(fb, fb_texture, width, height, Framebuffer::DEPTH));
 
@@ -290,7 +289,6 @@ unsigned int Renderer::createFramebuffer(unsigned int width, unsigned int height
 
 	//Return to normal frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//	glDrawBuffer(GL_FRONT);
 
 	fbo.push_back(Framebuffer(fb, fb_texture, width, height, Framebuffer::COLOR));
 
@@ -302,13 +300,11 @@ void Renderer::useFramebuffer(unsigned int id)
 	if (id == NO_VALUE)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-//		glDrawBuffer(GL_FRONT);
 		useViewport(activeViewport);
 	}
 	else
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo[id].id);
-		//glDrawBuffer(GL_NONE);
 		glViewport(0, 0, fbo[id].width, fbo[id].height);
 	}
 
@@ -806,7 +802,7 @@ void Renderer::drawBufferedAll(bool useShadows)
 
 void Renderer::drawRadar(vector<vec2> radarVecs, vector<vec3> colours)
 {
-	glViewport(windowWidth * 0.75, windowHeight * 0.75, windowWidth * 0.25, windowHeight * 0.25);
+	//glViewport(windowWidth * 0.75, windowHeight * 0.75, windowWidth * 0.25, windowHeight * 0.25);
 	
 	glUseProgram(0);
 

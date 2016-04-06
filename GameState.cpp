@@ -5,7 +5,7 @@
 
 GameState::GameState()
 {
-	maxScore = 2000;
+	maxScore = 3000;
 }
 /*
 GameState::GameState(MeshObject* selectedLevel, char *coinsFile, char *boostFile)
@@ -496,7 +496,7 @@ void GameState::clearEvents()
 
 void GameState::setMap(MeshObject* arena, unsigned int selectedLevel) 
 {
-	if (selectedLevel == 0 || selectedLevel == 1) {
+	if (selectedLevel == 0 || selectedLevel == 1 || selectedLevel == 2) {
 		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
 	}
 	

@@ -1423,6 +1423,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 			}
 
 			
+			
 
 			bool isBomb1 = false;
 			bool isBomb2 = false;
@@ -1439,6 +1440,8 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 					}
 				}
 			}
+
+		
 			
 			int numContacts = cp.contactCount;
 			PxContactPairPoint contactPoint[1];
@@ -1452,6 +1455,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				vec3 force = vec3(contactPoint->impulse.x / lastFrameTime, contactPoint->impulse.y / lastFrameTime, contactPoint->impulse.z / lastFrameTime);
 
 				if (isVehicle1 && isVehicle2) {
+					applyCollisionSeparation(index1, index2);
 					lastState->pushEvent(new VehicleCollisionEvent(index1, index2, pos, normal, force));
 				}
 				else if (isBomb1 && isVehicle2) {
@@ -1677,6 +1681,25 @@ void Physics::bombExplosion(int bombID) {
 			lastState->getPowerup(i)->setPhysicsID(lastState->getPowerup(i)->getPhysicsID() - 1);
 		}
 	}
+
+}
+
+void Physics::applyCollisionSeparation(int vehID1, int vehID2)
+{
+	Vehicle veh1 = vehicleActors[vehID1];
+	Vehicle veh2 = vehicleActors[vehID2];
+
+	vec3 difference = getVec3(veh1.vehDrive4W->getRigidDynamicActor()->getGlobalPose().p) - getVec3(veh2.vehDrive4W->getRigidDynamicActor()->getGlobalPose().p);
+	vec3 normalizeDiff = normalize(difference);
+
+	float multiplier = 250000.0f;
+	vec3 forceOnVeh1 = multiplier * normalizeDiff;
+	vec3 forceOnVeh2 = -multiplier * normalizeDiff;
+
+	veh1.vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(forceOnVeh1));
+	veh2.vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(forceOnVeh2));
+
+
 
 }
 
