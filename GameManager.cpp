@@ -115,7 +115,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 		renderer.assignScale(wheelIDs[i], 
 			scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
 		renderer.assignColor(wheelIDs[i], vec3(0.2f, 0.2f, 0.2f));
-		//renderer.setShadowBehaviour(wheelIDs[i], SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
+		renderer.setShadowBehaviour(wheelIDs[i], SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
@@ -908,13 +908,7 @@ void GameManager::gameLoop()
 
 	vector<vec3> path;
 	
-	clock.start();
-	float timeProgressed = 0.f;
-	unsigned int frameCount = 0;
-
-	float frameTime = 1.f / 60.f;
-
-	physics.startSim(frameTime);
+	
 
 	// 5 because of 4 players and the inital golden buggy which is not
 	// a player
@@ -955,6 +949,14 @@ void GameManager::gameLoop()
 	//use multiple of these to allow for split screen
 	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
 	_interface.assignTexture(radarInterfaceID, renderer.getFramebufferTexture(radarFBO), ComponentInfo::UP_TEXTURE); //Magic third parameter
+
+	clock.start();
+	float timeProgressed = 0.f;
+	unsigned int frameCount = 0;
+
+	float frameTime = 1.f / 60.f;
+
+	physics.startSim(frameTime);
 
 	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
@@ -1018,15 +1020,6 @@ void GameManager::gameLoop()
 			}
 		}
 
-		//Update game state and renderer
-		physics.updateGameState(&state, frameTime);
-		renderer.updateObjectTransforms(&state);
-		sound.updateSounds(state, inputs);
-
-		//Put into function
-		processEvents();
-		state.clearEvents();
-
 		//Wait until end of frame
 		float timeElapsed = clock.getElapsedTime();
 		if (frameTime > timeElapsed)
@@ -1043,6 +1036,15 @@ void GameManager::gameLoop()
 		}
 
 		clock.start();
+
+		//Update game state and renderer
+		physics.updateGameState(&state, frameTime);
+		renderer.updateObjectTransforms(&state);
+		sound.updateSounds(state, inputs);
+
+		//Put into function
+		processEvents();
+		state.clearEvents();
 
 		if (!paused) {
 			checkCoinCollisions();
@@ -1652,6 +1654,8 @@ void GameManager::partialTeardown() {
 	skyboxVerts.clear();
 	skyboxUVs.clear();
 	skyboxIndices.clear();
+
+	renderer.deleteAllDrawableObjects();
 
 	hasPowerup.clear();
 

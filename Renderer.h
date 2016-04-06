@@ -304,6 +304,7 @@ public:
 
 	//Delete objects
 	void deleteDrawableObject(int object);
+	void deleteAllDrawableObjects();
 	void deleteLightObject(int object);
 	void deleteIDs();
 

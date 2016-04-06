@@ -1904,6 +1904,11 @@ void Renderer::deleteDrawableObject(int objectID)
 	objects[objectID].deleted = true;
 }
 
+void Renderer::deleteAllDrawableObjects()
+{
+	objects.clear();
+}
+
 
 mat4 biasMatrix()
 {
