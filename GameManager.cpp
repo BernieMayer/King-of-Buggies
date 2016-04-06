@@ -192,7 +192,10 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 }
 void GameManager::createLevel(unsigned int objectID) {
 
-	if (selectedLevel == 1) {
+	if (selectedLevel == 2) {
+		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+	}
+	else if (selectedLevel == 1) {
 		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
 	}
 	else if (selectedLevel == 0) {
@@ -891,7 +894,10 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -2.f;
 
 	NavMesh nav;
-	if (selectedLevel == 1) {
+	if (selectedLevel == 2) { // temporary
+		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
+	}
+	else if (selectedLevel == 1) {
 		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
 	}
 	else if (selectedLevel == 0) {
@@ -1246,7 +1252,12 @@ void GameManager::gameInit()
 	gameOver = false;
 	
 
-	if (selectedLevel == 1) {
+	if (selectedLevel == 2) {
+		// temporary since we only have one level right now
+		createLevel(PIPELEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+	}
+	else if (selectedLevel == 1) {
 		// temporary since we only have one level right now
 		createLevel(DONUTLEVEL);
 		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
