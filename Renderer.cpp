@@ -110,7 +110,7 @@ Renderer::~Renderer()
 **/
 unsigned int Renderer::generateObjectID()
 {
-	if (false)	//deletedObjects.size() != 0)
+	if (deletedObjects.size() != 0)
 	{
 		unsigned int id = deletedObjects[0];
 		objects[id] = ObjectInfo();
@@ -1921,6 +1921,8 @@ void Renderer::deleteDrawableObject(int objectID)
 void Renderer::deleteAllDrawableObjects()
 {
 	objects.clear();
+	newObjects.clear();
+	deletedObjects.clear();
 }
 
 
