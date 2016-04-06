@@ -1255,11 +1255,7 @@ void GameManager::gameInit()
 	}
 
 	state.setMap(levelMesh, selectedLevel);
-	initTestScene();
-}
 
-void GameManager::initTestScene()
-{
 	for (int i = 0; i < playerColours.size(); i++) {
 		if (playerColours[i] == 0) {
 			vehicleColours.push_back(vec3(1.f, 0.f, 0.f)); // red car
