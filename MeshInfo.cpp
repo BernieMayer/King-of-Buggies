@@ -19,7 +19,8 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\wheel.obj");
-	MeshObject wheelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	texID = LoadTexture("textures\\wheeltexture.png");
+	MeshObject wheelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(wheelObject);
 
 	meshLoader.clearData();
