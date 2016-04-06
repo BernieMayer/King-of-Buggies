@@ -176,6 +176,14 @@ vector<vec2> GameState::setupRadarSeeingOnlyGoldenBuggy(int playerId)
 
 }
 
+//Move into game manager alongwith setupRadar
+mat2 rot2D(float angle)
+{
+	return mat2(
+		cos(angle), sin(angle),
+		-sin(angle), cos(angle));
+}
+
 vector<vec2> GameState::setupRadar(int playerId)
 {
 
