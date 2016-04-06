@@ -110,11 +110,24 @@ Renderer::~Renderer()
 **/
 unsigned int Renderer::generateObjectID()
 {
-	objects.push_back(ObjectInfo());
+	if (false)	//deletedObjects.size() != 0)
+	{
+		unsigned int id = deletedObjects[0];
+		objects[id] = ObjectInfo();
+		deletedObjects.erase(deletedObjects.begin());
 
-	newObjects.push_back(objects.size() - 1);
+		newObjects.push_back(id);
 
-	return objects.size() - 1;		//Handle for the object
+		return id;
+	}
+	else
+	{
+		objects.push_back(ObjectInfo());
+
+		newObjects.push_back(objects.size() - 1);
+
+		return objects.size() - 1;		//Handle for the object
+	}
 }
 
 void Renderer::assignMeshObject(unsigned int id, MeshObject* mesh)
@@ -1902,6 +1915,7 @@ void Renderer::assignSkyDome(unsigned int id, float radius, unsigned int divisio
 void Renderer::deleteDrawableObject(int objectID)
 {
 	objects[objectID].deleted = true;
+	deletedObjects.push_back(objectID);
 }
 
 void Renderer::deleteAllDrawableObjects()

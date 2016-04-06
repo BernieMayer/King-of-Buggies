@@ -132,6 +132,9 @@ private:
 	vector<LightInfo> lights;
 	vector<Viewport> viewports;
 
+	//Deleted object indices
+	vector<unsigned int> deletedObjects;
+
 	vector<unsigned int> newObjects;
 
 	//Optimized buffers
