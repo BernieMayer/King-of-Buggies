@@ -57,7 +57,7 @@ void SoundManager::initListener(GameState state) {
 		alListenerfv(AL_POSITION, ListenerPos);
 		alListenerfv(AL_VELOCITY, ListenerVel);
 
-		for (int i = 0; i < state.numberOfPlayers(); i++) {
+		for (int i = 0; i < MAX_PLAYERS; i++) {
 			honking.push_back(false);
 			honkSources.push_back(0);
 			honkBuffers.push_back(0);
@@ -770,9 +770,9 @@ void SoundManager::resumeAllSounds() {
 void SoundManager::deleteAll() {
 	for (int i = 0; i < oneTimeUseSources.size(); i++) {
 		alDeleteSources(1, &oneTimeUseSources[i]);
-		oneTimeUseSources.erase(oneTimeUseSources.begin() + i);
+		oneTimeUseSources.erase(oneTimeUseSources.begin());
 		alDeleteBuffers(1, &oneTimeUseBuffers[i]);
-		oneTimeUseBuffers.erase(oneTimeUseBuffers.begin() + i);
+		oneTimeUseBuffers.erase(oneTimeUseBuffers.begin());
 	}
 
 	for (int i = 0; i < MAX_PLAYERS; i++) {
@@ -780,9 +780,9 @@ void SoundManager::deleteAll() {
 		alDeleteBuffers(1, &engineBuffers[i]);
 
 		alDeleteSources(1, &honkSources[i]);
-		honkSources.erase(honkSources.begin() + i);
+		honkSources.erase(honkSources.begin());
 		alDeleteBuffers(1, &honkBuffers[i]);
-		honkBuffers.erase(honkBuffers.begin() + i);
+		honkBuffers.erase(honkBuffers.begin());
 	}
 
 	for (int i = 0; i < fuseSources.size(); i++) {

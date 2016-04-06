@@ -1702,13 +1702,18 @@ void Physics::clear() {
 		dynamicActors[i]->release();
 	}
 
+	for (int i = 0; i < vehicleActors.size(); i++) {
+		PxRigidDynamic* actor = vehicleActors[i].getVehDrive4W()->getRigidDynamicActor();
+		gScene->removeActor(*actor);
+		actor->release();
+	}
+
 	// Their actors should be removed and released in clearing the ground/dynamic actors lists
-	vehicleActors.clear();
 	vehiclesToDelete.clear();
 	bombActors.clear();
 	powerupActors.clear();
 	
-	
+	vehicleActors.clear();
 	groundActors.clear();
 	dynamicActors.clear();
 
