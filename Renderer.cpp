@@ -257,7 +257,7 @@ unsigned int Renderer::createDepthbuffer(unsigned int width, unsigned int height
 
 	//Return to normal frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDrawBuffer(GL_FRONT);
+	//glDrawBuffer(GL_FRONT);
 
 	fbo.push_back(Framebuffer(fb, fb_texture, width, height, Framebuffer::DEPTH));
 
@@ -290,7 +290,7 @@ unsigned int Renderer::createFramebuffer(unsigned int width, unsigned int height
 
 	//Return to normal frame buffer
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDrawBuffer(GL_FRONT);
+	//glDrawBuffer(GL_FRONT);
 
 	fbo.push_back(Framebuffer(fb, fb_texture, width, height, Framebuffer::COLOR));
 
@@ -302,7 +302,7 @@ void Renderer::useFramebuffer(unsigned int id)
 	if (id == NO_VALUE)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDrawBuffer(GL_FRONT);
+		//glDrawBuffer(GL_FRONT);
 		useViewport(activeViewport);
 	}
 	else
