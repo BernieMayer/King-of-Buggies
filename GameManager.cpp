@@ -808,21 +808,23 @@ void GameManager::processEvents()
 				collided->setCollided(true);
 				collided->startCountdown();
 
-				hasPowerup[vehicleId] = true;
-				int powerUpType = randomPowerup();
-				//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-				//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-				if (powerUpType == POWERUPS::NITROBOOST) {
-					state.getPlayer(i)->setEnergyForNitro(300.0f);
-					printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
-				}
-				state.getPlayer(vehicleId)->addPowerUp(powerUpType);
-
-				// display powerup information in HUD
-				_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-				_interface.toggleActive(powerupComponentIDs[vehicleId], true);
-
 				sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
+
+				if (state.getPlayer(vehicleId)->getCurrentPowerup() < 0) {
+					hasPowerup[vehicleId] = true;
+					int powerUpType = randomPowerup();
+					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+					if (powerUpType == POWERUPS::NITROBOOST) {
+						state.getPlayer(i)->setEnergyForNitro(300.0f);
+						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
+					}
+					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+					// display powerup information in HUD
+					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+				}
 			}
 		}
 	}
