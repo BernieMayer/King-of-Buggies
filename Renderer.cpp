@@ -806,7 +806,7 @@ void Renderer::drawBufferedAll(bool useShadows)
 
 void Renderer::drawRadar(vector<vec2> radarVecs, vector<vec3> colours)
 {
-	glViewport(windowWidth * 0.75, windowHeight * 0.75, windowWidth * 0.25, windowHeight * 0.25);
+	//glViewport(windowWidth * 0.75, windowHeight * 0.75, windowWidth * 0.25, windowHeight * 0.25);
 	
 	glUseProgram(0);
 

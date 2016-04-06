@@ -1122,6 +1122,7 @@ void GameManager::gameLoop()
 			}
 			//Draw the radar to the frameBuffer
 			renderer.useFramebuffer(radarFBO);
+			renderer.clearDrawBuffers(vec3(0.0f,0.0f,0.0f));
 			renderer.drawRadar(radarPos, coloursRadar);
 			renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
 
