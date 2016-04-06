@@ -172,6 +172,7 @@ unsigned int Physics::vehicle_create(VehicleTraits traits, vec3 initPos)
 
 	return vehicleActors.size() - 1;
 }
+
 void Physics::modifySpeed(unsigned int vehicleNum , float modSpeed)
 {
 
@@ -224,8 +225,6 @@ void Physics::applyNitroBoost(unsigned int vehicleNum)
 	forceVec = 160000.f * forceVec * vec3(1, 0, 1);
 	vehBody->addForce(getPxVec3(forceVec));
 }
-
-
 
 void Physics::applyMineExplosion(unsigned int vehicleNum)
 {
@@ -605,34 +604,65 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	float fSpeed = vehicle->computeForwardSpeed();
 
-	// May need to change speed checks to be something like between 0.1 and -0.1
-	// And then may need a timer to prevent rapid gear changes during wobbling
+	/*
+	// if more forward input than backwards
+	if (input->forward >= input->backward) {
+		vehicleForwards[id] = 1;
+		// If not in a forwards gear
+		if (vehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE || vehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eNEUTRAL) {
+			//vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+			//vehicle->mDriveDynData.setCurrentGear(PxVehicleGearsData::eFIRST);
+			vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
+			//vehicle->mDriveDynData.startGearChange(PxVehicleGearsData::eFIRST);
+			if (id == 0) {
+				cout << "First\n";
+			}
+		}
+	}
+	// If more backwards input than forwards
+	else if (input->forward < input->backward) {
+		vehicleForwards[id] = 0;
+		// If not in reverse gear
+		if (vehicle->mDriveDynData.getCurrentGear() != PxVehicleGearsData::eREVERSE) {
+			if (id == 0) {
+				cout << "Reverse\n";
+			}
+			//vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+			//vehicle->mDriveDynData.setCurrentGear(PxVehicleGearsData::eREVERSE);
+			vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
+			//vehicle->mDriveDynData.startGearChange(PxVehicleGearsData::eREVERSE);
+		}
+	}
+	*/
+
+	
 	if ((input->forward > input->backward) && (vehicleForwards[id] == 0 || vehicleForwards[id] == -1)) {
 		// If not moving and was in reverse gear, but more forwards
 		// input than backwards, switch to forwards gear
-		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+		vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
 		vehicleForwards[id] = 1;
 	}
 	else if ((input->forward > input->backward) && vehicleForwards[id] == 1) {
 		// If supposed to be moving forwards
+		// But in reverse gear
+		// put into first
 		if (vehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE) {
-			// But in reverse gear
-			// put into first
-			vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
+			vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
 		}
 	}
 	else if ((input->forward < input->backward) && (vehicleForwards[id] == 1 || vehicleForwards[id] == -1)) {
-		vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+		vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
 		vehicleForwards[id] = 0;
 	}
 	else if ((input->forward < input->backward) && vehicleForwards[id] == 0) {
 		// If supposed to be moving backwards
+		// But not in reverse gear
+		// put into reverse gear
 		if (vehicle->mDriveDynData.getCurrentGear() != PxVehicleGearsData::eREVERSE) {
-			// But not in reverse gear
-			// put into reverse gear
-			vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
+			vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
 		}
 	}
+	
 
 	if (vehicleForwards[id] == 1) {
 		vehicle->mDriveDynData.setAnalogInput(PxVehicleDrive4WControl::eANALOG_INPUT_ACCEL, input->forward);
