@@ -627,19 +627,21 @@ void SoundManager::playPauseSong2(GameState state) {
 }
 
 void SoundManager::updateMusicPitch(GameState state, Input input) {
-	PlayerInfo* player = state.getPlayer(0);
+	if (initSuccess) {
+		PlayerInfo* player = state.getPlayer(0);
 
-	bool forwardsGear = player->getForwardsGear();
+		bool forwardsGear = player->getForwardsGear();
 
-	float accelInput = 0;
-	if (forwardsGear) {
-		accelInput = map(input.forward, 0, 1, 0.5, 2);
+		float accelInput = 0;
+		if (forwardsGear) {
+			accelInput = map(input.forward, 0, 1, 0.5, 2);
+		}
+		else {
+			accelInput = map(input.backward, 0, 1, 0.5, 2);
+		}
+
+		alSourcef(musicSource, AL_PITCH, 1 * accelInput);
 	}
-	else {
-		accelInput = map(input.backward, 0, 1, 0.5, 2);
-	}
-
-	alSourcef(musicSource, AL_PITCH, 1 * accelInput);
 }
 
 void SoundManager::playWinSound(vec3 pos) {
@@ -662,20 +664,22 @@ void SoundManager::playWinSound(vec3 pos) {
 }
 
 void SoundManager::playLossSound(vec3 pos) {
-	alSourcePause(musicSource);
+	if (initSuccess) {
+		alSourcePause(musicSource);
 
-	loadWavToBuf("Trombone.wav", &winSoundSource, &winSoundBuffer);
+		loadWavToBuf("Trombone.wav", &winSoundSource, &winSoundBuffer);
 
-	ALfloat *SourcePos = vec3ToALfloat(pos).data();
-	float volume = distanceVolumeAdjuster(1.0f, pos);
+		ALfloat *SourcePos = vec3ToALfloat(pos).data();
+		float volume = distanceVolumeAdjuster(1.0f, pos);
 
-	alSourcei(winSoundSource, AL_BUFFER, winSoundBuffer);
-	alSourcef(winSoundSource, AL_PITCH, 1.0f);
-	alSourcef(winSoundSource, AL_GAIN, volume);
-	alSourcefv(winSoundSource, AL_POSITION, SourcePos);
-	alSourcei(winSoundSource, AL_LOOPING, AL_FALSE);
+		alSourcei(winSoundSource, AL_BUFFER, winSoundBuffer);
+		alSourcef(winSoundSource, AL_PITCH, 1.0f);
+		alSourcef(winSoundSource, AL_GAIN, volume);
+		alSourcefv(winSoundSource, AL_POSITION, SourcePos);
+		alSourcei(winSoundSource, AL_LOOPING, AL_FALSE);
 
-	alSourcePlay(winSoundSource);
+		alSourcePlay(winSoundSource);
+	}
 }
 
 void SoundManager::playMineExplosionSound(vec3 pos) {
@@ -731,17 +735,19 @@ void SoundManager::cleanOneTimeUseSources() {
  * Win sound is also excluded BECAUSE NOTHING CAN STOP IT
  */
 void SoundManager::pauseAllSounds() {
-	for (int i = 0; i < MAX_PLAYERS; i++) {
-		alSourcePause(engineSources[i]);
-		alSourcePause(honkSources[i]);
-	}
+	if (initSuccess) {
+		for (int i = 0; i < MAX_PLAYERS; i++) {
+			alSourcePause(engineSources[i]);
+			alSourcePause(honkSources[i]);
+		}
 
-	for (int i = 0; i < oneTimeUseSources.size(); i++) {
-		alSourcePause(oneTimeUseSources[i]);
-	}
+		for (int i = 0; i < oneTimeUseSources.size(); i++) {
+			alSourcePause(oneTimeUseSources[i]);
+		}
 
-	for (int i = 0; i < fuseSources.size(); i++) {
-		alSourcePause(fuseSources[i]);
+		for (int i = 0; i < fuseSources.size(); i++) {
+			alSourcePause(fuseSources[i]);
+		}
 	}
 }
 
@@ -749,17 +755,19 @@ void SoundManager::pauseAllSounds() {
  * Resumes all sound effects, no effect on music
  */
 void SoundManager::resumeAllSounds() {
-	for (int i = 0; i < MAX_PLAYERS; i++) {
-		alSourcePlay(engineSources[i]);
-		alSourcePlay(honkSources[i]);
-	}
+	if (initSuccess) {
+		for (int i = 0; i < MAX_PLAYERS; i++) {
+			alSourcePlay(engineSources[i]);
+			alSourcePlay(honkSources[i]);
+		}
 
-	for (int i = 0; i < oneTimeUseSources.size(); i++) {
-		alSourcePlay(oneTimeUseSources[i]);
-	}
+		for (int i = 0; i < oneTimeUseSources.size(); i++) {
+			alSourcePlay(oneTimeUseSources[i]);
+		}
 
-	for (int i = 0; i < fuseSources.size(); i++) {
-		alSourcePlay(fuseSources[i]);
+		for (int i = 0; i < fuseSources.size(); i++) {
+			alSourcePlay(fuseSources[i]);
+		}
 	}
 }
 
@@ -768,30 +776,32 @@ void SoundManager::resumeAllSounds() {
  * Only to be used before restarting a game or closing the game
  */
 void SoundManager::deleteAll() {
-	for (int i = 0; i < oneTimeUseSources.size(); i++) {
-		alDeleteSources(1, &oneTimeUseSources[i]);
-		oneTimeUseSources.erase(oneTimeUseSources.begin());
-		alDeleteBuffers(1, &oneTimeUseBuffers[i]);
-		oneTimeUseBuffers.erase(oneTimeUseBuffers.begin());
+	if (initSuccess) {
+		for (int i = 0; i < oneTimeUseSources.size(); i++) {
+			alDeleteSources(1, &oneTimeUseSources[i]);
+			oneTimeUseSources.erase(oneTimeUseSources.begin());
+			alDeleteBuffers(1, &oneTimeUseBuffers[i]);
+			oneTimeUseBuffers.erase(oneTimeUseBuffers.begin());
+		}
+
+		for (int i = 0; i < MAX_PLAYERS; i++) {
+			alDeleteSources(1, &engineSources[i]);
+			alDeleteBuffers(1, &engineBuffers[i]);
+
+			alDeleteSources(1, &honkSources[i]);
+			honkSources.erase(honkSources.begin());
+			alDeleteBuffers(1, &honkBuffers[i]);
+			honkBuffers.erase(honkBuffers.begin());
+		}
+
+		for (int i = 0; i < fuseSources.size(); i++) {
+			stopFuse(i);
+			i--;
+		}
+
+		alDeleteSources(1, &winSoundSource);
+		alDeleteBuffers(1, &winSoundBuffer);
 	}
-
-	for (int i = 0; i < MAX_PLAYERS; i++) {
-		alDeleteSources(1, &engineSources[i]);
-		alDeleteBuffers(1, &engineBuffers[i]);
-
-		alDeleteSources(1, &honkSources[i]);
-		honkSources.erase(honkSources.begin());
-		alDeleteBuffers(1, &honkBuffers[i]);
-		honkBuffers.erase(honkBuffers.begin());
-	}
-
-	for (int i = 0; i < fuseSources.size(); i++) {
-		stopFuse(i);
-		i--;
-	}
-
-	alDeleteSources(1, &winSoundSource);
-	alDeleteBuffers(1, &winSoundBuffer);
 }
 
 /*
