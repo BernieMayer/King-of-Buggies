@@ -129,6 +129,8 @@ MeshInfo::MeshInfo() {
 	blueGoldenBuggy = LoadTexture("textures\\hud\\blue.png");
 	purpleGoldenBuggy = LoadTexture("textures\\hud\\purple.png");
 	youGoldenBuggy = LoadTexture("textures\\hud\\you.png");
+
+	scoreBar = LoadTexture("textures\\hud\\scorebar.png");
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {

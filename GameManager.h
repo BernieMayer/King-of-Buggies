@@ -99,6 +99,7 @@ private:
 	vector<unsigned int> powerupComponentIDs;
 	vector<unsigned int> playerCoinIDs;
 	vector<unsigned int> buggyIndicatorUIs;
+	vector<unsigned int> scoreBarIDs;
 
 	//Game loop functions
 	void changeGoldenBuggy();
@@ -107,6 +108,9 @@ private:
 	void updateCamera(unsigned int i, Input input, float frameTime);
 
 	int selectedLevel = 1;
+
+	//temporary
+	vector<float> scoreBarWidths;
 
 public:
 	GameManager(GLFWwindow* newWindow);
@@ -145,6 +149,8 @@ public:
 	int randomPowerup();
 
 	void partialTeardown();
+
+	void incScoreBar(unsigned int playerID);
 };
 
 #endif // GAMEMANAGER_H

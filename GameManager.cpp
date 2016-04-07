@@ -1111,7 +1111,6 @@ void GameManager::gameLoop()
 				
 			renderer.drawBufferedAll(USING_SHADOWS);
 
-			renderer.drawUI(_interface.generateScoreBars(&state), vehicleColours);
 			//Should be in a for loop for every player
 			
 			vector<vec2> radarPos = state.setupRadar(0);
@@ -1164,6 +1163,8 @@ void GameManager::gameLoop()
 			state.getGoldenBuggy()->incrementScore(clock.getTimeSince(lastScoreUpdateTime), totalPausedTime);
 			lastScoreUpdateTime = clock.getCurrentTime();
 			totalPausedTime = 0.f;
+
+			incScoreBar(state.getGoldenBuggyID());
 
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
 
@@ -1452,7 +1453,7 @@ void GameManager::initUI()
 		powerupComponentIDs.push_back(_interface.generateComponentID());
 
 		_interface.assignSquare(powerupComponentIDs[i]);
-		_interface.setDimensions(powerupComponentIDs[i], -1.f, 1.f, 0.5f, 0.5f, ANCHOR::TOP_LEFT);
+		_interface.setDimensions(powerupComponentIDs[i], -1.f, 1.f, 0.4f, 0.4f, ANCHOR::TOP_LEFT);
 		_interface.toggleActive(powerupComponentIDs[i], false);
 
 		// set display filter for each player's indicator
@@ -1492,6 +1493,23 @@ void GameManager::initUI()
 
 	//Add dummy objects to interface
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	float yOffset = .55f;
+	// initialize each player's scorebars
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		scoreBarIDs.push_back(_interface.generateComponentID());
+		_interface.assignSquare(scoreBarIDs[i]);
+		_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(scoreBarIDs[i], -.95f, yOffset, 0.f, 0.05f, ANCHOR::TOP_LEFT);
+		_interface.setDisplayFilter(scoreBarIDs[i], DISPLAY::ALL);
+		yOffset = yOffset - 0.15f;
+	}
+}
+
+// temporary
+void GameManager::incScoreBar(unsigned int playerID) {
+	float barWidth = _interface.getScoreBarWidth(&state, playerID);
+	float yOffset = _interface.getComponentY(scoreBarIDs[playerID]);
+	_interface.setDimensions(scoreBarIDs[playerID], -.95f, yOffset, barWidth, 0.05f, ANCHOR::TOP_LEFT);
 }
 
 void GameManager::switchBuggyUI() {
