@@ -59,7 +59,7 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
-	meshLoader.loadModel("models\\pipelevel.obj");
+	meshLoader.loadModel("models\\islandlevel.obj");
 	//texID = LoadTexture("textures\\donutleveltexture.png");
 	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);//, texID);
 	meshes.push_back(levelObject);
