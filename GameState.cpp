@@ -132,8 +132,9 @@ vector<vec2> GameState::setupRadarSeeingOnlyGoldenBuggy(int playerId)
 	vec3 player3DposRight = -rightVector;
 	vec3 player3DposLeft = rightVector;
 
-	vec2 playerLeft = vec2(player3DposRight.x, -player3DposRight.z);
-	vec2 playerRight = vec2(player3DposLeft.x, -player3DposLeft.z);
+	float widthScaleFactor = 0.5f;
+	vec2 playerLeft = widthScaleFactor * vec2(player3DposRight.x, -player3DposRight.z);
+	vec2 playerRight = widthScaleFactor * vec2(player3DposLeft.x, -player3DposLeft.z);
 	vec2 playerUp = vec2(player3DposUp.x, -player3DposUp.z);
 
 
@@ -201,8 +202,9 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vec3 player3DposRight = -rightVector;
 	vec3 player3DposLeft = rightVector;
 
-	vec2 playerLeft =  vec2(  0.2 * player3DposRight.x, - 0.2 * player3DposRight.z);
-	vec2 playerRight = vec2( 0.2 * player3DposLeft.x, - 0.2 * player3DposLeft.z);
+	float widthScaleFactor = 0.5f;
+	vec2 playerLeft = widthScaleFactor * vec2(0.2 * player3DposRight.x, -0.2 * player3DposRight.z);
+	vec2 playerRight = widthScaleFactor * vec2(0.2 * player3DposLeft.x, -0.2 * player3DposLeft.z);
 	vec2 playerUp =  vec2( 0.2 * player3DposUp.x, - 0.2 * player3DposUp.z);
 
 
@@ -235,6 +237,9 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 				vec3 otherPlayer3DUp = getPlayer(i)->getForward();
 				vec3 otherPlayer3DRight = cross(getPlayer(i)->getForward(), getPlayer(i)->getUp());
+				// Might shrink the width of other player triangles
+				// Might not...
+				otherPlayer3DRight = widthScaleFactor * otherPlayer3DRight;
 
 				
 				vec2 otherPlayerLeft = vec2(otherPlayerCenter.x - otherPlayer3DRight.x, -(otherPlayerCenter.z - otherPlayer3DRight.z));
