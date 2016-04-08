@@ -261,7 +261,7 @@ found:
 
 bool NavMesh:: fetchPowerupLocations()
 {
-
+	return true;
 	//for (unsigned int i = 0; i<)
 }
 
