@@ -951,6 +951,7 @@ void GameManager::gameLoop()
 	_interface.assignSquare(radarInterfaceID);
 	//-1, -1 offset 0.5 width, 0.5 height. Screen space (-1, -1) to (1, 1)
 	_interface.setDimensions(radarInterfaceID, -1.0f, -1.0f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
+	_interface.setDisplayFilter(radarInterfaceID, DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
 	//use multiple of these to allow for split screen
 	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
