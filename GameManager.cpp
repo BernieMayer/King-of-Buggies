@@ -951,6 +951,7 @@ void GameManager::gameLoop()
 	_interface.assignSquare(radarInterfaceID);
 	//-1, -1 offset 0.5 width, 0.5 height. Screen space (-1, -1) to (1, 1)
 	_interface.setDimensions(radarInterfaceID, -1.0f, -1.0f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
+	_interface.setDisplayFilter(radarInterfaceID, DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
 	//use multiple of these to allow for split screen
 	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
@@ -1478,7 +1479,7 @@ void GameManager::initUI()
 	_interface.assignSquare(display);
 	_interface.assignTexture(display, meshInfo.getBuggyIndicator(), ComponentInfo::UP_TEXTURE);
 	_interface.setDimensions(display, 1.f, 1.f, .75f, 0.2f, ANCHOR::TOP_RIGHT);
-	_interface.setDisplayFilter(display, DISPLAY::ALL);
+	_interface.setDisplayFilter(display, DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 		buggyIndicatorUIs.push_back(_interface.generateComponentID());
@@ -1511,13 +1512,13 @@ void GameManager::initUI()
 		_interface.assignSquare(scoreBarIDs[i]);
 		_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(scoreBarIDs[i], -.95f, (yOffset - .084), 0.f, 0.063f, ANCHOR::TOP_LEFT);
-		_interface.setDisplayFilter(scoreBarIDs[i], DISPLAY::ALL);
+		_interface.setDisplayFilter(scoreBarIDs[i], DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
 		unsigned int fullBar = _interface.generateComponentID();
 		_interface.assignSquare(fullBar);
 		_interface.assignTexture(fullBar, barTexture, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(fullBar, -.95f, yOffset, 0.35f, 0.15f, ANCHOR::TOP_LEFT);
-		_interface.setDisplayFilter(fullBar, DISPLAY::ALL);
+		_interface.setDisplayFilter(fullBar, DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
 		yOffset = yOffset - 0.15f;
 	}
@@ -1683,7 +1684,7 @@ void GameManager::displayEndScreen(unsigned int winnerID)
 }
 
 void GameManager::displayPauseMenu() {
-	_interface.clear();
+	//_interface.clear();
 
 	float frameTime = 1.f / 60.f;
 	
@@ -1766,15 +1767,15 @@ void GameManager::displayPauseMenu() {
 		}
 
 		// Only do something with offsets if confirmation button is pressed
-		if ((in.isKeyboard && in.powerup) || (!in.isKeyboard && in.jump)) {
+		if ((in.isKeyboard && in.powerup) || (!in.isKeyboard && in.jump) || in.menu) {
 			if (xOffset == xOffset1) {
 				// Continue
-				_interface.clear();
+				//_interface.clear();
 				renderer.loadCamera(&cam[0]);
 				totalPausedTime = clock.getTimeSince(pauseStartTime);
 				paused = false;
 				sound.unpause(state);
-				initUI();
+				//initUI();
 				return;
 			}
 			else if (xOffset == xOffset2) {
@@ -1794,16 +1795,19 @@ void GameManager::displayPauseMenu() {
 		_interface.assignSquare(p1Icon);
 		_interface.assignTexture(p1Icon, p1Texture, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(p1Icon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
+		_interface.setDisplayFilter(p1Icon, DISPLAY::D9);
 
 		_interface.assignSquare(pauseScreen);
 		_interface.assignTexture(pauseScreen, pauseScreenTexture, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(pauseScreen, 0.0f, 0.0f, 2, 2, ANCHOR::CENTER);
+		_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
 
 		_interface.assignSquare(menu);
 		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
+		_interface.setDisplayFilter(menu, DISPLAY::D9);
 
-		_interface.drawAll(&renderer);
+		_interface.drawAll(&renderer, DISPLAY::D9);
 
 		//Swap buffers  
 		glfwSwapBuffers(window);

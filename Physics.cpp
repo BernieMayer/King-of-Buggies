@@ -603,38 +603,6 @@ void Physics::handleInput(Input* input, unsigned int id){
 	PxVehicleDrive4W* vehicle = vehicleActors[id].vehDrive4W;;
 
 	float fSpeed = vehicle->computeForwardSpeed();
-
-	/*
-	// if more forward input than backwards
-	if (input->forward >= input->backward) {
-		vehicleForwards[id] = 1;
-		// If not in a forwards gear
-		if (vehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eREVERSE || vehicle->mDriveDynData.getCurrentGear() == PxVehicleGearsData::eNEUTRAL) {
-			//vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eFIRST);
-			//vehicle->mDriveDynData.setCurrentGear(PxVehicleGearsData::eFIRST);
-			vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eFIRST);
-			//vehicle->mDriveDynData.startGearChange(PxVehicleGearsData::eFIRST);
-			if (id == 0) {
-				cout << "First\n";
-			}
-		}
-	}
-	// If more backwards input than forwards
-	else if (input->forward < input->backward) {
-		vehicleForwards[id] = 0;
-		// If not in reverse gear
-		if (vehicle->mDriveDynData.getCurrentGear() != PxVehicleGearsData::eREVERSE) {
-			if (id == 0) {
-				cout << "Reverse\n";
-			}
-			//vehicle->mDriveDynData.forceGearChange(PxVehicleGearsData::eREVERSE);
-			//vehicle->mDriveDynData.setCurrentGear(PxVehicleGearsData::eREVERSE);
-			vehicle->mDriveDynData.setTargetGear(PxVehicleGearsData::eREVERSE);
-			//vehicle->mDriveDynData.startGearChange(PxVehicleGearsData::eREVERSE);
-		}
-	}
-	*/
-
 	
 	if ((input->forward > input->backward) && (vehicleForwards[id] == 0 || vehicleForwards[id] == -1)) {
 		// If not moving and was in reverse gear, but more forwards
@@ -755,6 +723,14 @@ void Physics::handleInput(Input* input, unsigned int id){
 			vec3 forwardVec = lastState->getPlayer(id)->getForward();
 			forwardVec = 30000.0f * forwardVec;
 			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
+		}
+	}
+
+	if (lastState != NULL) {
+		if (length(lastState->getPlayer(id)->getPos() - vec3(0.0f, 0.0f, 0.0f)) >= 60.0f) {
+			vehicle->getRigidDynamicActor()->setGlobalPose(PxTransform(getPxVec3(lastState->getStartCoord(id))));
+			vehicle->getRigidDynamicActor()->clearForce(PxForceMode::eACCELERATION);
+			vehicle->getRigidDynamicActor()->clearTorque(PxForceMode::eACCELERATION);
 		}
 	}
 
@@ -1677,7 +1653,7 @@ void Physics::bombExplosion(int bombID) {
 		}
 		vec = normalize(vec);
 
-		float force = 6000000;
+		float force = 12000000;
 		vec = (force * (1 / (distance * distance))) * vec;
 		vehicleActors[i].vehDrive4W->getRigidDynamicActor()->addForce(getPxVec3(vec));
 	}
@@ -1688,7 +1664,7 @@ void Physics::bombExplosion(int bombID) {
 			float distance = length(getVec3(vec));
 			vec = getPxVec3(normalize(getVec3(vec)));
 
-			float force = 10000;
+			float force = 20000;
 			vec = (force * (1 / (distance * distance))) * vec;
 			bombActors[i]->addForce(vec);
 		}
