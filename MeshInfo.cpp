@@ -135,6 +135,7 @@ MeshInfo::MeshInfo() {
 	blueBar = LoadTexture("textures\\hud\\bluebar.png");
 	purpleBar = LoadTexture("textures\\hud\\purplebar.png");
 	scoreBar = LoadTexture("textures\\hud\\scorebar.png");
+	goldScoreBar = LoadTexture("textures\\hud\\goldenscorebar.png");
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
