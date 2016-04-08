@@ -47,6 +47,7 @@ public:
 	unsigned int getBlueBar() { return blueBar; }
 	unsigned int getPurpleBar() { return purpleBar; }
 	unsigned int getScoreBar() { return scoreBar; }
+	unsigned int getGoldScoreBar() { return goldScoreBar; }
 
 
 	MeshInfoLoader meshLoader;
@@ -81,6 +82,7 @@ private:
 	unsigned int blueBar;
 	unsigned int purpleBar;
 	unsigned int scoreBar;
+	unsigned int goldScoreBar;
 };
 
 #endif // MESHINFO_H

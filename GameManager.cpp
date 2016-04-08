@@ -1491,7 +1491,6 @@ void GameManager::initUI()
 		else if (i == 2) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D3); }
 		else if (i == 3) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D4); }
 	}
-	switchBuggyUI();
 
 	totalPausedTime = 0.f;
 
@@ -1510,7 +1509,10 @@ void GameManager::initUI()
 
 		scoreBarIDs.push_back(_interface.generateComponentID());
 		_interface.assignSquare(scoreBarIDs[i]);
-		_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
+		if (state.getPlayer(i)->isGoldenBuggy())
+			_interface.assignTexture(scoreBarIDs[i], meshInfo.getGoldScoreBar(), ComponentInfo::UP_TEXTURE);
+		else
+			_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(scoreBarIDs[i], -.95f, (yOffset - .084), 0.f, 0.063f, ANCHOR::TOP_LEFT);
 		_interface.setDisplayFilter(scoreBarIDs[i], DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
@@ -1522,6 +1524,8 @@ void GameManager::initUI()
 
 		yOffset = yOffset - 0.15f;
 	}
+
+	switchBuggyUI();
 }
 
 // temporary
@@ -1545,9 +1549,11 @@ void GameManager::switchBuggyUI() {
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
 		if (i != golden) {
 			_interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE);
+			_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
 		}
 		else {
 			_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE);
+			_interface.assignTexture(scoreBarIDs[i], meshInfo.getGoldScoreBar(), ComponentInfo::UP_TEXTURE);
 		}
 	}
 }
