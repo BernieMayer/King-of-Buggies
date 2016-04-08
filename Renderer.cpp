@@ -831,7 +831,7 @@ void Renderer::drawRadar(vector<vec2> radarVecs, vector<vec3> colours)
 	
 	int j = 1;
 	for (int i = 0; i < radarVecs.size(); i++){
-		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 12), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 12), 0);
+		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 2), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 2), 0);
 		glVertex3f(vec.x, vec.y, vec.z);
 		
 		if (i ==2){

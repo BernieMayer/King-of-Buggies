@@ -201,19 +201,21 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vec3 player3DposRight = -rightVector;
 	vec3 player3DposLeft = rightVector;
 
-	vec2 playerLeft =  vec2( player3DposRight.x, - player3DposRight.z);
-	vec2 playerRight = vec2( player3DposLeft.x, - player3DposLeft.z);
-	vec2 playerUp =  vec2(player3DposUp.x, -player3DposUp.z);
+	vec2 playerLeft =  vec2(  0.2 * player3DposRight.x, - 0.2 * player3DposRight.z);
+	vec2 playerRight = vec2( 0.2 * player3DposLeft.x, - 0.2 * player3DposLeft.z);
+	vec2 playerUp =  vec2( 0.2 * player3DposUp.x, - 0.2 * player3DposUp.z);
 
 
 	vec3 origin = vec3((playerLeft.x + playerRight.x) / 2, 0, (playerLeft.y + playerRight.y) / 2);
+
+	
 
 	vectors.push_back( playerLeft);
 	vectors.push_back( playerUp);
 	vectors.push_back( playerRight);
 
 	int radarSize = 100;
-	for (unsigned int i = 0; i < numberOfPlayers(); i++)
+	for (unsigned int i = 9; i < numberOfPlayers(); i++)
 	{
 		if (i != playerId)
 		{
@@ -249,6 +251,25 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 
 		}
+	}
+
+	
+	vec3 carDir3D = getPlayer(playerId)->getForward();
+	vec3 carDirNorm = normalize(vec3(carDir3D.x, 0, carDir3D.z));
+	
+	float cos_theta = dot(carDirNorm, vec3(0, 0, 1));
+	
+	cos_theta = cos_theta;
+	float angle = acos(cos_theta);
+	angle = angle * sign(dot(getPlayer(playerId)->getRight(), vec3(0, 0, 1)));
+	
+
+	printf("The angle is %f \n", angle);
+
+	mat2 m = rot2D(angle);
+	for (unsigned int i = 0; i < vectors.size(); i++)
+	{
+		vectors[i] = m * vectors[i];
 	}
 	
 	return vectors;
