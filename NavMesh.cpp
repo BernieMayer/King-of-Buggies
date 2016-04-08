@@ -259,6 +259,12 @@ found:
 		
 }
 
+bool NavMesh:: fetchPowerupLocations()
+{
+
+	//for (unsigned int i = 0; i<)
+}
+
 void NavMesh::resizeEdges(unsigned int newSize)
 {
 	edges.setSize(newSize);

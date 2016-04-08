@@ -109,6 +109,7 @@ public:
 	void resizeEdges(unsigned int newSize);
 
 	bool loadNavMesh(string fileName);
+	bool fetchPowerupLocations();
 
 	void navMeshToLines(vector<vec3>* polygons, vector<vec3>* edges);
 
@@ -116,6 +117,7 @@ public:
 	float trajectoryCost(vec3 trajectory, vec3 newTrajectory);
 	float heuristic(unsigned int i, unsigned int j);
 	float proximityCost(unsigned int node);
+	float powerupBoxCost(unsigned int node);
 
 	unsigned int getPolygon(vec3 position);
 

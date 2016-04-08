@@ -359,10 +359,10 @@ void GameState::checkRespawns()
 		vec3 pos = boxes[i].getPos();
 
 		if (boxes[i].getCollided()) {
-			// countdown to coin respawn
+			// countdown to boxes respawn
 			boxes[i].decrementCountdown();
 			if (boxes[i].getCountdown() < 0) {
-				// reset coin to original spawn location
+				// reset boxes to original spawn location
 				vec3 newPos = pos;
 				newPos.y = pos.y + 20;
 				boxes[i].setPos(newPos);
