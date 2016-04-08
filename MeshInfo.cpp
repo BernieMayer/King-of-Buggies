@@ -130,6 +130,10 @@ MeshInfo::MeshInfo() {
 	purpleGoldenBuggy = LoadTexture("textures\\hud\\purple.png");
 	youGoldenBuggy = LoadTexture("textures\\hud\\you.png");
 
+	redBar = LoadTexture("textures\\hud\\redbar.png");
+	greenBar = LoadTexture("textures\\hud\\greenbar.png");
+	blueBar = LoadTexture("textures\\hud\\bluebar.png");
+	purpleBar = LoadTexture("textures\\hud\\purplebar.png");
 	scoreBar = LoadTexture("textures\\hud\\scorebar.png");
 }
 

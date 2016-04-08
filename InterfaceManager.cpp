@@ -122,7 +122,7 @@ float InterfaceManager::getScoreBarWidth(GameState* state, unsigned int playerID
 	float maxScore = state->getMaxScore();
 
 	float barRatio = score / maxScore;
-	float theWidth = (.3f * barRatio);
+	float theWidth = (.35f * barRatio);
 	
 	return theWidth;
 }
@@ -179,7 +179,7 @@ void InterfaceManager::drawAll(Renderer* r, unsigned int displayFilter)
 	}
 }
 
-vector<vector<vec3>> InterfaceManager::generateScoreBars(GameState* state) 
+/*vector<vector<vec3>> InterfaceManager::generateScoreBars(GameState* state) 
 {
 	vector<vector<vec3>> scorebarQuads;
 
@@ -200,7 +200,7 @@ vector<vector<vec3>> InterfaceManager::generateScoreBars(GameState* state)
 		barOffset += 10;
 	}
 	return scorebarQuads;
-}
+}*/
 
 unsigned int InterfaceManager::generateComponentID()
 {

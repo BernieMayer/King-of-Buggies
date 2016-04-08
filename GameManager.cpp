@@ -1499,11 +1499,26 @@ void GameManager::initUI()
 	float yOffset = .55f;
 	// initialize each player's scorebars
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+		
+		vec3 colour = state.getPlayer(i)->getColour();
+		unsigned int barTexture;
+		if (colour == vec3(1.f, 0.f, 0.f)) { barTexture = meshInfo.getRedBar(); }
+		else if (colour == vec3(0.f, 1.f, 0.f)) { barTexture = meshInfo.getGreenBar(); }
+		else if (colour == vec3(0.f, 0.f, 1.f)) { barTexture = meshInfo.getBlueBar(); }
+		else if (colour == vec3(1.f, 0.f, 1.f)) { barTexture = meshInfo.getPurpleBar(); }
+
 		scoreBarIDs.push_back(_interface.generateComponentID());
 		_interface.assignSquare(scoreBarIDs[i]);
 		_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(scoreBarIDs[i], -.95f, yOffset, 0.f, 0.05f, ANCHOR::TOP_LEFT);
+		_interface.setDimensions(scoreBarIDs[i], -.95f, (yOffset - .084), 0.f, 0.063f, ANCHOR::TOP_LEFT);
 		_interface.setDisplayFilter(scoreBarIDs[i], DISPLAY::ALL);
+
+		unsigned int fullBar = _interface.generateComponentID();
+		_interface.assignSquare(fullBar);
+		_interface.assignTexture(fullBar, barTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(fullBar, -.95f, yOffset, 0.35f, 0.15f, ANCHOR::TOP_LEFT);
+		_interface.setDisplayFilter(fullBar, DISPLAY::ALL);
+
 		yOffset = yOffset - 0.15f;
 	}
 }
@@ -1511,8 +1526,9 @@ void GameManager::initUI()
 // temporary
 void GameManager::incScoreBar(unsigned int playerID) {
 	float barWidth = _interface.getScoreBarWidth(&state, playerID);
+	float barHeight = _interface.getComponentHeight(scoreBarIDs[playerID]);
 	float yOffset = _interface.getComponentY(scoreBarIDs[playerID]);
-	_interface.setDimensions(scoreBarIDs[playerID], -.95f, yOffset, barWidth, 0.05f, ANCHOR::TOP_LEFT);
+	_interface.setDimensions(scoreBarIDs[playerID], -.95f, yOffset, barWidth, barHeight, ANCHOR::TOP_LEFT);
 }
 
 void GameManager::switchBuggyUI() {

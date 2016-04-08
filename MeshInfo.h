@@ -42,7 +42,10 @@ public:
 	unsigned int getYouGoldenBuggy() { return youGoldenBuggy; }
 	unsigned int getBuggyIndicator() { return buggyIndicator; }
 
-	unsigned int getFullScoreBar() { return fullScoreBar; }
+	unsigned int getRedBar() { return redBar; }
+	unsigned int getGreenBar() { return greenBar; }
+	unsigned int getBlueBar() { return blueBar; }
+	unsigned int getPurpleBar() { return purpleBar; }
 	unsigned int getScoreBar() { return scoreBar; }
 
 
@@ -73,7 +76,10 @@ private:
 	unsigned int youGoldenBuggy;
 	unsigned int buggyIndicator;
 
-	unsigned int fullScoreBar;
+	unsigned int redBar;
+	unsigned int greenBar;
+	unsigned int blueBar;
+	unsigned int purpleBar;
 	unsigned int scoreBar;
 };
 
