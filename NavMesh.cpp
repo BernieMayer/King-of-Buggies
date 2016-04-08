@@ -108,6 +108,18 @@ bool Node::inPolygon(vec3 pos)
 	return true;
 }
 
+float Node::getMin() const
+{
+	float minPoint = 10000.f;
+
+	for (unsigned int i = 0; i < points.size(); i++)
+	{
+		minPoint = std::min(minPoint, points[i].y);
+	}
+
+	return minPoint;
+}
+
 void Node::addEdge(unsigned int edge, float weight)
 {
 	edges.push_back(Edge(edge, weight));
@@ -288,13 +300,35 @@ void NavMesh::calculateImplicitEdges()
 
 unsigned int NavMesh::getPolygon(vec3 position)
 {
+	vector<unsigned int> index;
+
 	for (unsigned int i = 0; i < nodes.size(); i++)
 	{
 		if (nodes[i].inPolygon(position))
-			return i;
+			index.push_back(i);
 	}
 
-	return NO_VALUE;
+	if (index.size() == 0)
+		return NO_VALUE;
+	else if (index.size() == 1)
+		return index[0];
+	else
+	{
+		float maxNode = -10000.f;
+		unsigned int node = 0;
+
+		for (unsigned int i = 0; i < nodes.size(); i++)
+		{
+			float newMax = nodes[i].getMin();
+			if (newMax < position.y)
+			{
+				node = i;
+				maxNode = std::max(maxNode, newMax);
+			}
+		}
+
+		return node;
+	}
 }
 
 class IndexWeightPair
