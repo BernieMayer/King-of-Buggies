@@ -909,44 +909,6 @@ void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, vector<vec3> colo
 
 }
 
-
-
-void Renderer::drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors)
-{
-	glUseProgram(0);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, windowWidth, 0, windowHeight);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-	glBegin(GL_QUADS);
-	
-	// each vector in segments stores the scorebar information for an individual player
-	for (unsigned int i = 0; i < min(segments.size(), colors.size()); i++) {
-		vec3 color = colors[i];
-		glColor3f(color.x, color.y, color.z);
-
-		for (unsigned int j = 3; j < segments[i].size(); j += 4)
-		{
-			vec3 a = segments[i][j - 3];
-			vec3 b = segments[i][j - 2];
-			vec3 c = segments[i][j - 1];
-			vec3 d = segments[i][j];
-			
-			glVertex3f(a.x, a.y, a.z);
-			glVertex3f(b.x, b.y, b.z);
-			glVertex3f(c.x, c.y, c.z);
-			glVertex3f(d.x, d.y, d.z);
-
-		}
-	}
-
-	glEnd();
-}
-
 void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
 {
 	GLint dimensions [4];

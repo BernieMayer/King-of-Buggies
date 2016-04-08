@@ -97,6 +97,8 @@ public:
 
 	float getComponentWidth(int num) { return components[num].width; }
 	float getComponentHeight(int num) { return components[num].height; }
+	float getComponentX(int num) { return components[num].xOffset; }
+	float getComponentY(int num) { return components[num].yOffset; }
 
 	vector<vec3>* storeVertices(vector<vec3>* vertices);
 	vector<vec2>* storeUVs(vector<vec2>* uvs);

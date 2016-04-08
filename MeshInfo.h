@@ -42,6 +42,13 @@ public:
 	unsigned int getYouGoldenBuggy() { return youGoldenBuggy; }
 	unsigned int getBuggyIndicator() { return buggyIndicator; }
 
+	unsigned int getRedBar() { return redBar; }
+	unsigned int getGreenBar() { return greenBar; }
+	unsigned int getBlueBar() { return blueBar; }
+	unsigned int getPurpleBar() { return purpleBar; }
+	unsigned int getScoreBar() { return scoreBar; }
+
+
 	MeshInfoLoader meshLoader;
 
 private:
@@ -68,6 +75,12 @@ private:
 	unsigned int purpleGoldenBuggy;
 	unsigned int youGoldenBuggy;
 	unsigned int buggyIndicator;
+
+	unsigned int redBar;
+	unsigned int greenBar;
+	unsigned int blueBar;
+	unsigned int purpleBar;
+	unsigned int scoreBar;
 };
 
 #endif // MESHINFO_H
