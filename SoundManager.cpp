@@ -801,7 +801,26 @@ void SoundManager::deleteAll() {
 
 		alDeleteSources(1, &winSoundSource);
 		alDeleteBuffers(1, &winSoundBuffer);
+
+		alDeleteSources(1, &musicSource);
+		alDeleteBuffers(1, &musicBuffer);
+
+		paused = false;
 	}
+}
+
+void SoundManager::unpause(GameState state) {
+	paused = false;
+	resumeAllSounds();
+
+	if (!secretPlaying) {
+		alSourceStop(musicSource);
+		alDeleteBuffers(1, &musicBuffer);
+		alDeleteSources(1, &musicSource);
+		startMusic(state);
+	}
+	pause2Playing = false;
+	pauseSongPitch = 1.0f;
 }
 
 /*
@@ -825,7 +844,6 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			secretPlaying = true;
 		}
 
-		// Change to menu later
 		if (inputs[0].menu && !paused && !secretPlaying && !firstFrame) {
 			paused = true;
 			pauseAllSounds();

@@ -148,6 +148,9 @@ public:
 
 	int randomPowerup();
 
+	bool paused = false;
+	void displayPauseMenu();
+
 	void partialTeardown();
 
 	void incScoreBar(unsigned int playerID);

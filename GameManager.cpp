@@ -930,7 +930,7 @@ void GameManager::gameLoop()
 	vector<vec3> frontier;
 	vector<vec3> paths;
 
-	bool paused = false;
+	
 	bool firstFrame = true;
 
 	unsigned int debugPathIterations = 0;
@@ -991,24 +991,7 @@ void GameManager::gameLoop()
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
-		if (inputs[0].menu && !firstFrame)
-		{
-			paused = !paused;
-
-			if (paused)
-			{
-				freeCam = cam[0];
-				freeCam.setCameraMode(FREEROAM_CAMERA);
-				renderer.loadCamera(&freeCam);
-				debugPathIterations = 0;
-				pauseStartTime = clock.getCurrentTime();
-			}
-			else {
-				renderer.loadCamera(&cam[0]);
-				totalPausedTime = clock.getTimeSince(pauseStartTime);
-			}
-		}
-		firstFrame = false;
+		
 
 		//Not AI code. AIManager shouldn't change the golden buggy
 		if (physics.newGoldenBuggy){
@@ -1051,6 +1034,26 @@ void GameManager::gameLoop()
 		//Put into function
 		processEvents();
 		state.clearEvents();
+
+		if (inputs[0].menu && !firstFrame)
+		{
+			paused = !paused;
+
+			if (paused)
+			{
+				freeCam = cam[0];
+				freeCam.setCameraMode(FREEROAM_CAMERA);
+				renderer.loadCamera(&freeCam);
+				debugPathIterations = 0;
+				pauseStartTime = clock.getCurrentTime();
+				displayPauseMenu();
+			}
+			else {
+				renderer.loadCamera(&cam[0]);
+				totalPausedTime = clock.getTimeSince(pauseStartTime);
+			}
+		}
+		firstFrame = false;
 
 		if (!paused) {
 			checkCoinCollisions();
@@ -1661,6 +1664,144 @@ void GameManager::displayEndScreen(unsigned int winnerID)
 	}
 }
 
+void GameManager::displayPauseMenu() {
+	_interface.clear();
+
+	float frameTime = 1.f / 60.f;
+	
+	const float xOffset1 = -0.65f;
+	const float xOffset2 = 0.025f;
+	const float xOffset3 = 0.7f;
+
+	const float yOffset1 = -0.85f;
+	const float yOffset2 = -0.85f;
+	const float yOffset3 = -0.87f;
+
+	float xOffset = xOffset1;
+	float yOffset = yOffset1;
+
+	float xMod = 1.0f;
+	float yMod = 1.0f;
+
+	bool movementLock = false;
+	timeb movementLockStart;
+	// Lock last 0.2 seconds
+	float movementLockEnd = 0.2;
+
+	unsigned int p1Texture = LoadTexture("menus/P1Icon.png");
+	unsigned int p1Icon = _interface.generateComponentID();
+
+	unsigned int pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
+	unsigned int pauseScreen = _interface.generateComponentID();
+
+	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
+	unsigned int menu = _interface.generateComponentID();
+
+	while (!glfwWindowShouldClose(window)) {
+		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+		if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
+			xMod = (float)_interface.getWindowWidth() / (float)_interface.getWindowHeight();
+			yMod = 1.0f;
+		}
+		else if (_interface.getWindowHeight() > _interface.getWindowWidth()) {
+			xMod = 1.0f;
+			yMod = (float)_interface.getWindowHeight() / (float)_interface.getWindowWidth();
+		}
+		else {
+			xMod = 1.0f;
+			yMod = 1.0f;
+		}
+		
+		if (movementLock && clock.getTimeSince(movementLockStart) >= movementLockEnd) {
+			movementLock = false;
+		}
+
+		Input in = smoothers[0].smooth(input.getInput(1), false);
+		if (in.turnL < -0.3 && !movementLock) {
+			if (xOffset == xOffset2) {
+				xOffset = xOffset1;
+				yOffset = yOffset1;
+				movementLock = true;
+				movementLockStart = clock.getCurrentTime();
+			}
+			else if (xOffset == xOffset3) {
+				xOffset = xOffset2;
+				yOffset = yOffset2;
+				movementLock = true;
+				movementLockStart = clock.getCurrentTime();
+			}
+		}
+		else if (in.turnR < -0.3 && !movementLock) {
+			if (xOffset == xOffset1) {
+				xOffset = xOffset2;
+				yOffset = yOffset2;
+				movementLock = true;
+				movementLockStart = clock.getCurrentTime();
+			}
+			else if (xOffset == xOffset2) {
+				xOffset = xOffset3;
+				yOffset = yOffset3;
+				movementLock = true;
+				movementLockStart = clock.getCurrentTime();
+			}
+			
+		}
+
+		// Only do something with offsets if confirmation button is pressed
+		if ((in.isKeyboard && in.powerup) || (!in.isKeyboard && in.jump)) {
+			if (xOffset == xOffset1) {
+				// Continue
+				_interface.clear();
+				renderer.loadCamera(&cam[0]);
+				totalPausedTime = clock.getTimeSince(pauseStartTime);
+				paused = false;
+				sound.unpause(state);
+				initUI();
+				return;
+			}
+			else if (xOffset == xOffset2) {
+				// Restart at start menu
+				_interface.clear();
+				partialTeardown();
+				initMenus();
+				return;
+			}
+			else {
+				// Quit
+				glfwSetWindowShouldClose(window, true);
+				return;
+			}
+		}
+
+		_interface.assignSquare(p1Icon);
+		_interface.assignTexture(p1Icon, p1Texture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(p1Icon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
+
+		_interface.assignSquare(pauseScreen);
+		_interface.assignTexture(pauseScreen, pauseScreenTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(pauseScreen, 0.0f, 0.0f, 2, 2, ANCHOR::CENTER);
+
+		_interface.assignSquare(menu);
+		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
+
+		_interface.drawAll(&renderer);
+
+		//Swap buffers  
+		glfwSwapBuffers(window);
+		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+		glfwPollEvents();
+		
+		sound.updateSounds(state, &in);
+
+		//Wait until end of frame
+		float timeElapsed = clock.getElapsedTime();
+		if (frameTime > timeElapsed)
+			clock.waitUntil(frameTime - timeElapsed);
+
+	}
+}
+
 void GameManager::partialTeardown() {
 	vehicleColours.clear();
 
@@ -1690,6 +1831,8 @@ void GameManager::partialTeardown() {
 	playerCoinIDs.clear();
 
 	selectedLevel = 1;
+
+	paused = false;
 
 	state.clear();
 	physics.clear();

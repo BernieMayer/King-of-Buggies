@@ -46,10 +46,12 @@ public:
 	void initListener(GameState state);
 	void startMusic(GameState state);
 	void startEngineSounds(GameState state);
+
+	void unpause(GameState state);
 	
 private:
 	float map(float value, float min, float max, float newMin, float newMax);
-	int lowestIdleVolume = 10;
+	int lowestIdleVolume = 8;
 	int menuSongCounter = 0;
 	int menuSongCounterMax = 15;
 	void initOpenAL(GameState state);
