@@ -660,6 +660,8 @@ void SoundManager::playWinSound(vec3 pos) {
 		alSourcei(winSoundSource, AL_LOOPING, AL_FALSE);
 
 		alSourcePlay(winSoundSource);
+
+		gameOver = true;
 	}
 }
 
@@ -679,6 +681,8 @@ void SoundManager::playLossSound(vec3 pos) {
 		alSourcei(winSoundSource, AL_LOOPING, AL_FALSE);
 
 		alSourcePlay(winSoundSource);
+
+		gameOver = true;
 	}
 }
 
@@ -727,6 +731,28 @@ void SoundManager::cleanOneTimeUseSources() {
 				i = oneTimeUseSources.size();
 			}
 		}
+	}
+}
+
+void SoundManager::playEndSong(GameState state) {
+	if (initSuccess) {
+		alSourceStop(musicSource);
+		ALuint buffer;
+		loadWavToBuf("EndGameSong.wav", &musicSource, &buffer);
+
+		PlayerInfo* p1 = state.getPlayer(0);
+
+		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+		alSourcei(musicSource, AL_BUFFER, buffer);
+		alSourcef(musicSource, AL_PITCH, 1.0f);
+		alSourcef(musicSource, AL_GAIN, musicVolume);
+		alSourcefv(musicSource, AL_POSITION, SourcePos);
+		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+		alSourcei(musicSource, AL_LOOPING, AL_TRUE);
+
+		alSourcePlay(musicSource);
 	}
 }
 
@@ -806,6 +832,7 @@ void SoundManager::deleteAll() {
 		alDeleteBuffers(1, &musicBuffer);
 
 		paused = false;
+		gameOver = false;
 	}
 }
 
@@ -828,7 +855,7 @@ void SoundManager::unpause(GameState state) {
  */
 void SoundManager::updateSounds(GameState state, Input inputs[]) {
 	if (initSuccess) {
-		if (!paused) {
+		if (!paused && !gameOver) {
 			updateListener(state);
 			updateMusic(state);
 			updateEngineSounds(state, inputs);
@@ -875,12 +902,14 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			}
 		}
 
-		ALint winSoundState;
-		alGetSourcei(winSoundSource, AL_SOURCE_STATE, &winSoundState);
-		if (winSoundState == AL_STOPPED) {
-			alSourcePlay(musicSource);
-			alDeleteBuffers(1, &winSoundBuffer);
-			alDeleteSources(1, &winSoundSource);
+		if (gameOver) {
+			ALint winSoundState;
+			alGetSourcei(winSoundSource, AL_SOURCE_STATE, &winSoundState);
+			if (winSoundState == AL_STOPPED) {
+				alDeleteBuffers(1, &winSoundBuffer);
+				alDeleteSources(1, &winSoundSource);
+				playEndSong(state);
+			}
 		}
 
 		ALint musicState;

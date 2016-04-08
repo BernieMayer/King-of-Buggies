@@ -1594,6 +1594,8 @@ void GameManager::displayEndScreen(unsigned int winnerID)
 	Input in = input.getInput(1);
 	bool doneLoop = false;
 	while (!doneLoop) {
+		sound.updateSounds(state, &in);
+
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
 		if (glfwWindowShouldClose(window)) {

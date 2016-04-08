@@ -5,6 +5,7 @@
 #include "GameState.h"
 #include "Input.h"
 #include "Definitions.h"
+#include "Timer.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -72,6 +73,7 @@ private:
 	void playPauseSong2(GameState state);
 	void updateMusicPitch(GameState state, Input input);
 	void cleanOneTimeUseSources();
+	void playEndSong(GameState state);
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicBuffer;
@@ -107,6 +109,12 @@ private:
 
 	float pauseSongPitch = 1.0f;
 	bool pause2Playing = false;
+
+	bool gameOver = false;
+	bool gameOverLock = false;
+	timeb gameOverLockStart;
+	float gameOverLockEnd = 2.0f;
+
 };
 
 #endif // SOUNDMANAGER_H
