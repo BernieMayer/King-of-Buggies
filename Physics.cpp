@@ -709,11 +709,13 @@ void Physics::handleInput(Input* input, unsigned int id){
 	}
 
 	if (lastState != NULL) {
-		if (vehicleInAir[id] && abs(lastState->getPlayer(id)->getFSpeed()) < 0.1f && !vehicleStuck[id]) {
+		if (vehicleInAir[id] && abs(lastState->getPlayer(id)->getFSpeed()) < 0.3f && !vehicleStuck[id]) {
 			vehicleStuck[id] = true;
+			// Flips direction
+			stuckRotationDirection = stuckRotationDirection * -1;
 			stuckTimer[id] = clock.getCurrentTime();
 		}
-		else if ((!vehicleInAir[id] || abs(lastState->getPlayer(id)->getFSpeed()) >= 0.1f) && vehicleStuck[id]) {
+		else if ((!vehicleInAir[id] || abs(lastState->getPlayer(id)->getFSpeed()) >= 0.3f) && vehicleStuck[id]) {
 			vehicleStuck[id] = false;
 		}
 
@@ -721,7 +723,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 		
 		if (vehicleStuck[id] && difference >= 2.0f) {
 			vec3 forwardVec = lastState->getPlayer(id)->getForward();
-			forwardVec = 30000.0f * forwardVec;
+			forwardVec = stuckRotationDirection * 30000.0f * forwardVec;
 			vehicle->getRigidDynamicActor()->addTorque(getPxVec3(forwardVec));
 		}
 	}

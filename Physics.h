@@ -153,6 +153,7 @@ private:
 	vector<bool> vehicleInAir;
 	vector<bool> vehicleStuck;
 	vector<timeb> stuckTimer;
+	int stuckRotationDirection = 1;
 
 	GameState* lastState = NULL;
 	float lastFrameTime = 1;
