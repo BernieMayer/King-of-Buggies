@@ -5,9 +5,13 @@
 
 GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics()
 {
+	vec3 camDir(0.f, -1.f, -1.f);
+	camDir = normalize(camDir);
+	float camDistance = 7.f;
+
 	for (unsigned int i = 0; i < MAX_PLAYERS; i++)
 	{
-		cam[i] = Camera(vec3(0.0, 0.0, -1.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 5.0), MODELVIEWER_CAMERA);
+		cam[i] = Camera(camDir, vec3(0.0, 1.0, 0.0), camDir*-camDistance, MODELVIEWER_CAMERA);
 	}
 
 	srand(time(NULL));
@@ -909,10 +913,13 @@ void GameManager::gameLoop()
 	else if (selectedLevel == 0) {
 		ai.nav.loadNavMesh("HiResNavigationMesh.obj");
 	}
+
+	ai.nav.fetchPowerupLocations();
 	ai.nav.calculateImplicitEdges();
 	ai.nav.navMeshToLines(&polygons, &edges);
 
-	vector<vec3> path;
+	vector<vector<vec3>> path;
+	path.resize(MAX_PLAYERS);
 	
 	
 
@@ -927,8 +934,10 @@ void GameManager::gameLoop()
 		//cout << endl;
 	}
 
-	vector<vec3> frontier;
-	vector<vec3> paths;
+	vector<vector<vec3>> frontier;
+	vector<vector<vec3>> paths;
+	frontier.resize(MAX_PLAYERS);
+	paths.resize(MAX_PLAYERS);
 
 	
 	bool firstFrame = true;
@@ -1090,7 +1099,12 @@ void GameManager::gameLoop()
 			{
 				renderer.loadCamera(&freeCam);
 				//Debugging avoidance
-				ai.debugAIPath(&paths, state.getGoldenBuggyID(), debugPathIterations);
+				for (unsigned int j = 0; j < state.numberOfPlayers(); j++)
+				{
+					if (state.getPlayer(j)->isAI())
+						ai.debugAIPath(&frontier[j], state.getGoldenBuggyID(), debugPathIterations);
+				}
+				
 				if (inputs[0].jump)
 					debugPathIterations++;
 
@@ -1141,19 +1155,24 @@ void GameManager::gameLoop()
 
 			//renderer.useViewport(i+1);
 
-			//Debugging
-			if (displayDebugging && (i == 0))
+			//Debugging pathfinding
+			if (displayDebugging)
 			{
-				ai.getPathAsLines(state.getGoldenBuggyID(), &path);
 
 				renderer.drawLines(polygons, vec3(0.f, 1.f, 0.f), lineTransform);
-				renderer.drawLines(path, vec3(1.f, 0.f, 0.f), lineTransform);
-				//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
-			}
 
-			if (paused && (i == 0))
-			{
-				renderer.drawLines(paths, vec3(0.7f, 0.5f, 1.f), lineTransform);
+				for (unsigned int j = 0; j< state.numberOfPlayers(); j++)
+				{
+					if (state.getPlayer(j)->isAI())
+					{
+						ai.getPathAsLines(j, &path[j]);
+						renderer.drawLines(path[j], vehicleColours[j], lineTransform);
+						if (paused)
+							renderer.drawLines(frontier[j], vec3(0.7f, 0.5f, 1.f), lineTransform);
+					}
+				}
+				
+				//renderer.drawLines(edges, vec3(0.f, 0.f, 1.f), lineTransform);
 			}
 
 			_interface.drawAll(&renderer, 1 << (i+1));
@@ -1188,7 +1207,8 @@ void GameManager::gameLoop()
 		renderer.useViewport(0);
 
 		//Get path
-		path.clear();
+		for (unsigned int i = 0; i < path.size(); i++)
+			path[i].clear();
 
 		//Swap buffers  
 		glfwSwapBuffers(window);

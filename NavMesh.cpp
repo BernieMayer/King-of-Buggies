@@ -261,8 +261,14 @@ found:
 
 bool NavMesh:: fetchPowerupLocations()
 {
-	return true;
-	//for (unsigned int i = 0; i<)
+	if (state == NULL)
+		return false;
+
+	for (unsigned int i = 0; i < state->numberOfPowerupBoxes(); i++)
+	{
+		unsigned int node = getPolygon(state->getPowerupBox(i)->getPos());
+		nodes[node].powerup = i;
+	}
 }
 
 void NavMesh::resizeEdges(unsigned int newSize)
@@ -372,31 +378,58 @@ float NavMesh::heuristic(unsigned int current, unsigned int finish)
 	return abs(diff.x) + abs(diff.y) + abs(diff.z);
 }
 
+float closeRangeWeight(float distanceSquared)
+{
+	float closeRange = 8.f;
+
+	return std::max((closeRange*closeRange - distanceSquared) / (closeRange*closeRange), 0.f)*50.f + 30.f;
+}
+
+float midRangeWeight(float distanceSquared)
+{
+	float midRange = 30.f;
+
+	return std::max((midRange*midRange - distanceSquared) / (midRange*midRange), 0.f) * 30.f;
+}
+
 float NavMesh::proximityCost(unsigned int node)
 {
-	const float closeRange = 10.f;
-	const float midRange = 30.f;
 
 	vec3 nodePos = nodes[node].getCenter();
 	float sumOfDists = 0.f;
+
+	float weight = 0.f;
 
 	for (unsigned int i = 0; i < state->numberOfPlayers(); i++)
 	{
 		if (state->getPlayer(i) != state->getGoldenBuggy())
 		{
 			vec3 diff = nodePos - state->getPlayer(i)->getPos();
-			sumOfDists += dot(diff, diff);
+			float distanceSquared = dot(diff, diff);
+
+			weight += closeRangeWeight(distanceSquared) + midRangeWeight(distanceSquared);
 		}
 	}
 
-	sumOfDists /= (float)(state->numberOfPlayers() - 1);
+	return weight/(float)(state->numberOfPlayers()-1);
 
-	float weight = std::max((closeRange*closeRange - sumOfDists)/(closeRange*closeRange), 0.f)*100.f;
+	/*sumOfDists /= (float)(state->numberOfPlayers() - 1);
+
+	weight = std::max((closeRange*closeRange - sumOfDists)/(closeRange*closeRange), 0.f)*1000.f + 30.f;
 	//If outside close range
 	if (weight == 0)
 		return std::max((midRange*midRange - sumOfDists) / (midRange*midRange), 0.f) * 30.f;
 
-	return weight;
+	return weight;*/
+}
+
+float NavMesh::powerupBoxCost(unsigned int node)
+{
+	if ((nodes[node].powerup < state->numberOfPowerupBoxes()) &&
+		(state->getPowerupBox(nodes[node].powerup)->getCountdown() < 0.f))
+		return 20.f;
+	else
+		return 0.f;
 }
 
 
@@ -533,7 +566,8 @@ bool NavMesh::getPath_AStar(vector<unsigned int>* path, vec3 position, vec3 forw
 			vec3 newTrajectory = normalize(nodes[next->index].getCenter() - nodes[current.i].getCenter());
 			float newCost = cost[current.i] + initWeight[next->index] 
 							+ edgeCost(current.i, next->index)
-							+ trajectoryCost(trajectory[current.i], newTrajectory);
+							+ trajectoryCost(trajectory[current.i], newTrajectory)
+							- powerupBoxCost(next->index);
 			newCost = std::max(newCost, cost[current.i] + 1.f);
 
 			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))
@@ -619,7 +653,8 @@ bool NavMesh::getPath_Avoidance(vector<unsigned int>* path, vec3 position, vec3 
 			float newCost = cost[current.i] + initWeight[next->index]
 				+ edgeCost(current.i, next->index)
 				+ trajectoryCost(trajectory[current.i], newTrajectory)
-				+ proximityCost(next->index);
+				+ proximityCost(next->index)
+				- powerupBoxCost(next->index);
 			newCost = std::max(newCost, cost[current.i] + 1.f);
 
 			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))
@@ -713,7 +748,8 @@ bool NavMesh::debugPath_Avoidance(vector<unsigned int>* path, vector<vec3>* path
 			float newCost = cost[current.i] + initWeight[next->index]
 				+ edgeCost(current.i, next->index)
 				+ trajectoryCost(trajectory[current.i], newTrajectory)
-				+ proximityCost(next->index);
+				+ proximityCost(next->index)
+				- powerupBoxCost(next->index);
 			newCost = std::max(newCost, cost[current.i] + 1.f);
 
 			if ((cost[next->index] == -1.f) || (newCost < cost[next->index]))

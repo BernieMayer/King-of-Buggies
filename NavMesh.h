@@ -56,6 +56,8 @@ public:
 	vec3 getCenter() const { return center; }
 	bool inPolygon(vec3 pos);
 	float getMin() const;
+
+	unsigned int powerup;
 };
 
 //Stores edges in matrix form
