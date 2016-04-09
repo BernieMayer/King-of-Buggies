@@ -51,6 +51,8 @@ public:
 	void unpause(GameState state);
 	
 private:
+	Timer timer;
+
 	float map(float value, float min, float max, float newMin, float newMax);
 	int lowestIdleVolume = 8;
 	int menuSongCounter = 0;
@@ -71,7 +73,9 @@ private:
 	void playSecretMusic(GameState state);
 	void playPauseSong(GameState state);
 	void playPauseSong2(GameState state);
-	void updateMusicPitch(GameState state, Input input);
+	float lastMusicPitch = 1.0f;
+	timeb lastFrameTime;
+	void updateMusicPitch(GameState state, float score);
 	void cleanOneTimeUseSources();
 	void playEndSong(GameState state);
 	vector<ALfloat> vec3ToALfloat(vec3 vec);

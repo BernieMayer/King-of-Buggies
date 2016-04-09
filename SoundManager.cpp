@@ -9,6 +9,8 @@ SoundManager::SoundManager() {
 
 SoundManager::SoundManager(GameState state) {
 	initOpenAL(state);
+	timer = Timer();
+	lastFrameTime = timer.getCurrentTime();
 }
 
 void SoundManager::initOpenAL(GameState state) {
@@ -310,7 +312,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 			alSourcef(engineSources[i], AL_PITCH, idleEnginePitch * pitchMod);
 
 
-			accelInput = map(accelInput, 0, 600, 1, 16);
+			accelInput = map(accelInput, 0, 600, 1, 14);
 
 			float volume = distanceVolumeAdjuster(idleEngineVolume * accelInput, state.getPlayer(i)->getPos());
 
@@ -626,21 +628,38 @@ void SoundManager::playPauseSong2(GameState state) {
 	}
 }
 
-void SoundManager::updateMusicPitch(GameState state, Input input) {
+void SoundManager::updateMusicPitch(GameState state, float score) {
 	if (initSuccess) {
-		PlayerInfo* player = state.getPlayer(0);
+		
+		float maxScore = state.getMaxScore();
+		float desiredPitch = 1.0f;
+		float pitchStep = 0.01f;
 
-		bool forwardsGear = player->getForwardsGear();
-
-		float accelInput = 0;
-		if (forwardsGear) {
-			accelInput = map(input.forward, 0, 1, 0.5, 2);
-		}
-		else {
-			accelInput = map(input.backward, 0, 1, 0.5, 2);
+		// Only adjust pitch if score at >= 75% needed to win
+		if (score >= maxScore * 0.75f) {
+			desiredPitch = map(score, maxScore * 0.75f, maxScore, 1.0f, 1.5f);
 		}
 
-		alSourcef(musicSource, AL_PITCH, 1 * accelInput);
+		float difference = timer.getTimeSince(lastFrameTime);
+		timeb now = timer.getCurrentTime();
+		// If 60fps, maxAccelChange = accelStep
+		// If less than 60fps, maxAccelChange > accelStep
+		// If greater than 60fps, maxAccelChange < accelStep
+		float maxPitchChange = pitchStep  * (difference / (1.0f / 60.0f));
+
+		// If forward is increasing too much, increase by max instead
+		if (desiredPitch > lastMusicPitch && desiredPitch - lastMusicPitch > maxPitchChange) {
+			desiredPitch = lastMusicPitch + maxPitchChange;
+		}
+		// If forward is decreasing too much, decrease by max instead
+		else if (desiredPitch < lastMusicPitch && lastMusicPitch - desiredPitch > maxPitchChange) {
+			desiredPitch = lastMusicPitch - maxPitchChange;
+		}
+		// Otherwise, do not change
+		lastMusicPitch = desiredPitch;
+
+
+		alSourcef(musicSource, AL_PITCH, desiredPitch);
 	}
 }
 
@@ -833,6 +852,7 @@ void SoundManager::deleteAll() {
 
 		paused = false;
 		gameOver = false;
+		lastMusicPitch = 1.0f;
 	}
 }
 
@@ -935,49 +955,56 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			}
 		}
 
-		for (int i = 0; i < state.getNbEvents(); i++) {
-			Event* e = state.getEvent(i);
+		float buggyScore = state.getGoldenBuggy()->getScore();
+		if (!paused && !gameOver) {
+			updateMusicPitch(state, buggyScore);
+		}
 
-			if (e->getType() == VEHICLE_COLLISION_EVENT)
-			{
-				VehicleCollisionEvent* vehE = dynamic_cast<VehicleCollisionEvent*>(e);
+		if (!paused && !gameOver) {
+			for (int i = 0; i < state.getNbEvents(); i++) {
+				Event* e = state.getEvent(i);
 
-				vec3 force = vehE->force;
-				float volume = length(force);
-				volume = map(volume, 0, 300000, 0, 2);
-				cout << "Volume: " << volume << "\n";
-				playBumpSound(vehE->location, volume);
-			}
-			else if (e->getType() == VEHICLE_WALL_COLLISION_EVENT) {
-				VehicleWallCollisionEvent* vehE = dynamic_cast<VehicleWallCollisionEvent*>(e);
+				if (e->getType() == VEHICLE_COLLISION_EVENT)
+				{
+					VehicleCollisionEvent* vehE = dynamic_cast<VehicleCollisionEvent*>(e);
 
-				vec3 force = vehE->force;
-				float volume = length(force);
-				volume = map(volume, 0, 300000, 0, 2);
-				cout << "Volume: " << volume << "\n";
-				playBumpSound(vehE->location, volume);
-			}
-			else if (e->getType() == GOLDEN_BUGGY_SWITCH_EVENT) {
-				GoldenBuggySwitchEvent* gbE = dynamic_cast<GoldenBuggySwitchEvent*>(e);
-				playSound("Boom.wav", gbE->gbPos, 1.0f);
-			}
-			else if (e->getType() == BOMB_CREATION_EVENT) {
-				BombCreationEvent* bombE = dynamic_cast<BombCreationEvent*>(e);
-				startFuse(state);
-			}
-			else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
-				VehicleBombCollisionEvent* boomE = dynamic_cast<VehicleBombCollisionEvent*>(e);
+					vec3 force = vehE->force;
+					float volume = length(force);
+					volume = map(volume, 0, 300000, 0, 2);
+					cout << "Volume: " << volume << "\n";
+					playBumpSound(vehE->location, volume);
+				}
+				else if (e->getType() == VEHICLE_WALL_COLLISION_EVENT) {
+					VehicleWallCollisionEvent* vehE = dynamic_cast<VehicleWallCollisionEvent*>(e);
 
-				playSound("LittleBoom.wav", boomE->location, 1.0f);
-				stopFuse(boomE->ob2);
+					vec3 force = vehE->force;
+					float volume = length(force);
+					volume = map(volume, 0, 300000, 0, 2);
+					cout << "Volume: " << volume << "\n";
+					playBumpSound(vehE->location, volume);
+				}
+				else if (e->getType() == GOLDEN_BUGGY_SWITCH_EVENT) {
+					GoldenBuggySwitchEvent* gbE = dynamic_cast<GoldenBuggySwitchEvent*>(e);
+					playSound("Boom.wav", gbE->gbPos, 1.0f);
+				}
+				else if (e->getType() == BOMB_CREATION_EVENT) {
+					BombCreationEvent* bombE = dynamic_cast<BombCreationEvent*>(e);
+					startFuse(state);
+				}
+				else if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
+					VehicleBombCollisionEvent* boomE = dynamic_cast<VehicleBombCollisionEvent*>(e);
+
+					playSound("LittleBoom.wav", boomE->location, 1.0f);
+					stopFuse(boomE->ob2);
+				}
 			}
 		}
-		// Feel free to remove this. It has no purpose, just sounds funny
-		//updateMusicPitch(state, inputs[0]);
 
 		if (firstFrame) {
 			firstFrame = false;
 		}
+
+		lastFrameTime = timer.getCurrentTime();
 	}
 }
 
