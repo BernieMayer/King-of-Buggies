@@ -26,6 +26,8 @@ struct Input
 	bool isKeyboard;
 
 	bool konamiCode;
+
+	bool debug;
 };
 
 #endif //INPUT_H

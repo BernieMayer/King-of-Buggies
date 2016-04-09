@@ -53,6 +53,10 @@ private:
 	timeb jumpTime;
 	float jumpCounterMax = 10.0f / 60.0f;
 
+	bool debugLock = false;
+	timeb debugTime;
+	float debugCounterMax = 10.0f / 60.0f;
+
 	bool cheatLock = false;
 	timeb cheatTime;
 	float cheatCounterMax = 10.0f / 60.0f;

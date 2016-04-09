@@ -23,6 +23,7 @@ bool kDrift;
 bool kMenu;
 bool kJump;
 bool kHorn;
+bool kDebug;
 
 //Only to easily cheat in coins
 bool kCheat_coin;
@@ -148,6 +149,12 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	else if (hornKeyboard(key) && action == GLFW_RELEASE) {
 		kHorn = false;
 	}
+	else if (key == GLFW_KEY_Y && action == GLFW_PRESS) {
+		kDebug = true;
+	}
+	else if (key == GLFW_KEY_Y && action == GLFW_RELEASE) {
+		kDebug = false;
+	}
 }
 
 /**
@@ -174,6 +181,7 @@ InputManager::InputManager(GLFWwindow* w)
 	kMenu = false;
 	kJump = false;
 	kHorn = false;
+	kDebug = false;
 
 	rumbleTimer = Timer();
 
@@ -293,6 +301,7 @@ Input InputManager::getInput(int playerNum)
 		input.menu = gamepads[playerNum].GetButtonPressed(menuButton);
 		input.jump = gamepads[playerNum].GetButtonPressed(jumpButton);
 		input.horn = gamepads[playerNum].GetButtonPressed(honkButton);
+		input.debug = gamepads[playerNum].GetButtonPressed(debugButton);
 
 		gamepads[playerNum].RefreshState();
 
@@ -320,6 +329,7 @@ Input InputManager::getInput(int playerNum)
 		input.menu = kMenu;
 		input.jump = kJump;
 		input.horn = kHorn;
+		input.debug = kDebug;
 
 		if (kDrift) {
 			input.rollL = kTurnL;

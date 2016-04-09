@@ -27,6 +27,7 @@ private:
 	const int menuButton = 12;
 	const int jumpButton = 0;
 	const int honkButton = 3;
+	const int debugButton = 13;
 
 	GLFWwindow* window;
 	Gamepad gamepads[MAX_PLAYERS];

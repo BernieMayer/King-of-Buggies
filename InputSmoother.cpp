@@ -20,17 +20,8 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		lastInputs.erase(lastInputs.begin());
 	}
 	lastInputs.push_back(in);
-	
-	if (konamiLock) {
-		if (timer.getTimeSince(konamiTime) >= konamiCounterMax) {
-			konamiLock = false;
-		}
-	}
 
 	Input out = in;
-	if (!konamiLock) {
-		out.konamiCode = checkKonamiCode();
-	}
 
 	difference = timer.getTimeSince(movementTime);
 	movementTime = timer.getCurrentTime();
@@ -199,6 +190,32 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		cheatLock = false;
 	}
 
+	if (out.debug && !debugLock) {
+		debugLock = true;
+		debugTime = timer.getCurrentTime();
+	}
+	else if (debugLock && timer.getTimeSince(debugTime) < debugCounterMax) {
+		out.debug = false;
+	}
+	else if (debugLock && timer.getTimeSince(debugTime) >= debugCounterMax) {
+		out.debug = false;
+		debugLock = false;
+	}
+
+
+
+	if (konamiLock) {
+		if (timer.getTimeSince(konamiTime) >= konamiCounterMax) {
+			konamiLock = false;
+		}
+	}
+
+	if (!konamiLock) {
+		out.konamiCode = checkKonamiCode();
+		if (out.konamiCode) {
+			out.menu = false;
+		}
+	}
 
 	return out;
 }
