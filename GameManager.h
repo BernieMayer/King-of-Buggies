@@ -109,6 +109,10 @@ private:
 
 	int selectedLevel = 1;
 
+	// temporary?
+	timeb blinkTime;
+	bool blinking = false;
+
 	//temporary
 	vector<float> scoreBarWidths;
 

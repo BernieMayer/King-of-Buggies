@@ -53,6 +53,9 @@ public:
 	void setEnergyForNitro(float nitro);
 	float getEnergyForNitro();
 
+	bool getAlmostWon() { return almostWon; }
+	void setAlmostWon() { almostWon = true; }
+
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
@@ -71,6 +74,7 @@ protected:
 	bool forwardsGear;
 	float engineSpeed;
 	bool inAir;
+	bool almostWon;
 
 	vec3 vehicleColour;
 	unsigned int textureID;

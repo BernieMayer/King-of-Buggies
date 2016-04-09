@@ -1546,6 +1546,7 @@ void GameManager::initUI()
 	}
 
 	switchBuggyUI();
+	blinkTime = clock.getCurrentTime();
 }
 
 // temporary
@@ -1554,6 +1555,20 @@ void GameManager::incScoreBar(unsigned int playerID) {
 	float barHeight = _interface.getComponentHeight(scoreBarIDs[playerID]);
 	float yOffset = _interface.getComponentY(scoreBarIDs[playerID]);
 	_interface.setDimensions(scoreBarIDs[playerID], -.95f, yOffset, barWidth, barHeight, ANCHOR::TOP_LEFT);
+
+	if (state.getPlayer(playerID)->getScore() > (state.getMaxScore() * 0.75f)) {
+		state.getPlayer(playerID)->setAlmostWon();
+	}
+	if ((state.getPlayer(playerID)->getAlmostWon()) && (clock.getTimeSince(blinkTime) > 0.75f)) {
+		if (!blinking) {
+			_interface.assignTexture(scoreBarIDs[playerID], meshInfo.getBlinkingScoreBar(), ComponentInfo::UP_TEXTURE);
+		}
+		else {
+			_interface.assignTexture(scoreBarIDs[playerID], meshInfo.getGoldScoreBar(), ComponentInfo::UP_TEXTURE);
+		}
+		blinking = !blinking;
+		blinkTime = clock.getCurrentTime();
+	}
 }
 
 void GameManager::switchBuggyUI() {

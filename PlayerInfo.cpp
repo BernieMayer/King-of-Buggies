@@ -4,14 +4,14 @@
 #include "PlayerInfo.h"
 
 PlayerInfo::PlayerInfo() : powerup(-1), numCoins(0), score(0),
-							goldenBuggy(false), timeGolden(0.f)
+goldenBuggy(false), timeGolden(0.f), almostWon(false)
 {
 
 }
 
 PlayerInfo::PlayerInfo(unsigned int _renderID, unsigned int _physicsID, unsigned int* _wheelRenderIDs, vec3 colour, unsigned int texID) :
 powerup(-1), numCoins(0), score(0),
-goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID)
+goldenBuggy(false), timeGolden(0.f), vehicleColour(colour), textureID(texID), almostWon(false)
 {
 	renderID = _renderID;
 	physicsID = _physicsID;

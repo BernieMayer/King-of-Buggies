@@ -7,25 +7,7 @@ GameState::GameState()
 {
 	maxScore = 3000;
 }
-/*
-GameState::GameState(MeshObject* selectedLevel, char *coinsFile, char *boostFile)
-{
-	maxScore = 2000;
-	map = LevelInfo(selectedLevel, coinsFile, boostFile);
-	vector<vec3> coinCoords = map.getCoinLocations();
-	for (unsigned int i = 0; i < coinCoords.size(); i++) {
-		Coin newCoin = Coin();
-		newCoin.setPos(coinCoords[i]);
-		addCoin(newCoin);
-	}
-	vector<vec3> boostCoords = map.getBoostLocations();
-	for (unsigned int i = 0; i < boostCoords.size(); i++) {
-		BoostPad newBoost = BoostPad();
-		newBoost.setDefault(boostCoords[i]);
-		addBoostPad(newBoost);
-	}
-}
-*/
+
 void GameState::addPlayer(const PlayerInfo& pinfo) { players.push_back(pinfo); }
 void GameState::addAI(const PlayerInfo& pinfo){ ai.push_back(pinfo); }
 

@@ -48,6 +48,7 @@ public:
 	unsigned int getPurpleBar() { return purpleBar; }
 	unsigned int getScoreBar() { return scoreBar; }
 	unsigned int getGoldScoreBar() { return goldScoreBar; }
+	unsigned int getBlinkingScoreBar() { return blinkingScoreBar; }
 
 
 	MeshInfoLoader meshLoader;
@@ -83,6 +84,7 @@ private:
 	unsigned int purpleBar;
 	unsigned int scoreBar;
 	unsigned int goldScoreBar;
+	unsigned int blinkingScoreBar;
 };
 
 #endif // MESHINFO_H
