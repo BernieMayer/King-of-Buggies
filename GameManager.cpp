@@ -964,7 +964,7 @@ void GameManager::gameLoop()
 		radarInterfaceID[i] = _interface.generateComponentID();
 		_interface.assignSquare(radarInterfaceID[i]);
 		//-1, -1 offset 0.5 width, 0.5 height. Screen space (-1, -1) to (1, 1)
-		_interface.setDimensions(radarInterfaceID[i], 1.0f, -1.0f, 0.5f, 0.5f, ANCHOR::BOTTOM_RIGHT);
+		_interface.setDimensions(radarInterfaceID[i], 1.0f, -1.0f, 0.65f, 0.65f, ANCHOR::BOTTOM_RIGHT);
 		if (i == 0)
 		{
 			_interface.setDisplayFilter(radarInterfaceID[i], DISPLAY::D1);
@@ -983,7 +983,7 @@ void GameManager::gameLoop()
 		}
 
 		//use multiple of these to allow for split screen
-		radarFBO[i] = renderer.createFramebuffer(500, 500);
+		radarFBO[i] = renderer.createFramebuffer(400, 400);
 		_interface.assignTexture(radarInterfaceID[i], renderer.getFramebufferTexture(radarFBO[i]), ComponentInfo::UP_TEXTURE); //Magic third parameter
 	}
 	clock.start();
