@@ -956,16 +956,36 @@ void GameManager::gameLoop()
 	//unsigned int numScreens = 4;
 	renderer.splitScreenViewports(numScreens);
 
-	unsigned int radarInterfaceID = _interface.generateComponentID();
-	_interface.assignSquare(radarInterfaceID);
-	//-1, -1 offset 0.5 width, 0.5 height. Screen space (-1, -1) to (1, 1)
-	_interface.setDimensions(radarInterfaceID, -1.0f, -1.0f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
-	_interface.setDisplayFilter(radarInterfaceID, DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
+	vector<unsigned int> radarInterfaceID(numScreens);
+	vector<unsigned int> radarFBO(numScreens);
+	for (int i = 0; i < numScreens; i++)
+	{
 
-	//use multiple of these to allow for split screen
-	unsigned int radarFBO = renderer.createFramebuffer(400, 400);
-	_interface.assignTexture(radarInterfaceID, renderer.getFramebufferTexture(radarFBO), ComponentInfo::UP_TEXTURE); //Magic third parameter
+		radarInterfaceID[i] = _interface.generateComponentID();
+		_interface.assignSquare(radarInterfaceID[i]);
+		//-1, -1 offset 0.5 width, 0.5 height. Screen space (-1, -1) to (1, 1)
+		_interface.setDimensions(radarInterfaceID[i], 1.0f, -1.0f, 0.5f, 0.5f, ANCHOR::BOTTOM_RIGHT);
+		if (i == 0)
+		{
+			_interface.setDisplayFilter(radarInterfaceID[i], DISPLAY::D1);
+		}
+		else if (i == 1)
+		{
+			_interface.setDisplayFilter(radarInterfaceID[i], DISPLAY::D2);
+		} 
+		else if (i == 2)
+		{
+			_interface.setDisplayFilter(radarInterfaceID[i], DISPLAY::D3);
+		} 
+		else if (i == 3)
+		{
+			_interface.setDisplayFilter(radarInterfaceID[i], DISPLAY::D4);
+		}
 
+		//use multiple of these to allow for split screen
+		radarFBO[i] = renderer.createFramebuffer(500, 500);
+		_interface.assignTexture(radarInterfaceID[i], renderer.getFramebufferTexture(radarFBO[i]), ComponentInfo::UP_TEXTURE); //Magic third parameter
+	}
 	clock.start();
 	float timeProgressed = 0.f;
 	unsigned int frameCount = 0;
@@ -1130,27 +1150,42 @@ void GameManager::gameLoop()
 			renderer.drawBufferedAll(USING_SHADOWS);
 
 			//Should be in a for loop for every player
-			
-			vector<vec2> radarPos = state.setupRadar(0);
-			vector<vec3> coloursRadar;
-			for (int i = 0; i < state.numberOfPlayers(); i++)
+			for (unsigned int i = 0; i < numScreens; i++)
 			{
+				vector<vec2> radarPos = state.setupRadar(i);
+				vector<vec3> coloursRadar;
+
 				if (state.getPlayer(i)->isGoldenBuggy())
 				{
 					// 	rgb(255,215,0)
-					coloursRadar.push_back(vec3(255.0f/255.0f, 215.0f/255.0f, 0.0));
+					coloursRadar.push_back(vec3(255.0f / 255.0f, 215.0f / 255.0f, 0.0));
 				}
 				else
 				{
 					coloursRadar.push_back(state.getPlayer(i)->getColour());
 				}
-			}
-			//Draw the radar to the frameBuffer
-			renderer.useFramebuffer(radarFBO);
-			renderer.clearDrawBuffers(vec3(0.0f,0.0f,0.0f));
-			renderer.drawRadar(radarPos, coloursRadar);
-			renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
+				for (int j = 0; j < state.numberOfPlayers(); j++)
+				{
+					if (j != i)
+					{
+						if (state.getPlayer(j)->isGoldenBuggy())
+						{
+							// 	rgb(255,215,0)
+							coloursRadar.push_back(vec3(255.0f / 255.0f, 215.0f / 255.0f, 0.0));
+						}
+						else
+						{
+							coloursRadar.push_back(state.getPlayer(j)->getColour());
+						}
+					}
 
+				}
+				//Draw the radar to the frameBuffer
+				renderer.useFramebuffer(radarFBO[i]);
+				renderer.clearDrawBuffers(vec3(0.0f, 0.0f, 0.0f));
+				renderer.drawRadar(radarPos, coloursRadar);
+				renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
+			}
 			//renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));
 
 			//renderer.useViewport(i+1);

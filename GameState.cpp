@@ -188,31 +188,26 @@ vector<vec2> GameState::setupRadar(int playerId)
 	float triangleSize = 0.2f;
 	vec2 playerLeft = widthScaleFactor * vec2(triangleSize * player3DposRight.x, -triangleSize * player3DposRight.z);
 	vec2 playerRight = widthScaleFactor * vec2(triangleSize * player3DposLeft.x, -triangleSize * player3DposLeft.z);
-	vec2 playerUp =  vec2( triangleSize * player3DposUp.x, - triangleSize * player3DposUp.z);
-
-
-	vec3 origin = vec3((playerLeft.x + playerRight.x) / 2, 0, (playerLeft.y + playerRight.y) / 2);
-
-	
-
-	vectors.push_back( playerLeft);
-	vectors.push_back( playerUp);
-	vectors.push_back( playerRight);
-
+	vec2 playerUp = vec2(triangleSize * player3DposUp.x, -triangleSize * player3DposUp.z);
+	vectors.push_back(playerLeft);
+	vectors.push_back(playerUp);
+	vectors.push_back(playerRight);
 	int radarSize = 50;
 	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
-		if (i != playerId)
-		{
+	
+		if (i != playerId){
+
 			vector<vec3> radarPoly;
 			vec3 otherPlayerPos = getPlayer(i)->getPos();
-			radarPoly.push_back(player3Dpos - vec3(radarSize / 2, 0, radarSize/2));
+			radarPoly.push_back(player3Dpos - vec3(radarSize / 2, 0, radarSize / 2));
 			radarPoly.push_back(player3Dpos - vec3(radarSize / 2, 0, -radarSize / 2));
 			radarPoly.push_back(player3Dpos + vec3(radarSize / 2, 0, radarSize / 2));
 			radarPoly.push_back(player3Dpos + vec3(radarSize / 2, 0, -radarSize / 2));
 
-			
-			if (isWithinPolygon(otherPlayerPos, radarPoly)){
+
+			if (isWithinPolygon(otherPlayerPos, radarPoly))
+			{
 
 				double dist = length((otherPlayerPos - player3Dpos));
 
@@ -224,22 +219,31 @@ vector<vec2> GameState::setupRadar(int playerId)
 				// Might not...
 				otherPlayer3DRight = widthScaleFactor * otherPlayer3DRight;
 
-				
+
 				vec3 radarOtherPlayerCenter = vec3(otherPlayerCenter.x / (radarSize / 2), 0, otherPlayerCenter.z / (radarSize / 2));
 
 				vec2 otherPlayerLeft = vec2(radarOtherPlayerCenter.x - widthScaleFactor * triangleSize, -radarOtherPlayerCenter.z);
 				vec2 otherPlayerRight = vec2(radarOtherPlayerCenter.x + widthScaleFactor * triangleSize, -radarOtherPlayerCenter.z);
 				vec2 otherPlayerUp = vec2(radarOtherPlayerCenter.x, -(radarOtherPlayerCenter.z + triangleSize));
-				
+
 
 				vectors.push_back(otherPlayerLeft);
 				vectors.push_back(otherPlayerUp);
 				vectors.push_back(otherPlayerRight);
 
 			}
-
+			else
+			{
+				//Draw a player out of the radar waaaaay of the radar so it won't show and 
+				//the radar and order stays the same
+				vectors.push_back(vec2(100, 100));
+				vectors.push_back(vec2(100, 100));
+				vectors.push_back(vec2(100, 100));
+			}
 
 		}
+
+		
 	}
 
 	
