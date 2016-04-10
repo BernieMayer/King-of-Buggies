@@ -1444,7 +1444,11 @@ void GameManager::gameInit()
 
 	//Create skybox
 	//skyboxTextureID = renderer.getFramebufferTexture(fbo);
-	skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
+	if (selectedLevel == 0 || selectedLevel == 1)
+		skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
+	else
+		skyboxTextureID = LoadTexture("textures/sunset.jpg");
+
 	skyboxID = renderer.generateObjectID();
 	renderer.assignSkyDome(skyboxID, 80.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
