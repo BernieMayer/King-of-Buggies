@@ -199,7 +199,11 @@ void SoundManager::stopMenuSong() {
  */
 void SoundManager::startMusic(GameState state) {
 	if (initSuccess) {
-		loadWavToBuf("Dogsong.wav", &musicSource, &musicBuffer);
+		if (state.getLevelID() == 0 || state.getLevelID() == 1)
+			loadWavToBuf("Dogsong.wav", &musicSource, &musicBuffer);
+
+		else if (state.getLevelID() == 2)
+			loadWavToBuf("IslandSong.wav", &musicSource, &musicBuffer);
 
 		PlayerInfo* p1 = state.getPlayer(0);
 

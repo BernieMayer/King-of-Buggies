@@ -729,7 +729,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 	}
 
 	if (lastState != NULL) {
-		if (length(lastState->getPlayer(id)->getPos() - vec3(0.0f, 0.0f, 0.0f)) >= 60.0f) {
+		if (lastState->getPlayer(id)->getPos().y <= -30.0f) {
 			vehicle->getRigidDynamicActor()->setGlobalPose(PxTransform(getPxVec3(lastState->getStartCoord(id))));
 			vehicle->getRigidDynamicActor()->clearForce(PxForceMode::eACCELERATION);
 			vehicle->getRigidDynamicActor()->clearTorque(PxForceMode::eACCELERATION);

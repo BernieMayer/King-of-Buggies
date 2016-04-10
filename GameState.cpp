@@ -505,10 +505,19 @@ void GameState::clearEvents()
 
 void GameState::setMap(MeshObject* arena, unsigned int selectedLevel) 
 {
-	if (selectedLevel == 0 || selectedLevel == 1 || selectedLevel == 2) {
+	if (selectedLevel == 0) { // test level
 		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
+		levelID = 0;
 	}
-	
+	else if (selectedLevel == 1) { // donut level
+		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
+		levelID = 1;
+	}
+	else if (selectedLevel == 2) { // island level
+		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
+		levelID = 2;
+	}
+
 	vector<vec3> coinCoords = map.getCoinLocations();
 	vector<vec3> boostCoords = map.getBoostLocations();
 	vector<vec3> boxCoords = map.getBoxLocations();

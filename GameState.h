@@ -45,7 +45,7 @@ private:
 
 	unsigned int maxScore;
 	
-	
+	unsigned int levelID;
 
 public:
 	GameState();
@@ -119,6 +119,7 @@ public:
 	void setMap(MeshObject* arena, unsigned int selectedLevel);
 	void applyRotations();
 	vec3 getStartCoord(unsigned int playerID);
+	unsigned int getLevelID() { return levelID; }
 
 	bool checkCoinCollision(vec3 playerPos);
 	unsigned int numOfDecoys = 0;
