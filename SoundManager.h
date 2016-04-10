@@ -78,6 +78,7 @@ private:
 	void updateMusicPitch(GameState state, float score);
 	void cleanOneTimeUseSources();
 	void playEndSong(GameState state);
+	void playSong(GameState state, string fileName, bool loop);
 	vector<ALfloat> vec3ToALfloat(vec3 vec);
 	vector<ALfloat> vec3ToALfloat(vec3 vector1, vec3 vector2);
 	ALuint musicBuffer;

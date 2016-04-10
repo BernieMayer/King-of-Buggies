@@ -199,11 +199,14 @@ void SoundManager::stopMenuSong() {
  */
 void SoundManager::startMusic(GameState state) {
 	if (initSuccess) {
-		if (state.getLevelID() == 0 || state.getLevelID() == 1)
+		
+		if (state.getLevelID() == 0 || state.getLevelID() == 1) {
 			loadWavToBuf("Dogsong.wav", &musicSource, &musicBuffer);
-
-		else if (state.getLevelID() == 2)
-			loadWavToBuf("IslandSong.wav", &musicSource, &musicBuffer);
+		}
+		else if (state.getLevelID() == 2) {
+			loadWavToBuf("IslandSongStart.wav", &musicSource, &musicBuffer);
+		}
+		
 
 		PlayerInfo* p1 = state.getPlayer(0);
 
@@ -215,7 +218,15 @@ void SoundManager::startMusic(GameState state) {
 		alSourcef(musicSource, AL_GAIN, musicVolume);
 		alSourcefv(musicSource, AL_POSITION, SourcePos);
 		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-		alSourcei(musicSource, AL_LOOPING, AL_TRUE);
+
+		
+		if (state.getLevelID() == 2) {
+			alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+		}
+		else {
+			alSourcei(musicSource, AL_LOOPING, AL_TRUE);
+		}
+		
 
 		alSourcePlay(musicSource);
 	}
@@ -546,8 +557,6 @@ void SoundManager::playDingSound(vec3 pos) {
 
 void SoundManager::playSecretMusic(GameState state) {
 	if (initSuccess) {
-		alSourceStop(musicSource);
-		ALuint buffer;
 		int songSelection;
 
 		do {
@@ -556,79 +565,32 @@ void SoundManager::playSecretMusic(GameState state) {
 		lastSecretPlayed = songSelection;
 
 		if (songSelection == 0) {
-			loadWavToBuf("Secret.wav", &musicSource, &buffer);
+			playSong(state, "Secret.wav", false);
 		}
 		else if (songSelection == 1) {
-			loadWavToBuf("Dogstorm.wav", &musicSource, &buffer);
+			playSong(state, "Dogstorm.wav", false);
 		}
 		else if (songSelection == 2) {
-			loadWavToBuf("Dogbass.wav", &musicSource, &buffer);
+			playSong(state, "Dogbass.wav", false);
 		}
 		else if (songSelection == 3) {
-			loadWavToBuf("DogLevels.wav", &musicSource, &buffer);
+			playSong(state, "DogLevels.wav", false);
 		}
 		else {
-			loadWavToBuf("DogsongMetal.wav", &musicSource, &buffer);
+			playSong(state, "DogsongMetal.wav", false);
 		}
-
-
-		PlayerInfo* p1 = state.getPlayer(0);
-
-		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
-
-		alSourcei(musicSource, AL_BUFFER, buffer);
-		alSourcef(musicSource, AL_PITCH, 1.0f);
-		alSourcef(musicSource, AL_GAIN, musicVolume);
-		alSourcefv(musicSource, AL_POSITION, SourcePos);
-		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-		alSourcei(musicSource, AL_LOOPING, AL_FALSE);
-
-		alSourcePlay(musicSource);
 	}
 }
 
 void SoundManager::playPauseSong(GameState state) {
 	if (initSuccess) {
-		alSourceStop(musicSource);
-		ALuint buffer;
-		loadWavToBuf("PauseSong2.wav", &musicSource, &buffer);
-
-		PlayerInfo* p1 = state.getPlayer(0);
-
-		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
-
-		alSourcei(musicSource, AL_BUFFER, buffer);
-		alSourcef(musicSource, AL_PITCH, 1.0f);
-		alSourcef(musicSource, AL_GAIN, musicVolume);
-		alSourcefv(musicSource, AL_POSITION, SourcePos);
-		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-		alSourcei(musicSource, AL_LOOPING, AL_FALSE);
-
-		alSourcePlay(musicSource);
+		playSong(state, "PauseSong2.wav", false);
 	}
 }
 
 void SoundManager::playPauseSong2(GameState state) {
 	if (initSuccess) {
-		alSourceStop(musicSource);
-		ALuint buffer;
-		loadWavToBuf("PauseSong3.wav", &musicSource, &buffer);
-
-		PlayerInfo* p1 = state.getPlayer(0);
-
-		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
-
-		alSourcei(musicSource, AL_BUFFER, buffer);
-		alSourcef(musicSource, AL_PITCH, 1.0f);
-		alSourcef(musicSource, AL_GAIN, musicVolume);
-		alSourcefv(musicSource, AL_POSITION, SourcePos);
-		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-		alSourcei(musicSource, AL_LOOPING, AL_FALSE);
-
-		alSourcePlay(musicSource);
+		playSong(state, "PauseSong3.wav", false);
 	}
 }
 
@@ -759,23 +721,7 @@ void SoundManager::cleanOneTimeUseSources() {
 
 void SoundManager::playEndSong(GameState state) {
 	if (initSuccess) {
-		alSourceStop(musicSource);
-		ALuint buffer;
-		loadWavToBuf("EndGameSong.wav", &musicSource, &buffer);
-
-		PlayerInfo* p1 = state.getPlayer(0);
-
-		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
-		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
-
-		alSourcei(musicSource, AL_BUFFER, buffer);
-		alSourcef(musicSource, AL_PITCH, 1.0f);
-		alSourcef(musicSource, AL_GAIN, musicVolume);
-		alSourcefv(musicSource, AL_POSITION, SourcePos);
-		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
-		alSourcei(musicSource, AL_LOOPING, AL_TRUE);
-
-		alSourcePlay(musicSource);
+		playSong(state, "EndGameSong.wav", true);
 	}
 }
 
@@ -874,6 +820,33 @@ void SoundManager::unpause(GameState state) {
 	pauseSongPitch = 1.0f;
 }
 
+void SoundManager::playSong(GameState state, string fileName, bool looping) {
+	if (initSuccess) {
+		alSourceStop(musicSource);
+		ALuint buffer;
+		loadWavToBuf(fileName, &musicSource, &buffer);
+
+		PlayerInfo* p1 = state.getPlayer(0);
+
+		ALfloat *SourcePos = vec3ToALfloat(p1->getPos()).data();
+		ALfloat *SourceVel = vec3ToALfloat(p1->getVelocity()).data();
+
+		alSourcei(musicSource, AL_BUFFER, buffer);
+		alSourcef(musicSource, AL_PITCH, 1.0f);
+		alSourcef(musicSource, AL_GAIN, musicVolume);
+		alSourcefv(musicSource, AL_POSITION, SourcePos);
+		alSourcefv(musicSource, AL_VELOCITY, SourceVel);
+		if (looping) {
+			alSourcei(musicSource, AL_LOOPING, AL_TRUE);
+		}
+		else {
+			alSourcei(musicSource, AL_LOOPING, AL_FALSE);
+		}
+
+		alSourcePlay(musicSource);
+	}
+}
+
 /*
  * Updates all sounds
  */
@@ -884,6 +857,16 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 			updateMusic(state);
 			updateEngineSounds(state, inputs);
 			updateFuses(state);
+
+			if (state.getLevelID() == 2) {
+				ALint musicState;
+				alGetSourcei(musicSource, AL_SOURCE_STATE, &musicState);
+				if (musicState == AL_STOPPED) {
+					alDeleteBuffers(1, &musicBuffer);
+					alDeleteSources(1, &musicSource);
+					playSong(state, "IslandSong.wav", true);
+				}
+			}
 		}
 
 		cleanOneTimeUseSources();
