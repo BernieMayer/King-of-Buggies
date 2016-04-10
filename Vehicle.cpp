@@ -26,9 +26,9 @@ Vehicle::Vehicle(PxPhysics& phys, PxCooking& cook, PxScene& aScene, VehicleTrait
 	vehicle_create(traits, initPos);
 }
 
-Vehicle::Vehicle(PxVehicleDrive4W& veh, VehicleTraits Vehtraits)
+Vehicle::Vehicle(PxVehicleDrive4W* veh, VehicleTraits Vehtraits)
 {
-	vehDrive4W = &veh;
+	vehDrive4W = veh;
 	traits = Vehtraits;
 }
 

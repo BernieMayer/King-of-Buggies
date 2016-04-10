@@ -102,10 +102,12 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 	renderer.assignMeshObject(chassisRenderID, playerMesh);
 	renderer.assignMaterial(chassisRenderID, &tsMat);
 	renderer.setShadowBehaviour(chassisRenderID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
-	if (state.numberOfPlayers() == 0) {
-		renderer.assignTexture(chassisRenderID, meshInfo.getGoldenBuggyTexID());
-	}
-	else { renderer.assignTexture(chassisRenderID, texID); }
+	//if (state.numberOfPlayers() == 0) {
+		//renderer.assignTexture(chassisRenderID, meshInfo.getGoldenBuggyTexID());
+	//}
+	//else { 
+		renderer.assignTexture(chassisRenderID, texID); 
+	//}
 
 	MeshObject* wheelMesh = meshInfo.getMeshPointer(WHEEL);
 	unsigned int wheelIDs[4];
@@ -835,8 +837,11 @@ void GameManager::processEvents()
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 					// display powerup information in HUD
-					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+					if (vehicleId < numScreens)
+					{
+						_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+						_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+					}
 				}
 			}
 		}
@@ -855,7 +860,8 @@ void GameManager::checkCoinCollisions()
 			physics.modifySpeed(i, 0.3333f);
 			sound.playDingSound(state.getPlayer(i)->getPos());
 			state.getPlayer(i)->addCoin();
-			_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
+			if (i < numScreens)
+				_interface.assignTexture(playerCoinIDs[i], meshInfo.getCoinComponentID(state.getPlayer(i)->getNumCoins()), ComponentInfo::UP_TEXTURE);
 		}
 
 		if (hasBoostPadCollision){
@@ -893,6 +899,21 @@ void GameManager::updateCamera(unsigned int i, Input input, float frameTime)
 	vec4 carDir = physics.vehicle_getGlobalPose(activePlayer->getPhysicsID())*vec4(0.f, 0.f, 1.f, 0.f);
 	if ((input.camH == 0.f) && (input.camV == 0.f))
 		cam[i].trackDirAroundY(vec3(carDir), frameTime);
+}
+
+void GameManager::removePlayer(unsigned int playerID)
+{
+	PlayerInfo* player = state.getPlayer(playerID);
+	renderer.deleteDrawableObject(player->getRenderID());
+
+	for (unsigned int i = 0; i < 4; i++)
+	{
+		renderer.deleteDrawableObject(player->getWheelRenderID(i));
+	}
+
+	physics.vehicle_remove(player->getPhysicsID());
+	player->setPos(vec3(1000.f, 1000.f, 1000.f));
+	state.removeLastPlayer();
 }
 
 void GameManager::gameLoop()
@@ -947,12 +968,15 @@ void GameManager::gameLoop()
 
 	timeb loopStart = clock.getCurrentTime();
 
-	hasPowerup.push_back(false);
-	hasPowerup.push_back(false);
-	hasPowerup.push_back(false);
-	hasPowerup.push_back(false);
+	for (unsigned int i = 0; i < MAX_PLAYERS; i++)
+	{
+		hasPowerup.push_back(false);
+	}
 
-	unsigned int numScreens = input.getNumPlayers();
+	numScreens = input.getNumPlayers();
+
+	initUI();
+
 	//unsigned int numScreens = 4;
 	renderer.splitScreenViewports(numScreens);
 
@@ -993,6 +1017,8 @@ void GameManager::gameLoop()
 	float frameTime = 1.f / 60.f;
 
 	physics.startSim(frameTime);
+
+	bool initialBuggyRemoved = false;
 
 	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
@@ -1089,6 +1115,12 @@ void GameManager::gameLoop()
 			checkCoinCollisions();
 
 			physics.getSim();
+
+			if ((!initialBuggyRemoved) && (!state.getPlayer(MAX_PLAYERS - 1)->isGoldenBuggy()))
+			{
+				removePlayer(MAX_PLAYERS - 1);
+				initialBuggyRemoved = true;
+			}
 
 			physics.startSim(max(timeElapsed, frameTime));
 		}
@@ -1432,8 +1464,9 @@ void GameManager::gameInit()
 		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getBuggyTexID(0));
 	}
 
-	
-	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS - 1; i++)
+	createPlayer(vec3(0.f, 3.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
+
+	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS; i++)
 	{
 		state.getPlayer(i)->setAI(true);
 	}
@@ -1443,10 +1476,8 @@ void GameManager::gameInit()
 		state.getPlayer(i)->setAI(true);
 	}
 
-
-
-	state.setGoldenBuggy(0);
-	sound.stopMenuSong();
+	state.setGoldenBuggy(MAX_PLAYERS-1);
+	sound.stopMenuSong(); 
 	sound.initListener(state);
 	sound.startSounds(state);
 
@@ -1465,7 +1496,7 @@ void GameManager::gameInit()
 
 	ai.initAI();
 
-	initUI();
+
 
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
 
@@ -1494,7 +1525,7 @@ void GameManager::gameInit()
 void GameManager::initUI()
 {
 	// setup for displaying each player's number of coins
-	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) { // 10 = textures for numbers 0-9, plus the coin icon texture
+	for (unsigned int i = 0; i < numScreens; i++) { // 10 = textures for numbers 0-9, plus the coin icon texture
 		playerCoinIDs.push_back(_interface.generateComponentID());
 
 		_interface.assignSquare(playerCoinIDs[i]);
@@ -1540,7 +1571,7 @@ void GameManager::initUI()
 	_interface.setDimensions(display, 1.f, 1.f, .75f, 0.2f, ANCHOR::TOP_RIGHT);
 	_interface.setDisplayFilter(display, DISPLAY::D1 | DISPLAY::D2 | DISPLAY::D3 | DISPLAY::D4);
 
-	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < numScreens; i++) {
 		buggyIndicatorUIs.push_back(_interface.generateComponentID());
 		_interface.assignSquare(buggyIndicatorUIs[i]);
 		_interface.setDimensions(buggyIndicatorUIs[i], 1.f, .8f, .4f, 0.15f, ANCHOR::TOP_RIGHT);
@@ -1620,7 +1651,7 @@ void GameManager::switchBuggyUI() {
 	else if (goldenColour == vec3(0.f, 0.f, 1.f)) { texID = meshInfo.getBlueGoldenBuggy(); }
 	else if (goldenColour == vec3(1.f, 0.f, 1.f)) { texID = meshInfo.getPurpleGoldenBuggy(); }
 
-	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < numScreens; i++) {
 		if (i != golden) {
 			_interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE);
 			_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);

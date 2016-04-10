@@ -96,6 +96,8 @@ private:
 
 	vector<int> playerColours;
 
+	unsigned int numScreens = 0;
+
 	vector<unsigned int> powerupComponentIDs;
 	vector<unsigned int> playerCoinIDs;
 	vector<unsigned int> buggyIndicatorUIs;
@@ -135,6 +137,8 @@ public:
 	// These entities get created dynamically:
 	void createMine(unsigned int playerID);
 	void createBomb(unsigned int playerID);
+
+	void removePlayer(unsigned int playerID);
 
 	void createDecoyGoldenBuggie(vec3 position, VehicleTraits traits);
 	void startDecoy(float time);

@@ -54,7 +54,7 @@ public:
 	void applyNitroBoost();
 
 	Vehicle(PxPhysics& phys, PxCooking& cook, PxScene& aScene, VehicleTraits traits, vec3 initPos);
-	Vehicle(PxVehicleDrive4W& veh, VehicleTraits Vehtraits);
+	Vehicle(PxVehicleDrive4W* veh, VehicleTraits Vehtraits);
 	Vehicle(){};
 
 	PxVec3 getPxVec3(const vec3& vec);

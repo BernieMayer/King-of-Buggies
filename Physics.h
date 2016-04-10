@@ -20,6 +20,8 @@
 #include "PowerupCollisionEvent.h"
 #include "Bomb.h"
 
+#include "definitions.h"
+
 
 
 
@@ -78,6 +80,7 @@ public:
 	float vehicle_getSSpeed(unsigned int id);
 	bool vehicle_getForwardsGear(unsigned int id);
 	float vehicle_getEngineSpeed(unsigned int id);
+	void vehicle_remove(unsigned int id);
 
 	unsigned int ground_createPlane(vec3 normal, float offset);	//Returns ID for plane
 	unsigned int ground_createGeneric(MeshObject* mesh);
@@ -102,8 +105,8 @@ public:
 	virtual void  onSleep(PxActor**, PxU32){}
 
 	bool newGoldenBuggy = false;
-	int indexOfGoldenBuggy = 0;
-	int indexOfOldGoldenBuggy = 0;
+	int indexOfGoldenBuggy = MAX_PLAYERS-1;
+	int indexOfOldGoldenBuggy = MAX_PLAYERS -1;
 	float initVehicleSpeed = 500.f;
 	bool goldenBuggyLock = false;
 	timeb gbLockStartTime;

@@ -71,6 +71,8 @@ public:
 	PlayerInfo* getGoldenBuggy();
 	unsigned int getGoldenBuggyID();
 
+	void removeLastPlayer();
+
 	unsigned int getDecoyIndex();
 	bool doesDecoyExist();
 

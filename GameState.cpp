@@ -22,6 +22,12 @@ void GameState::addDecoy(const PlayerInfo& decoyInfo)
 		decoys.push_back(decoyInfo);
 	}
 }
+
+void GameState::removeLastPlayer()
+{
+	players.pop_back();
+}
+
 void GameState::removeDecoy()
 {
 	if (players.size() >= 5)
