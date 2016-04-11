@@ -153,6 +153,7 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		menuLock = false;
 	}
 
+	/*
 	if (out.powerup && !powerupLock) {
 		powerupLock = true;
 		powerupTime = timer.getCurrentTime();
@@ -164,6 +165,7 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		out.powerup = false;
 		powerupLock = false;
 	}
+	*/
 
 	
 	if (out.jump && !jumpLock) {
