@@ -1087,7 +1087,7 @@ void GameManager::gameLoop()
 		//Update game state and renderer
 		physics.updateGameState(&state, frameTime);
 		renderer.updateObjectTransforms(&state);
-		sound.updateSounds(state, inputs);
+		sound.updateSounds(state, vector<Input>(inputs, inputs + sizeof inputs / sizeof inputs[0]));
 
 		//Put into function
 		processEvents();
@@ -1262,7 +1262,8 @@ void GameManager::gameLoop()
 
 			if (theScore >= state.getMaxScore() && gameOver == false) {
 				winner = state.getGoldenBuggyID();
-				if (winner == 0) {
+				if (winner == 0 || (winner == 1 && !state.getPlayer(1)->isAI()) || (winner == 2 && !state.getPlayer(2)->isAI()) || 
+					(winner == 3 && !state.getPlayer(3)->isAI())) {
 					sound.playWinSound(state.getPlayer(0)->getPos());
 				}
 				else {
@@ -1721,10 +1722,11 @@ void GameManager::displayEndScreen(unsigned int winnerID)
 	unsigned int menu = _interface.generateComponentID();
 
 
-	Input in = input.getInput(1);
+	vector<Input> in;
+	in.push_back(input.getInput(1));
 	bool doneLoop = false;
 	while (!doneLoop) {
-		sound.updateSounds(state, &in);
+		sound.updateSounds(state, in);
 
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 
@@ -1927,7 +1929,9 @@ void GameManager::displayPauseMenu() {
 		//Get and organize events, like keyboard and mouse input, window resizing, etc...  
 		glfwPollEvents();
 		
-		sound.updateSounds(state, &in);
+		vector<Input> in2;
+		in2.push_back(in);
+		sound.updateSounds(state, in2);
 
 		//Wait until end of frame
 		float timeElapsed = clock.getElapsedTime();

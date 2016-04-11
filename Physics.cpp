@@ -1722,8 +1722,8 @@ void Physics::vehicle_remove(unsigned int id)
 
 void Physics::clear() {
 	newGoldenBuggy = false;
-	indexOfGoldenBuggy = 0;
-	indexOfOldGoldenBuggy = 0;
+	indexOfGoldenBuggy = MAX_PLAYERS - 1;
+	indexOfOldGoldenBuggy = MAX_PLAYERS - 1;
 	initVehicleSpeed = 500.f;
 	goldenBuggyLock = false;
 	gbLockEndTime = 1.0f;

@@ -850,12 +850,12 @@ void SoundManager::playSong(GameState state, string fileName, bool looping) {
 /*
  * Updates all sounds
  */
-void SoundManager::updateSounds(GameState state, Input inputs[]) {
+void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 	if (initSuccess) {
 		if (!paused && !gameOver) {
 			updateListener(state);
 			updateMusic(state);
-			updateEngineSounds(state, inputs);
+			updateEngineSounds(state, inputs.data());
 			updateFuses(state);
 
 			if (state.getLevelID() == 2) {
@@ -871,11 +871,13 @@ void SoundManager::updateSounds(GameState state, Input inputs[]) {
 
 		cleanOneTimeUseSources();
 
-		if (inputs[0].konamiCode) {
-			alDeleteBuffers(1, &musicBuffer);
-			alDeleteSources(1, &musicSource);
-			playSecretMusic(state);
-			secretPlaying = true;
+		for (int i = 0; i < inputs.size(); i++) {
+			if (inputs[i].konamiCode) {
+				alDeleteBuffers(1, &musicBuffer);
+				alDeleteSources(1, &musicSource);
+				playSecretMusic(state);
+				secretPlaying = true;
+			}
 		}
 
 		if (inputs[0].menu && !paused && !secretPlaying && !firstFrame) {

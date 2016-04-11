@@ -24,7 +24,7 @@ public:
 	SoundManager();
 	SoundManager(GameState state);
 	void startSounds(GameState state);
-	void updateSounds(GameState state, Input inputs[]);
+	void updateSounds(GameState state, vector<Input> inputs);
 	void playBumpSound(vec3 pos, float volume);
 	void playDingSound() { playDingSound(listenerPos); }
 	void playDingSound(vec3 pos);
