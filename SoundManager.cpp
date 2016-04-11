@@ -753,7 +753,9 @@ void SoundManager::resumeAllSounds() {
 	if (initSuccess) {
 		for (int i = 0; i < MAX_PLAYERS; i++) {
 			alSourcePlay(engineSources[i]);
-			alSourcePlay(honkSources[i]);
+			if (honking[i]) {
+				alSourcePlay(honkSources[i]);
+			}
 		}
 
 		for (int i = 0; i < oneTimeUseSources.size(); i++) {
