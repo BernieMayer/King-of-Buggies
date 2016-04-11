@@ -137,6 +137,8 @@ MeshInfo::MeshInfo() {
 	scoreBar = LoadTexture("textures\\hud\\scorebar.png");
 	goldScoreBar = LoadTexture("textures\\hud\\goldenscorebar.png");
 	blinkingScoreBar = LoadTexture("textures\\hud\\blinkingscorebar.png");
+
+	transparent = LoadTexture("textures\\hud\\transparent.png");
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {

@@ -50,6 +50,7 @@ public:
 	unsigned int getGoldScoreBar() { return goldScoreBar; }
 	unsigned int getBlinkingScoreBar() { return blinkingScoreBar; }
 
+	unsigned int getTransparent() { return transparent; }
 
 	MeshInfoLoader meshLoader;
 
@@ -85,6 +86,8 @@ private:
 	unsigned int scoreBar;
 	unsigned int goldScoreBar;
 	unsigned int blinkingScoreBar;
+
+	unsigned int transparent;
 };
 
 #endif // MESHINFO_H

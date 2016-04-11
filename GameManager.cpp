@@ -976,10 +976,11 @@ void GameManager::gameLoop()
 	}
 
 	numScreens = input.getNumPlayers();
+	//unsigned int numScreens = 4;
 
 	initUI();
 
-	//unsigned int numScreens = 4;
+	
 	renderer.splitScreenViewports(numScreens);
 
 	vector<unsigned int> radarInterfaceID(numScreens);
@@ -1256,7 +1257,7 @@ void GameManager::gameLoop()
 			lastScoreUpdateTime = clock.getCurrentTime();
 			totalPausedTime = 0.f;
 
-			incScoreBar(state.getGoldenBuggyID());
+			if (state.getGoldenBuggyID() < 4) { incScoreBar(state.getGoldenBuggyID()); }
 
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
 
@@ -1468,6 +1469,7 @@ void GameManager::gameInit()
 	}
 
 	createPlayer(vec3(0.f, 3.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
+	state.getPlayer(4)->setInitialBuggy(true);
 
 	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS; i++)
 	{
@@ -1577,6 +1579,7 @@ void GameManager::initUI()
 	for (unsigned int i = 0; i < numScreens; i++) {
 		buggyIndicatorUIs.push_back(_interface.generateComponentID());
 		_interface.assignSquare(buggyIndicatorUIs[i]);
+		_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getTransparent(), ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(buggyIndicatorUIs[i], 1.f, .8f, .4f, 0.15f, ANCHOR::TOP_RIGHT);
 
 		if (i == 0) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D1); }
@@ -1591,7 +1594,7 @@ void GameManager::initUI()
 	carSelectScreen = LoadTexture("menus/opacity-512.png");
 	float yOffset = .55f;
 	// initialize each player's scorebars
-	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < state.numberOfPlayers() - 1; i++) {
 		
 		vec3 colour = state.getPlayer(i)->getColour();
 		unsigned int barTexture;
@@ -1618,7 +1621,6 @@ void GameManager::initUI()
 		yOffset = yOffset - 0.15f;
 	}
 
-	switchBuggyUI();
 	blinkTime = clock.getCurrentTime();
 }
 
@@ -1652,15 +1654,15 @@ void GameManager::switchBuggyUI() {
 	if (goldenColour == vec3(1.f, 0.f, 0.f)) { texID = meshInfo.getRedGoldenBuggy(); }
 	else if (goldenColour == vec3(0.f, 1.f, 0.f)) { texID = meshInfo.getGreenGoldenBuggy(); }
 	else if (goldenColour == vec3(0.f, 0.f, 1.f)) { texID = meshInfo.getBlueGoldenBuggy(); }
-	else if (goldenColour == vec3(1.f, 0.f, 1.f)) { texID = meshInfo.getPurpleGoldenBuggy(); }
+	else { texID = meshInfo.getPurpleGoldenBuggy(); }
 
-	for (unsigned int i = 0; i < numScreens; i++) {
+	for (unsigned int i = 0; i < 4; i++) { // only 4 players
 		if (i != golden) {
-			_interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE);
+			if (!state.getPlayer(i)->isAI()) { _interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE); }
 			_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
 		}
 		else {
-			_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE);
+			if (!state.getPlayer(i)->isAI()) { _interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE); }
 			_interface.assignTexture(scoreBarIDs[i], meshInfo.getGoldScoreBar(), ComponentInfo::UP_TEXTURE);
 		}
 	}
