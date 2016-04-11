@@ -887,6 +887,8 @@ void GameManager::updateCamera(unsigned int i, Input input, float frameTime)
 		activePlayer->getPhysicsID())*vec4(0.f, 0.f, 0.f, 1.f);
 	vec3 cPos = vec3(cameraPosition) / cameraPosition.w;
 
+	cam[i].computeLag(cPos, frameTime);
+
 	if (cPos != cam[i].getViewCenter())
 		cam[i].changeCenterAndPos(cPos - cam[i].getViewCenter());
 

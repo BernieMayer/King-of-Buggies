@@ -33,6 +33,8 @@ class Camera
 	int cameraMode;
 
 public:
+	vec3 lag;
+
 	Camera();
 
 	Camera(vec3 _dir, vec3 _up, vec3 _pos);
@@ -56,6 +58,8 @@ public:
 	float trackingSpeedFunc(float angleDiff);
 
 	void trackDirAroundY(vec3 _dir, float timeStep);
+
+	void computeLag(vec3 targetCenter, float timeStep);
 
 	void changePos(vec3 _pos);
 

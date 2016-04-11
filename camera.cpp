@@ -45,13 +45,15 @@ Camera::Camera():
 	pos(vec3 (0.f, 0.f, 0.f)),
 	viewCenter(vec3(0.f, 0.f, 0.f)),
 	cameraMode(FREEROAM_CAMERA),
-	distance(5.f){}
+	distance(5.f),
+	lag(0.f){}
 
-Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos):
+Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos) :
 	up(_up),
 	pos(_pos),
 	cameraMode(FREEROAM_CAMERA),
-	distance(5.f)
+	distance(5.f),
+	lag(0.f)
 {
 	changeDir(_dir);
 }
@@ -60,7 +62,8 @@ Camera::Camera(vec3 _dir, vec3 _up, vec3 _pos, int _cameraMode) :
 	up(_up),
 	pos(_pos),
 	cameraMode(_cameraMode),
-	distance(5.f)
+	distance(5.f),
+	lag(0.f)
 {
 	changeDir(_dir);
 }
@@ -91,10 +94,15 @@ void Camera::changeDir(vec3 _dir)
 
 mat4 Camera::getMatrix()
 {
+	vec3 mPos = pos + lag;
 
-	mat4 lookat (	right.x, up.x, -dir.x, 0,
-					right.y, up.y, -dir.y, 0,
-					right.z, up.z, -dir.z, 0,
+	vec3 mDir = normalize(viewCenter - mPos);
+	vec3 mRight = normalize(cross(mDir, vec3(0.f, 1.f, 0.f)));
+	vec3 mUp = normalize(cross(mRight, mDir));
+
+	mat4 lookat (	mRight.x, mUp.x, -mDir.x, 0,
+					mRight.y, mUp.y, -mDir.y, 0,
+					mRight.z, mUp.z, -mDir.z, 0,
 					0, 0, 0, 1);
 	/*mat4 lookat(right.x, right.y, right.z, 0,
 				up.x, up.y, up.z, 0,
@@ -104,7 +112,7 @@ mat4 Camera::getMatrix()
 	mat4 translation(	1, 0, 0, 0,
 						0, 1, 0, 0,
 						0, 0, 1, 0,
-						-pos.x, -pos.y, -pos.z, 1);
+						-mPos.x, -mPos.y, -mPos.z, 1);
 
 	//mat4 lookat{right.x, }
 	
@@ -202,6 +210,25 @@ void Camera::trackDirAroundY(vec3 _dir, float timeStep)
 	pos = vec3(rotY(sign*min(angleDiff, adjustedSpeed))*vec4(pos - viewCenter, 1.f))+viewCenter;
 	changeDir(viewCenter - pos);
 
+}
+
+void Camera::computeLag(vec3 targetCenter, float timeStep)
+{
+
+	const float MAX_LAG = 3.f;
+	const float UNITS_PER_SECOND = 1.f;
+
+	//viewCenter += movement;
+	//pos += movement;
+
+	lag = viewCenter - targetCenter + lag;
+
+	float lagLength = clamp(length(lag) - UNITS_PER_SECOND*timeStep*abs(dot(lag, lag)), 0.f, MAX_LAG);
+
+	lag = normalize(lag)*lagLength;
+
+	if (lag != lag)
+		lag = vec3(0.f, 0.f, 0.f);
 }
 
 void Camera::rotateViewAround(float x, float y)
