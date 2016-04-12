@@ -223,10 +223,10 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &matteMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
-	if ((selectedLevel == 1) || (selectedLevel == 3)) {
+	//if ((selectedLevel == 1) || (selectedLevel == 3)) {
 		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
 		renderer.setShadowBehaviour(surfaceRenderID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
-	}
+	//}
 	
 
 }
