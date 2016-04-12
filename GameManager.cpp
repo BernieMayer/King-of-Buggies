@@ -349,10 +349,10 @@ void GameManager::initMenus() {
 	vector<float> xOffsets;
 	vector<float> yOffsets;
 
-	const float lSel1XBase = -0.55f;
-	const float lSel1YBase = -0.89f;
-	const float lSel2XBase = 0.525f;
-	const float lSel2YBase = -0.89f;
+	const float lSel1XBase = -0.625f;
+	const float lSel1YBase = -0.15f;
+	const float lSel2XBase = 0.625f;
+	const float lSel2YBase = -0.90f;
 	const float cSel1XBase = -0.79f;
 	const float cSel2XBase = 0.25f;
 	const float cSel1YBase = -0.22f;
@@ -373,7 +373,7 @@ void GameManager::initMenus() {
 	xOffsets.push_back(lSel1X);
 	yOffsets.push_back(lSel1Y);
 
-	float p1Scale = 0.25f;
+	float p1Scale = 0.15f;
 	const float iconWidthBase = 0.145f;
 
 	float iconWidth = iconWidthBase;
@@ -464,10 +464,10 @@ void GameManager::initMenus() {
 			else if (xOffsets[0] == lSel2X && yOffsets[0] == lSel1Y) {
 				selectedLevel = 1;
 			} else if (xOffsets[0] == lSel1X && yOffsets[0] == lSel2Y) {
-				selectedLevel = 0;
+				selectedLevel = 2;
 			}
 			else if (xOffsets[0] == lSel2X && yOffsets[0] == lSel2Y) {
-				selectedLevel = 1;
+				selectedLevel = 3;
 			}
 
 
@@ -545,7 +545,7 @@ void GameManager::initMenus() {
 				xOffsets[0] = lSel1X;
 			}
 
-			if (yOffsets[0] == lSel1X && in[0].tiltBackward > 0.3f) {
+			if (yOffsets[0] == lSel1Y && in[0].tiltBackward > 0.3f) {
 				yOffsets[0] = lSel2Y;
 			}
 			else if (yOffsets[0] == lSel2Y && in[0].tiltForward > 0.3f) {

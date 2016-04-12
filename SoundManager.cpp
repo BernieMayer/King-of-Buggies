@@ -200,7 +200,7 @@ void SoundManager::stopMenuSong() {
 void SoundManager::startMusic(GameState state) {
 	if (initSuccess) {
 		
-		if (state.getLevelID() == 0 || state.getLevelID() == 1) {
+		if (state.getLevelID() == 0 || state.getLevelID() == 1 || state.getLevelID() == 3) {
 			loadWavToBuf("Dogsong.wav", &musicSource, &musicBuffer);
 		}
 		else if (state.getLevelID() == 2) {
