@@ -198,7 +198,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vectors.push_back(playerLeft);
 	vectors.push_back(playerUp);
 	vectors.push_back(playerRight);
-	int radarSize = 50;
+	int radarSize = 75;
 	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
 	
@@ -220,18 +220,26 @@ vector<vec2> GameState::setupRadar(int playerId)
 				vec3 otherPlayerCenter = otherPlayerPos - player3Dpos;
 
 				vec3 otherPlayer3DUp = getPlayer(i)->getForward();
-				vec3 otherPlayer3DRight = cross(getPlayer(i)->getForward(), getPlayer(i)->getUp());
+				vec3 otherPlayer3DRight = getPlayer(i)->getRight();
 				// Might shrink the width of other player triangles
 				// Might not...
-				otherPlayer3DRight = widthScaleFactor * otherPlayer3DRight;
+			
 
 
 				vec3 radarOtherPlayerCenter = vec3(otherPlayerCenter.x / (radarSize / 2), 0, otherPlayerCenter.z / (radarSize / 2));
 
-				vec2 otherPlayerLeft = vec2(radarOtherPlayerCenter.x - widthScaleFactor * triangleSize, -radarOtherPlayerCenter.z);
-				vec2 otherPlayerRight = vec2(radarOtherPlayerCenter.x + widthScaleFactor * triangleSize, -radarOtherPlayerCenter.z);
-				vec2 otherPlayerUp = vec2(radarOtherPlayerCenter.x, -(radarOtherPlayerCenter.z + triangleSize));
+				vec2 otherPlayerLeft = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + widthScaleFactor * vec2(-triangleSize * otherPlayer3DRight.x, -triangleSize * otherPlayer3DRight.z);
+				vec2 otherPlayerRight = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + widthScaleFactor * vec2(-triangleSize * -otherPlayer3DRight.x, -triangleSize * -otherPlayer3DRight.z);
+				vec2 otherPlayerUp = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + vec2(-triangleSize * otherPlayer3DUp.x, -triangleSize * otherPlayer3DUp.z);
 
+				otherPlayerLeft = vec2(1, -1) * otherPlayerLeft;
+				otherPlayerRight = vec2(1, -1) * otherPlayerRight;
+				otherPlayerUp = vec2(1, -1) * otherPlayerUp;
+				/*
+				vec2 otherPlayerLeft = vec2(radarOtherPlayerCenter.x - widthScaleFactor * triangleSize * otherPlayer3DRight.x, -(radarOtherPlayerCenter.z + widthScaleFactor * triangleSize * otherPlayer3DRight.z));
+				vec2 otherPlayerRight =vec2(radarOtherPlayerCenter.x + widthScaleFactor * triangleSize * otherPlayer3DRight.x, -(radarOtherPlayerCenter.z + widthScaleFactor * triangleSize * otherPlayer3DRight.z));
+				vec2 otherPlayerUp = vec2(radarOtherPlayerCenter.x, -(radarOtherPlayerCenter.z + triangleSize));
+				*/
 
 				vectors.push_back(otherPlayerLeft);
 				vectors.push_back(otherPlayerUp);
@@ -265,10 +273,12 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 
 	mat2 m = rot2D(angle);
+	
 	for (unsigned int i = 0; i < vectors.size(); i++)
 	{
 		vectors[i] = m * vectors[i];
 	}
+	
 	
 	return vectors;
 }
