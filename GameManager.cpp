@@ -458,10 +458,15 @@ void GameManager::initMenus() {
 			currentMenu++;
 			_interface.clear();
 
-			if (xOffsets[0] == lSel1X) {
+			if (xOffsets[0] == lSel1X && yOffsets[0] == lSel1Y) {
 				selectedLevel = 0;
 			}
-			else if (xOffsets[0] == lSel2X) {
+			else if (xOffsets[0] == lSel2X && yOffsets[0] == lSel1Y) {
+				selectedLevel = 1;
+			} else if (xOffsets[0] == lSel1X && yOffsets[0] == lSel2Y) {
+				selectedLevel = 0;
+			}
+			else if (xOffsets[0] == lSel2X && yOffsets[0] == lSel2Y) {
 				selectedLevel = 1;
 			}
 
@@ -538,6 +543,13 @@ void GameManager::initMenus() {
 			}
 			else if (xOffsets[0] == lSel2X && in[0].turnL < -0.3f) {
 				xOffsets[0] = lSel1X;
+			}
+
+			if (yOffsets[0] == lSel1X && in[0].tiltBackward > 0.3f) {
+				yOffsets[0] = lSel2Y;
+			}
+			else if (yOffsets[0] == lSel2Y && in[0].tiltForward > 0.3f) {
+				yOffsets[0] = lSel1Y;
 			}
 
 			if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
