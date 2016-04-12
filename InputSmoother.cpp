@@ -204,6 +204,18 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 		debugLock = false;
 	}
 
+	if (out.navMesh && !navMeshLock) {
+		navMeshLock = true;
+		navMeshTime = timer.getCurrentTime();
+	}
+	else if (navMeshLock && timer.getTimeSince(navMeshTime) < navMeshCounterMax) {
+		out.navMesh = false;
+	}
+	else if (navMeshLock && timer.getTimeSince(navMeshTime) >= navMeshCounterMax) {
+		out.navMesh = false;
+		navMeshLock = false;
+	}
+
 
 
 	if (konamiLock) {

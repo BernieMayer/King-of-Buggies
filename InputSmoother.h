@@ -57,6 +57,10 @@ private:
 	timeb debugTime;
 	float debugCounterMax = 10.0f / 60.0f;
 
+	bool navMeshLock = false;
+	timeb navMeshTime;
+	float navMeshCounterMax = 10.0f / 60.0f;
+
 	bool cheatLock = false;
 	timeb cheatTime;
 	float cheatCounterMax = 10.0f / 60.0f;

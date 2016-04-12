@@ -28,6 +28,7 @@ struct Input
 	bool konamiCode;
 
 	bool debug;
+	bool navMesh;
 };
 
 #endif //INPUT_H
