@@ -74,7 +74,7 @@ MeshInfo::MeshInfo() {
 
 	//Courtyard level
 	meshLoader.loadModel("models\\courtyardLevel.obj");
-	texID = LoadTexture("textures\\donutleveltexture.png");		//Change
+	texID = LoadTexture("textures\\courtyardTexture.png");		//Change
 	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(levelObject);
 

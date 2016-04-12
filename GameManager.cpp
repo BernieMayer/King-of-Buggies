@@ -934,7 +934,7 @@ void GameManager::gameLoop()
 	vector<vec3> edges;
 	
 	mat4 lineTransform;
-	lineTransform[3][1] = -2.f;
+	lineTransform[3][1] = 2.f;
 
 	NavMesh nav;
 	//Why? WHY?!
@@ -948,7 +948,7 @@ void GameManager::gameLoop()
 		ai.nav.loadNavMesh("HiResNavigationMesh.obj");
 	}
 	else if (selectedLevel == 3) {
-		ai.nav.loadNavMesh("HiResNavigationMesh.obj");	//Change
+		ai.nav.loadNavMesh("courtyardNavMesh.obj");	//Change
 	}
 
 
@@ -995,8 +995,6 @@ void GameManager::gameLoop()
 	//unsigned int numScreens = 4;
 
 	initUI();
-
-	unsigned int numScreens = 1;
 
 	renderer.splitScreenViewports(numScreens);
 
@@ -1636,10 +1634,10 @@ void GameManager::initUI()
 	totalPausedTime = 0.f;
 
 	//Add dummy objects to interface
-	unsigned int shadowMapComponent = _interface.generateComponentID();
+	/*unsigned int shadowMapComponent = _interface.generateComponentID();
 	_interface.assignSquare(shadowMapComponent);
 	_interface.setDimensions(shadowMapComponent, -1.f, -1.f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
-	_interface.assignTexture(shadowMapComponent, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
+	_interface.assignTexture(shadowMapComponent, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);*/
 
 	float yOffset = .55f;
 	// initialize each player's scorebars
