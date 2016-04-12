@@ -209,7 +209,7 @@ void GameManager::createLevel(unsigned int objectID) {
 		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
 		break;
 	case 2:
-		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+		levelMesh = meshInfo.getMeshPointer(ISLANDLEVEL);
 		break;
 	case 3:
 		levelMesh = meshInfo.getMeshPointer(COURTYARDLEVEL);
@@ -992,10 +992,12 @@ void GameManager::gameLoop()
 	}
 
 	numScreens = input.getNumPlayers();
+	//unsigned int numScreens = 4;
 
 	initUI();
 
 	unsigned int numScreens = 1;
+
 	renderer.splitScreenViewports(numScreens);
 
 	vector<unsigned int> radarInterfaceID(numScreens);
@@ -1162,13 +1164,13 @@ void GameManager::gameLoop()
 		if (USING_SHADOWS)
 		{
 			renderer.useFramebuffer(fbo);
-			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+			renderer.clearDrawBuffers(backgroundColor);
 			renderer.drawShadowMapAll(0);
 			renderer.loadShadowMap(renderer.getFramebufferTexture(fbo));
 			renderer.useFramebuffer(NO_VALUE);
 		}
 		//Draw scene
-		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+		renderer.clearDrawBuffers(backgroundColor);
 
 		for (unsigned int i = 0; i < numScreens; i++)
 		{
@@ -1280,7 +1282,7 @@ void GameManager::gameLoop()
 			lastScoreUpdateTime = clock.getCurrentTime();
 			totalPausedTime = 0.f;
 
-			incScoreBar(state.getGoldenBuggyID());
+			if (state.getGoldenBuggyID() < 4) { incScoreBar(state.getGoldenBuggyID()); }
 
 			unsigned int theScore = state.getGoldenBuggy()->getScore();
 
@@ -1377,6 +1379,19 @@ void GameManager::applyPowerupEffect(int playerNum)
 
 void GameManager::gameInit()
 {
+
+	p1PauseTexture = LoadTexture("menus/P1Icon.png");
+	p1PauseIcon = _interface.generateComponentID();
+	_interface.setDisplayFilter(p1PauseIcon, DISPLAY::D9);
+
+	pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
+	pauseScreen = _interface.generateComponentID();
+	_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
+
+	pauseMenuBackground = LoadTexture("menus/Background.bmp");
+	pauseMenu = _interface.generateComponentID();
+	_interface.setDisplayFilter(pauseMenu, DISPLAY::D9);
+
 	gameOver = false;
 	
 	unsigned int levelID = 0;
@@ -1390,14 +1405,14 @@ void GameManager::gameInit()
 		levelID = DONUTLEVEL;
 		break;
 	case 2:
-		levelID = PIPELEVEL;
+		levelID = ISLANDLEVEL;
+		backgroundColor = vec3(3.f / 255.f, 70.f / 255.f, 106.f / 255.f);
 		break;
 	case 3:
 		levelID = COURTYARDLEVEL;
 	}
 
 	createLevel(levelID);
-	//MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
 
 	state.setMap(levelMesh, selectedLevel);
 
@@ -1496,6 +1511,8 @@ void GameManager::gameInit()
 	}
 
 	createPlayer(vec3(0.f, 10.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
+
+	state.getPlayer(4)->setInitialBuggy(true);
 
 	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS; i++)
 	{
@@ -1607,6 +1624,7 @@ void GameManager::initUI()
 	for (unsigned int i = 0; i < numScreens; i++) {
 		buggyIndicatorUIs.push_back(_interface.generateComponentID());
 		_interface.assignSquare(buggyIndicatorUIs[i]);
+		_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getTransparent(), ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(buggyIndicatorUIs[i], 1.f, .8f, .4f, 0.15f, ANCHOR::TOP_RIGHT);
 
 		if (i == 0) { _interface.setDisplayFilter(buggyIndicatorUIs[i], DISPLAY::D1); }
@@ -1625,7 +1643,7 @@ void GameManager::initUI()
 
 	float yOffset = .55f;
 	// initialize each player's scorebars
-	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
+	for (unsigned int i = 0; i < state.numberOfPlayers() - 1; i++) {
 		
 		vec3 colour = state.getPlayer(i)->getColour();
 		unsigned int barTexture;
@@ -1652,7 +1670,6 @@ void GameManager::initUI()
 		yOffset = yOffset - 0.15f;
 	}
 
-	switchBuggyUI();
 	blinkTime = clock.getCurrentTime();
 }
 
@@ -1686,15 +1703,15 @@ void GameManager::switchBuggyUI() {
 	if (goldenColour == vec3(1.f, 0.f, 0.f)) { texID = meshInfo.getRedGoldenBuggy(); }
 	else if (goldenColour == vec3(0.f, 1.f, 0.f)) { texID = meshInfo.getGreenGoldenBuggy(); }
 	else if (goldenColour == vec3(0.f, 0.f, 1.f)) { texID = meshInfo.getBlueGoldenBuggy(); }
-	else if (goldenColour == vec3(1.f, 0.f, 1.f)) { texID = meshInfo.getPurpleGoldenBuggy(); }
+	else { texID = meshInfo.getPurpleGoldenBuggy(); }
 
-	for (unsigned int i = 0; i < numScreens; i++) {
+	for (unsigned int i = 0; i < 4; i++) { // only 4 players
 		if (i != golden) {
-			_interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE);
+			if (!state.getPlayer(i)->isAI()) { _interface.assignTexture(buggyIndicatorUIs[i], texID, ComponentInfo::UP_TEXTURE); }
 			_interface.assignTexture(scoreBarIDs[i], meshInfo.getScoreBar(), ComponentInfo::UP_TEXTURE);
 		}
 		else {
-			_interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE);
+			if (!state.getPlayer(i)->isAI()) { _interface.assignTexture(buggyIndicatorUIs[i], meshInfo.getYouGoldenBuggy(), ComponentInfo::UP_TEXTURE); }
 			_interface.assignTexture(scoreBarIDs[i], meshInfo.getGoldScoreBar(), ComponentInfo::UP_TEXTURE);
 		}
 	}
@@ -1856,15 +1873,6 @@ void GameManager::displayPauseMenu() {
 	// Lock last 0.2 seconds
 	float movementLockEnd = 0.2;
 
-	unsigned int p1Texture = LoadTexture("menus/P1Icon.png");
-	unsigned int p1Icon = _interface.generateComponentID();
-
-	unsigned int pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
-	unsigned int pauseScreen = _interface.generateComponentID();
-
-	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
-	unsigned int menu = _interface.generateComponentID();
-
 	while (!glfwWindowShouldClose(window)) {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 		if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
@@ -1941,20 +1949,17 @@ void GameManager::displayPauseMenu() {
 			}
 		}
 
-		_interface.assignSquare(p1Icon);
-		_interface.assignTexture(p1Icon, p1Texture, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(p1Icon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
-		_interface.setDisplayFilter(p1Icon, DISPLAY::D9);
+		_interface.assignSquare(p1PauseIcon);
+		_interface.assignTexture(p1PauseIcon, p1PauseTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(p1PauseIcon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
 
 		_interface.assignSquare(pauseScreen);
 		_interface.assignTexture(pauseScreen, pauseScreenTexture, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(pauseScreen, 0.0f, 0.0f, 2, 2, ANCHOR::CENTER);
-		_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
-
-		_interface.assignSquare(menu);
-		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
-		_interface.setDisplayFilter(menu, DISPLAY::D9);
+	
+		_interface.assignSquare(pauseMenu);
+		_interface.assignTexture(pauseMenu, pauseMenuBackground, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(pauseMenu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
 
 		_interface.drawAll(&renderer, DISPLAY::D9);
 

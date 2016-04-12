@@ -207,6 +207,7 @@ private:
 	vec3 getVec3(PxVec3 vec) { return vec3(vec.x, vec.y, vec.z); }
 
 	void bombExplosion(int bombID);
+	vector<int> bombsToExplodeThisFrame;
 	void applyCollisionSeparation(int vehID1, int vehID2);
 };
 

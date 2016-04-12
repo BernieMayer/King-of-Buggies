@@ -7,7 +7,8 @@
 #include "PxPhysicsAPI.h"
 
 // Loads the indices of meshes contained in MeshInfo
-enum { BRICK = 0, CUBE, WHEEL, COIN, MINE, BOMB, BOOST, DONUTLEVEL, PIPELEVEL, OLDLEVEL, COURTYARDLEVEL, BUGGY, UNITBUGGY, COUNT };
+
+enum { BRICK = 0, CUBE, WHEEL, COIN, MINE, BOMB, BOOST, DONUTLEVEL, ISLANDLEVEL, OLDLEVEL, COURTYARDLEVEL, BUGGY, UNITBUGGY, COUNT };
 
 class MeshInfo {
 public:
@@ -50,6 +51,7 @@ public:
 	unsigned int getGoldScoreBar() { return goldScoreBar; }
 	unsigned int getBlinkingScoreBar() { return blinkingScoreBar; }
 
+	unsigned int getTransparent() { return transparent; }
 
 	MeshInfoLoader meshLoader;
 
@@ -85,6 +87,8 @@ private:
 	unsigned int scoreBar;
 	unsigned int goldScoreBar;
 	unsigned int blinkingScoreBar;
+
+	unsigned int transparent;
 };
 
 #endif // MESHINFO_H

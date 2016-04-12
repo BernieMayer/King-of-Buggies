@@ -56,6 +56,9 @@ public:
 	bool getAlmostWon() { return almostWon; }
 	void setAlmostWon() { almostWon = true; }
 
+	bool getInitialBuggy() { return initialBuggy; }
+	void setInitialBuggy(bool isInitial) { initialBuggy = isInitial; }
+
 protected:
 	unsigned int wheelRenderIDs[4];
 	mat4 wheelTransforms [4];
@@ -75,6 +78,7 @@ protected:
 	float engineSpeed;
 	bool inAir;
 	bool almostWon;
+	bool initialBuggy;
 
 	vec3 vehicleColour;
 	unsigned int textureID;
