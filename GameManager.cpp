@@ -938,20 +938,24 @@ void GameManager::gameLoop()
 
 	NavMesh nav;
 	//Why? WHY?!
-	if (selectedLevel == 2) { // temporary
-		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
-	}
-	else if (selectedLevel == 1) {
-		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
-	}
-	else if (selectedLevel == 0) {
+
+	// Ok, ok! We'll use switches. :) 
+
+	switch (selectedLevel)
+	{
+	case 0:
 		ai.nav.loadNavMesh("HiResNavigationMesh.obj");
-	}
-	else if (selectedLevel == 3) {
+		break;
+	case 1:
+		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
+		break;
+	case 2:
+		ai.nav.loadNavMesh("islandLevelNavMesh.obj");
+		break;
+	case 3:
 		ai.nav.loadNavMesh("HiResNavigationMesh.obj");	//Change
+		break;
 	}
-
-
 
 	ai.nav.fetchPowerupLocations();
 	ai.nav.calculateImplicitEdges();
