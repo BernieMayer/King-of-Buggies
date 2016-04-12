@@ -118,6 +118,15 @@ private:
 	//temporary
 	vector<float> scoreBarWidths;
 
+	unsigned int p1PauseTexture;
+	unsigned int p1PauseIcon;
+
+	unsigned int pauseScreenTexture;
+	unsigned int pauseScreen;
+
+	unsigned int pauseMenuBackground;
+	unsigned int pauseMenu;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 

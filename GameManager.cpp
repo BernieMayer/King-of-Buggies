@@ -1354,6 +1354,19 @@ void GameManager::applyPowerupEffect(int playerNum)
 
 void GameManager::gameInit()
 {
+
+	p1PauseTexture = LoadTexture("menus/P1Icon.png");
+	p1PauseIcon = _interface.generateComponentID();
+	_interface.setDisplayFilter(p1PauseIcon, DISPLAY::D9);
+
+	pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
+	pauseScreen = _interface.generateComponentID();
+	_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
+
+	pauseMenuBackground = LoadTexture("menus/Background.bmp");
+	pauseMenu = _interface.generateComponentID();
+	_interface.setDisplayFilter(pauseMenu, DISPLAY::D9);
+
 	gameOver = false;
 	
 
@@ -1824,15 +1837,6 @@ void GameManager::displayPauseMenu() {
 	// Lock last 0.2 seconds
 	float movementLockEnd = 0.2;
 
-	unsigned int p1Texture = LoadTexture("menus/P1Icon.png");
-	unsigned int p1Icon = _interface.generateComponentID();
-
-	unsigned int pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
-	unsigned int pauseScreen = _interface.generateComponentID();
-
-	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
-	unsigned int menu = _interface.generateComponentID();
-
 	while (!glfwWindowShouldClose(window)) {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 		if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
@@ -1909,20 +1913,17 @@ void GameManager::displayPauseMenu() {
 			}
 		}
 
-		_interface.assignSquare(p1Icon);
-		_interface.assignTexture(p1Icon, p1Texture, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(p1Icon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
-		_interface.setDisplayFilter(p1Icon, DISPLAY::D9);
+		_interface.assignSquare(p1PauseIcon);
+		_interface.assignTexture(p1PauseIcon, p1PauseTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(p1PauseIcon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
 
 		_interface.assignSquare(pauseScreen);
 		_interface.assignTexture(pauseScreen, pauseScreenTexture, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(pauseScreen, 0.0f, 0.0f, 2, 2, ANCHOR::CENTER);
-		_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
-
-		_interface.assignSquare(menu);
-		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
-		_interface.setDisplayFilter(menu, DISPLAY::D9);
+	
+		_interface.assignSquare(pauseMenu);
+		_interface.assignTexture(pauseMenu, pauseMenuBackground, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(pauseMenu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
 
 		_interface.drawAll(&renderer, DISPLAY::D9);
 
