@@ -348,8 +348,16 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 
 					float volume = distanceVolumeAdjuster(1.0, state.getPlayer(i)->getPos());
 					alSourcei(honkSources[i], AL_BUFFER, honkBuffers[i]);
-					alSourcef(honkSources[i], AL_PITCH, 1.0);
-					alSourcef(honkSources[i], AL_GAIN, volume);
+					if (i != 3) {
+						alSourcef(honkSources[i], AL_PITCH, 1.0 + 0.1 * i);
+						alSourcef(honkSources[i], AL_GAIN, volume);
+					}
+					else {
+						alSourcef(honkSources[i], AL_PITCH, 0.25);
+						alSourcef(honkSources[i], AL_GAIN, volume * 2);
+					}
+					
+					
 					alSourcefv(honkSources[i], AL_POSITION, SourcePos);
 					alSourcefv(honkSources[i], AL_VELOCITY, SourceVel);
 					alSourcei(honkSources[i], AL_LOOPING, AL_TRUE);
