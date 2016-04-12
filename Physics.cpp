@@ -76,7 +76,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
 {
 	//NORMAL,	WORN
-	{ 1.8f, 0.5f }//TARMAC
+	{ 1.6f, 0.5f }//TARMAC
 };
 
 

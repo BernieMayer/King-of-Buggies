@@ -227,6 +227,16 @@ void Renderer::setLightPosition(unsigned int id, vec3 lightPos)
 	lights[id].pos = lightPos;
 }
 
+Camera* Renderer::getLightCamera(unsigned int object)
+{
+	return &lights[object].cam;
+}
+
+mat4 Renderer::getLightProjection(unsigned int object)
+{
+	return lights[object].projection;
+}
+
 
 /**
 * Framebuffers

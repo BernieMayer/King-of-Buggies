@@ -25,7 +25,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 
 	timePassedDecoy = 0;
 
-	renderer.loadPerspectiveTransform(0.1f, 100.f, 90.f);		//Near, far, fov
+	renderer.loadPerspectiveTransform(0.1f, 170.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam[0]);
 
 	ai = AIManager(&state);
@@ -198,14 +198,22 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 }
 void GameManager::createLevel(unsigned int objectID) {
 
-	if (selectedLevel == 2) {
-		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
-	}
-	else if (selectedLevel == 1) {
-		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	}
-	else if (selectedLevel == 0) {
+	//Why were we counting backwards?!
+	//Also, this is why we have switches
+	switch (selectedLevel)
+	{
+	case 0:
 		levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
+		break;
+	case 1:
+		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+		break;
+	case 2:
+		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+		break;
+	case 3:
+		levelMesh = meshInfo.getMeshPointer(COURTYARDLEVEL);
+		break;
 	}
 	
 	surfacePhysicsID = physics.ground_createGeneric(levelMesh);
@@ -215,7 +223,7 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &matteMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
-	if (selectedLevel == 1) {
+	if ((selectedLevel == 1) || (selectedLevel == 3)) {
 		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
 		renderer.setShadowBehaviour(surfaceRenderID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 	}
@@ -423,6 +431,8 @@ void GameManager::initMenus() {
 				in[i].tiltForward = 0;
 				in[i].turnL = 0;
 				in[i].turnR = 0;
+
+				//Temporary
 			}
 
 			sound.playDingSound();
@@ -927,6 +937,7 @@ void GameManager::gameLoop()
 	lineTransform[3][1] = -2.f;
 
 	NavMesh nav;
+	//Why? WHY?!
 	if (selectedLevel == 2) { // temporary
 		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
 	}
@@ -936,6 +947,11 @@ void GameManager::gameLoop()
 	else if (selectedLevel == 0) {
 		ai.nav.loadNavMesh("HiResNavigationMesh.obj");
 	}
+	else if (selectedLevel == 3) {
+		ai.nav.loadNavMesh("HiResNavigationMesh.obj");	//Change
+	}
+
+
 
 	ai.nav.fetchPowerupLocations();
 	ai.nav.calculateImplicitEdges();
@@ -979,7 +995,7 @@ void GameManager::gameLoop()
 
 	initUI();
 
-	//unsigned int numScreens = 4;
+	unsigned int numScreens = 1;
 	renderer.splitScreenViewports(numScreens);
 
 	vector<unsigned int> radarInterfaceID(numScreens);
@@ -1022,13 +1038,15 @@ void GameManager::gameLoop()
 
 	bool initialBuggyRemoved = false;
 
+	bool freeRoam = false;
+
 	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
 
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
-			if ((state.getPlayer(i)->isAI()) && !paused)
+			if ((state.getPlayer(i)->isAI()) && !paused && !freeRoam)
 			{
 				frameCount++;
 				if (frameCount > 30)
@@ -1045,7 +1063,7 @@ void GameManager::gameLoop()
 
 			inputs[i] = smoothers[i].smooth(inputs[i], state.getPlayer(i)->getInAir());
 
-			if(!paused)
+			if(!paused && !freeRoam)
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
@@ -1058,7 +1076,7 @@ void GameManager::gameLoop()
 
 		//Allow for nitro/powerup activation here
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused) {
+			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused && !freeRoam) {
 
 				if (hasPowerup.at(i))
 				{
@@ -1096,15 +1114,21 @@ void GameManager::gameLoop()
 		if (inputs[0].menu && !firstFrame)
 		{
 			paused = !paused;
+			displayPauseMenu();
+		}
 
-			if (paused)
+		if (inputs[0].debug && !firstFrame)
+		{
+			freeRoam = !freeRoam;
+			
+			if (freeRoam)
 			{
 				freeCam = cam[0];
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
 				pauseStartTime = clock.getCurrentTime();
-				displayPauseMenu();
+				
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
@@ -1113,7 +1137,7 @@ void GameManager::gameLoop()
 		}
 		firstFrame = false;
 
-		if (!paused) {
+		if (!paused && !freeRoam) {
 			checkCoinCollisions();
 
 			physics.getSim();
@@ -1149,7 +1173,7 @@ void GameManager::gameLoop()
 		for (unsigned int i = 0; i < numScreens; i++)
 		{
 			//Free camera movement
-			if (paused && (i == 0))
+			if (freeRoam && (i == 0))
 			{
 				renderer.loadCamera(&freeCam);
 				//Debugging avoidance
@@ -1236,7 +1260,7 @@ void GameManager::gameLoop()
 					{
 						ai.getPathAsLines(j, &path[j]);
 						renderer.drawLines(path[j], vehicleColours[j], lineTransform);
-						if (paused)
+						if (freeRoam)
 							renderer.drawLines(frontier[j], vec3(0.7f, 0.5f, 1.f), lineTransform);
 					}
 				}
@@ -1250,7 +1274,7 @@ void GameManager::gameLoop()
 
 		
 		
-		if (!paused) {
+		if (!paused && !freeRoam) {
 			// increase score and check win conditions
 			state.getGoldenBuggy()->incrementScore(clock.getTimeSince(lastScoreUpdateTime), totalPausedTime);
 			lastScoreUpdateTime = clock.getCurrentTime();
@@ -1355,21 +1379,25 @@ void GameManager::gameInit()
 {
 	gameOver = false;
 	
+	unsigned int levelID = 0;
 
-	if (selectedLevel == 2) {
-		// temporary since we only have one level right now
-		createLevel(PIPELEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+	switch (selectedLevel)
+	{
+	case 0:
+		levelID = OLDLEVEL;
+		break;
+	case 1:
+		levelID = DONUTLEVEL;
+		break;
+	case 2:
+		levelID = PIPELEVEL;
+		break;
+	case 3:
+		levelID = COURTYARDLEVEL;
 	}
-	else if (selectedLevel == 1) {
-		// temporary since we only have one level right now
-		createLevel(DONUTLEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	}
-	else if (selectedLevel == 0) {
-		createLevel(OLDLEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
-	}
+
+	createLevel(levelID);
+	//MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
 
 	state.setMap(levelMesh, selectedLevel);
 
@@ -1467,7 +1495,7 @@ void GameManager::gameInit()
 		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getBuggyTexID(0));
 	}
 
-	createPlayer(vec3(0.f, 3.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
+	createPlayer(vec3(0.f, 10.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
 
 	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS; i++)
 	{
@@ -1519,10 +1547,12 @@ void GameManager::gameInit()
 		skyboxTextureID = LoadTexture("textures/sunset.jpg");
 
 	skyboxID = renderer.generateObjectID();
-	renderer.assignSkyDome(skyboxID, 80.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
+	renderer.assignSkyDome(skyboxID, 160.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
 
 	lastScoreUpdateTime = clock.getCurrentTime();
+
+	//renderer.loadShadowMap(LoadTexture("textures/P1Icon.png"));
 }
 
 void GameManager::initUI()
@@ -1588,7 +1618,11 @@ void GameManager::initUI()
 	totalPausedTime = 0.f;
 
 	//Add dummy objects to interface
-	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	unsigned int shadowMapComponent = _interface.generateComponentID();
+	_interface.assignSquare(shadowMapComponent);
+	_interface.setDimensions(shadowMapComponent, -1.f, -1.f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
+	_interface.assignTexture(shadowMapComponent, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);
+
 	float yOffset = .55f;
 	// initialize each player's scorebars
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {

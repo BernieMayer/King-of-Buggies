@@ -260,6 +260,8 @@ public:
 	void assignLightIntensity(unsigned int object, float intensity);
 	void enableShadowCasting(unsigned int object);
 	void disableShadowCasting(unsigned int object);
+	Camera* getLightCamera(unsigned int object);
+	mat4 getLightProjection(unsigned int object);
 
 	//Framebuffer objects
 	unsigned int createFramebuffer(unsigned int width, unsigned int height);

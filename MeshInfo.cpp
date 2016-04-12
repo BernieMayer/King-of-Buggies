@@ -72,6 +72,14 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
+	//Courtyard level
+	meshLoader.loadModel("models\\courtyardLevel.obj");
+	texID = LoadTexture("textures\\donutleveltexture.png");		//Change
+	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
+	meshes.push_back(levelObject);
+
+	meshLoader.clearData();
+
 	// Buggy textures are loaded separately, since there are multiple textures for the same mesh
 	meshLoader.loadModel("models\\buggy.obj");
 	MeshObject buggyObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
