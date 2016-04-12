@@ -94,11 +94,22 @@ void Camera::changeDir(vec3 _dir)
 
 mat4 Camera::getMatrix()
 {
-	vec3 mPos = pos + lag;
+	vec3 mPos, mDir, mRight, mUp;
+	if (cameraMode == MODELVIEWER_CAMERA)
+	{
+		mPos = pos + lag;
 
-	vec3 mDir = normalize(viewCenter - mPos);
-	vec3 mRight = normalize(cross(mDir, vec3(0.f, 1.f, 0.f)));
-	vec3 mUp = normalize(cross(mRight, mDir));
+		mDir = normalize(viewCenter - mPos);
+		mRight = normalize(cross(mDir, vec3(0.f, 1.f, 0.f)));
+		mUp = normalize(cross(mRight, mDir));
+	}
+	else
+	{
+		mPos = pos;
+		mDir = dir;
+		mRight = right;
+		mUp = up;
+	}
 
 	mat4 lookat (	mRight.x, mUp.x, -mDir.x, 0,
 					mRight.y, mUp.y, -mDir.y, 0,

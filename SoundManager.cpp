@@ -200,7 +200,7 @@ void SoundManager::stopMenuSong() {
 void SoundManager::startMusic(GameState state) {
 	if (initSuccess) {
 		
-		if (state.getLevelID() == 0 || state.getLevelID() == 1) {
+		if (state.getLevelID() == 0 || state.getLevelID() == 1 || state.getLevelID() == 3) {
 			loadWavToBuf("Dogsong.wav", &musicSource, &musicBuffer);
 		}
 		else if (state.getLevelID() == 2) {
@@ -753,7 +753,9 @@ void SoundManager::resumeAllSounds() {
 	if (initSuccess) {
 		for (int i = 0; i < MAX_PLAYERS; i++) {
 			alSourcePlay(engineSources[i]);
-			alSourcePlay(honkSources[i]);
+			if (honking[i]) {
+				alSourcePlay(honkSources[i]);
+			}
 		}
 
 		for (int i = 0; i < oneTimeUseSources.size(); i++) {

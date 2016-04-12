@@ -267,7 +267,8 @@ bool NavMesh:: fetchPowerupLocations()
 	for (unsigned int i = 0; i < state->numberOfPowerupBoxes(); i++)
 	{
 		unsigned int node = getPolygon(state->getPowerupBox(i)->getPos());
-		nodes[node].powerup = i;
+		if(node != NO_VALUE)
+			nodes[node].powerup = i;
 	}
 }
 

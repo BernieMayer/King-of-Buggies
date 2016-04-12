@@ -110,6 +110,7 @@ private:
 	void updateCamera(unsigned int i, Input input, float frameTime);
 
 	int selectedLevel = 1;
+	vec3 backgroundColor = vec3(1.f, 1.f, 1.f);
 
 	// temporary?
 	timeb blinkTime;
@@ -117,6 +118,15 @@ private:
 
 	//temporary
 	vector<float> scoreBarWidths;
+
+	unsigned int p1PauseTexture;
+	unsigned int p1PauseIcon;
+
+	unsigned int pauseScreenTexture;
+	unsigned int pauseScreen;
+
+	unsigned int pauseMenuBackground;
+	unsigned int pauseMenu;
 
 public:
 	GameManager(GLFWwindow* newWindow);

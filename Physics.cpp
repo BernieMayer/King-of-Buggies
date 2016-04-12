@@ -76,7 +76,7 @@ PxFixedSizeLookupTable<8> gSteerVsForwardSpeedTable(gSteerVsForwardSpeedData, 4)
 static PxF32 gTireFrictionMultipliers[MAX_NUM_SURFACE_TYPES][MAX_NUM_TIRE_TYPES] =
 {
 	//NORMAL,	WORN
-	{ 1.8f, 0.5f }//TARMAC
+	{ 1.6f, 0.5f }//TARMAC
 };
 
 
@@ -540,9 +540,16 @@ void Physics::updateGameState(GameState* state, float time)
 	for (int i = 0; i < bombActors.size(); i++) {
 		if (clock.getTimeSince(bombStartTimes[i]) >= 5.0f) {
 			lastState->pushEvent(new VehicleBombCollisionEvent(-1, i, getVec3(bombActors[i]->getGlobalPose().p)));
-			bombExplosion(i);
-			i--;
+			//bombExplosion(i);
+			bombsToExplodeThisFrame.push_back(i);
 		}
+	}
+
+	for (int i = 0; i < bombsToExplodeThisFrame.size(); i++) {
+		bombExplosion(bombsToExplodeThisFrame[i]);
+		bombsToExplodeThisFrame.erase(bombsToExplodeThisFrame.begin() + i);
+
+		i--;
 	}
 
 	lastFrameEnd = clock.getCurrentTime();
@@ -1468,11 +1475,13 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 				}
 				else if (isBomb1 && isVehicle2) {
 					lastState->pushEvent(new VehicleBombCollisionEvent(index2, index1, pos));
-					bombExplosion(index1);
+					bombsToExplodeThisFrame.push_back(index1);
+					//bombExplosion(index1);
 				}
 				else if (isBomb2 && isVehicle1) {
 					lastState->pushEvent(new VehicleBombCollisionEvent(index1, index2, pos));
-					bombExplosion(index2);
+					bombsToExplodeThisFrame.push_back(index2);
+					//bombExplosion(index2);
 				}
 				else {
 					lastState->pushEvent(new VehicleWallCollisionEvent(index1, pos, normal, force));
@@ -1582,7 +1591,7 @@ int Physics::createBomb(vec3 location, int playerID) {
 	// Add dynamic thrown ball to scene
 	PxRigidDynamic* aSphereActor = mPhysics->createRigidDynamic(PxTransform(getPxVec3(location)));
 	aSphereActor->setMass(800);
-	cout << "Mass: " << aSphereActor->getMass();
+	//cout << "Mass: " << aSphereActor->getMass();
 	float radius = 0.5f;
 	PxShape* aSphereShape = aSphereActor->createShape(PxSphereGeometry(radius), *mMaterial);
 
@@ -1604,6 +1613,9 @@ int Physics::createBomb(vec3 location, int playerID) {
 	// Ensures forwards throwing when moving backwards or not moving
 	if (speedMod < 30) {
 		speedMod = 30;
+	}
+	else if (speedMod > 60) {
+		speedMod = 60;
 	}
 	velocity = speedMod * velocity;
 	aSphereActor->setLinearVelocity(getPxVec3(velocity));
@@ -1759,6 +1771,7 @@ void Physics::clear() {
 
 
 	bombStartTimes.clear();
+	bombsToExplodeThisFrame.clear();
 
 	//
 	vehicleForwards.clear();	//Vehicle class

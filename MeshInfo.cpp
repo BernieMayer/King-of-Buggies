@@ -60,8 +60,8 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\islandlevel.obj");
-	//texID = LoadTexture("textures\\donutleveltexture.png");
-	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);//, texID);
+	texID = LoadTexture("textures\\hud\\transparent.png");
+	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(levelObject);
 
 	meshLoader.clearData();
@@ -69,6 +69,14 @@ MeshInfo::MeshInfo() {
 	meshLoader.loadModel("models\\oldlevel.obj");
 	MeshObject oldObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
 	meshes.push_back(oldObject);
+
+	meshLoader.clearData();
+
+	//Courtyard level
+	meshLoader.loadModel("models\\courtyardLevel.obj");
+	texID = LoadTexture("textures\\courtyardTexture.png");		//Change
+	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
+	meshes.push_back(levelObject);
 
 	meshLoader.clearData();
 

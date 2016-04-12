@@ -25,7 +25,7 @@ GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(new
 
 	timePassedDecoy = 0;
 
-	renderer.loadPerspectiveTransform(0.1f, 100.f, 90.f);		//Near, far, fov
+	renderer.loadPerspectiveTransform(0.1f, 170.f, 90.f);		//Near, far, fov
 	renderer.loadCamera(&cam[0]);
 
 	ai = AIManager(&state);
@@ -198,14 +198,22 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 }
 void GameManager::createLevel(unsigned int objectID) {
 
-	if (selectedLevel == 2) {
-		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
-	}
-	else if (selectedLevel == 1) {
-		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	}
-	else if (selectedLevel == 0) {
+	//Why were we counting backwards?!
+	//Also, this is why we have switches
+	switch (selectedLevel)
+	{
+	case 0:
 		levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
+		break;
+	case 1:
+		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
+		break;
+	case 2:
+		levelMesh = meshInfo.getMeshPointer(ISLANDLEVEL);
+		break;
+	case 3:
+		levelMesh = meshInfo.getMeshPointer(COURTYARDLEVEL);
+		break;
 	}
 	
 	surfacePhysicsID = physics.ground_createGeneric(levelMesh);
@@ -215,10 +223,10 @@ void GameManager::createLevel(unsigned int objectID) {
 	renderer.assignMeshObject(surfaceRenderID, levelMesh);
 	renderer.assignMaterial(surfaceRenderID, &matteMat);
 	renderer.assignColor(surfaceRenderID, vec3(0.5f, 0.5f, 0.5f));
-	if (selectedLevel == 1) {
+	//if ((selectedLevel == 1) || (selectedLevel == 3)) {
 		renderer.assignTexture(surfaceRenderID, levelMesh->getTextureID());
 		renderer.setShadowBehaviour(surfaceRenderID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
-	}
+	//}
 	
 
 }
@@ -341,10 +349,10 @@ void GameManager::initMenus() {
 	vector<float> xOffsets;
 	vector<float> yOffsets;
 
-	const float lSel1XBase = -0.55f;
-	const float lSel1YBase = -0.89f;
-	const float lSel2XBase = 0.525f;
-	const float lSel2YBase = -0.89f;
+	const float lSel1XBase = -0.625f;
+	const float lSel1YBase = -0.15f;
+	const float lSel2XBase = 0.625f;
+	const float lSel2YBase = -0.90f;
 	const float cSel1XBase = -0.79f;
 	const float cSel2XBase = 0.25f;
 	const float cSel1YBase = -0.22f;
@@ -365,7 +373,7 @@ void GameManager::initMenus() {
 	xOffsets.push_back(lSel1X);
 	yOffsets.push_back(lSel1Y);
 
-	float p1Scale = 0.25f;
+	float p1Scale = 0.15f;
 	const float iconWidthBase = 0.145f;
 
 	float iconWidth = iconWidthBase;
@@ -423,6 +431,8 @@ void GameManager::initMenus() {
 				in[i].tiltForward = 0;
 				in[i].turnL = 0;
 				in[i].turnR = 0;
+
+				//Temporary
 			}
 
 			sound.playDingSound();
@@ -448,11 +458,16 @@ void GameManager::initMenus() {
 			currentMenu++;
 			_interface.clear();
 
-			if (xOffsets[0] == lSel1X) {
+			if (xOffsets[0] == lSel1X && yOffsets[0] == lSel1Y) {
 				selectedLevel = 0;
 			}
-			else if (xOffsets[0] == lSel2X) {
+			else if (xOffsets[0] == lSel2X && yOffsets[0] == lSel1Y) {
 				selectedLevel = 1;
+			} else if (xOffsets[0] == lSel1X && yOffsets[0] == lSel2Y) {
+				selectedLevel = 2;
+			}
+			else if (xOffsets[0] == lSel2X && yOffsets[0] == lSel2Y) {
+				selectedLevel = 3;
 			}
 
 
@@ -528,6 +543,13 @@ void GameManager::initMenus() {
 			}
 			else if (xOffsets[0] == lSel2X && in[0].turnL < -0.3f) {
 				xOffsets[0] = lSel1X;
+			}
+
+			if (yOffsets[0] == lSel1Y && in[0].tiltBackward > 0.3f) {
+				yOffsets[0] = lSel2Y;
+			}
+			else if (yOffsets[0] == lSel2Y && in[0].tiltForward > 0.3f) {
+				yOffsets[0] = lSel1Y;
 			}
 
 			if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
@@ -924,17 +946,27 @@ void GameManager::gameLoop()
 	vector<vec3> edges;
 	
 	mat4 lineTransform;
-	lineTransform[3][1] = -2.f;
+	lineTransform[3][1] = 2.f;
 
 	NavMesh nav;
-	if (selectedLevel == 2) { // temporary
-		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
-	}
-	else if (selectedLevel == 1) {
-		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
-	}
-	else if (selectedLevel == 0) {
+	//Why? WHY?!
+
+	// Ok, ok! We'll use switches. :) 
+
+	switch (selectedLevel)
+	{
+	case 0:
 		ai.nav.loadNavMesh("HiResNavigationMesh.obj");
+		break;
+	case 1:
+		ai.nav.loadNavMesh("donutLevelNavMesh.obj");
+		break;
+	case 2:
+		ai.nav.loadNavMesh("islandLevelNavMesh.obj");
+		break;
+	case 3:
+		ai.nav.loadNavMesh("courtyardNavMesh.obj");	//Change
+		break;
 	}
 
 	ai.nav.fetchPowerupLocations();
@@ -980,7 +1012,6 @@ void GameManager::gameLoop()
 
 	initUI();
 
-	
 	renderer.splitScreenViewports(numScreens);
 
 	vector<unsigned int> radarInterfaceID(numScreens);
@@ -1023,13 +1054,15 @@ void GameManager::gameLoop()
 
 	bool initialBuggyRemoved = false;
 
+	bool freeRoam = false;
+
 	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
 
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
-			if ((state.getPlayer(i)->isAI()) && !paused)
+			if ((state.getPlayer(i)->isAI()) && !paused && !freeRoam)
 			{
 				frameCount++;
 				if (frameCount > 30)
@@ -1046,7 +1079,7 @@ void GameManager::gameLoop()
 
 			inputs[i] = smoothers[i].smooth(inputs[i], state.getPlayer(i)->getInAir());
 
-			if(!paused)
+			if(!paused && !freeRoam)
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());
 		}
 
@@ -1059,7 +1092,7 @@ void GameManager::gameLoop()
 
 		//Allow for nitro/powerup activation here
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused) {
+			if ((inputs[i].cheat_coin || inputs[i].powerup) && !paused && !freeRoam) {
 
 				if (hasPowerup.at(i))
 				{
@@ -1097,15 +1130,21 @@ void GameManager::gameLoop()
 		if (inputs[0].menu && !firstFrame)
 		{
 			paused = !paused;
+			displayPauseMenu();
+		}
 
-			if (paused)
+		if (inputs[0].debug && !firstFrame)
+		{
+			freeRoam = !freeRoam;
+			
+			if (freeRoam)
 			{
 				freeCam = cam[0];
 				freeCam.setCameraMode(FREEROAM_CAMERA);
 				renderer.loadCamera(&freeCam);
 				debugPathIterations = 0;
 				pauseStartTime = clock.getCurrentTime();
-				displayPauseMenu();
+				
 			}
 			else {
 				renderer.loadCamera(&cam[0]);
@@ -1114,7 +1153,7 @@ void GameManager::gameLoop()
 		}
 		firstFrame = false;
 
-		if (!paused) {
+		if (!paused && !freeRoam) {
 			checkCoinCollisions();
 
 			physics.getSim();
@@ -1139,18 +1178,18 @@ void GameManager::gameLoop()
 		if (USING_SHADOWS)
 		{
 			renderer.useFramebuffer(fbo);
-			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+			renderer.clearDrawBuffers(backgroundColor);
 			renderer.drawShadowMapAll(0);
 			renderer.loadShadowMap(renderer.getFramebufferTexture(fbo));
 			renderer.useFramebuffer(NO_VALUE);
 		}
 		//Draw scene
-		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+		renderer.clearDrawBuffers(backgroundColor);
 
 		for (unsigned int i = 0; i < numScreens; i++)
 		{
 			//Free camera movement
-			if (paused && (i == 0))
+			if (freeRoam && (i == 0))
 			{
 				renderer.loadCamera(&freeCam);
 				//Debugging avoidance
@@ -1237,7 +1276,7 @@ void GameManager::gameLoop()
 					{
 						ai.getPathAsLines(j, &path[j]);
 						renderer.drawLines(path[j], vehicleColours[j], lineTransform);
-						if (paused)
+						if (freeRoam)
 							renderer.drawLines(frontier[j], vec3(0.7f, 0.5f, 1.f), lineTransform);
 					}
 				}
@@ -1251,7 +1290,7 @@ void GameManager::gameLoop()
 
 		
 		
-		if (!paused) {
+		if (!paused && !freeRoam) {
 			// increase score and check win conditions
 			state.getGoldenBuggy()->incrementScore(clock.getTimeSince(lastScoreUpdateTime), totalPausedTime);
 			lastScoreUpdateTime = clock.getCurrentTime();
@@ -1354,23 +1393,40 @@ void GameManager::applyPowerupEffect(int playerNum)
 
 void GameManager::gameInit()
 {
+
+	p1PauseTexture = LoadTexture("menus/P1Icon.png");
+	p1PauseIcon = _interface.generateComponentID();
+	_interface.setDisplayFilter(p1PauseIcon, DISPLAY::D9);
+
+	pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
+	pauseScreen = _interface.generateComponentID();
+	_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
+
+	pauseMenuBackground = LoadTexture("menus/Background.bmp");
+	pauseMenu = _interface.generateComponentID();
+	_interface.setDisplayFilter(pauseMenu, DISPLAY::D9);
+
 	gameOver = false;
 	
+	unsigned int levelID = 0;
 
-	if (selectedLevel == 2) {
-		// temporary since we only have one level right now
-		createLevel(PIPELEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+	switch (selectedLevel)
+	{
+	case 0:
+		levelID = OLDLEVEL;
+		break;
+	case 1:
+		levelID = DONUTLEVEL;
+		break;
+	case 2:
+		levelID = ISLANDLEVEL;
+		backgroundColor = vec3(3.f / 255.f, 70.f / 255.f, 106.f / 255.f);
+		break;
+	case 3:
+		levelID = COURTYARDLEVEL;
 	}
-	else if (selectedLevel == 1) {
-		// temporary since we only have one level right now
-		createLevel(DONUTLEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
-	}
-	else if (selectedLevel == 0) {
-		createLevel(OLDLEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(OLDLEVEL);
-	}
+
+	createLevel(levelID);
 
 	state.setMap(levelMesh, selectedLevel);
 
@@ -1468,7 +1524,8 @@ void GameManager::gameInit()
 		createPlayer(vec3(5.f, 5.f, -15.f), traits, meshInfo.getBuggyTexID(0));
 	}
 
-	createPlayer(vec3(0.f, 3.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
+	createPlayer(vec3(0.f, 10.f, 0.f), traits, meshInfo.getGoldenBuggyTexID());	//Create initial buggy
+
 	state.getPlayer(4)->setInitialBuggy(true);
 
 	for (unsigned int i = input.getNumPlayers(); i < MAX_PLAYERS; i++)
@@ -1521,10 +1578,12 @@ void GameManager::gameInit()
 		skyboxTextureID = LoadTexture("textures/sunset.jpg");
 
 	skyboxID = renderer.generateObjectID();
-	renderer.assignSkyDome(skyboxID, 80.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
+	renderer.assignSkyDome(skyboxID, 160.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
 
 	lastScoreUpdateTime = clock.getCurrentTime();
+
+	//renderer.loadShadowMap(LoadTexture("textures/P1Icon.png"));
 }
 
 void GameManager::initUI()
@@ -1591,7 +1650,11 @@ void GameManager::initUI()
 	totalPausedTime = 0.f;
 
 	//Add dummy objects to interface
-	carSelectScreen = LoadTexture("menus/opacity-512.png");
+	/*unsigned int shadowMapComponent = _interface.generateComponentID();
+	_interface.assignSquare(shadowMapComponent);
+	_interface.setDimensions(shadowMapComponent, -1.f, -1.f, 0.5f, 0.5f, ANCHOR::BOTTOM_LEFT);
+	_interface.assignTexture(shadowMapComponent, renderer.getFramebufferTexture(fbo), ComponentInfo::UP_TEXTURE);*/
+
 	float yOffset = .55f;
 	// initialize each player's scorebars
 	for (unsigned int i = 0; i < state.numberOfPlayers() - 1; i++) {
@@ -1824,15 +1887,6 @@ void GameManager::displayPauseMenu() {
 	// Lock last 0.2 seconds
 	float movementLockEnd = 0.2;
 
-	unsigned int p1Texture = LoadTexture("menus/P1Icon.png");
-	unsigned int p1Icon = _interface.generateComponentID();
-
-	unsigned int pauseScreenTexture = LoadTexture("menus/KoB_PauseScreen.bmp");
-	unsigned int pauseScreen = _interface.generateComponentID();
-
-	unsigned int menuBackground = LoadTexture("menus/Background.bmp");
-	unsigned int menu = _interface.generateComponentID();
-
 	while (!glfwWindowShouldClose(window)) {
 		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
 		if (_interface.getWindowWidth() > _interface.getWindowHeight()) {
@@ -1909,20 +1963,17 @@ void GameManager::displayPauseMenu() {
 			}
 		}
 
-		_interface.assignSquare(p1Icon);
-		_interface.assignTexture(p1Icon, p1Texture, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(p1Icon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
-		_interface.setDisplayFilter(p1Icon, DISPLAY::D9);
+		_interface.assignSquare(p1PauseIcon);
+		_interface.assignTexture(p1PauseIcon, p1PauseTexture, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(p1PauseIcon, xOffset / xMod, yOffset / yMod, 0.25, 0.25, ANCHOR::CENTER);
 
 		_interface.assignSquare(pauseScreen);
 		_interface.assignTexture(pauseScreen, pauseScreenTexture, ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(pauseScreen, 0.0f, 0.0f, 2, 2, ANCHOR::CENTER);
-		_interface.setDisplayFilter(pauseScreen, DISPLAY::D9);
-
-		_interface.assignSquare(menu);
-		_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
-		_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
-		_interface.setDisplayFilter(menu, DISPLAY::D9);
+	
+		_interface.assignSquare(pauseMenu);
+		_interface.assignTexture(pauseMenu, pauseMenuBackground, ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(pauseMenu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
 
 		_interface.drawAll(&renderer, DISPLAY::D9);
 

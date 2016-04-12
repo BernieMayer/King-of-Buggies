@@ -537,6 +537,14 @@ void GameState::setMap(MeshObject* arena, unsigned int selectedLevel)
 		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
 		levelID = 2;
 	}
+	else if (selectedLevel == 3) {	//Courtyard level
+		map = LevelInfo(arena,
+			"models\\levelinfo\\courtyardCoinLocations.obj",
+			"models\\levelinfo\\courtyardBoostLocations.obj",
+			"models\\levelinfo\\courtyardBoxLocations.obj",
+			"models\\levelinfo\\courtyardStartLocations.obj");
+		levelID = 3;
+	}
 
 	vector<vec3> coinCoords = map.getCoinLocations();
 	vector<vec3> boostCoords = map.getBoostLocations();

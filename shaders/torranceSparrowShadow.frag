@@ -111,7 +111,8 @@ void main(){
 	vec3 normal = normalize(fragNormal);
 	vec3 lightDir = normalize(light - worldPosition);
 	float bias = biasRange*(1-clamp(dot(normal, lightDir), 0.0, 1.0))+baseBias;	
-	
+	//bias = 0.0;
+
 	float visibility = testVisibility(shadowCoord, bias);
 
 	//vec2 mc = mappedCoordinate(shadowCoord, bias, vec2(0.f, 0.f));	
