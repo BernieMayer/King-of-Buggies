@@ -853,7 +853,7 @@ void GameManager::processEvents()
 					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
 					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
 					if (powerUpType == POWERUPS::NITROBOOST) {
-						state.getPlayer(i)->setEnergyForNitro(300.0f);
+						state.getPlayer(i)->setEnergyForNitro(600.0f);
 						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
 					}
 					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
