@@ -110,6 +110,7 @@ private:
 	void updateCamera(unsigned int i, Input input, float frameTime);
 
 	int selectedLevel = 1;
+	vec3 backgroundColor = vec3(1.f, 1.f, 1.f);
 
 	// temporary?
 	timeb blinkTime;

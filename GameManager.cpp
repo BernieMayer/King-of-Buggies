@@ -199,7 +199,7 @@ void GameManager::createGroundPlane(vec3 normal, float offset)
 void GameManager::createLevel(unsigned int objectID) {
 
 	if (selectedLevel == 2) {
-		levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+		levelMesh = meshInfo.getMeshPointer(ISLANDLEVEL);
 	}
 	else if (selectedLevel == 1) {
 		levelMesh = meshInfo.getMeshPointer(DONUTLEVEL);
@@ -1139,13 +1139,13 @@ void GameManager::gameLoop()
 		if (USING_SHADOWS)
 		{
 			renderer.useFramebuffer(fbo);
-			renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+			renderer.clearDrawBuffers(backgroundColor);
 			renderer.drawShadowMapAll(0);
 			renderer.loadShadowMap(renderer.getFramebufferTexture(fbo));
 			renderer.useFramebuffer(NO_VALUE);
 		}
 		//Draw scene
-		renderer.clearDrawBuffers(vec3(1.f, 1.f, 1.f));
+		renderer.clearDrawBuffers(backgroundColor);
 
 		for (unsigned int i = 0; i < numScreens; i++)
 		{
@@ -1372,8 +1372,9 @@ void GameManager::gameInit()
 
 	if (selectedLevel == 2) {
 		// temporary since we only have one level right now
-		createLevel(PIPELEVEL);
-		MeshObject* levelMesh = meshInfo.getMeshPointer(PIPELEVEL);
+		createLevel(ISLANDLEVEL);
+		MeshObject* levelMesh = meshInfo.getMeshPointer(ISLANDLEVEL);
+		backgroundColor = vec3(3.f/255.f, 70.f/255.f, 106.f/255.f);
 	}
 	else if (selectedLevel == 1) {
 		// temporary since we only have one level right now
