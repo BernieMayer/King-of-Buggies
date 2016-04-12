@@ -336,6 +336,10 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 			alSourcefv(engineSources[i], AL_VELOCITY, SourceVel);
 			alSourcei(engineSources[i], AL_LOOPING, AL_TRUE);
 
+			if (inputs[0].navMesh) {
+				playSound("Yay.wav", state.getPlayer(0)->getPos(), 1.0f);
+			}
+
 			if (inputs[i].horn) {
 				if (!honking[i]) {
 					loadWavToBuf("Honk.wav", &honkSources[i], &honkBuffers[i]);

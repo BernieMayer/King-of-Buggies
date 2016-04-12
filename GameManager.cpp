@@ -1168,7 +1168,7 @@ void GameManager::gameLoop()
 		}
 		
 		
-		if (inputs[0].horn) {
+		if (inputs[0].navMesh) {
 			displayDebugging = !displayDebugging;
 		}
 
