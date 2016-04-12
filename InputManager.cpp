@@ -24,6 +24,7 @@ bool kMenu;
 bool kJump;
 bool kHorn;
 bool kDebug;
+bool kNavMesh;
 
 //Only to easily cheat in coins
 bool kCheat_coin;
@@ -154,6 +155,12 @@ void keyboard(GLFWwindow *sender, int key, int scancode, int action, int mods) {
 	}
 	else if (key == GLFW_KEY_Y && action == GLFW_RELEASE) {
 		kDebug = false;
+	}
+	else if (key == GLFW_KEY_N && action == GLFW_PRESS) {
+		kNavMesh = true;
+	}
+	else if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+		kNavMesh = false;
 	}
 }
 
@@ -302,6 +309,7 @@ Input InputManager::getInput(int playerNum)
 		input.jump = gamepads[playerNum].GetButtonPressed(jumpButton);
 		input.horn = gamepads[playerNum].GetButtonPressed(honkButton);
 		input.debug = gamepads[playerNum].GetButtonPressed(debugButton);
+		input.navMesh = gamepads[playerNum].GetButtonPressed(navMeshButton);
 
 		gamepads[playerNum].RefreshState();
 
@@ -330,6 +338,7 @@ Input InputManager::getInput(int playerNum)
 		input.jump = kJump;
 		input.horn = kHorn;
 		input.debug = kDebug;
+		input.navMesh = kNavMesh;
 
 		if (kDrift) {
 			input.rollL = kTurnL;
