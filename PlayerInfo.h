@@ -48,6 +48,8 @@ public:
 
 	void addCoin();
 	int getNumCoins();
+	void removeCoins(int numToRemove);
+	void removeCoins() { numCoins = 0; }
 	
 	void removeEnergyForNitro(float nitro);
 	void setEnergyForNitro(float nitro);

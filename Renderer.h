@@ -249,6 +249,11 @@ public:
 					vector<vec2>* uvs,
 					vector<unsigned int>* indices,
 					unsigned int textureID);
+	void assignSphere(unsigned int object, float radius, unsigned int divisions,
+		vector<vec3>* mesh,
+		vector<vec2>* uvs,
+		vector<unsigned int>* indices,
+		unsigned int textureID);
 
 	void loadShadowMap(unsigned int texID);
 

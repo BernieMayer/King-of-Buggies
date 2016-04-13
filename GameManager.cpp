@@ -3,7 +3,7 @@
 
 #include "GameManager.h"
 
-GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics()
+GameManager::GameManager(GLFWwindow* newWindow) : renderer(newWindow), input(newWindow), state(), physics(), explosionID(NO_VALUE)
 {
 	vec3 camDir(0.f, -1.f, -1.f);
 	camDir = normalize(camDir);
@@ -841,57 +841,104 @@ void GameManager::changeGoldenBuggy()
 	switchBuggyUI();
 }
 
+const float MIN_EXPLOSION_RADIUS = 0.01f;
+const float MAX_EXPLOSION_RADIUS = 5.f;
+
+void GameManager::startBuggyExplosion(vec3 loc)
+{
+
+
+	explosionLocation = loc;
+
+	explosionID = renderer.generateObjectID();
+	renderer.assignSkyDome(explosionID, 1.f, 100, &buggyExplosionVerts, &buggyExplosionUVs, &buggyExplosionIndices, skyboxTextureID);		//Change texture
+
+
+}
+
+void GameManager::updateBuggyExplosion()
+{
+
+}
+
+void GameManager::endBuggyExplosion()
+{
+
+}
+
+void GameManager::handleBombCollisionEvent(Event* e)
+{
+	// Remove bomb
+	VehicleBombCollisionEvent* powerupEvent = (VehicleBombCollisionEvent*)(e);
+	Powerup* explodedBomb = state.getPowerup(powerupEvent->ob2);
+	renderer.deleteDrawableObject(explodedBomb->getRenderID());
+	state.removePowerup(powerupEvent->ob2);
+}
+
+void GameManager::handlePowerupBoxCollisionEvent(Event* e)
+{
+	PowerupCollisionEvent* powerupEvent = dynamic_cast<PowerupCollisionEvent*>(e);
+	int vehicleId = powerupEvent->ob1;
+	int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
+
+	if (!state.getPowerupBox(powerupId)->getCollided()) {
+		// temporarily remove powerup from board
+		PowerupBox* collided = state.getPowerupBox(powerupId);
+		vec3 pos = collided->getPos();
+		vec3 newPos = pos;
+		newPos.y = pos.y - 20;
+		collided->setPos(newPos);
+		collided->setCollided(true);
+		collided->startCountdown();
+
+		sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
+
+		if (state.getPlayer(vehicleId)->getCurrentPowerup() < 0) {
+			hasPowerup[vehicleId] = true;
+			int powerUpType = randomPowerup();
+			//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
+			//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
+			if (powerUpType == POWERUPS::NITROBOOST) {
+				state.getPlayer(vehicleId)->setEnergyForNitro(600.0f);
+				printf("Nitro Boost with energy level  %f \n", state.getPlayer(vehicleId)->getEnergyForNitro());
+			}
+			state.getPlayer(vehicleId)->addPowerUp(powerUpType);
+
+			// display powerup information in HUD
+			if (vehicleId < numScreens)
+			{
+				_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+				_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+			}
+		}
+	}
+}
+
+void GameManager::handleBuggySwitchEvent(Event* e)
+{
+
+}
+
 
 void GameManager::processEvents()
 {
 	for (int i = 0; i < state.getNbEvents(); i++) {
 		Event* e = state.getEvent(i);
 
-		if (e->getType() == VEHICLE_BOMB_COLLISION_EVENT) {
-			// Remove bomb
-			VehicleBombCollisionEvent* powerupEvent = (VehicleBombCollisionEvent*)(e);
-			Powerup* explodedBomb = state.getPowerup(powerupEvent->ob2);
-			renderer.deleteDrawableObject(explodedBomb->getRenderID());
-			state.removePowerup(powerupEvent->ob2);
-		}
-		else if (e->getType() == POWERUPBOX_COLLISION_EVENT)
+		switch (e->getType())
 		{
-			PowerupCollisionEvent* powerupEvent = dynamic_cast<PowerupCollisionEvent*>(e);
-			int vehicleId = powerupEvent->ob1;
-			int powerupId = powerupEvent->ob2; //Delete the powerup, note the id is based on the order that the powerups are made.
+		case VEHICLE_BOMB_COLLISION_EVENT:
+			handleBombCollisionEvent(e);
+			break;
+		case POWERUPBOX_COLLISION_EVENT:
+			handlePowerupBoxCollisionEvent(e);
+			break;
 
-			if (!state.getPowerupBox(powerupId)->getCollided()) {
-				// temporarily remove powerup from board
-				PowerupBox* collided = state.getPowerupBox(powerupId);
-				vec3 pos = collided->getPos();
-				vec3 newPos = pos;
-				newPos.y = pos.y - RESPAWN_HEIGHT;
-				collided->setPos(newPos);
-				collided->setCollided(true);
-				collided->startCountdown();
-
-				sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
-
-				if (state.getPlayer(vehicleId)->getCurrentPowerup() < 0) {
-					hasPowerup[vehicleId] = true;
-					int powerUpType = randomPowerup();
-					//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
-					//powerUpType = POWERUPS::NITROBOOST;	//Prevents the non golden buggies from using the Decoy
-					if (powerUpType == POWERUPS::NITROBOOST) {
-						state.getPlayer(i)->setEnergyForNitro(1800.0f);
-						printf("Nitro Boost with energy level  %f \n", state.getPlayer(i)->getEnergyForNitro());
-					}
-					state.getPlayer(vehicleId)->addPowerUp(powerUpType);
-
-					// display powerup information in HUD
-					if (vehicleId < numScreens)
-					{
-						_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-						_interface.toggleActive(powerupComponentIDs[vehicleId], true);
-					}
-				}
-			}
+		case GOLDEN_BUGGY_SWITCH_EVENT:
+			handleBuggySwitchEvent(e);
+			break;
 		}
+		
 	}
 }
 
@@ -1771,8 +1818,7 @@ int GameManager::randomPowerup()
 	
 
 	int powerupId = rand() % 3;
-	return 0;
-	//return powerupId;
+	return powerupId;
 }
 
 void GameManager::displayEndScreen(unsigned int winnerID)

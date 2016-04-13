@@ -138,4 +138,14 @@ void PlayerInfo::addCoin()
 
 int PlayerInfo::getNumCoins() { return numCoins; }
 
+void PlayerInfo::removeCoins(int numToRemove) {
+	if (numToRemove > 0) {
+		numCoins -= numToRemove;
+
+		if (numCoins < 0) {
+			numCoins = 0;
+		}
+	}
+}
+
 #endif // PLAYERINFO_CPP
