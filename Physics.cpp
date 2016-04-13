@@ -1525,6 +1525,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 									newGoldenBuggy = true;
 									modifySpeed(i, 3);
 									goldenBuggyLock = true;
+									//lastState->getPlayer(indexOfOldGoldenBuggy)->removeCoins();
 									gbLockStartTime = clock.getCurrentTime();
 									//buggyExplosion(i);
 									lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
@@ -1541,6 +1542,7 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 									goldenBuggy = &vehicleActors[i];
 									newGoldenBuggy = true;
 									modifySpeed(i, 3);
+									//lastState->getPlayer(indexOfOldGoldenBuggy)->removeCoins();
 									goldenBuggyLock = true;
 									gbLockStartTime = clock.getCurrentTime();
 									//buggyExplosion(i);
