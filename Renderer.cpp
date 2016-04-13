@@ -861,6 +861,12 @@ void Renderer::drawRadar(vector<vec2> radarVecs, vector<vec3> colours)
 			j++;
 			//glColor3f(1, 1, 0);
 		}
+		else if (i == 11)
+		{
+			glColor3f(colours[j].x, colours[j].y, colours[j].z);
+			j++;
+			//glColor3f(1, 1, 0);
+		}
 	}
 	
 

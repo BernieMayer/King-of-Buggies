@@ -38,7 +38,7 @@ GLFWwindow* initializeWindow()
 	GLFWwindow* window;
 
 	//Create a window and create its OpenGL context  
-	window = glfwCreateWindow(640, 480, "King of Buggies!!", NULL, NULL);
+	window = glfwCreateWindow(640, 480, "King of Buggies", NULL, NULL);
 
 	//If the window couldn't be created  
 	if (!window)
