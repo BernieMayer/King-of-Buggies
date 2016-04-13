@@ -150,7 +150,6 @@ vector<vec2> GameState::setupRadar(int playerId)
 			radarPoly.push_back(player3Dpos + vec3(radarSize / 2, 0, radarSize / 2));
 			radarPoly.push_back(player3Dpos + vec3(radarSize / 2, 0, -radarSize / 2));
 
-
 			if (isWithinPolygon(otherPlayerPos, radarPoly))
 			{
 
@@ -169,7 +168,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 
 				vec2 otherPlayerLeft = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + widthScaleFactor * vec2(-triangleSize * otherPlayer3DRight.x, -triangleSize * otherPlayer3DRight.z);
 				vec2 otherPlayerRight = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + widthScaleFactor * vec2(-triangleSize * -otherPlayer3DRight.x, -triangleSize * -otherPlayer3DRight.z);
-				vec2 otherPlayerUp = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + vec2(-triangleSize * otherPlayer3DUp.x, -triangleSize * otherPlayer3DUp.z);
+				vec2 otherPlayerUp = vec2(radarOtherPlayerCenter.x, radarOtherPlayerCenter.z) + vec2(triangleSize * otherPlayer3DUp.x, triangleSize * otherPlayer3DUp.z);
 
 				otherPlayerLeft = vec2(1, -1) * otherPlayerLeft;
 				otherPlayerRight = vec2(1, -1) * otherPlayerRight;
