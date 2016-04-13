@@ -1820,8 +1820,7 @@ int GameManager::randomPowerup()
 	
 
 	int powerupId = rand() % 3;
-	return 0;
-	//return powerupId;
+	return powerupId;
 }
 
 void GameManager::displayEndScreen(unsigned int winnerID)
