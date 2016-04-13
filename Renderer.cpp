@@ -870,55 +870,6 @@ void Renderer::drawRadar(vector<vec2> radarVecs, vector<vec3> colours)
 	useViewport(activeViewport);
 }
 
-void Renderer::drawRadarForSplitScreen(vector<vec2> radarVecs, vector<vec3> colours, int playerID)
-{
-	int viewportWidth = 0;
-	int viewportHeight = 0;
-
-	glViewport(viewportWidth * 0.75, viewportHeight * 0.75, viewportWidth * 0.25, viewportHeight * 0.25);
-
-	glUseProgram(0);
-
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0, viewportWidth, 0, viewportHeight);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glBegin(GL_TRIANGLES);
-	glColor3f(colours[0].x , colours[0].y, colours[0].z);
-
-	int j = 0;
-	for (int i = 0; i < radarVecs.size(); i++){
-		vec3 vec = vec3((windowWidth / 2) - radarVecs[i].x * (windowWidth / 15), (windowHeight / 2) - radarVecs[i].y * (windowHeight / 15), 0);
-		glVertex3f(vec.x, vec.y, vec.z);
-
-		if (i == 2){
-			glColor3f(colours[j].x, colours[j].y, colours[j].z);
-			j++;
-		}
-		else if (i ==5 )
-		{
-			glColor3f(colours[j].x, colours[j].y, colours[j].z);
-			j++;
-		}
-		else if (i== 8)
-		{
-			glColor3f(colours[j].x, colours[j].y, colours[j].z);
-			j++;
-		}
-	}
-
-
-	glEnd();
-
-	//I need a function here to deal with the viewport stuff...
-	useViewport(activeViewport);
-	//glViewport(0, 0, windowWidth, windowHeight);
-
-}
-
 void Renderer::drawLines(const vector<vec3>& segments, vec3 color, const mat4& objectTransform)
 {
 	GLint dimensions [4];

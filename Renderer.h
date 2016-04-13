@@ -285,8 +285,6 @@ public:
 	void drawWithShadows(unsigned int object, unsigned int shadowTexture, unsigned int lightID);
 
 	void drawRadar(vector<vec2> radarVecs, vector<vec3> colours);
-	void drawRadarForSplitScreen(vector<vec2> radarVecs, vector<vec3> colours, int playerID);
-
 
 	void drawUI(const vector<vector<vec3>>& segments, vector<vec3> colors);
 	

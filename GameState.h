@@ -76,7 +76,6 @@ public:
 	unsigned int getDecoyIndex();
 	bool doesDecoyExist();
 
-	vector<vec2> setupRadarSeeingOnlyGoldenBuggy(int playerId);
 	vector<vec2> setupRadar(int playerID);
 	bool isWithinPolygon(vec3 pos, vector<vec3> points);
 
