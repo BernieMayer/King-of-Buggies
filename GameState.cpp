@@ -534,7 +534,11 @@ void GameState::setMap(MeshObject* arena, unsigned int selectedLevel)
 		levelID = 1;
 	}
 	else if (selectedLevel == 2) { // island level
-		map = LevelInfo(arena, "models\\levelinfo\\donutlevelcoinlocations.obj", "models\\levelinfo\\donutlevelboostlocations.obj", "models\\levelinfo\\donutlevelboxlocations.obj", "models\\levelinfo\\donutlevelstartlocations.obj");
+		map = LevelInfo(arena, 
+						"models\\levelinfo\\islandCoinLocations.obj", 
+						"models\\levelinfo\\islandBoostLocations.obj", 
+						"models\\levelinfo\\islandBoxLocations.obj", 
+						"models\\levelinfo\\islandStartLocations.obj");
 		levelID = 2;
 	}
 	else if (selectedLevel == 3) {	//Courtyard level
