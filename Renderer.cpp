@@ -1835,6 +1835,8 @@ void Renderer::assignSkyDome(unsigned int id, float radius, unsigned int divisio
 
 }
 
+
+
 void Renderer::deleteDrawableObject(int objectID)
 {
 	objects[objectID].deleted = true;

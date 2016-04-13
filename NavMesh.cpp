@@ -256,7 +256,6 @@ found:
 	{
 		return false;
 	}
-		
 }
 
 bool NavMesh:: fetchPowerupLocations()

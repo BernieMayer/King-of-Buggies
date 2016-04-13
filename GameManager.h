@@ -87,6 +87,15 @@ private:
 	unsigned int skyboxID;
 	Unshaded skyMaterial;
 
+	vector<vec3> buggyExplosionVerts;
+	vector<vec2> buggyExplosionUVs;
+	vector<unsigned int> buggyExplosionIndices;
+	unsigned int buggyExplosionTexture;
+	unsigned int explosionID;
+
+	vec3 explosionLocation;
+	
+
 	vector<bool> hasPowerup;
 
 	unsigned int carSelectScreen;
@@ -105,6 +114,9 @@ private:
 
 	//Game loop functions
 	void changeGoldenBuggy();
+	void handleBombCollisionEvent(Event* e);
+	void handlePowerupBoxCollisionEvent(Event* e);
+	void handleBuggySwitchEvent(Event* e);
 	void processEvents();
 	void checkCoinCollisions();
 	void updateCamera(unsigned int i, Input input, float frameTime);
@@ -158,6 +170,11 @@ public:
 	void switchBuggyUI();
 
 	void cameraEnvironmentCollision(Camera* cam);
+
+	//Buggy explosion
+	void startBuggyExplosion(vec3 loc);
+	void updateBuggyExplosion();
+	void endBuggyExplosion();
 	
 	void gameLoop();
 	void gameInit();
