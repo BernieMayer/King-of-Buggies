@@ -222,7 +222,7 @@ void Physics::applyNitroBoost(unsigned int vehicleNum)
 	PxRigidDynamic* vehBody = veh->getRigidDynamicActor();
 
 	vec3 forceVec = lastState->getPlayer(vehicleNum)->getForward();
-	forceVec = 80000.f * forceVec * vec3(1, 0, 1);
+	forceVec = 60000.f * forceVec * vec3(1, 0, 1);
 	vehBody->addForce(getPxVec3(forceVec));
 }
 
@@ -722,7 +722,7 @@ void Physics::handleInput(Input* input, unsigned int id){
 			stuckRotationDirection = stuckRotationDirection * -1;
 			stuckTimer[id] = clock.getCurrentTime();
 		}
-		else if ((!vehicleInAir[id] || abs(lastState->getPlayer(id)->getFSpeed()) >= 0.3f) && vehicleStuck[id]) {
+		else if ((!vehicleInAir[id]) && vehicleStuck[id]) {
 			vehicleStuck[id] = false;
 		}
 
