@@ -1648,6 +1648,8 @@ void GameManager::gameInit()
 	//skyboxTextureID = renderer.getFramebufferTexture(fbo);
 	if (selectedLevel == 0 || selectedLevel == 1)
 		skyboxTextureID = LoadTexture("textures/sky_photo6.jpg");
+	else if (selectedLevel == 3)
+		skyboxTextureID = LoadTexture("textures/courtyardSky.png");
 	else
 		skyboxTextureID = LoadTexture("textures/sunset.jpg");
 
