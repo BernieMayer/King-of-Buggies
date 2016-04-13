@@ -865,7 +865,7 @@ void GameManager::processEvents()
 				PowerupBox* collided = state.getPowerupBox(powerupId);
 				vec3 pos = collided->getPos();
 				vec3 newPos = pos;
-				newPos.y = pos.y - 20;
+				newPos.y = pos.y - RESPAWN_HEIGHT;
 				collided->setPos(newPos);
 				collided->setCollided(true);
 				collided->startCountdown();
