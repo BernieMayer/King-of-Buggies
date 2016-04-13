@@ -358,7 +358,7 @@ void AIManager::updateRecovery(unsigned int playerNum)
 
 	bool allSlow = true;
 	for (int i = 0; i < pastInfo[playerNum].size(); i++) {
-		if (pastInfo[playerNum][i].getFSpeed() > 0.5f || pastInfo[playerNum][i].getFSpeed() < -0.5f) {
+		if (pastInfo[playerNum][i].getFSpeed() > 0.25f || pastInfo[playerNum][i].getFSpeed() < -0.25f) {
 			allSlow = false;
 		}
 	}

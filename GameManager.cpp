@@ -524,6 +524,29 @@ void GameManager::initMenus() {
 				in[i].turnR = 0;
 			}
 
+			unsigned int loadingTexture = LoadTexture("menus/Loading.bmp");
+			unsigned int loading = _interface.generateComponentID();
+
+			menuBackground = LoadTexture("menus/Background.bmp");
+			menu = _interface.generateComponentID();
+
+			_interface.assignSquare(loading);
+			_interface.assignTexture(loading, loadingTexture, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(loading, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+
+			_interface.assignSquare(menu);
+			_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
+			_interface.setDimensions(menu, 0.f, 0.f, 16.f, 8.f, ANCHOR::CENTER);
+
+
+			_interface.drawAll(&renderer);
+
+			//Swap buffers  
+			glfwSwapBuffers(window);
+			//Get and organize events, like keyboard and mouse input, window resizing, etc...  
+			glfwPollEvents();
+
+
 			sound.playDingSound();
 			gameInit();
 
@@ -572,6 +595,8 @@ void GameManager::initMenus() {
 			_interface.assignSquare(lScreen);
 			_interface.assignTexture(lScreen, levelSelectScreen, ComponentInfo::UP_TEXTURE);
 			_interface.setDimensions(lScreen, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+
+
 		}
 		// If car select menu
 		else if (currentMenu == 2) {
@@ -905,7 +930,6 @@ void GameManager::processEvents()
 		case VEHICLE_BOMB_COLLISION_EVENT:
 			handleBombCollisionEvent(e);
 			break;
-
 		case POWERUPBOX_COLLISION_EVENT:
 			handlePowerupBoxCollisionEvent(e);
 			break;
@@ -1442,6 +1466,8 @@ void GameManager::applyPowerupEffect(int playerNum)
 void GameManager::gameInit()
 {
 
+	_interface.clear();
+
 	p1PauseTexture = LoadTexture("menus/P1Icon.png");
 	p1PauseIcon = _interface.generateComponentID();
 	_interface.setDisplayFilter(p1PauseIcon, DISPLAY::D9);
@@ -1792,7 +1818,8 @@ int GameManager::randomPowerup()
 	
 
 	int powerupId = rand() % 3;
-	return powerupId;
+	return 0;
+	//return powerupId;
 }
 
 void GameManager::displayEndScreen(unsigned int winnerID)
