@@ -60,7 +60,7 @@ MeshInfo::MeshInfo() {
 	meshLoader.clearData();
 
 	meshLoader.loadModel("models\\islandlevel.obj");
-	texID = LoadTexture("textures\\hud\\transparent.png");
+	texID = LoadTexture("textures\\islandleveltexture.png");
 	levelObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices, texID);
 	meshes.push_back(levelObject);
 
