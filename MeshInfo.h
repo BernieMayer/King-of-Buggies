@@ -52,6 +52,7 @@ public:
 	unsigned int getBlinkingScoreBar() { return blinkingScoreBar; }
 
 	unsigned int getTransparent() { return transparent; }
+	unsigned int getRadar() { return radar; }
 
 	MeshInfoLoader meshLoader;
 
@@ -89,6 +90,7 @@ private:
 	unsigned int blinkingScoreBar;
 
 	unsigned int transparent;
+	unsigned int radar;
 };
 
 #endif // MESHINFO_H

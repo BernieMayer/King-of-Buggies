@@ -147,6 +147,7 @@ MeshInfo::MeshInfo() {
 	blinkingScoreBar = LoadTexture("textures\\hud\\blinkingscorebar.png");
 
 	transparent = LoadTexture("textures\\hud\\transparent.png");
+	radar = LoadTexture("textures\\hud\\radar.png");
 }
 
 MeshObject MeshInfo::getMesh(int objectType) {
