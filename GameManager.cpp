@@ -874,8 +874,8 @@ void GameManager::updateBuggyExplosion()
 	if (explosionID == NO_VALUE)
 		return;
 
-	const float EXPLOSION_DURATION = 1.f;
-	const float EXPLOSION_MAX_RAD = 50.f;
+	const float EXPLOSION_DURATION = 0.7f;
+	const float EXPLOSION_MAX_RAD = 20.f;
 	const float EXPLOSION_MIN_RAD = 0.01f;
 
 	float timePassed = clock.getTimeSince(physics.gbLockStartTime);
