@@ -1000,6 +1000,11 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 					playSound("LittleBoom.wav", boomE->location, 1.0f);
 					stopFuse(boomE->ob2);
 				}
+				else if (e->getType() == RESPAWN_EVENT) {
+					RespawnEvent* rE = dynamic_cast<RespawnEvent*>(e);
+
+					playSound("Scream.wav", rE->oldLocation, 1.0f);
+				}
 			}
 		}
 
