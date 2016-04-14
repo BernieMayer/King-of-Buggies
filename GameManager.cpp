@@ -525,7 +525,7 @@ void GameManager::initMenus() {
 				in[i].turnR = 0;
 			}
 
-			unsigned int loadingTexture = LoadTexture("menus/Loading.bmp");
+			unsigned int loadingTexture = LoadTexture("menus\\controls.png");
 			unsigned int loading = _interface.generateComponentID();
 
 			menuBackground = LoadTexture("menus/Background.bmp");
@@ -533,7 +533,7 @@ void GameManager::initMenus() {
 
 			_interface.assignSquare(loading);
 			_interface.assignTexture(loading, loadingTexture, ComponentInfo::UP_TEXTURE);
-			_interface.setDimensions(loading, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+			_interface.setDimensions(loading, 0.f, 0.f, 2.f, 1.8f, ANCHOR::CENTER);
 
 			_interface.assignSquare(menu);
 			_interface.assignTexture(menu, menuBackground, ComponentInfo::UP_TEXTURE);
