@@ -448,7 +448,7 @@ void GameManager::initMenus() {
 			p1Icon = LoadTexture("menus/P1Icon.png");
 			Icon1 = _interface.generateComponentID();
 
-			levelSelectScreen = LoadTexture("menus/KoB_LevelScreen.bmp");
+			levelSelectScreen = LoadTexture("menus/KoB_LevelScreen.png");
 			lScreen = _interface.generateComponentID();
 
 			menuBackground = LoadTexture("menus/Background.bmp");
