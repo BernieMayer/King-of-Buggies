@@ -919,6 +919,7 @@ void GameManager::handleBuggySwitchEvent(Event* e)
 	GoldenBuggySwitchEvent* gbEvent = dynamic_cast<GoldenBuggySwitchEvent*>(e);
 
 	int gbIndex = gbEvent->newGB;
+	physics.modifySpeed(gbIndex, state.getPlayer(gbIndex)->getNumCoins() * -0.3333f * 2);
 	state.getPlayer(gbIndex)->removeCoins();
 	if (gbIndex < playerCoinIDs.size()) {
 		_interface.assignTexture(playerCoinIDs[gbIndex], meshInfo.getCoinComponentID(state.getPlayer(gbIndex)->getNumCoins()), ComponentInfo::UP_TEXTURE);
@@ -965,7 +966,7 @@ void GameManager::checkCoinCollisions()
 		int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
 		if (hasCoinCollision){
 			//TODO change to all
-			physics.modifySpeed(i, 0.3333f);
+			physics.modifySpeed(i, 0.3333f * 2);
 			sound.playDingSound(state.getPlayer(i)->getPos());
 			state.getPlayer(i)->addCoin();
 			if (i < numScreens)
