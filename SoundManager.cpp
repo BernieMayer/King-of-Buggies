@@ -358,7 +358,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 					}
 					else {
 						alSourcef(honkSources[i], AL_PITCH, 0.25);
-						alSourcef(honkSources[i], AL_GAIN, volume * 10);
+						alSourcef(honkSources[i], AL_GAIN, volume * 2);
 					}
 					
 					
@@ -377,6 +377,15 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 
 					alSourcefv(honkSources[i], AL_POSITION, SourcePos);
 					alSourcefv(honkSources[i], AL_VELOCITY, SourceVel);
+
+					float volume;
+					if (i != 3) {
+						volume = distanceVolumeAdjuster(1.0, state.getPlayer(i)->getPos());
+					}
+					else {
+						volume = distanceVolumeAdjuster(2.0, state.getPlayer(i)->getPos());
+					}
+					alSourcef(honkSources[i], AL_GAIN, volume);
 				}
 			}
 			else {
@@ -885,6 +894,7 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 
 		cleanOneTimeUseSources();
 
+		bool allHonking = true;
 		for (int i = 0; i < inputs.size(); i++) {
 			if (inputs[i].konamiCode) {
 				alDeleteBuffers(1, &musicBuffer);
@@ -892,9 +902,20 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 				playSecretMusic(state);
 				secretPlaying = true;
 			}
+
+			if (i < 4 && !inputs[i].horn) {
+				allHonking = false;
+			}
 		}
 
-		if (inputs[0].menu && !paused && !secretPlaying && !firstFrame) {
+		if (allHonking) {
+			alDeleteBuffers(1, &musicBuffer);
+			alDeleteSources(1, &musicSource);
+			playSong(state, "Dogsongs.wav", false);
+			secretPlaying = true;
+		}
+
+		if (inputs[0].menu && !paused && !firstFrame) {
 			paused = true;
 			pauseAllSounds();
 
