@@ -1152,7 +1152,7 @@ void GameManager::gameLoop()
 	}
 
 	numScreens = input.getNumPlayers();
-	//unsigned int numScreens = 4;
+	//numScreens = 2;
 
 	initUI();
 
@@ -1193,7 +1193,7 @@ void GameManager::gameLoop()
 		_interface.assignTexture(radarBG, meshInfo.getRadar(), ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(radarBG, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
 		_interface.setDisplayFilter(radarBG, DISPLAY::D5);
-		_interface.assignTransform(radarBG, inverse(_interface.getWinRatio()));
+		_interface.assignTransform(radarBG, inverse(_interface.getWinRatio())*inverse(renderer.getViewportRatio(renderer.getActiveViewportID())));
 	}
 	clock.start();
 	float timeProgressed = 0.f;

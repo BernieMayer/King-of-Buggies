@@ -309,6 +309,7 @@ public:
 	mat4 getViewportRatio(unsigned int viewport);
 	unsigned int numberOfViewports() { return viewports.size(); }
 	Viewport getActiveViewport() { return viewports[activeViewport]; }
+	unsigned int getActiveViewportID() { return activeViewport; }
 
 	//Delete objects
 	void deleteDrawableObject(int object);

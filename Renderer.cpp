@@ -130,6 +130,11 @@ unsigned int Renderer::generateObjectID()
 	}
 }
 
+mat4 Renderer::getViewportRatio(unsigned int viewport)
+{
+	return viewports[activeViewport].viewRatio;
+}
+
 void Renderer::assignMeshObject(unsigned int id, MeshObject* mesh)
 {
 	if ((id >= objects.size()) || (objects[id].deleted))
