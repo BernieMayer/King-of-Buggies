@@ -841,29 +841,58 @@ void GameManager::changeGoldenBuggy()
 	switchBuggyUI();
 }
 
-const float MIN_EXPLOSION_RADIUS = 0.01f;
-const float MAX_EXPLOSION_RADIUS = 5.f;
+mat4 translationMatrix(vec3 mPos)
+{
+	return mat4 (1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		mPos.x, mPos.y, mPos.z, 1);
+}
+
+/*mat4 scaleMatrix(vec3 scale)
+{
+	return mat4(scale.x, 0, 0, 0,
+		0, scale.y, 0, 0,
+		0, 0, scale.z, 0,
+		0, 0, 0, 1);
+}*/
+
 
 void GameManager::startBuggyExplosion(vec3 loc)
 {
-
-
 	explosionLocation = loc;
 
 	explosionID = renderer.generateObjectID();
-	renderer.assignSkyDome(explosionID, 1.f, 100, &buggyExplosionVerts, &buggyExplosionUVs, &buggyExplosionIndices, skyboxTextureID);		//Change texture
-
-
+	renderer.assignSphere(explosionID, 1.f, 100, &buggyExplosionVerts, &buggyExplosionUVs, &buggyExplosionIndices, buggyExplosionTexture);		//Change texture
+	renderer.assignMaterial(explosionID, &skyMaterial);
+	renderer.assignTransform(explosionID, translationMatrix(loc));
 }
 
 void GameManager::updateBuggyExplosion()
 {
+	if (explosionID == NO_VALUE)
+		return;
 
+	const float EXPLOSION_DURATION = 1.f;
+	const float EXPLOSION_MAX_RAD = 50.f;
+	const float EXPLOSION_MIN_RAD = 0.01f;
+
+	float timePassed = clock.getTimeSince(physics.gbLockStartTime);
+
+	float radius = EXPLOSION_MIN_RAD + timePassed*(EXPLOSION_MAX_RAD - EXPLOSION_MIN_RAD) / EXPLOSION_DURATION;
+
+	printf("Radius = %f\n", radius);
+
+	renderer.assignScale(explosionID, scaleMatrix(vec3(radius, radius, radius)));
+
+	if (radius > EXPLOSION_MAX_RAD)
+		endBuggyExplosion();
 }
 
 void GameManager::endBuggyExplosion()
 {
-
+	renderer.deleteDrawableObject(explosionID);
+	explosionID = NO_VALUE;
 }
 
 void GameManager::handleBombCollisionEvent(Event* e)
@@ -923,6 +952,8 @@ void GameManager::handleBuggySwitchEvent(Event* e)
 	if (gbIndex < playerCoinIDs.size()) {
 		_interface.assignTexture(playerCoinIDs[gbIndex], meshInfo.getCoinComponentID(state.getPlayer(gbIndex)->getNumCoins()), ComponentInfo::UP_TEXTURE);
 	}
+
+	startBuggyExplosion(gbEvent->gbPos);
 }
 
 
@@ -1258,6 +1289,8 @@ void GameManager::gameLoop()
 			displayDebugging = !displayDebugging;
 		}
 
+		updateBuggyExplosion();
+
 		renderer.loadOptimizedBuffers();
 
 		//Render shadow map
@@ -1307,6 +1340,9 @@ void GameManager::gameLoop()
 			//Render
 			renderer.useViewport(i+1);
 				
+			glEnable(GL_BLEND); 
+			//glBlendFunc(GL_ONE, GL_ONE);
+			glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 			renderer.drawBufferedAll(USING_SHADOWS);
 
 			//Should be in a for loop for every player
@@ -1670,6 +1706,8 @@ void GameManager::gameInit()
 	skyboxID = renderer.generateObjectID();
 	renderer.assignSkyDome(skyboxID, 160.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
+
+	buggyExplosionTexture = LoadTexture("textures/explosion.png");
 
 	lastScoreUpdateTime = clock.getCurrentTime();
 

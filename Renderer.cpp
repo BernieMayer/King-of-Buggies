@@ -1721,6 +1721,64 @@ void Renderer::assignPlane(unsigned int id, float width,
 
 void Renderer::assignSphere(unsigned int id, float radius, unsigned int divisions,
 	vector<vec3>* mesh,
+	vector<vec2>* uvs,
+	vector<unsigned int>* indices, unsigned int textureID)
+{
+
+	mesh->clear();
+	indices->clear();
+	uvs->clear();
+
+	unsigned int yDivisions = divisions;
+	unsigned int xDivisions = 2 * divisions;
+
+	float uInc = 2.f*M_PI / (float)xDivisions;
+	float vInc = M_PI / (float)yDivisions;
+
+	//Front face
+	float u = 0.f;
+	for (unsigned int i = 0; i <= xDivisions; i++)
+	{
+		float x_base = cos(u);
+		float z_base = sin(u);
+
+		float v = -M_PI*0.5;
+		for (unsigned int j = 0; j <= yDivisions; j++)
+		{
+
+			float x = x_base*cos(v);
+			float z = z_base*cos(v);
+			float y = sin(v);
+			mesh->push_back(vec3(x, y, z)*radius);
+			uvs->push_back(vec2(u / (2.f*M_PI), (v + M_PI*0.5) / (M_PI)));
+
+			v += vInc;
+		}
+		u += uInc;
+	}
+
+	for (unsigned int i = 0; i < xDivisions; i++)
+	{
+		for (unsigned int j = 0; j < yDivisions; j++)
+		{
+			indices->push_back(i*(yDivisions + 1) + j);
+			indices->push_back(i*(yDivisions + 1) + j + 1);
+			indices->push_back((i + 1)*(yDivisions + 1) + j + 1);
+			indices->push_back(i*(yDivisions + 1) + j);
+			indices->push_back((i + 1)*(yDivisions + 1) + j + 1);
+			indices->push_back((i + 1)*(yDivisions + 1) + j);
+		}
+	}
+
+	assignMesh(id, mesh);
+	assignUVs(id, uvs);
+	assignIndices(id, indices);
+	assignTexture(id, textureID);
+
+}
+
+void Renderer::assignSphere(unsigned int id, float radius, unsigned int divisions,
+	vector<vec3>* mesh,
 	vector<vec3>* normals,
 	vector<vec2>* uvs,
 	vector<unsigned int>* indices)

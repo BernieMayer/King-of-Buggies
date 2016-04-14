@@ -18,6 +18,8 @@ public:
 
 	unsigned int anchorPoint;
 	float xOffset, yOffset, width, height;
+	
+	mat4 transform;
 
 	ComponentInfo();
 
@@ -90,6 +92,7 @@ public:
 	void assignTexture(unsigned int id, unsigned int texID, unsigned int textureType);
 	void assignIndices(unsigned int id, vector<unsigned int>* indices);
 	void setDisplayFilter(unsigned int id, unsigned int displayFilter);
+	void assignTransform(unsigned int id, const mat4& transform);
 	//Coordinates run from -1 to 1 (-1, -1 being bottom left corner)
 	void setDimensions(unsigned int id, float xOffset, float yOffset, float width, float height, unsigned int anchor);
 	void changeState(unsigned int id, unsigned int state);

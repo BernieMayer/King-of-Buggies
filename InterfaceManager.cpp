@@ -11,7 +11,8 @@ ComponentInfo::ComponentInfo() :
 	height(1.f),
 	state(STATE::UP),
 	isActive(true),
-	displayFilter(DISPLAY::ALL)
+	displayFilter(DISPLAY::ALL),
+	transform(1.f)
 {
 	for (unsigned int i = 0; i < 3; i++)
 		texIDs[i] = NO_VALUE;
@@ -52,7 +53,7 @@ mat4 ComponentInfo::getMatrix(const mat4& winRatio)
 	transMat[3][0] = translation.x;
 	transMat[3][1] = translation.y;
 
-	return winRatio*transMat*scale;
+	return winRatio*transform*transMat*scale;
 }
 
 
@@ -223,6 +224,11 @@ void InterfaceManager::assignSquare(unsigned int id)
 {
 	assignVertices(id, &squareVerts);
 	assignUVs(id, &squareUVs);
+}
+
+void InterfaceManager::assignTransform(unsigned int id, const mat4& transform)
+{
+	components[id].transform = transform;
 }
 
 void InterfaceManager::setDisplayFilter(unsigned int id, unsigned int displayFilter)
