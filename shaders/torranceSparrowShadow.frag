@@ -1,6 +1,6 @@
 #version 330 core
  
-out vec3 fragColor;
+out vec4 fragColor;
 
 in vec3 worldPosition;
 in vec3 fragNormal;
@@ -121,7 +121,7 @@ void main(){
 	visibility = visibility*0.7 + 0.3;
 
 	vec3 color = texture(colorTexture, texCoord).rgb;
-    fragColor = torranceSparrowLighting(visibility)*color;
+    fragColor = vec4(torranceSparrowLighting(visibility)*color, 1.0);
 }
 
 

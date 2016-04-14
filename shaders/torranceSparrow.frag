@@ -1,6 +1,6 @@
 #version 330 core
  
-out vec3 fragColor;
+out vec4 fragColor;
 
 in vec3 worldPosition;
 in vec3 fragNormal;
@@ -29,7 +29,7 @@ float torranceSparrowLighting()
 
 void main(){
     
-    fragColor = torranceSparrowLighting()*color;
+    fragColor = vec4(torranceSparrowLighting()*color, 1.0);
 }
 
 

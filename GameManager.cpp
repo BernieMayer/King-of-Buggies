@@ -878,13 +878,18 @@ void GameManager::updateBuggyExplosion()
 	const float EXPLOSION_MAX_RAD = 20.f;
 	const float EXPLOSION_MIN_RAD = 0.01f;
 
+	const float MAX_ROTATION = M_PI*3.f;
+
 	float timePassed = clock.getTimeSince(physics.gbLockStartTime);
 
-	float radius = EXPLOSION_MIN_RAD + timePassed*(EXPLOSION_MAX_RAD - EXPLOSION_MIN_RAD) / EXPLOSION_DURATION;
+	float progress = timePassed / EXPLOSION_DURATION;
+
+	float radius = EXPLOSION_MIN_RAD + progress*(EXPLOSION_MAX_RAD - EXPLOSION_MIN_RAD);
 
 	printf("Radius = %f\n", radius);
 
 	renderer.assignScale(explosionID, scaleMatrix(vec3(radius, radius, radius)));
+	renderer.assignTransform(explosionID, translationMatrix(explosionLocation)*rotY(MAX_ROTATION*progress));
 
 	if (radius > EXPLOSION_MAX_RAD)
 		endBuggyExplosion();
@@ -1355,6 +1360,7 @@ void GameManager::gameLoop()
 			renderer.clearDrawBuffers(backgroundColor);
 			renderer.drawShadowMapAll(0);
 			renderer.loadShadowMap(renderer.getFramebufferTexture(fbo));
+			//renderer.loadShadowMap(skyboxTextureID);
 			renderer.useFramebuffer(NO_VALUE);
 		}
 		//Draw scene
@@ -1364,7 +1370,7 @@ void GameManager::gameLoop()
 		{
 			//Free camera movement
 			if (freeRoam && (i == 0))
-			{
+			{ 
 				renderer.loadCamera(&freeCam);
 				//Debugging avoidance
 				for (unsigned int j = 0; j < state.numberOfPlayers(); j++)
@@ -1770,11 +1776,11 @@ void GameManager::gameInit()
 	else
 		skyboxTextureID = LoadTexture("textures/sunset.jpg");
 
+	buggyExplosionTexture = LoadTexture("textures/explosion.png");
+
 	skyboxID = renderer.generateObjectID();
 	renderer.assignSkyDome(skyboxID, 160.f, 50, &skyboxVerts, &skyboxUVs, &skyboxIndices, skyboxTextureID);
 	renderer.assignMaterial(skyboxID, &skyMaterial);
-
-	buggyExplosionTexture = LoadTexture("textures/explosion.png");
 
 	lastScoreUpdateTime = clock.getCurrentTime();
 

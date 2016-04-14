@@ -1,6 +1,6 @@
 #version 330 core
  
-out vec3 fragColor;
+out vec4 fragColor;
 
 in vec3 worldPosition;
 in vec3 fragNormal;
@@ -33,7 +33,7 @@ void main(){
     
 	vec3 color = texture(colorTexture, texCoord).rgb;
 	//vec3 color = vec3(texCoord.x, texCoord.y, 0.f);
-    fragColor = torranceSparrowLighting()*color;
+    fragColor = vec4(torranceSparrowLighting()*color, 1.0);
 }
 
 

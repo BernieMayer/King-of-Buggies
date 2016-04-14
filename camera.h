@@ -91,5 +91,9 @@ public:
 
 };
 
+mat4 rotX(float theta);
+mat4 rotY(float theta);
+mat4 rotZ(float theta);
+
 
 #endif //CAMERA_H

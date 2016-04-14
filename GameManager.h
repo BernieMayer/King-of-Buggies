@@ -94,6 +94,8 @@ private:
 	unsigned int explosionID;
 
 	vec3 explosionLocation;
+
+	unsigned int blTex;
 	
 
 	vector<bool> hasPowerup;
