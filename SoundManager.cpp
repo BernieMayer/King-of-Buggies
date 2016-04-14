@@ -358,7 +358,7 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 					}
 					else {
 						alSourcef(honkSources[i], AL_PITCH, 0.25);
-						alSourcef(honkSources[i], AL_GAIN, volume * 2);
+						alSourcef(honkSources[i], AL_GAIN, volume * 10);
 					}
 					
 					
