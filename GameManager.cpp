@@ -916,7 +916,13 @@ void GameManager::handlePowerupBoxCollisionEvent(Event* e)
 
 void GameManager::handleBuggySwitchEvent(Event* e)
 {
+	GoldenBuggySwitchEvent* gbEvent = dynamic_cast<GoldenBuggySwitchEvent*>(e);
 
+	int gbIndex = gbEvent->newGB;
+	state.getPlayer(gbIndex)->removeCoins();
+	if (gbIndex < playerCoinIDs.size()) {
+		_interface.assignTexture(playerCoinIDs[gbIndex], meshInfo.getCoinComponentID(state.getPlayer(gbIndex)->getNumCoins()), ComponentInfo::UP_TEXTURE);
+	}
 }
 
 
@@ -946,7 +952,15 @@ void GameManager::checkCoinCollisions()
 {
 	// Check for player/coin collisions, and coin respawns also check for other collisions
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++) {
-		bool hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+		
+		bool hasCoinCollision;
+		if (state.getGoldenBuggyID() != i) {
+			hasCoinCollision = state.checkCoinCollision(state.getPlayer(i)->getPos());
+		}
+		else {
+			hasCoinCollision = false;
+		}
+
 		bool hasBoostPadCollision = state.checkBoostPadCollision(state.getPlayer(i)->getPos());
 		int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
 		if (hasCoinCollision){
