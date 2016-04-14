@@ -112,6 +112,8 @@ private:
 	vector<unsigned int> buggyIndicatorUIs;
 	vector<unsigned int> scoreBarIDs;
 
+	vector<timeb> lastTimeUsedBomb;
+
 	//Game loop functions
 	void changeGoldenBuggy();
 	void handleBombCollisionEvent(Event* e);

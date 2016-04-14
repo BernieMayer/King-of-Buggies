@@ -125,6 +125,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
+	lastTimeUsedBomb.push_back(clock.getCurrentTime());
 }
 
 void GameManager::createDecoyGoldenBuggie(vec3 position, VehicleTraits traits)
@@ -902,6 +903,9 @@ void GameManager::handlePowerupBoxCollisionEvent(Event* e)
 				state.getPlayer(vehicleId)->setEnergyForNitro(600.0f);
 				printf("Nitro Boost with energy level  %f \n", state.getPlayer(vehicleId)->getEnergyForNitro());
 			}
+			else if (powerUpType == POWERUPS::BOMB) {
+				state.getPlayer(vehicleId)->setNumBombs(3);
+			}
 			state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 			// display powerup information in HUD
@@ -1457,7 +1461,16 @@ void GameManager::applyPowerupEffect(int playerNum)
 	}
 	else if (powerUpId == POWERUPS::BOMB)
 	{
-		createBomb(playerNum);
+		if (clock.getTimeSince(lastTimeUsedBomb[playerNum]) >= 10 / 60.0f) {
+			createBomb(playerNum);
+			lastTimeUsedBomb[playerNum] = clock.getCurrentTime();
+			state.getPlayer(playerNum)->decrementBombs();
+			if (state.getPlayer(playerNum)->getNumBombs() <= 0) {
+				_interface.toggleActive(powerupComponentIDs[playerNum], false);
+				hasPowerup.at(playerNum) = false;
+			}
+		}
+		state.getPlayer(playerNum)->addPowerUp(POWERUPS::BOMB);
 	}
 	else if (powerUpId == POWERUPS::MINE)
 	{
@@ -1487,7 +1500,7 @@ void GameManager::applyPowerupEffect(int playerNum)
 		}
 	}
 
-	if (powerUpId != POWERUPS::NITROBOOST) {
+	if (powerUpId != POWERUPS::NITROBOOST && powerUpId != POWERUPS::BOMB) {
 		_interface.toggleActive(powerupComponentIDs[playerNum], false);
 		hasPowerup.at(playerNum) = false;
 	}

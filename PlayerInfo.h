@@ -55,6 +55,10 @@ public:
 	void setEnergyForNitro(float nitro);
 	float getEnergyForNitro();
 
+	int getNumBombs() { return numBombs; }
+	void decrementBombs() { numBombs--; }
+	void setNumBombs(int num) { numBombs = num; }
+
 	bool getAlmostWon() { return almostWon; }
 	void setAlmostWon() { almostWon = true; }
 
@@ -67,6 +71,7 @@ protected:
 	vec3 velocity;
 
 	float energyForNitro;
+	int numBombs = 0;
 	int powerup;
 	int numCoins;
 	float score;
