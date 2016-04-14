@@ -80,6 +80,8 @@ public:
 	unsigned int getWindowWidth() { return wWidth; }
 	unsigned int getWindowHeight() { return wHeight; }
 
+	mat4 getWinRatio() { return winRatio; }
+
 	void clear();
 	
 	vector<vector<vec3>> generateScoreBars(GameState* state);

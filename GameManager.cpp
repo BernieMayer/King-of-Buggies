@@ -1186,6 +1186,7 @@ void GameManager::gameLoop()
 		_interface.assignTexture(radarBG, meshInfo.getRadar(), ComponentInfo::UP_TEXTURE);
 		_interface.setDimensions(radarBG, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
 		_interface.setDisplayFilter(radarBG, DISPLAY::D5);
+		_interface.assignTransform(radarBG, inverse(_interface.getWinRatio()));
 	}
 	clock.start();
 	float timeProgressed = 0.f;
@@ -1402,6 +1403,7 @@ void GameManager::gameLoop()
 
 				}
 				//Draw the radar to the frameBuffer
+				_interface.assignTransform(radarBG, inverse(_interface.getWinRatio()));
 				renderer.useFramebuffer(radarFBO[i]);
 				renderer.clearDrawBuffers(vec3(0.0f, 0.0f, 0.0f));
 				_interface.draw(radarBG, &renderer);
