@@ -19,6 +19,7 @@
 #include "BombCreationEvent.h"
 #include "PowerupCollisionEvent.h"
 #include "Bomb.h"
+#include "RespawnEvent.h"
 
 #include "definitions.h"
 

@@ -737,6 +737,8 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (lastState != NULL) {
 		if (lastState->getPlayer(id)->getPos().y <= -30.0f) {
+			lastState->pushEvent(new RespawnEvent(id, lastState->getStartCoord(id), lastState->getPlayer(id)->getPos()));
+
 			vehicle->getRigidDynamicActor()->setGlobalPose(PxTransform(getPxVec3(lastState->getStartCoord(id))));
 			vehicle->getRigidDynamicActor()->clearForce(PxForceMode::eACCELERATION);
 			vehicle->getRigidDynamicActor()->clearTorque(PxForceMode::eACCELERATION);
@@ -1525,7 +1527,6 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 									newGoldenBuggy = true;
 									modifySpeed(i, 3);
 									goldenBuggyLock = true;
-									//lastState->getPlayer(indexOfOldGoldenBuggy)->removeCoins();
 									gbLockStartTime = clock.getCurrentTime();
 									//buggyExplosion(i);
 									lastState->pushEvent(new GoldenBuggySwitchEvent(indexOfOldGoldenBuggy, indexOfGoldenBuggy, lastState->getPlayer(i)->getPos()));
@@ -1542,7 +1543,6 @@ void Physics::onContact(const PxContactPairHeader& pairHeader, const PxContactPa
 									goldenBuggy = &vehicleActors[i];
 									newGoldenBuggy = true;
 									modifySpeed(i, 3);
-									//lastState->getPlayer(indexOfOldGoldenBuggy)->removeCoins();
 									goldenBuggyLock = true;
 									gbLockStartTime = clock.getCurrentTime();
 									//buggyExplosion(i);

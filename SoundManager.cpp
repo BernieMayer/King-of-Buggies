@@ -974,7 +974,7 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 					vec3 force = vehE->force;
 					float volume = length(force);
 					volume = map(volume, 0, 300000, 0, 2);
-					cout << "Volume: " << volume << "\n";
+					//cout << "Volume: " << volume << "\n";
 					playBumpSound(vehE->location, volume);
 				}
 				else if (e->getType() == VEHICLE_WALL_COLLISION_EVENT) {
@@ -983,7 +983,7 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 					vec3 force = vehE->force;
 					float volume = length(force);
 					volume = map(volume, 0, 300000, 0, 2);
-					cout << "Volume: " << volume << "\n";
+					//cout << "Volume: " << volume << "\n";
 					playBumpSound(vehE->location, volume);
 				}
 				else if (e->getType() == GOLDEN_BUGGY_SWITCH_EVENT) {

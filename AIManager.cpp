@@ -351,14 +351,14 @@ Input AIManager::recover(int playerNum) {
 void AIManager::updateRecovery(unsigned int playerNum)
 {
 	// Keeps a sort of cyclical vector
-	if (pastInfo[playerNum].size() < recoveryThreshold) {
+	if (pastInfo[playerNum].size() > recoveryThreshold) {
 		pastInfo[playerNum].erase(pastInfo[playerNum].begin());
 	}
 	pastInfo[playerNum].push_back((*state->getPlayer(playerNum)));
 
 	bool allSlow = true;
 	for (int i = 0; i < pastInfo[playerNum].size(); i++) {
-		if (pastInfo[playerNum][i].getFSpeed() > 0.25f || pastInfo[playerNum][i].getFSpeed() < -0.25f) {
+		if (pastInfo[playerNum][i].getFSpeed() > 0.5f || pastInfo[playerNum][i].getFSpeed() < -0.5f) {
 			allSlow = false;
 		}
 	}
@@ -367,9 +367,9 @@ void AIManager::updateRecovery(unsigned int playerNum)
 		collisionRecoveryCounter++;
 		if (collisionRecoveryCounter > collisionRecoveryCounterMax) {
 			collisionRecoveryCounter = 0;
-			if (!allSlow) {
+			//if (!allSlow) {
 				collisionRecovery = false;
-			}
+			//}
 		}
 	}
 
@@ -594,7 +594,7 @@ Input AIManager::testAIEvade(int playerNum) {
 Input AIManager::driveToPoint(int playerNum, vec3 pos) {
 	lastDriveToPos = pos;
 
-	
+	reversing[playerNum] = false;
 	
 	Entity* ai = state->getPlayer(playerNum);
 	vec3 aiPos = ai->getPos();

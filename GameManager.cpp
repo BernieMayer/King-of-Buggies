@@ -125,6 +125,7 @@ void GameManager::createPlayer(vec3 position, VehicleTraits traits, unsigned int
 	}
 
 	state.addPlayer(PlayerInfo(chassisRenderID, physicsID, wheelIDs, colour, texID));
+	lastTimeUsedBomb.push_back(clock.getCurrentTime());
 }
 
 void GameManager::createDecoyGoldenBuggie(vec3 position, VehicleTraits traits)
@@ -931,6 +932,9 @@ void GameManager::handlePowerupBoxCollisionEvent(Event* e)
 				state.getPlayer(vehicleId)->setEnergyForNitro(600.0f);
 				printf("Nitro Boost with energy level  %f \n", state.getPlayer(vehicleId)->getEnergyForNitro());
 			}
+			else if (powerUpType == POWERUPS::BOMB) {
+				state.getPlayer(vehicleId)->setNumBombs(3);
+			}
 			state.getPlayer(vehicleId)->addPowerUp(powerUpType);
 
 			// display powerup information in HUD
@@ -948,6 +952,7 @@ void GameManager::handleBuggySwitchEvent(Event* e)
 	GoldenBuggySwitchEvent* gbEvent = dynamic_cast<GoldenBuggySwitchEvent*>(e);
 
 	int gbIndex = gbEvent->newGB;
+	physics.modifySpeed(gbIndex, state.getPlayer(gbIndex)->getNumCoins() * -0.3333f * 2);
 	state.getPlayer(gbIndex)->removeCoins();
 	if (gbIndex < playerCoinIDs.size()) {
 		_interface.assignTexture(playerCoinIDs[gbIndex], meshInfo.getCoinComponentID(state.getPlayer(gbIndex)->getNumCoins()), ComponentInfo::UP_TEXTURE);
@@ -956,6 +961,17 @@ void GameManager::handleBuggySwitchEvent(Event* e)
 	startBuggyExplosion(gbEvent->gbPos);
 }
 
+void GameManager::handleRespawnEvent(Event* e) {
+	RespawnEvent* rEvent = dynamic_cast<RespawnEvent*>(e);
+
+	int index = rEvent->playerNum;
+	physics.modifySpeed(index, state.getPlayer(index)->getNumCoins() * -0.3333f * 2);
+
+	state.getPlayer(index)->removeCoins();
+	if (index < playerCoinIDs.size()) {
+		_interface.assignTexture(playerCoinIDs[index], meshInfo.getCoinComponentID(state.getPlayer(index)->getNumCoins()), ComponentInfo::UP_TEXTURE);
+	}
+}
 
 void GameManager::processEvents()
 {
@@ -973,6 +989,10 @@ void GameManager::processEvents()
 
 		case GOLDEN_BUGGY_SWITCH_EVENT:
 			handleBuggySwitchEvent(e);
+			break;
+
+		case RESPAWN_EVENT:
+			handleRespawnEvent(e);
 			break;
 		}
 		
@@ -996,7 +1016,7 @@ void GameManager::checkCoinCollisions()
 		int hasMineCollision = state.checkMineCollision(state.getPlayer(i)->getPos());
 		if (hasCoinCollision){
 			//TODO change to all
-			physics.modifySpeed(i, 0.3333f);
+			physics.modifySpeed(i, 0.3333f * 2);
 			sound.playDingSound(state.getPlayer(i)->getPos());
 			state.getPlayer(i)->addCoin();
 			if (i < numScreens)
@@ -1477,7 +1497,16 @@ void GameManager::applyPowerupEffect(int playerNum)
 	}
 	else if (powerUpId == POWERUPS::BOMB)
 	{
-		createBomb(playerNum);
+		if (clock.getTimeSince(lastTimeUsedBomb[playerNum]) >= 10 / 60.0f) {
+			createBomb(playerNum);
+			lastTimeUsedBomb[playerNum] = clock.getCurrentTime();
+			state.getPlayer(playerNum)->decrementBombs();
+			if (state.getPlayer(playerNum)->getNumBombs() <= 0) {
+				_interface.toggleActive(powerupComponentIDs[playerNum], false);
+				hasPowerup.at(playerNum) = false;
+			}
+		}
+		state.getPlayer(playerNum)->addPowerUp(POWERUPS::BOMB);
 	}
 	else if (powerUpId == POWERUPS::MINE)
 	{
@@ -1507,7 +1536,7 @@ void GameManager::applyPowerupEffect(int playerNum)
 		}
 	}
 
-	if (powerUpId != POWERUPS::NITROBOOST) {
+	if (powerUpId != POWERUPS::NITROBOOST && powerUpId != POWERUPS::BOMB) {
 		_interface.toggleActive(powerupComponentIDs[playerNum], false);
 		hasPowerup.at(playerNum) = false;
 	}

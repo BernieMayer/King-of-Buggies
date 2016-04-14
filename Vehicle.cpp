@@ -42,7 +42,7 @@ void Vehicle::modifySpeed(float modSpeed)
 
 	PxVehicleDrive4W* veh = vehDrive4W;
 	PxVehicleEngineData engine = veh->mDriveSimData.getEngineData();
-	engine.mPeakTorque = engine.mPeakTorque + modSpeed * engine.mPeakTorque;
+	engine.mPeakTorque = engine.mPeakTorque + modSpeed * baseTorque;
 	veh->mDriveSimData.setEngineData(engine);
 }
 

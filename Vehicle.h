@@ -44,6 +44,8 @@ public:
 	bool inAir;
 	bool isGoldenBuggy;
 
+	float baseTorque = 2000.0f;
+
 
 	int forwards; 
 	unsigned int vehicle_create(VehicleTraits traits, vec3 initPos);	//Returns ID for vehicle

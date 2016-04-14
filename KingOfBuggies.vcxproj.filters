@@ -90,6 +90,7 @@
     <ClCompile Include="shadow.cpp">
       <Filter>Materials</Filter>
     </ClCompile>
+    <ClCompile Include="RespawnEvent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AIManager.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="shadow.h">
       <Filter>Materials</Filter>
     </ClInclude>
+    <ClInclude Include="RespawnEvent.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Materials">

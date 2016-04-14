@@ -58,7 +58,7 @@ public:
 	bool collisionRecovery = false;
 	int collisionRecoveryCounter = 0;
 	// 2 seconds to recover
-	int collisionRecoveryCounterMax = 1 * 60;
+	int collisionRecoveryCounterMax = 1.5 * 60;
 	timeb collisionStartTime;
 
 	//Test code - Not for use in final product
