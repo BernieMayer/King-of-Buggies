@@ -117,6 +117,7 @@ private:
 	void handleBombCollisionEvent(Event* e);
 	void handlePowerupBoxCollisionEvent(Event* e);
 	void handleBuggySwitchEvent(Event* e);
+	void handleRespawnEvent(Event* e);
 	void processEvents();
 	void checkCoinCollisions();
 	void updateCamera(unsigned int i, Input input, float frameTime);

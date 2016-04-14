@@ -740,6 +740,8 @@ void Physics::handleInput(Input* input, unsigned int id){
 			vehicle->getRigidDynamicActor()->setGlobalPose(PxTransform(getPxVec3(lastState->getStartCoord(id))));
 			vehicle->getRigidDynamicActor()->clearForce(PxForceMode::eACCELERATION);
 			vehicle->getRigidDynamicActor()->clearTorque(PxForceMode::eACCELERATION);
+
+			lastState->pushEvent(new RespawnEvent(id, lastState->getStartCoord(id)));
 		}
 	}
 

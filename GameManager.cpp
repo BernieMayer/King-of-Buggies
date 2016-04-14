@@ -926,6 +926,17 @@ void GameManager::handleBuggySwitchEvent(Event* e)
 	}
 }
 
+void GameManager::handleRespawnEvent(Event* e) {
+	RespawnEvent* rEvent = dynamic_cast<RespawnEvent*>(e);
+
+	int index = rEvent->playerNum;
+	physics.modifySpeed(index, state.getPlayer(index)->getNumCoins() * -0.3333f * 2);
+
+	state.getPlayer(index)->removeCoins();
+	if (index < playerCoinIDs.size()) {
+		_interface.assignTexture(playerCoinIDs[index], meshInfo.getCoinComponentID(state.getPlayer(index)->getNumCoins()), ComponentInfo::UP_TEXTURE);
+	}
+}
 
 void GameManager::processEvents()
 {
@@ -943,6 +954,10 @@ void GameManager::processEvents()
 
 		case GOLDEN_BUGGY_SWITCH_EVENT:
 			handleBuggySwitchEvent(e);
+			break;
+
+		case RESPAWN_EVENT:
+			handleRespawnEvent(e);
 			break;
 		}
 		
