@@ -958,6 +958,8 @@ void GameManager::handleBuggySwitchEvent(Event* e)
 		_interface.assignTexture(playerCoinIDs[gbIndex], meshInfo.getCoinComponentID(state.getPlayer(gbIndex)->getNumCoins()), ComponentInfo::UP_TEXTURE);
 	}
 
+	gbInputLock = false;
+
 	startBuggyExplosion(gbEvent->gbPos);
 }
 
@@ -970,6 +972,11 @@ void GameManager::handleRespawnEvent(Event* e) {
 	state.getPlayer(index)->removeCoins();
 	if (index < playerCoinIDs.size()) {
 		_interface.assignTexture(playerCoinIDs[index], meshInfo.getCoinComponentID(state.getPlayer(index)->getNumCoins()), ComponentInfo::UP_TEXTURE);
+	}
+
+	if (state.getGoldenBuggyID() == rEvent->playerNum) {
+		gbInputLock = true;
+		buggyInputLockTime = clock.getCurrentTime();
 	}
 }
 
@@ -1221,6 +1228,28 @@ void GameManager::gameLoop()
 			}
 
 			inputs[i] = smoothers[i].smooth(inputs[i], state.getPlayer(i)->getInAir());
+
+			if (gbInputLock) {
+				if (clock.getTimeSince(buggyInputLockTime) >= buggyInputLockEnd) {
+					gbInputLock = false;
+				}
+				else {
+					inputs[state.getGoldenBuggyID()].forward = 0.0f;
+					inputs[state.getGoldenBuggyID()].backward = 0.0f;
+					inputs[state.getGoldenBuggyID()].turnL = 0.0f;
+					inputs[state.getGoldenBuggyID()].turnR = 0.0f;
+					inputs[state.getGoldenBuggyID()].tiltForward = 0.0f;
+					inputs[state.getGoldenBuggyID()].tiltBackward = 0.0f;
+					inputs[state.getGoldenBuggyID()].rollL = 0.0f;
+					inputs[state.getGoldenBuggyID()].rollR = 0.0f;
+					inputs[state.getGoldenBuggyID()].spinL = 0.0f;
+					inputs[state.getGoldenBuggyID()].spinR = 0.0f;
+
+					inputs[state.getGoldenBuggyID()].jump = false;
+					inputs[state.getGoldenBuggyID()].drift = false;
+					inputs[state.getGoldenBuggyID()].powerup = false;
+				}
+			}
 
 			if(!paused && !freeRoam)
 				physics.handleInput(&inputs[i], state.getPlayer(i)->getPhysicsID());

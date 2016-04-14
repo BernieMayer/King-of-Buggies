@@ -143,6 +143,10 @@ private:
 	unsigned int pauseMenuBackground;
 	unsigned int pauseMenu;
 
+	bool gbInputLock = false;
+	timeb buggyInputLockTime = clock.getCurrentTime();
+	float buggyInputLockEnd = 7.0f;
+
 public:
 	GameManager(GLFWwindow* newWindow);
 
