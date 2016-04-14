@@ -53,7 +53,7 @@ mat4 ComponentInfo::getMatrix(const mat4& winRatio)
 	transMat[3][0] = translation.x;
 	transMat[3][1] = translation.y;
 
-	return winRatio*transform*transMat*scale;
+	return winRatio*transMat*scale*transform;
 }
 
 

@@ -916,7 +916,7 @@ void GameManager::handlePowerupBoxCollisionEvent(Event* e)
 		PowerupBox* collided = state.getPowerupBox(powerupId);
 		vec3 pos = collided->getPos();
 		vec3 newPos = pos;
-		newPos.y = pos.y - 20;
+		newPos.y = pos.y - RESPAWN_HEIGHT;
 		collided->setPos(newPos);
 		collided->setCollided(true);
 		collided->startCountdown();
@@ -1153,6 +1153,7 @@ void GameManager::gameLoop()
 
 	vector<unsigned int> radarInterfaceID(numScreens);
 	vector<unsigned int> radarFBO(numScreens);
+	unsigned int radarBG;
 	for (int i = 0; i < numScreens; i++)
 	{
 
@@ -1180,6 +1181,12 @@ void GameManager::gameLoop()
 		//use multiple of these to allow for split screen
 		radarFBO[i] = renderer.createFramebuffer(400, 400);
 		_interface.assignTexture(radarInterfaceID[i], renderer.getFramebufferTexture(radarFBO[i]), ComponentInfo::UP_TEXTURE); //Magic third parameter
+		radarBG = _interface.generateComponentID();
+		_interface.assignSquare(radarBG);
+		_interface.assignTexture(radarBG, meshInfo.getRadar(), ComponentInfo::UP_TEXTURE);
+		_interface.setDimensions(radarBG, 0.f, 0.f, 2.f, 2.f, ANCHOR::CENTER);
+		_interface.setDisplayFilter(radarBG, DISPLAY::D5);
+		_interface.assignTransform(radarBG, inverse(_interface.getWinRatio()));
 	}
 	clock.start();
 	float timeProgressed = 0.f;
@@ -1195,7 +1202,6 @@ void GameManager::gameLoop()
 
 	while (!glfwWindowShouldClose(window) && !gameOver)
 	{
-
 		//Get inputs from players/ai
 		for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 		{
@@ -1397,9 +1403,12 @@ void GameManager::gameLoop()
 
 				}
 				//Draw the radar to the frameBuffer
+				_interface.assignTransform(radarBG, inverse(_interface.getWinRatio()));
 				renderer.useFramebuffer(radarFBO[i]);
 				renderer.clearDrawBuffers(vec3(0.0f, 0.0f, 0.0f));
+				_interface.draw(radarBG, &renderer);
 				renderer.drawRadar(radarPos, coloursRadar);
+				
 				renderer.useFramebuffer(NO_VALUE);    //Reset to default fbo
 			}
 			//renderer.drawRadar(state.setupRadarSeeingOnlyGoldenBuggy(0));

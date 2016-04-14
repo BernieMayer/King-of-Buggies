@@ -16,6 +16,7 @@
 #include "VehicleWallCollisionEvent.h"
 #include "GoldenBuggySwitchEvent.h"
 #include "VehicleBombCollisionEvent.h"
+#include "RespawnEvent.h"
 #include "BombCreationEvent.h"
 #include "Definitions.h"
 
