@@ -294,7 +294,7 @@ void GameState::checkRespawns()
 			if (coins[i].getCountdown() < 0) {
 				// reset coin to original spawn location
 				vec3 newPos = pos;
-				newPos.y = pos.y + 20;
+				newPos.y = pos.y + RESPAWN_HEIGHT;
 				coins[i].setPos(newPos);
 				coins[i].setCollided(false);
 			}
@@ -310,7 +310,7 @@ void GameState::checkRespawns()
 			if (boxes[i].getCountdown() < 0) {
 				// reset boxes to original spawn location
 				vec3 newPos = pos;
-				newPos.y = pos.y + 20;
+				newPos.y = pos.y + RESPAWN_HEIGHT;
 				boxes[i].setPos(newPos);
 				boxes[i].setCollided(false);
 			}
@@ -426,7 +426,7 @@ bool GameState::checkCoinCollision(vec3 playerPos) {
 			//change coin to spawn below level if it is hit by a player
 			if ((abs(difference.x) < 1.4) && (abs(difference.y) < 1.4) && (abs(difference.z) < 1.4)) {
 				vec3 newPos = pos;
-				newPos.y = pos.y - 20;
+				newPos.y = pos.y - RESPAWN_HEIGHT;
 				coins[i].setPos(newPos);
 				coins[i].setCollided(true);
 				coins[i].startCountdown();

@@ -17,6 +17,7 @@
 #include "GoldenBuggySwitchEvent.h"
 #include "VehicleBombCollisionEvent.h"
 #include "BombCreationEvent.h"
+#include "Definitions.h"
 
 const unsigned int NUM_PLAYERS = 4;
 const unsigned int NUM_POWERUPS = 5;
