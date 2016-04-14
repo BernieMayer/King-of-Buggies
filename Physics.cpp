@@ -737,11 +737,11 @@ void Physics::handleInput(Input* input, unsigned int id){
 
 	if (lastState != NULL) {
 		if (lastState->getPlayer(id)->getPos().y <= -30.0f) {
+			lastState->pushEvent(new RespawnEvent(id, lastState->getStartCoord(id), lastState->getPlayer(id)->getPos()));
+
 			vehicle->getRigidDynamicActor()->setGlobalPose(PxTransform(getPxVec3(lastState->getStartCoord(id))));
 			vehicle->getRigidDynamicActor()->clearForce(PxForceMode::eACCELERATION);
 			vehicle->getRigidDynamicActor()->clearTorque(PxForceMode::eACCELERATION);
-
-			lastState->pushEvent(new RespawnEvent(id, lastState->getStartCoord(id)));
 		}
 	}
 

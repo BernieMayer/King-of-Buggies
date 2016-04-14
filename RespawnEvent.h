@@ -12,10 +12,11 @@ class RespawnEvent :
 public:
 	int playerNum;
 	vec3 respawnLocation;
+	vec3 oldLocation;
 
 	unsigned int getType() { return RESPAWN_EVENT; }
 
-	RespawnEvent(int pNum, vec3 pos);
+	RespawnEvent(int pNum, vec3 nPos, vec3 oPos);
 	~RespawnEvent();
 };
 
