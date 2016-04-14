@@ -137,7 +137,7 @@ vector<vec2> GameState::setupRadar(int playerId)
 	vectors.push_back(playerLeft);
 	vectors.push_back(playerUp);
 	vectors.push_back(playerRight);
-	int radarSize = 75;
+	int radarSize = 125;
 	for (unsigned int i = 0; i < numberOfPlayers(); i++)
 	{
 	
