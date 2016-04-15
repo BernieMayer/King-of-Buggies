@@ -1313,6 +1313,8 @@ void GameManager::gameLoop()
 		{
 			paused = !paused;
 			displayPauseMenu();
+			if (paused)
+				pauseStartTime = clock.getCurrentTime();
 		}
 
 		if (inputs[0].debug && !firstFrame)
@@ -2242,6 +2244,8 @@ void GameManager::partialTeardown() {
 // SECRET
 void GameManager::woof()
 {
+	MeshObject* secretMesh = meshInfo.getMeshPointer(SOMETHING);
+
 	for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
 	{
 		unsigned int texID = state.getPlayer(i)->getTextureID();
@@ -2249,21 +2253,19 @@ void GameManager::woof()
 		unsigned int newID = renderer.generateObjectID();
 		VehicleTraits traits = VehicleTraits(physics.getMaterial());
 
-		MeshObject* playerMesh = meshInfo.getMeshPointer(SOMETHING);
-		renderer.assignMeshObject(newID, playerMesh);
+		renderer.assignMeshObject(newID, secretMesh);
 		renderer.assignMaterial(newID, &tsMat);
 		renderer.setShadowBehaviour(newID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
 		renderer.assignTexture(newID, texID);
 
 		state.getPlayer(i)->setRenderID(newID);
 
-		MeshObject* wheelMesh = meshInfo.getMeshPointer(SOMETHING);
 		for (unsigned int j = 0; j < 4; j++)
 		{
 			renderer.deleteDrawableObject(state.getPlayer(i)->getWheelRenderID(j));
 
 			unsigned int newWheelID = renderer.generateObjectID();
-			renderer.assignMeshObject(newWheelID, wheelMesh);
+			renderer.assignMeshObject(newWheelID, secretMesh);
 			renderer.assignMaterial(newWheelID, &matteMat);
 			renderer.assignScale(newWheelID,
 				scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
@@ -2272,6 +2274,33 @@ void GameManager::woof()
 
 			state.getPlayer(i)->setWheelRenderID(j, newWheelID);
 		}
+	}
+	for (unsigned int i = 0; i < state.numberOfCoins(); i++)
+	{
+		renderer.deleteDrawableObject(state.getCoin(i)->getRenderID());
+
+		unsigned int newCoin = renderer.generateObjectID();
+
+		renderer.assignMeshObject(newCoin, secretMesh);
+		renderer.assignMaterial(newCoin, &tsMat);
+		renderer.assignColor(newCoin, vec3(1.f, 1.f, 0.f));
+		renderer.setShadowBehaviour(newCoin, SHADOW_BEHAVIOUR::CAST);
+
+		state.getCoin(i)->setRenderID(newCoin);
+	}
+
+	for (unsigned int i = 0; i < state.numberOfPowerupBoxes(); i++)
+	{
+		renderer.deleteDrawableObject(state.getPowerupBox(i)->getRenderID());
+
+		unsigned int newBox = renderer.generateObjectID();
+
+		renderer.assignMeshObject(newBox, secretMesh);
+		renderer.assignMaterial(newBox, &tsMat);
+		renderer.assignColor(newBox, vec3(0.f, 0.f, 0.f));
+		renderer.setShadowBehaviour(newBox, SHADOW_BEHAVIOUR::CAST);
+
+		state.getPowerupBox(i)->setRenderID(newBox);
 	}
 }
 
