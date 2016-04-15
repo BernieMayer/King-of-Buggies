@@ -34,6 +34,7 @@ public:
 	void playMineCreationSound(vec3 pos) { playSound("MinePlace.wav", pos, 1.0f); }
 	void playNitroSound(vec3 pos) { playSound("Nitro.wav", pos, 1.0f); }
 	void playPowerupSound(vec3 pos) { playSound("GetPowerup.wav", pos, 1.0); }
+	void playSecretSound(vec3 pos) { playSound("AlsoSecret.wav", pos, 1.0); }
 
 	void pauseAllSounds();
 	void resumeAllSounds();

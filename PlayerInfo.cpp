@@ -103,6 +103,12 @@ unsigned int PlayerInfo::getWheelRenderID(unsigned int wheelNum)
 		return 100000;
 }
 
+void PlayerInfo::setWheelRenderID(unsigned int wheelNum, unsigned int ID)
+{
+	if (wheelNum < 4)
+		wheelRenderIDs[wheelNum] = ID;
+}
+
 mat4 PlayerInfo::getWheelTransform(unsigned int wheelNum)
 {
 	if (wheelNum < 4)

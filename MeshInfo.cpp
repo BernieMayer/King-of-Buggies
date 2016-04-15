@@ -93,6 +93,12 @@ MeshInfo::MeshInfo() {
 
 	meshLoader.clearData();
 
+	meshLoader.loadModel("models\\something.obj");
+	MeshObject secretObject = MeshObject(meshLoader.vertices, meshLoader.normals, meshLoader.uvs, meshLoader.indices);
+	meshes.push_back(secretObject);
+
+	meshLoader.clearData();
+
 	// load buggy textures
 	redBuggyTexID = LoadTexture("textures\\redbuggytexture.png");
 	greenBuggyTexID = LoadTexture("textures\\greenbuggytexture.png");

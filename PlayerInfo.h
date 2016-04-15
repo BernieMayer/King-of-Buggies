@@ -21,6 +21,7 @@ public:
 	void incrementScore(float timeSinceLastScoreUpdate, float pausedTime);
 
 	unsigned int getWheelRenderID(unsigned int wheelNum);
+	void setWheelRenderID(unsigned int wheelNum, unsigned int ID);
 	mat4 getWheelTransform(unsigned int wheelNum);
 	void setWheelTransform(unsigned int wheelNum, const mat4& transform);
 	void setTransform(const mat4& transform, float time);

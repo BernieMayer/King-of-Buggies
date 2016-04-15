@@ -149,6 +149,8 @@ private:
 	timeb buggyInputLockTime = clock.getCurrentTime();
 	float buggyInputLockEnd = 7.0f;
 
+	void woof();
+
 public:
 	GameManager(GLFWwindow* newWindow);
 

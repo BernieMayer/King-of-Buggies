@@ -1276,6 +1276,11 @@ void GameManager::gameLoop()
 					applyPowerupEffect(i);
 				}
 			}
+			if (inputs[i].konamiCode)
+			{
+				sound.playSecretSound(state.getPlayer(i)->getPos());
+				woof();
+			}
 		}
 
 		//Wait until end of frame
@@ -2232,6 +2237,42 @@ void GameManager::partialTeardown() {
 	ai.clear();
 	_interface.clear();
 	sound.deleteAll();
+}
+
+// SECRET
+void GameManager::woof()
+{
+	for (unsigned int i = 0; i < state.numberOfPlayers(); i++)
+	{
+		unsigned int texID = state.getPlayer(i)->getTextureID();
+		renderer.deleteDrawableObject(state.getPlayer(i)->getRenderID());
+		unsigned int newID = renderer.generateObjectID();
+		VehicleTraits traits = VehicleTraits(physics.getMaterial());
+
+		MeshObject* playerMesh = meshInfo.getMeshPointer(SOMETHING);
+		renderer.assignMeshObject(newID, playerMesh);
+		renderer.assignMaterial(newID, &tsMat);
+		renderer.setShadowBehaviour(newID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
+		renderer.assignTexture(newID, texID);
+
+		state.getPlayer(i)->setRenderID(newID);
+
+		MeshObject* wheelMesh = meshInfo.getMeshPointer(SOMETHING);
+		for (unsigned int j = 0; j < 4; j++)
+		{
+			renderer.deleteDrawableObject(state.getPlayer(i)->getWheelRenderID(j));
+
+			unsigned int newWheelID = renderer.generateObjectID();
+			renderer.assignMeshObject(newWheelID, wheelMesh);
+			renderer.assignMaterial(newWheelID, &matteMat);
+			renderer.assignScale(newWheelID,
+				scaleMatrix(vec3(traits.wheelWidth, traits.wheelRadius, traits.wheelRadius)));
+			renderer.assignColor(newWheelID, vec3(0.2f, 0.2f, 0.2f));
+			renderer.setShadowBehaviour(newWheelID, SHADOW_BEHAVIOUR::CAST | SHADOW_BEHAVIOUR::RECEIVE);
+
+			state.getPlayer(i)->setWheelRenderID(j, newWheelID);
+		}
+	}
 }
 
 #endif // GAMEMANAGER_CPP
