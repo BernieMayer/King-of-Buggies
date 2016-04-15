@@ -221,8 +221,10 @@ Input InputSmoother::smooth(Input in, bool inAir) {
 	if (konamiLock) {
 		if (timer.getTimeSince(konamiTime) >= konamiCounterMax) {
 			konamiLock = false;
+			cout << "Lock off\n";
 		}
 	}
+
 
 	if (!konamiLock) {
 		out.konamiCode = checkKonamiCode();

@@ -342,7 +342,12 @@ void SoundManager::updateEngineSounds(GameState state, Input inputs[]) {
 
 			if (inputs[i].horn) {
 				if (!honking[i]) {
-					loadWavToBuf("Honk.wav", &honkSources[i], &honkBuffers[i]);
+					if (!dogmode) {
+						loadWavToBuf("Honk.wav", &honkSources[i], &honkBuffers[i]);
+					}
+					else {
+						loadWavToBuf("Dogmode.wav", &honkSources[i], &honkBuffers[i]);
+					}
 
 					PlayerInfo* player = state.getPlayer(i);
 
@@ -795,6 +800,8 @@ void SoundManager::resumeAllSounds() {
  */
 void SoundManager::deleteAll() {
 	if (initSuccess) {
+		dogmode = false;
+
 		for (int i = 0; i < oneTimeUseSources.size(); i++) {
 			alDeleteSources(1, &oneTimeUseSources[i]);
 			oneTimeUseSources.erase(oneTimeUseSources.begin());
@@ -897,6 +904,8 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 		bool allHonking = true;
 		for (int i = 0; i < inputs.size(); i++) {
 			if (inputs[i].konamiCode) {
+				dogmode = true;
+
 				alDeleteBuffers(1, &musicBuffer);
 				alDeleteSources(1, &musicSource);
 				playSecretMusic(state);
@@ -908,7 +917,7 @@ void SoundManager::updateSounds(GameState state, vector<Input> inputs) {
 			}
 		}
 
-		if (allHonking) {
+		if (allHonking && !secretPlaying) {
 			alDeleteBuffers(1, &musicBuffer);
 			alDeleteSources(1, &musicSource);
 			playSong(state, "Dogsongs.wav", false);
