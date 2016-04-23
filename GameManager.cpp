@@ -929,6 +929,7 @@ void GameManager::handlePowerupBoxCollisionEvent(Event* e)
 		sound.playPowerupSound(state.getPlayer(vehicleId)->getPos());
 
 		if (state.getPlayer(vehicleId)->getCurrentPowerup() < 0) {
+
 			hasPowerup[vehicleId] = true;
 			int powerUpType = randomPowerup();
 			//if (!state.getPlayer(vehicleId)->isGoldenBuggy() && powerUpType == POWERUPS::DECOY)
@@ -1114,7 +1115,7 @@ void GameManager::gameLoop()
 		ai.nav.loadNavMesh("islandLevelNavMesh.obj");
 		break;
 	case 3:
-		ai.nav.loadNavMesh("courtyardNavMesh.obj");	//Change
+		ai.nav.loadNavMesh("courtyardNavMesh.obj");	
 		break;
 	}
 
@@ -1554,10 +1555,17 @@ void GameManager::applyPowerupEffect(int playerNum)
 			state.getPlayer(playerNum)->decrementBombs();
 			if (state.getPlayer(playerNum)->getNumBombs() <= 0) {
 				_interface.toggleActive(powerupComponentIDs[playerNum], false);
+				state.getPlayer(playerNum)->removePowerup();
 				hasPowerup.at(playerNum) = false;
 			}
+			else
+			{
+				state.getPlayer(playerNum)->addPowerUp(POWERUPS::BOMB);
+			}
 		}
-		state.getPlayer(playerNum)->addPowerUp(POWERUPS::BOMB);
+
+		if (state.getPlayer(playerNum)->getNumBombs() > 0)
+			state.getPlayer(playerNum)->addPowerUp(POWERUPS::BOMB);
 	}
 	else if (powerUpId == POWERUPS::MINE)
 	{
