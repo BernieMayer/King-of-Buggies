@@ -521,8 +521,8 @@ void Renderer::splitScreenViewports(unsigned int numViewports)
 		addViewport(0.f, 0.f, 1.f, 1.f);
 		break;
 	case 2:
-		addViewport(0.f, 0.5f, 1.f, 0.5f);
-		addViewport(0.f, 0.f, 1.f, 0.5f);
+		addViewport(0.f, 0.f, 0.5f, 1.f);
+		addViewport(0.5f, 0.f, 0.5f, 1.0f);
 		break;
 	case 3:
 		addViewport(0.f, 0.5f, 0.5f, 0.5f);
