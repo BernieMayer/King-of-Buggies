@@ -115,13 +115,14 @@ MeshInfo::MeshInfo() {
 	goldenBuggyTexID = LoadTexture("textures\\goldenbuggytexture.png");
 
 	// load UI textures for displaying powerup information
+	UIbombIDs.push_back(LoadTexture("textures\\hud\\bomb1.png"));
+	UIbombIDs.push_back(LoadTexture("textures\\hud\\bomb2.png"));
+	UIbombIDs.push_back(LoadTexture("textures\\hud\\bomb3.png"));
 
 	UInitroID = LoadTexture("textures\\hud\\nitro.png");
-	UIbombID = LoadTexture("textures\\hud\\bomb.png");
 	UImineID = LoadTexture("textures\\hud\\mine.png");
 
 	UIcomponentIDs.push_back(UInitroID);
-	UIcomponentIDs.push_back(UIbombID);
 	UIcomponentIDs.push_back(UImineID);
 
 	coinComponentIDs.push_back(LoadTexture("textures\\hud\\0.png"));

@@ -30,7 +30,7 @@ public:
 	unsigned int getGoldenBuggyTexID() { return goldenBuggyTexID; }
 
 	unsigned int getUInitroID() { return UInitroID; }
-	unsigned int getUIbombID() { return UIbombID; }
+	unsigned int getUIbombID(unsigned int id) { return UIbombIDs[id]; }
 	unsigned int getUImineID() { return UImineID; }
 
 	unsigned int getUIcomponentID(unsigned int itemType);
@@ -68,7 +68,7 @@ private:
 	vector<unsigned int> buggyTexIDs;
 
 	unsigned int UInitroID;
-	unsigned int UIbombID;
+	vector<unsigned int> UIbombIDs;
 	unsigned int UImineID;
 
 	vector<unsigned int> UIcomponentIDs;

@@ -38,7 +38,7 @@ GLFWwindow* initializeWindow()
 	GLFWwindow* window;
 
 	//Create a window and create its OpenGL context  
-	window = glfwCreateWindow(640, 480, "King of Buggies", NULL, NULL);
+	window = glfwCreateWindow(936, 702, "King of Buggies", NULL, NULL);
 
 	//If the window couldn't be created  
 	if (!window)
@@ -74,7 +74,7 @@ int main() {
 	GLFWwindow* window = initializeWindow();
 	if (window == NULL)
 		return -1;
-	glfwSetWindowPos(window, 500, 500);    
+	glfwSetWindowPos(window, 300, 300);    
 	GameManager manager(window);
 
 	// Enter main game loop

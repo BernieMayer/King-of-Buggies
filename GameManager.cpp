@@ -946,8 +946,14 @@ void GameManager::handlePowerupBoxCollisionEvent(Event* e)
 			// display powerup information in HUD
 			if (vehicleId < numScreens)
 			{
-				_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
-				_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+				if (powerUpType == POWERUPS::BOMB) {
+					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIbombID(MAX_BOMBS - 1), ComponentInfo::UP_TEXTURE);
+					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+				}
+				else {
+					_interface.assignTexture(powerupComponentIDs[vehicleId], meshInfo.getUIcomponentID(powerUpType), ComponentInfo::UP_TEXTURE);
+					_interface.toggleActive(powerupComponentIDs[vehicleId], true);
+				}
 			}
 		}
 	}
@@ -1561,6 +1567,7 @@ void GameManager::applyPowerupEffect(int playerNum)
 			else
 			{
 				state.getPlayer(playerNum)->addPowerUp(POWERUPS::BOMB);
+				if (playerNum < numScreens) { _interface.assignTexture(powerupComponentIDs[playerNum], meshInfo.getUIbombID(state.getPlayer(playerNum)->getNumBombs() - 1), ComponentInfo::UP_TEXTURE); }
 			}
 		}
 

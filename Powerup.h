@@ -11,7 +11,7 @@
 4 - Decoy?
 */
 struct POWERUPS{
-	enum { NITROBOOST = 0, BOMB, MINE, COIN, DECOY, COUNT };
+	enum { NITROBOOST = 0, MINE, BOMB, COIN, DECOY, COUNT };
 };
 
 class Powerup : public Entity {
