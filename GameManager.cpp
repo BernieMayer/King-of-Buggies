@@ -1318,10 +1318,13 @@ void GameManager::gameLoop()
 
 		if (inputs[0].menu && !firstFrame)
 		{
-			paused = !paused;
-			displayPauseMenu();
+			paused = !paused; 
+			
 			if (paused)
+			{
 				pauseStartTime = clock.getCurrentTime();
+				displayPauseMenu();
+			}
 		}
 
 		if (inputs[0].debug && !firstFrame)
